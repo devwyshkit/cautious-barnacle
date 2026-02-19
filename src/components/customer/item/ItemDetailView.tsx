@@ -359,11 +359,11 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
 
                             {/* Non-returnable warning */}
                             <div className={cn(
-                                "grid transition-all duration-300 ease-in-out",
-                                selectedPersonalizations.length > 0 ? "grid-rows-[1fr] opacity-100 mb-2" : "grid-rows-[0fr] opacity-0"
+                                "grid transition-all duration-300 ease-in-out overflow-hidden",
+                                selectedPersonalizations.length > 0 ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
                             )}>
-                                <div className="overflow-hidden">
-                                    <div className="flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 rounded-2xl">
+                                <div className="min-h-0">
+                                    <div className="flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 rounded-2xl mb-2">
                                         <AlertTriangle className="size-4 text-[var(--primary)] shrink-0" />
                                         <p className="text-[10px] font-bold text-[var(--primary)] leading-tight uppercase tracking-wider">
                                             Important: Identity-linked items are non-returnable and non-refundable.

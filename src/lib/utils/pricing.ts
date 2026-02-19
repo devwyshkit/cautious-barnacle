@@ -15,19 +15,24 @@ export function getDeliveryFeeByDistance(distanceKm: number | null): number {
 /**
  * Calculates total price for a single line item including variants and addons.
  * Wyshkit 2026: Inclusive GST Model. Price displayed = Price inclusive of GST.
+ * 
+ * Swiggy 2026: Single Logic Path
+ * This must match the Postgres RPC `calculate_order_total` exactly.
  */
-export function calculateItemPrice(item: DraftLineItem): number {
-    const unitPrice = Number(item.unitPrice) || 0;
+export function calculateItemPrice(item: any): number {
+    // 1. Resolve Base/Variant Price
+    // Handle both DraftLineItem (unitPrice) and HydratedDraftItem (basePrice/variantPrice)
+    const basePrice = Number(item.variantPrice ?? item.basePrice ?? item.unitPrice) || 0;
     const quantity = Number(item.quantity) || 1;
 
-    // WYSHKIT 2026: Include addons in item level total
-    const addonsTotal = (item.selectedAddons || []).reduce((sum, addon) => sum + (Number(addon.price) || 0), 0);
+    // 2. Addons Sum
+    const addonsTotal = (item.selectedAddons || []).reduce((sum: number, addon: any) => sum + (Number(addon.price) || 0), 0);
 
-    // WYSHKIT 2026: Dynamic personalization fee calculation
-    // Prefer passed personalizationPrice if hydrated, otherwise fallback to item personalization price
-    const personalizationFee = item.personalizationPrice ?? (item.personalization?.enabled ? (Number(item.personalization.price) || 0) : 0);
+    // 3. Personalization Fee
+    // RPC currently uses 50 as standard if enabled, unless overridden by personalizationPrice
+    const personalizationFee = item.personalizationPrice ?? (item.personalization?.enabled ? (Number(item.personalization.price) || 50) : 0);
 
-    return (unitPrice + addonsTotal + personalizationFee) * quantity;
+    return (basePrice + addonsTotal + personalizationFee) * quantity;
 }
 
 /**

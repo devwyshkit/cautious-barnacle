@@ -656,8 +656,7 @@ export async function getGuestCartDetails(payload: Array<{ itemId: string; quant
       const addonsPrice = (selectedAddons).reduce((sum, addon) => sum + (Number(addon.price) || 0), 0);
       const personalizationPrice = (p.personalization?.price || 0);
 
-      // Unit Price for UI (Base + Addons + (Pers / Qty))
-      // Consistent with getCart and getTransactionData
+      // Unit Price for UI (Base + Addons)
       const unitPrice = basePrice + addonsPrice;
 
       return {
@@ -667,7 +666,7 @@ export async function getGuestCartDetails(payload: Array<{ itemId: string; quant
         itemImage: item.image,
         quantity: p.quantity,
         unitPrice: unitPrice,
-        totalPrice: (unitPrice + addonsPrice + personalizationPrice) * p.quantity,
+        totalPrice: (unitPrice + personalizationPrice) * p.quantity,
         selectedVariantId: p.variantId ?? null,
         personalization: p.personalization,
         selectedAddons: selectedAddons,

@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
-import { formatCurrency } from '@/lib/utils/pricing';
+import { formatCurrency, calculateItemPrice } from '@/lib/utils/pricing';
 
 const FALLBACK_IMAGE = '/images/logo.png';
 
@@ -48,8 +48,8 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
 
       <div className="space-y-1.5">
         {items.map((item) => {
-          const unitPrice = item.basePrice + item.variantPrice + item.personalizationPrice;
-          const totalPrice = unitPrice * item.quantity;
+          const totalPrice = calculateItemPrice(item);
+          const unitPrice = totalPrice / item.quantity;
 
           return (
             <div key={`${item.itemId}-${item.variantId}`} className="flex gap-2.5 p-2 bg-zinc-50/50 rounded-lg">
