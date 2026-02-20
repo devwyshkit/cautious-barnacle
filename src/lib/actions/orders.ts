@@ -422,12 +422,12 @@ export async function createOrder(payload: PlaceOrderPayload) {
 
     // WYSHKIT 2026: Standardize to snake_case for DB consistency
     const standardizedItems = payload.items.map(item => ({
-      item_id: item.itemId,
-      variant_id: item.variantId,
+      itemId: item.itemId,
+      variantId: item.variantId,
       quantity: item.quantity,
-      has_personalization: item.hasPersonalization,
+      hasPersonalization: item.hasPersonalization,
       personalization: item.personalization,
-      selected_addons: item.selectedAddons
+      selectedAddons: item.selectedAddons
     }));
 
     // WYSHKIT 2026: Atomic execution (Single Source of Truth)

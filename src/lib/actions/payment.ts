@@ -102,12 +102,12 @@ export async function createPaymentOrder(
         // 2. FETCH PRICING FROM DB RPC
         const { data: pricingData, error: pricingError } = await (supabase as any).rpc('calculate_order_total', {
             p_cart_items: payload.draftItems.map((item: any) => ({
-                item_id: item.itemId,
+                itemId: item.itemId,
                 quantity: item.quantity,
-                variant_id: item.selectedVariantId ?? item.variantId ?? null,
-                personalization_option_id: item.personalization?.option_id || null,
-                has_personalization: hasAnyPersonalization([item]),
-                selected_addons: item.selectedAddons || []
+                variantId: item.selectedVariantId ?? item.variantId ?? null,
+                personalization_option_id: item.personalization?.option_id || null, // Keep if RPC expects it, but we also have hasPersonalization
+                hasPersonalization: hasAnyPersonalization([item]),
+                selectedAddons: item.selectedAddons || []
             })),
             p_delivery_fee_override: deliveryFee,
             p_address_id: payload.addressId,
