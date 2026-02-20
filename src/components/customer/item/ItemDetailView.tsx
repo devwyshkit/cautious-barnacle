@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Plus, Minus, Star, Check, Loader2, PlayCircle, Clock, ShieldCheck, Info, AlertTriangle, Sparkles, IndianRupee } from 'lucide-react';
 import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 import { useCart } from '@/components/customer/CartProvider';
-// import { UpsellGrid } from '@/components/features/UpsellGrid';
+
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { formatCurrency } from '@/lib/utils/pricing';
 
@@ -386,14 +386,14 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                             className={cn(
                                                 "w-full flex items-center justify-between p-5 rounded-[24px] border-2 transition-all text-left",
                                                 isSelected
-                                                    ? "bg-[#D91B24]/5 border-[#D91B24] text-[#D91B24]"
+                                                    ? "bg-[var(--primary)]/5 border-[var(--primary)] text-[var(--primary)]"
                                                     : "bg-white border-zinc-100 text-zinc-600 hover:border-zinc-200"
                                             )}
                                         >
                                             <div className="flex gap-4">
                                                 <div className={cn(
                                                     "size-6 rounded-lg border-2 flex items-center justify-center transition-all shrink-0",
-                                                    isSelected ? "bg-[#D91B24] border-[#D91B24]" : "border-zinc-200"
+                                                    isSelected ? "bg-[var(--primary)] border-[var(--primary)]" : "border-zinc-200"
                                                 )}>
                                                     {isSelected && <Check className="size-3.5 text-white stroke-[4]" />}
                                                 </div>
@@ -521,7 +521,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                         </section>
                     )}
 
-                    {/* Redundant UpsellGrid removed for Swiggy 2026 Purification */}
+
 
                     {/* Buffer for footer */}
                     <div className="h-10" />

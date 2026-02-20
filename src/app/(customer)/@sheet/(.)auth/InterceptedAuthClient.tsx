@@ -68,12 +68,21 @@ function AuthContent({ onClose }: { onClose: () => void }) {
             hideHeader
             hideBack
             onComplete={() => {
-                // WYSHKIT 2026: Explicitly close sheet via callback before redirecting
+                // WYSHKIT 2026: Elite Clean Handoff
+                // 1. Close the sheet state immediately
                 onClose();
-                setTimeout(() => {
-                    router.push(returnUrl);
-                    router.refresh();
-                }, 300);
+
+                // 2. Perform one authoritative navigation
+                // If we are already on the returnUrl (intercepted), router.back() in onClose is enough.
+                // If we need to go elsewhere, we use router.replace.
+                const currentPath = window.location.pathname;
+                const targetPath = returnUrl.split('?')[0];
+
+                if (currentPath !== targetPath && targetPath !== '/auth') {
+                    router.replace(returnUrl);
+                }
+
+                router.refresh();
             }}
         />
     );

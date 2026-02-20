@@ -157,7 +157,8 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
     );
   }
 
-  const showIdentityForm = !isIdentitySubmittedOptimistic && (showSuccess || proactivePersonalizationOpen) && personalizedItemsPending.length > 0;
+  // WYSHKIT 2026: Simplified visibility logic for the identity overlay
+  const showIdentityForm = !isIdentitySubmittedOptimistic && proactivePersonalizationOpen && personalizedItemsPending.length > 0;
 
   return (
     <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker" showHomeButton>

@@ -53,6 +53,26 @@ export function IdentityForm({
     const [isOptimisticSuccess, setIsOptimisticSuccess] = useState(false);
     const [uploadingItems, setUploadingItems] = useState<Record<string, number>>({});
 
+    // WYSHKIT 2026: Momentum Persistence
+    // Load draft details on mount
+    React.useEffect(() => {
+        const saved = localStorage.getItem(`wyshkit_draft_${orderId}`);
+        if (saved) {
+            try {
+                setFormData(JSON.parse(saved));
+            } catch (e) {
+                logger.error('Failed to parse saved draft', e as Error);
+            }
+        }
+    }, [orderId]);
+
+    // Save draft details on change
+    React.useEffect(() => {
+        if (Object.keys(formData).length > 0) {
+            localStorage.setItem(`wyshkit_draft_${orderId}`, JSON.stringify(formData));
+        }
+    }, [formData, orderId]);
+
     const personalizedItems = items;
     const allOptional = isAllOptional(personalizedItems);
 
@@ -192,6 +212,8 @@ export function IdentityForm({
             const result = await submitOrderPersonalization(orderId, personalizationData);
             if (result.success) {
                 triggerHaptic(HapticPattern.SUCCESS);
+                // WYSHKIT 2026: Clear draft on success
+                localStorage.removeItem(`wyshkit_draft_${orderId}`);
                 onSubmitted();
             } else {
                 toast.error(result.error || "Failed to submit details");
@@ -301,7 +323,7 @@ export function IdentityForm({
                         instructions: "Our partner will use these details for your preview."
                     } : {
                         ...(legacyConfig as any),
-                        allow_text: (legacyConfig as any).allow_text ?? ((legacyConfig as any).type === 'text' || !!(legacyConfig as any).prompt),
+                        allow_text: (legacyConfig as any).allow_text ?? true,
                         text_label: (legacyConfig as any).text_label || (legacyConfig as any).prompt || 'details',
                         text_required: (legacyConfig as any).text_required ?? true
                     };

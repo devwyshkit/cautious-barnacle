@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PhoneInput } from "@/components/auth/PhoneInput";
 import { OTPInput } from "@/components/auth/OTPInput";
 import { useAuth } from "@/hooks/useAuth";
+import { verifyOTPServerAction } from "@/lib/actions/auth";
 import { ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/Logo";
@@ -86,16 +87,18 @@ export function AuthPageClient({
 
     try {
       triggerHaptic(HapticPattern.SUCCESS);
-      const result = await verifyOTP(phone, otpValue);
+      const result = await verifyOTPServerAction(phone, otpValue, returnUrl);
 
       if (result.success) {
-        // WYSHKIT 2026: Ensure session is propagated before redirect
         // WYSHKIT 2026: Ensure session is propagated before redirect
         setLoading(false);
 
         // WYSHKIT 2026: Intent-Based Navigation
         if (onComplete) {
           onComplete();
+        } else if (result.redirectPath) {
+          router.push(result.redirectPath);
+          router.refresh();
         } else {
           router.push(returnUrl);
           router.refresh();
