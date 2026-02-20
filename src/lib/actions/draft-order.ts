@@ -340,32 +340,18 @@ export async function addToCart(payload: {
       return ciKey === personalizationKey && ciAddonsKey === addonsKey
     })
 
-    // 1. Stock Check (Zero Reinvention)
-    const targetIdForStock = normalizedVariantId || itemId;
-    const { data: stockData, error: stockError } = await supabase
-      .from(variantId ? 'variants' : 'items')
-      .select('stock_quantity')
-      .eq('id', targetIdForStock)
-      .single();
+    // 1. Stock Check (Unified Authority - Zero Reinvention)
+    const { data: availableStock, error: stockError } = await (supabase as any).rpc('get_available_stock', {
+      p_item_id: !variantId ? itemId : null,
+      p_variant_id: variantId || null,
+      p_exclude_user_id: user?.id || null,
+      p_exclude_session_id: sessionId || null
+    });
 
-    if (stockError || !stockData) {
+    if (stockError) {
+      logger.error('Stock verification failed', stockError);
       return { error: 'Stock information unavailable', code: 'STOCK_ERROR' };
     }
-
-    // Get active reservations for this item/variant (excluding current user's cart if any)
-    let reservationQuery = supabase
-      .from('cart_reservations')
-      .select('*', { count: 'exact', head: true })
-      .eq(variantId ? 'variant_id' : 'item_id', targetIdForStock)
-      .gt('expires_at', new Date().toISOString());
-
-    if (duplicateItem) {
-      reservationQuery = reservationQuery.neq('cart_item_id', duplicateItem.id);
-    }
-
-    const { count: reservedCount } = await reservationQuery;
-
-    const availableStock = (stockData.stock_quantity || 0) - (reservedCount || 0);
 
     const isAvailable = (Number(availableStock) || 0) >= quantity;
 
@@ -387,7 +373,7 @@ export async function addToCart(payload: {
         if (vData?.name) displayName += ` (${vData.name})`;
       }
 
-      return { error: `Insufficient stock for "${displayName}". Only ${Math.max(0, availableStock)} available.`, code: 'OUT_OF_STOCK' };
+      return { error: `Insufficient stock for "${displayName}". Only ${Math.max(0, Number(availableStock))} available.`, code: 'OUT_OF_STOCK' };
     }
 
     // 2. Partner Mismatch Check (Swiggy 2026: Single Partner Enforcement)
@@ -505,22 +491,19 @@ export async function updateCartItemQuantity(cartItemId: string, quantity: numbe
 
     if (cappedQty > currentItem.quantity) {
       const qtyNeeded = cappedQty - currentItem.quantity;
-      // Direct Stock Check (Zero Reinvention)
-      const { data: stockData } = await supabase
-        .from(currentItem.selected_variant_id ? 'variants' : 'items')
-        .select('stock_quantity')
-        .eq('id', currentItem.selected_variant_id || currentItem.item_id)
-        .single();
 
-      const { count: reservedCount } = await supabase
-        .from('cart_reservations')
-        .select('*', { count: 'exact', head: true })
-        .eq(currentItem.selected_variant_id ? 'variant_id' : 'item_id', currentItem.selected_variant_id || currentItem.item_id)
-        .neq('cart_item_id', cartItemId)
-        .gt('expires_at', new Date().toISOString());
+      // Unified Stock Check (Zero Reinvention)
+      const { data: availableStock, error: stockError } = await (supabase as any).rpc('get_available_stock', {
+        p_item_id: !currentItem.selected_variant_id ? currentItem.item_id : null,
+        p_variant_id: currentItem.selected_variant_id || null,
+        p_exclude_user_id: user?.id || null,
+        p_exclude_session_id: sessionId || null
+      });
 
-      const availableStock = (stockData?.stock_quantity || 0) - (reservedCount || 0);
-
+      if (stockError) {
+        logger.error('Stock check failed', stockError);
+        return { error: 'Stock check failed' };
+      }
 
       if ((Number(availableStock) || 0) < qtyNeeded) {
         // Enrich error message
