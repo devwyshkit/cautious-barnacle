@@ -30,7 +30,14 @@ interface CartContextType {
         personalization: SelectedPersonalization,
         selectedAddons?: any[],
         quantity?: number,
-        optimisticData?: { itemName?: string; itemImage?: string; unitPrice?: number; partnerId?: string; partnerName?: string }
+        optimisticData?: {
+            itemName?: string;
+            itemImage?: string;
+            unitPrice?: number;
+            partnerId?: string;
+            partnerName?: string;
+            updateItemId?: string;
+        }
     ) => Promise<any>;
     removeFromDraftOrder: (itemId: string, variantId?: string | null) => Promise<void>;
     updateQuantity: (itemId: string, variantId: string | null, quantity: number) => Promise<void>;

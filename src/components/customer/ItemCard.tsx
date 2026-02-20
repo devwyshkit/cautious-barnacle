@@ -136,7 +136,7 @@ export function ItemCard({
         <div className="absolute top-2 left-2 flex flex-col gap-1 items-start max-w-[calc(100%-4rem)]">
           {item.is_promoted && (
             <div className="bg-white/70 backdrop-blur-md px-1.5 py-0.5 rounded-md shadow-sm border border-white/20">
-              <span className="text-[9px] font-bold text-amber-600">Featured</span>
+              <span className="text-[11px] font-bold text-amber-600">Featured</span>
             </div>
           )}
           {rating && rating >= 4.0 && (
@@ -150,8 +150,8 @@ export function ItemCard({
         {isPersonalizable && (
           <div className="absolute bottom-2 left-2 max-w-[calc(100%-4rem)] animate-in slide-in-from-left-2 duration-500">
             <div className="bg-[var(--primary)]/10 backdrop-blur-md px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm border border-[var(--primary)]/20">
-              <Sparkles className="size-2.5 text-[var(--primary)]" />
-              <span className="text-[9px] font-black text-[var(--primary)] uppercase tracking-tighter">Identity Enabled</span>
+              <Sparkles className="size-3 text-[var(--primary)]" />
+              <span className="text-[11px] font-black text-[var(--primary)] uppercase tracking-tighter">Identity Enabled</span>
             </div>
           </div>
         )}
@@ -180,18 +180,18 @@ export function ItemCard({
           {name}
         </h3>
         <div className="flex items-center gap-1.5 mt-1">
-          <p className="text-[10px] font-black text-[var(--primary)] uppercase tracking-tight truncate leading-none">
+          <p className="text-[11px] font-black text-[var(--primary)] uppercase tracking-tight truncate leading-none">
             {partnerName || 'Local store'}
           </p>
           <div className="size-1 rounded-full bg-zinc-200" />
-          <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">View Store</span>
+          <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-tighter">View Store</span>
         </div>
 
         {deliverySignal && (
           <div className="flex items-center gap-1 mt-1">
             {deliverySignal.icon}
             <span className={cn(
-              "text-[10px] font-bold",
+              "text-[11px] font-bold",
               deliverySignal.type === 'fast' ? "text-[var(--primary)]" : "text-emerald-600"
             )}>
               {deliverySignal.text}
@@ -203,7 +203,7 @@ export function ItemCard({
           <div className="flex items-center gap-1 mt-1">
             <Flame className={cn("size-3", urgencySignal.type === 'scarcity' ? "text-amber-500" : "text-emerald-500")} />
             <span className={cn(
-              "text-[10px] font-bold",
+              "text-[11px] font-bold",
               urgencySignal.type === 'scarcity' ? "text-amber-600" : "text-emerald-600"
             )}>
               {urgencySignal.text}
@@ -214,7 +214,7 @@ export function ItemCard({
         {travelTime && (
           <div className="flex items-center gap-1.5 mt-1.5 px-0.5">
             <Clock className="size-3 text-zinc-500" />
-            <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">
+            <span className="text-[11px] font-black text-zinc-600 uppercase tracking-widest">
               {travelTime.min}-{travelTime.max} mins
             </span>
           </div>
@@ -224,8 +224,8 @@ export function ItemCard({
           <span className="text-sm font-black text-foreground tabular-nums tracking-tighter">{formatCurrency(displayPrice)}</span>
           {displayMrp > displayPrice && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-zinc-400 line-through font-bold">{formatCurrency(displayMrp)}</span>
-              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter bg-emerald-50 px-1.5 py-0.5 rounded-md">
+              <span className="text-[11px] text-zinc-400 line-through font-bold">{formatCurrency(displayMrp)}</span>
+              <span className="text-[11px] font-black text-emerald-600 uppercase tracking-tighter bg-emerald-50 px-1.5 py-0.5 rounded-md">
                 {Math.round(((displayMrp - displayPrice) / displayMrp) * 100)}% OFF
               </span>
             </div>
