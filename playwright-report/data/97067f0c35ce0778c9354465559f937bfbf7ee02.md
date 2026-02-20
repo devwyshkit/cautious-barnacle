@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - button "Delivery Location" [ref=e5]:
+      - img [ref=e7]
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - generic [ref=e12]: Bangalore (Dev)
+          - img [ref=e13]
+        - generic [ref=e15]: Koramangala, Bangalore
+  - generic [ref=e18]:
+    - generic [ref=e19]:
+      - button [ref=e20]:
+        - img
+      - generic [ref=e21]:
+        - img [ref=e22]
+        - textbox "Search items, stores..." [active] [ref=e25]
+    - generic [ref=e27]:
+      - img [ref=e28]
+      - paragraph [ref=e31]: Search for items or stores
+  - navigation [ref=e32]:
+    - generic [ref=e33]:
+      - button "Home" [ref=e34]:
+        - img [ref=e35]
+        - generic [ref=e38]: Home
+      - button "Search" [ref=e39]:
+        - img [ref=e40]
+        - generic [ref=e43]: Search
+      - button "Orders" [ref=e44]:
+        - img [ref=e45]
+        - generic [ref=e49]: Orders
+      - button "Account" [ref=e50]:
+        - img [ref=e51]
+        - generic [ref=e54]: Account
+  - region "Floating cart summary":
+    - generic:
+      - generic:
+        - button "00 0 items Local store ₹0" [disabled]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - img
+              - generic:
+                - generic: "00"
+            - generic:
+              - generic:
+                - generic: 0 items
+              - generic: Local store
+          - generic:
+            - generic: ₹0
+            - img
+      - generic:
+        - generic:
+          - generic: Wyshkit Secure
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e60] [cursor=pointer]:
+    - img [ref=e61]
+  - alert [ref=e66]
+```

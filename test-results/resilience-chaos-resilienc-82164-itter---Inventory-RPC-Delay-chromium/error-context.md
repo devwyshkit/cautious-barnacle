@@ -1,5 +1,6 @@
 # Page snapshot
 
 ```yaml
-- generic [ref=e2]: Internal Server Error
+- generic [active]:
+  - region "Notifications alt+T"
 ```
