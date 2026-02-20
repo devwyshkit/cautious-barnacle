@@ -17,6 +17,8 @@ import { cn } from '@/lib/utils';
 import { useEffect, useMemo } from 'react';
 import { InterceptedItemSheet } from '@/components/customer/item/InterceptedItemSheet';
 import { formatPrepTime } from '@/lib/utils/sla-format';
+import { useCartValidation } from '@/hooks/useCartValidation';
+import { AlertCircle } from 'lucide-react';
 
 const FALLBACK_IMAGE = '/images/logo.png';
 
@@ -42,6 +44,9 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
       (typeof item.stock_quantity !== 'number' || item.stock_quantity > 0)
     );
   }, [initialItems]);
+
+  // WYSHKIT 2026: Proactive Cart Validation
+  const { isMismatch } = useCartValidation(partnerId);
 
   // Filter state
   const [selectedCategory, setSelectedCategory] = useState<string>('Recommended');
@@ -147,6 +152,31 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
           </div>
         </div>
       </div>
+
+      {/* WYSHKIT 2026: Proactive Mismatch Nudge */}
+      {isMismatch && (
+        <div className="px-4 mt-6 max-w-[1200px] mx-auto animate-in slide-in-from-top duration-500">
+          <div className="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-center justify-between gap-4 shadow-sm shadow-amber-900/5">
+            <div className="flex items-center gap-3">
+              <div className="size-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                <AlertCircle className="size-4 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-[12px] font-black text-amber-900 uppercase tracking-tight">Active cart at another store</p>
+                <p className="text-[10px] font-medium text-amber-700/80 leading-tight mt-0.5">Adding items from {displayName} will replace your current cart.</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push('/checkout')}
+              className="rounded-xl h-9 text-[10px] font-black uppercase tracking-widest border-amber-200 bg-white text-amber-900 hover:bg-amber-100"
+            >
+              View Cart
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* TWO-LAYER BROWSE AREA */}
       <div className="flex flex-col md:flex-row max-w-[1440px] mx-auto min-h-[70vh] relative pt-8">

@@ -113,25 +113,32 @@ export function AddToCartButton({
 
     return (
         <Button
-            size="icon"
+            size="sm"
             onClick={handleQuickAdd}
             aria-label={`Add ${itemName} to cart`}
+            data-testid="add-to-cart-quick"
             disabled={isDisabled}
             className={cn(
-                "size-8 rounded-xl transition-all z-10",
+                "h-8 px-3 rounded-xl transition-all z-10 font-black text-[10px] uppercase tracking-widest",
                 justAdded
-                    ? "bg-emerald-500 text-white hover:bg-emerald-600"
-                    : isOutOfStock ? "bg-zinc-100 text-zinc-400 cursor-not-allowed" : "bg-white text-zinc-900 hover:bg-zinc-100 shadow-sm border border-zinc-100",
+                    ? "bg-emerald-500 text-white hover:bg-emerald-600 border-none"
+                    : isOutOfStock ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border-zinc-200" : "bg-white text-zinc-900 hover:bg-zinc-100 shadow-sm border border-zinc-100",
                 "active:scale-95",
                 className
             )}
         >
             {isAdding ? (
-                <Loader2 className="size-4 animate-spin" />
+                <Loader2 className="size-3.5 animate-spin" />
             ) : justAdded ? (
-                <Check className="size-4" />
+                <div className="flex items-center gap-1.5">
+                    <Check className="size-3.5" />
+                    <span>Added</span>
+                </div>
             ) : (
-                <Plus className="size-4" />
+                <div className="flex items-center gap-1.5">
+                    <Plus className="size-3.5" />
+                    <span>Add</span>
+                </div>
             )}
         </Button>
     );

@@ -555,6 +555,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     <button
                         className="flex-1 h-12 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-black text-[13px] uppercase tracking-widest rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                         onClick={handleAddToCart}
+                        data-testid="add-to-cart-drawer"
                         disabled={continuing || !canAdd}
                     >
                         {continuing ? (

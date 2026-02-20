@@ -56,6 +56,8 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
           </Link>
 
           <button
+            id="location-trigger"
+            aria-label="Delivery Location"
             onClick={() => router.push('/location')}
             className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-50 rounded-2xl transition-all group"
           >
@@ -114,6 +116,8 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
       <div className="md:hidden flex flex-col px-4 pt-2 pb-1.5">
         <div className="flex items-center justify-between">
           <button
+            id="location-trigger-mobile"
+            aria-label="Delivery Location"
             onClick={() => router.push('/location')}
             className="flex items-center gap-2"
           >

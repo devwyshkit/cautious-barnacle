@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 import { type UserRole } from '@/lib/auth/core';
-import { resolveUserRoleClient } from '@/lib/auth/client';
+import { resolveUserPermissionsClient } from '@/lib/auth/client';
 import { logger } from '@/lib/logging/logger';
 
 interface RoleGuardProps {
@@ -36,11 +36,15 @@ export function RoleGuard({
       }
 
       try {
-        const actualRole = await resolveUserRoleClient(user.id);
+        const permissions = await resolveUserPermissionsClient(user.id);
 
         if (mounted) {
           // Wyshkit 2026: Admins can access everything (Partner/Admin dashboards)
-          const isAuthorized = allowedRoles.includes(actualRole) || actualRole === 'admin';
+          // We check the specific permission flags
+          const isAuthorized =
+            (allowedRoles.includes('admin') && permissions.isAdmin) ||
+            (allowedRoles.includes('partner') && (permissions.isPartner || permissions.isAdmin)) ||
+            (allowedRoles.includes('customer') && permissions.isCustomer);
 
           if (isAuthorized) {
             setAuthorized(true);

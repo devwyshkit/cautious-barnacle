@@ -295,6 +295,8 @@ export async function getPartnerStoreData(partnerId: string, includeInactive = f
   try {
     const supabase = await createClient();
 
+    // WYSHKIT 2026: Parallel Fetching - Parallelize partner and items fetch
+    // This solves the waterfall problem and ensures sub-1s loads.
     const [partnerRes, itemsRes] = await Promise.all([
       supabase
         .from('partners')
@@ -317,7 +319,7 @@ export async function getPartnerStoreData(partnerId: string, includeInactive = f
         .eq('id', partnerId)
         .maybeSingle(),
       (async () => {
-        let itemsQuery = supabase
+        let query = supabase
           .from('items')
           .select(`
             *,
@@ -327,19 +329,18 @@ export async function getPartnerStoreData(partnerId: string, includeInactive = f
             variants(*)
           `)
           .eq('partner_id', partnerId)
-          .eq('approval_status', 'approved')
-          .order('category');
+          .eq('approval_status', 'approved');
 
         if (!includeInactive) {
-          itemsQuery = itemsQuery.eq('is_active', true);
+          query = query.eq('is_active', true);
         }
 
-        return itemsQuery.order('category');
+        return query.order('category');
       })()
     ]);
 
     const { data: partnerData, error: partnerError } = partnerRes;
-    const { data: itemsData, error: itemsError } = await itemsRes;
+    const { data: itemsData, error: itemsError } = itemsRes;
 
     if (partnerError) {
       logger.error('Partner fetch failed in getPartnerStoreData', partnerError, { partnerId });
@@ -356,6 +357,8 @@ export async function getPartnerStoreData(partnerId: string, includeInactive = f
 
     const partner = mapPartner(partnerData as unknown as DBRowPartner);
     const rawItems = (itemsData || []) as unknown as WyshkitItem[];
+
+    // WYSHKIT 2026: Zero Reflection - Sort out-of-stock to bottom server-side
     const items = rawItems.sort((a, b) => {
       const aOut = a.is_active === false || a.stock_status === 'out_of_stock' || (typeof a.stock_quantity === 'number' && a.stock_quantity <= 0);
       const bOut = b.is_active === false || b.stock_status === 'out_of_stock' || (typeof b.stock_quantity === 'number' && b.stock_quantity <= 0);

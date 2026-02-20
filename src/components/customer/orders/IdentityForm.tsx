@@ -12,6 +12,7 @@ import { submitOrderPersonalization } from '@/lib/actions/orders';
 import { cn } from '@/lib/utils';
 import imageCompression from 'browser-image-compression';
 import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
+import { Progress } from '@/components/ui/progress';
 
 import { PersonalizationConfig } from '@/lib/types/personalization';
 
@@ -50,7 +51,7 @@ export function IdentityForm({
     const [formData, setFormData] = useState<Record<string, { text?: string; imageUrl?: string }>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isOptimisticSuccess, setIsOptimisticSuccess] = useState(false);
-    const [uploadingItems, setUploadingItems] = useState<Record<string, boolean>>({});
+    const [uploadingItems, setUploadingItems] = useState<Record<string, number>>({});
 
     const personalizedItems = items;
     const allOptional = isAllOptional(personalizedItems);
@@ -69,20 +70,34 @@ export function IdentityForm({
         if (!file) return;
 
         try {
-            setUploadingItems(prev => ({ ...prev, [itemId]: true }));
+            setUploadingItems(prev => ({ ...prev, [itemId]: 10 }));
 
             const options = {
                 maxSizeMB: 0.5,
                 maxWidthOrHeight: 1200,
                 useWebWorker: true,
-                initialQuality: 0.8
+                initialQuality: 0.8,
+                onProgress: (percent: number) => {
+                    setUploadingItems(prev => ({ ...prev, [itemId]: 10 + (percent * 0.4) }));
+                }
             };
 
             const compressedFile = await imageCompression(file, options);
+            setUploadingItems(prev => ({ ...prev, [itemId]: 50 }));
+
             const finalFile = new File([compressedFile], file.name, { type: file.type || 'image/jpeg' });
 
             const supabase = createClient();
             const fileName = `customer-uploads/${orderId}/${itemId}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+
+            // Simulate upload progress
+            const uploadInterval = setInterval(() => {
+                setUploadingItems(prev => {
+                    const current = prev[itemId] || 50;
+                    if (current < 90) return { ...prev, [itemId]: current + 5 };
+                    return prev;
+                });
+            }, 100);
 
             const { data, error } = await supabase.storage
                 .from('order-assets')
@@ -91,7 +106,11 @@ export function IdentityForm({
                     upsert: false
                 });
 
+            clearInterval(uploadInterval);
+
             if (error) throw error;
+
+            setUploadingItems(prev => ({ ...prev, [itemId]: 100 }));
 
             const { data: { publicUrl } } = supabase.storage
                 .from('order-assets')
@@ -99,12 +118,24 @@ export function IdentityForm({
 
             handleInputChange(itemId, 'imageUrl', publicUrl);
             triggerHaptic(HapticPattern.SUCCESS);
+
+            setTimeout(() => {
+                setUploadingItems(prev => {
+                    const next = { ...prev };
+                    delete next[itemId];
+                    return next;
+                });
+            }, 1000);
+
             toast.success("Image added to design");
         } catch (error: any) {
             logger.error('Image upload error in IdentityForm', error);
             toast.error(error.message || 'Failed to upload image');
-        } finally {
-            setUploadingItems(prev => ({ ...prev, [itemId]: false }));
+            setUploadingItems(prev => {
+                const next = { ...prev };
+                delete next[itemId];
+                return next;
+            });
         }
     };
 
@@ -337,7 +368,7 @@ export function IdentityForm({
                                         <div className="grid grid-cols-2 gap-4">
                                             <button
                                                 type="button"
-                                                disabled={uploadingItems[item.id]}
+                                                disabled={!!uploadingItems[item.id]}
                                                 onClick={() => {
                                                     const input = document.createElement('input');
                                                     input.type = 'file';
@@ -357,7 +388,7 @@ export function IdentityForm({
 
                                             <button
                                                 type="button"
-                                                disabled={uploadingItems[item.id]}
+                                                disabled={!!uploadingItems[item.id]}
                                                 onClick={() => {
                                                     const input = document.createElement('input');
                                                     input.type = 'file';
@@ -376,6 +407,16 @@ export function IdentityForm({
                                                 <span className="text-[10px] font-black text-white/60 uppercase tracking-widest group-hover/btn:text-white transition-colors">Capture</span>
                                             </button>
                                         </div>
+
+                                        {uploadingItems[item.id] !== undefined && (
+                                            <div className="space-y-2 animate-in fade-in duration-300">
+                                                <div className="flex items-center justify-between px-1">
+                                                    <span className="text-[9px] font-black text-zinc-900 uppercase tracking-widest">Processing Image...</span>
+                                                    <span className="text-[10px] font-bold text-zinc-400 tabular-nums">{Math.round(uploadingItems[item.id])}%</span>
+                                                </div>
+                                                <Progress value={uploadingItems[item.id]} className="h-1.5 bg-zinc-100" />
+                                            </div>
+                                        )}
 
                                         {input.imageUrl && (
                                             <div className="relative aspect-video rounded-2xl overflow-hidden border border-zinc-100 group shadow-sm bg-zinc-50 animate-in zoom-in-95 duration-500">

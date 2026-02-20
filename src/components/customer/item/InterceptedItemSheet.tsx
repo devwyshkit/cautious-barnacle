@@ -1,7 +1,8 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import React from "react";
+import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { ItemDetailView } from '@/components/customer/item/ItemDetailView';
 import { WyshkitItem } from '@/lib/types/item';
 interface InterceptedItemSheetProps {
@@ -11,16 +12,20 @@ interface InterceptedItemSheetProps {
 
 export function InterceptedItemSheet({ item, onCloseOverride }: InterceptedItemSheetProps) {
     const router = useRouter();
+    const [open, setOpen] = React.useState(true);
     const searchParams = useSearchParams();
     const isFromSearch = searchParams.get('context') === 'search';
 
-    const handleClose = () => {
-        if (onCloseOverride) {
-            router.push(onCloseOverride);
-        } else {
-            router.back();
-        }
-    };
+    const handleClose = React.useCallback(() => {
+        setOpen(false);
+        setTimeout(() => {
+            if (onCloseOverride) {
+                router.push(onCloseOverride);
+            } else {
+                router.back();
+            }
+        }, 100);
+    }, [onCloseOverride, router]);
 
     const isEditMode = searchParams.get('edit') === 'true';
     const cartItemId = searchParams.get('cartItemId');
@@ -36,24 +41,20 @@ export function InterceptedItemSheet({ item, onCloseOverride }: InterceptedItemS
     } : undefined;
 
     return (
-        <Sheet
-            open={true}
-            onOpenChange={(open) => {
-                if (!open) handleClose();
+        <Drawer
+            open={open}
+            onOpenChange={(v) => {
+                if (!v) handleClose();
             }}
         >
-            <SheetContent
-                side="bottom"
-                hideClose
-                className="h-[92dvh] max-h-[92dvh] rounded-t-[32px] border-x border-t border-zinc-100 overflow-hidden p-0 gap-0 md:max-w-[520px] md:left-1/2 md:right-auto md:-translate-x-1/2 flex flex-col"
+            <DrawerContent
+                className="h-[92dvh] max-h-[92dvh] rounded-t-[32px] border-x border-t border-zinc-100 overflow-hidden p-0 gap-0 md:max-w-[520px] md:left-1/2 md:right-auto md:-translate-x-1/2 flex flex-col bg-white"
             >
-                <SheetTitle className="sr-only">{item.name || 'Product Details'}</SheetTitle>
-                <SheetDescription className="sr-only">
+                <DrawerTitle className="sr-only">{item.name || 'Product Details'}</DrawerTitle>
+                <DrawerDescription className="sr-only">
                     View details and add {item.name || 'this item'} to your cart.
-                </SheetDescription>
-                <div className="mt-4 flex justify-center">
-                    <div className="h-1 w-12 rounded-full bg-zinc-200" aria-hidden />
-                </div>
+                </DrawerDescription>
+
                 <div className="flex-1 overflow-hidden relative min-h-0">
                     <ItemDetailView
                         item={item}
@@ -61,7 +62,7 @@ export function InterceptedItemSheet({ item, onCloseOverride }: InterceptedItemS
                         initialState={initialState}
                     />
                 </div>
-            </SheetContent>
-        </Sheet>
+            </DrawerContent>
+        </Drawer>
     );
 }

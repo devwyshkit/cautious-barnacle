@@ -93,15 +93,7 @@ export async function resolveUserPermissionsWithTimeout(
 
 /**
  * @deprecated Use resolveUserPermissions() instead.
- * 
- * Migration: Replace resolveUserRole() calls with resolveUserPermissions() and check permissions directly.
- * 
- * Still used by:
- * - src/lib/auth/server.ts (resolveUserRoleServer)
- * - src/lib/auth/client.ts (resolveUserRoleClient)
- * - src/components/layout/RoleGuard.tsx
- * 
- * TODO: Migrate these usages to resolveUserPermissions() for better granularity.
+ * resolveUserPermissions() provides non-exclusive capability checks.
  */
 export async function resolveUserRole(
   supabase: SupabaseClient,
