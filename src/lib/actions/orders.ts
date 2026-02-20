@@ -50,6 +50,9 @@ async function logOrderStatusHistory(orderId: string, type: string, title: strin
 
 export async function submitOrderPersonalization(orderId: string, personalizationInput: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
   try {
+    if (!orderId || orderId.trim() === '') {
+      return { success: false, error: 'Invalid Order ID' };
+    }
     logger.info(`[submitOrderPersonalization] Starting for order: ${orderId}`, {
       orderId,
       personalizationInput: Object.keys(personalizationInput),
@@ -173,6 +176,9 @@ export async function submitOrderPersonalization(orderId: string, personalizatio
 
 export async function markOrderAsPacked(orderId: string) {
   try {
+    if (!orderId || orderId.trim() === '') {
+      return { success: false, error: 'Invalid Order ID' };
+    }
     const { updateOrderStatus } = await import('@/lib/actions/partner-actions');
     const result = await updateOrderStatus(orderId, ORDER_STATUS.PACKED);
 
@@ -472,6 +478,9 @@ export async function createOrder(payload: PlaceOrderPayload) {
 
 export async function getOrder(orderId: string) {
   try {
+    if (!orderId || orderId.trim() === '') {
+      return { data: null, error: 'Invalid Order ID' };
+    }
     const supabase = await createClient();
     const { data: order, error } = await supabase
       .from('orders')

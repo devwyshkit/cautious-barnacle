@@ -37,8 +37,8 @@ export function NavShell({ initialLocation, children }: NavShellProps) {
         if (isImmersive) {
             root.style.setProperty('--bottom-nav-height', '0px');
         } else {
-            // Standard mobile bottom nav is ~80px
-            root.style.setProperty('--bottom-nav-height', window.innerWidth < 768 ? '80px' : '0px');
+            // WYSHKIT 2026: Mobile bottom nav is 64px (h-16) + safe-area
+            root.style.setProperty('--bottom-nav-height', window.innerWidth < 768 ? 'calc(64px + env(safe-area-inset-bottom, 0px))' : '0px');
         }
     }, [isImmersive, pathname]);
 

@@ -18,14 +18,19 @@ export function InterceptedItemSheet({ item, onCloseOverride }: InterceptedItemS
 
     const handleClose = React.useCallback(() => {
         setOpen(false);
+        const partnerPath = `/partner/${item.partner_id || searchParams.get('id')}`;
+
         setTimeout(() => {
             if (onCloseOverride) {
                 router.push(onCloseOverride);
+            } else if (window.history.length <= 1) {
+                // Dead end case: Push to partner store
+                router.push(partnerPath);
             } else {
                 router.back();
             }
         }, 100);
-    }, [onCloseOverride, router]);
+    }, [item.partner_id, onCloseOverride, router, searchParams]);
 
     const isEditMode = searchParams.get('edit') === 'true';
     const cartItemId = searchParams.get('cartItemId');

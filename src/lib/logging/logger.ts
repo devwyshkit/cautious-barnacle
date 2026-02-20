@@ -80,13 +80,14 @@ class Logger {
 
     // WYSHKIT 2026: Zero Console Leak Enforcement
     // In production, we ONLY log to standard output if log level is ERROR or WARN.
-    // In development, we use full verbosity.
+    // In development, we use full verbosity for DX.
     if (this.isDevelopment) {
       const prefix = `[${entry.level.toUpperCase()}]`;
-      const contextStr = entry.context ? JSON.stringify(entry.context, null, 2) : '';
-      const errorStr = entry.error ? `\nError: ${entry.error.name}: ${entry.error.message}` : '';
-      const metadataStr = entry.metadata ? `\nMetadata: ${JSON.stringify(entry.metadata, null, 2)}` : '';
+      const contextStr = entry.context ? ` | Context: ${JSON.stringify(entry.context)}` : '';
+      const errorStr = entry.error ? ` | Error: ${entry.error.name}: ${entry.error.message}` : '';
+      const metadataStr = entry.metadata ? ` | Metadata: ${JSON.stringify(entry.metadata)}` : '';
 
+      // Clean single-line log for dev console
       console.log(`${prefix} ${entry.message}${contextStr}${errorStr}${metadataStr}`);
 
       if (entry.error?.stack) {
@@ -94,9 +95,10 @@ class Logger {
       }
     } else {
       // In production, output structured JSON for log aggregation (e.g., Datadog, Pino style)
-      // Only log if level is WARN or ERROR to keep logs clean and fast
+      // We ONLY emit logs for levels that meet the minimum threshold (WARN/ERROR by default)
       if (entry.level === LogLevel.ERROR || entry.level === LogLevel.WARN) {
-        console.log(JSON.stringify(entry));
+        // Use standard out for structured logs
+        process.stdout.write(JSON.stringify(entry) + '\n');
       }
     }
   }

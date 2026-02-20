@@ -256,11 +256,19 @@ export async function addToCart(payload: {
   quantity?: number
 }) {
   try {
+    const { itemId, variantId: rawVariantId, personalization, selectedAddons, quantity: rawQty = 1 } = payload
+
+    // WYSHKIT 2026: Strict UUID Guard
+    if (!itemId || itemId.trim() === '') {
+      return { error: 'Invalid Item ID', code: 'INVALID_ID' }
+    }
+
+    const variantId = (rawVariantId && rawVariantId.trim() !== '') ? rawVariantId : null
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser()
     const sessionId = !user ? await getGuestSessionId() : null
 
-    const { itemId, variantId, personalization, selectedAddons, quantity: rawQty = 1 } = payload
     const quantity = Math.min(Math.max(1, Math.floor(Number(rawQty) || 1)), MAX_ITEM_QUANTITY)
 
     const [itemRes, cartRes, variantsRes] = await Promise.all([
@@ -292,13 +300,13 @@ export async function addToCart(payload: {
 
     // WYSHKIT 2026: Require variant when item has variants (Swiggy-style)
     let hasVariants = Array.isArray(variantRows) && variantRows.length > 0
-    if (hasVariants && (variantId == null || variantId === '')) {
+    if (hasVariants && (variantId == null)) {
       return { error: 'Please select an option', code: 'VARIANT_REQUIRED' }
     }
 
     // 0. STOCK CHECK (Swiggy 2026: Inventory Soft-Lock)
     // 0. STOCK CHECK (Swiggy 2026: Direct Inventory Check - Zero Reinvention)
-    const normalizedVariantId = (variantId as string) || '';
+    const normalizedVariantId = variantId;
 
     // 2. Duplicate Item Check (In-Memory)
     const normalizedPersonalization = personalization || { enabled: false }
@@ -333,11 +341,11 @@ export async function addToCart(payload: {
     })
 
     // 1. Stock Check (Zero Reinvention)
-    hasVariants = !!normalizedVariantId;
+    const targetIdForStock = normalizedVariantId || itemId;
     const { data: stockData, error: stockError } = await supabase
-      .from(hasVariants ? 'variants' : 'items')
+      .from(variantId ? 'variants' : 'items')
       .select('stock_quantity')
-      .eq('id', hasVariants ? normalizedVariantId : itemId)
+      .eq('id', targetIdForStock)
       .single();
 
     if (stockError || !stockData) {
@@ -348,7 +356,7 @@ export async function addToCart(payload: {
     let reservationQuery = supabase
       .from('cart_reservations')
       .select('*', { count: 'exact', head: true })
-      .eq(hasVariants ? 'variant_id' : 'item_id', hasVariants ? normalizedVariantId : itemId)
+      .eq(variantId ? 'variant_id' : 'item_id', targetIdForStock)
       .gt('expires_at', new Date().toISOString());
 
     if (duplicateItem) {
@@ -379,16 +387,15 @@ export async function addToCart(payload: {
         if (vData?.name) displayName += ` (${vData.name})`;
       }
 
-      return {
-        error: `Insufficient stock for "${displayName}". Only ${Number(availableStock)} available.`,
-        code: 'OUT_OF_STOCK'
-      };
+      return { error: `Insufficient stock for "${displayName}". Only ${Math.max(0, availableStock)} available.`, code: 'OUT_OF_STOCK' };
     }
+
+    // 2. Partner Mismatch Check (Swiggy 2026: Single Partner Enforcement)
     if (cartItems && cartItems.length > 0) {
       const existingItemId = cartItems[0].item_id;
       const { data: existingItemData } = await supabase.from('items')
         .select('partner_id')
-        .eq('id', existingItemId)
+        .eq('id', existingItemId as string)
         .maybeSingle();
 
       const currentCartPartnerId = (existingItemData as { partner_id: string } | null)?.partner_id;
@@ -402,22 +409,7 @@ export async function addToCart(payload: {
       }
     }
 
-
-    // 3. Mutation (Insert or Update)
-    // 3. Mutation (Insert or Update) with Reservation
-    const currentQty = duplicateItem ? duplicateItem.quantity : 0;
-    const qtyNeeded = duplicateItem ? (quantity) : quantity; // Wait, addToCart ADDS to existing. So we need `quantity` more.
-
-    // Check if we have enough for the INCREASE
-    if ((Number(availableStock) || 0) < qtyNeeded) {
-      return {
-        error: `Insufficient stock. Only ${Number(availableStock)} available.`,
-        code: 'OUT_OF_STOCK'
-      };
-    }
-
     const newQty = duplicateItem ? Math.min(duplicateItem.quantity + quantity, MAX_ITEM_QUANTITY) : quantity
-
     let cartItemId = duplicateItem?.id;
 
     if (duplicateItem) {
@@ -446,12 +438,10 @@ export async function addToCart(payload: {
     }
 
     // 4. RESERVE STOCK (10 Minutes Soft-Lock)
-    // We strictly upsert reservation based on cart_item_id
     if (cartItemId) {
       const expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + 10); // 10 min expiry
+      expiresAt.setMinutes(expiresAt.getMinutes() + 10);
 
-      // Check if reservation exists
       const { data: existingRes } = await supabase.from('cart_reservations')
         .select('id')
         .eq('cart_item_id', cartItemId)
@@ -470,8 +460,8 @@ export async function addToCart(payload: {
           .insert({
             cart_item_id: cartItemId,
             item_id: itemId,
-            variant_id: normalizedVariantId as any,
-            quantity: newQty, // Reservation holds FULL quantity of the item in cart
+            variant_id: variantId as any,
+            quantity: newQty,
             expires_at: expiresAt.toISOString()
           });
       }
@@ -483,17 +473,12 @@ export async function addToCart(payload: {
       itemId,
       partnerId: item.partner_id,
       userId: user?.id,
-      sessionId: user ? null : sessionId,
       quantity: newQty
     })
 
-    try {
-      const cartResult = await getCart();
-      return cartResult.cart ? { success: true, cart: cartResult.cart } : { success: true };
-    } catch (cartError) {
-      logError(cartError, 'GetCartAfterAdd')
-      return { success: true };
-    }
+    const cartResult = await getCart();
+    return cartResult.cart ? { success: true, cart: cartResult.cart } : { success: true };
+
   } catch (error) {
     logError(error, 'AddToDraftOrder')
     return handleActionError(error)
@@ -502,6 +487,11 @@ export async function addToCart(payload: {
 
 export async function updateCartItemQuantity(cartItemId: string, quantity: number) {
   try {
+    // WYSHKIT 2026: Strict UUID Guard
+    if (!cartItemId || cartItemId.trim() === '') {
+      return { error: 'Invalid Cart Item ID', code: 'INVALID_ID' }
+    }
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser()
     const sessionId = !user ? await getGuestSessionId() : null

@@ -83,22 +83,21 @@ export function FloatingCartBar() {
     <div
       role="region"
       aria-label="Floating cart summary"
+      data-testid="floating-cart-bar"
       className={cn(
-        "fixed z-50 transition-all duration-500 ease-in-out",
-        "left-4 right-4 md:left-auto md:w-[420px] md:right-8", // Mobile: Full width; Desktop: Right aligned
-        // Mobile: Safe area for BottomNav (approx 80px) + spacing
-        // If tracking bar is active, it will push this up via CSS variable --tracking-bar-height
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0 pointer-events-none"
+        "fixed z-50 transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "left-4 right-4 md:left-auto md:w-[420px] md:right-8",
+        isVisible ? "translate-y-0 opacity-100" : "translate-y-32 opacity-0 pointer-events-none"
       )}
       style={{
-        bottom: `calc(${isVisible ? 'var(--bottom-nav-height, 0px)' : '0px'} + var(--tracking-bar-height, 0px) + 12px)`
+        bottom: `calc(var(--bottom-nav-height, 0px) + var(--tracking-bar-height, 0px) + 16px + env(safe-area-inset-bottom, 0px))`
       }}
     >
       <div
         className={cn(
-          "bg-zinc-950/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] border border-white/5 overflow-hidden",
-          "transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1)",
-          shouldPulse && "scale-[1.04]"
+          "bg-zinc-950/95 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.8)] border border-white/10 overflow-hidden",
+          "transition-all duration-500",
+          shouldPulse && "scale-[1.04] ring-4 ring-[var(--primary)]/20"
         )}
       >
         <div className="relative">
@@ -106,13 +105,13 @@ export function FloatingCartBar() {
             onClick={handleCheckout}
             disabled={isLoading}
             className={cn(
-              "w-full flex items-center justify-between p-3 transition-all active:scale-[0.98]",
+              "w-full flex items-center justify-between p-3.5 transition-all active:scale-[0.98]",
               isLoading && "opacity-70 pointer-events-none"
             )}
           >
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center gap-3.5 min-w-0">
               <div className="relative">
-                <div className="relative size-12 rounded-xl bg-zinc-800 overflow-hidden ring-2 ring-zinc-700">
+                <div className="relative size-12 rounded-2xl bg-zinc-800 overflow-hidden ring-2 ring-zinc-700/50 shadow-inner">
                   {firstItemImage ? (
                     <div className="relative size-full">
                       <Image
@@ -129,54 +128,60 @@ export function FloatingCartBar() {
                     </div>
                   )}
                 </div>
-                <div className="absolute -top-1 -right-1 size-5 rounded-full bg-[#D91B24] flex items-center justify-center">
-                  <span className="text-[10px] font-black text-white">{(visualCount).toString().padStart(2, '0')}</span>
+                <div className="absolute -top-1.5 -right-1.5 size-6 rounded-full bg-[#D91B24] flex items-center justify-center ring-4 ring-zinc-950 shadow-lg animate-in zoom-in-50 duration-300">
+                  <span className="text-[11px] font-black text-white">{(visualCount).toString().padStart(2, '0')}</span>
                 </div>
               </div>
 
               <div className="flex flex-col items-start min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-black text-white tracking-tight">
+                <div className="flex items-center gap-2">
+                  <span className="text-[15px] font-black text-white tracking-tight leading-none">
                     {visualCount} {visualCount === 1 ? 'item' : 'items'}
                   </span>
                   {hasPersonalization && (
-                    <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-amber-500/20">
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/20">
                       <Sparkles className="size-2.5 text-amber-400" />
-                      <span className="text-[9px] font-black text-amber-400 uppercase tracking-tighter">Identity Available</span>
-                    </span>
+                      <span className="text-[8px] font-black text-amber-400 uppercase tracking-tighter">Personalized</span>
+                    </div>
                   )}
                 </div>
-                <span className="text-xs text-zinc-400 truncate max-w-[120px]">
-                  {displayCart?.items?.[0]?.partnerName || 'From local store'}
+                <span className="text-[11px] font-bold text-zinc-500 truncate max-w-[140px] uppercase tracking-wider mt-1">
+                  {displayCart?.items?.[0]?.partnerName || 'Local store'}
                 </span>
               </div>
             </div>
 
             <div
               className={cn(
-                "flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm bg-[#D91B24] text-white"
+                "flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-black text-sm bg-[#D91B24] text-white shadow-xl shadow-rose-900/20"
               )}
             >
               <span className="tabular-nums">₹{displayTotal.toFixed(0)}</span>
-              <ChevronRight className="size-4" />
+              <ChevronRight className="size-4 stroke-[3]" />
             </div>
           </button>
         </div>
 
-        <div className="h-px bg-white/5" />
+        <div className="h-px bg-white/[0.05]" />
 
-        <div className="flex items-center justify-between px-6 py-3">
+        <div className="flex items-center justify-between px-7 py-3 bg-white/[0.02]">
           {displayCart?.partnerId && (
             <button
-              onClick={() => router.push(`/partner/${displayCart.partnerId}`)}
-              className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest hover:text-zinc-300 transition-colors truncate"
+              onClick={() => {
+                triggerHaptic(HapticPattern.ACTION);
+                router.push(`/partner/${displayCart.partnerId}`);
+              }}
+              className="group flex items-center gap-2"
             >
-              View {displayCart?.items?.[0]?.partnerName || 'Store'}
+              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.15em] group-hover:text-zinc-300 transition-colors truncate max-w-[200px]">
+                View {displayCart?.items?.[0]?.partnerName || 'Store'}
+              </span>
+              <ChevronRight className="size-3 text-zinc-700 group-hover:text-zinc-400 transition-colors" />
             </button>
           )}
-          <div className="flex items-center gap-1 opacity-40">
-            <span className="size-1 rounded-full bg-zinc-500 animate-pulse" />
-            <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">Safe & Secured</span>
+          <div className="flex items-center gap-2">
+            <div className="size-1.5 rounded-full bg-emerald-500/50 animate-pulse" />
+            <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Wyshkit Secure</span>
           </div>
         </div>
       </div>

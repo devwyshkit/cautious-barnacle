@@ -291,6 +291,20 @@ export function CartProvider({
         triggerHaptic(HapticPattern.ACTION);
         setShowReplaceCartDialog(false);
 
+        // WYSHKIT 2026: Zero-Flicker Transition
+        // Immediately clear local state and add the pending item optimistically
+        startTransition(() => {
+            setDraftOrder({ items: [], partnerId: null, subtotal: 0, total: 0, itemCount: 0 });
+            addOptimisticCart({
+                itemId: pendingItem.itemId,
+                variantId: pendingItem.variantId,
+                personalization: pendingItem.personalization,
+                selectedAddons: pendingItem.selectedAddons,
+                quantity: pendingItem.quantity,
+                ...pendingItem.optimisticData,
+            });
+        });
+
         try {
             await clearDraftOrder();
             await addToDraftOrder(
@@ -304,6 +318,7 @@ export function CartProvider({
             setPendingItem(null);
         } catch (error) {
             logger.error('Failed to replace cart', error as Error);
+            fetchDraftOrder(); // Rollback on failure
         }
     };
 

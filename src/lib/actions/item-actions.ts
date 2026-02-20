@@ -141,6 +141,9 @@ export async function getUpsellItems(
  */
 export async function getItemWithFullSpec(itemId: string): Promise<{ data: ItemWithFullSpec | null; error?: string }> {
   try {
+    if (!itemId || itemId.trim() === '') {
+      return { data: null, error: 'Invalid Item ID' };
+    }
     const supabase = await createClient();
 
     const [itemRes, variantsRes, addonsRes, personalizationRes] = await Promise.all([
@@ -199,6 +202,9 @@ export async function getItemReviews(itemId: string): Promise<{
   error?: string;
 }> {
   try {
+    if (!itemId || itemId.trim() === '') {
+      return { data: null, error: 'Invalid Item ID' };
+    }
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -229,6 +235,9 @@ export async function submitItemReview(
   comment: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    if (!itemId || itemId.trim() === '') {
+      return { success: false, error: 'Invalid Item ID' };
+    }
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -342,6 +351,9 @@ export async function createItem(
   input: ItemInput
 ): Promise<{ data?: { id: string }; error?: string }> {
   try {
+    if (!partnerId || partnerId.trim() === '') {
+      return { error: 'Invalid Partner ID' };
+    }
     const supabase = await createClient();
 
     // WYSHKIT 2026: Check partner status for auto-approval
@@ -408,6 +420,9 @@ export async function updateItem(
   input: Partial<ItemInput>
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    if (!itemId || itemId.trim() === '') {
+      return { success: false, error: 'Invalid Item ID' };
+    }
     const supabase = await createClient();
 
     const { data: existing } = await supabase

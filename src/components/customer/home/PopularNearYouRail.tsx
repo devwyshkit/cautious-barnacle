@@ -50,7 +50,7 @@ export function PopularNearYouRail({ items }: PopularNearYouRailProps) {
                         {items.map((item, index) => (
 
                             <CarouselItem
-                                key={item.id}
+                                key={`${item.id}-${index}`}
                                 className="pl-2 md:pl-4 basis-[200px] sm:basis-[240px] animate-in slide-in-from-bottom-8 duration-700 fill-mode-backwards"
                                 style={{ animationDelay: `${index * 80}ms` }}
                             >
