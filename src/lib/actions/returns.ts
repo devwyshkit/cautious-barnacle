@@ -6,10 +6,10 @@ import { ORDER_STATUS } from '@/lib/types/order-status';
 import { orderHasPersonalizedItems } from '@/lib/utils/personalization';
 import type { DBOrder } from '@/lib/supabase/types';
 import { logError, handleActionError } from '@/lib/utils/error-handler';
-import { updateOrderStatus } from '@/lib/actions/partner-actions';
+import { update_order_status } from '@/lib/actions/partner-actions';
 import { createAdminClient } from '@/lib/supabase/server';
 import { Json } from '@/lib/supabase/database.types';
-import { refundPayment } from '@/lib/services/razorpay';
+import { refund_payment } from '@/lib/services/razorpay';
 import { logger } from '@/lib/logging/logger';
 
 export type ReturnReason = 'wrong_item' | 'damaged' | 'defective' | 'not_as_described' | 'other';
@@ -112,7 +112,7 @@ export async function initiateReturn({ orderId, reason, description, images }: I
     // We must return the money for successful returns.
     if (returnRecord.refund_amount > 0 && order.payment_id) {
       try {
-        await refundPayment(
+        await refund_payment(
           order.payment_id,
           Math.round(returnRecord.refund_amount * 100), // Convert INR to Paise
           {
@@ -135,7 +135,7 @@ export async function initiateReturn({ orderId, reason, description, images }: I
 
     // 5. Update order status via state machine gateway
     // WYSHKIT 2026: Returns use proper REFUNDED status, not CANCELLED.
-    const updateResult = await updateOrderStatus(orderId, ORDER_STATUS.REFUNDED);
+    const updateResult = await update_order_status(orderId, ORDER_STATUS.REFUNDED);
 
     if (!updateResult.success) {
       return { error: updateResult.error || 'Failed to update order status' };

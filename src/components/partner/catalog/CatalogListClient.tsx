@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Search, Package } from 'lucide-react';
 import { CatalogList } from './CatalogList';
 import { ItemForm } from './ItemForm';
-import { toggleItemActiveStatus, toggleItemStockStatus } from '@/lib/actions/partner-actions';
+import { toggle_item_active_status, toggle_item_stock_status } from '@/lib/actions/partner-actions';
 import { deleteItem, getItemWithFullSpec } from '@/lib/actions/item-actions';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -47,7 +47,7 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
   );
 
   const handleToggleActive = async (itemId: string, isActive: boolean) => {
-    const result = await toggleItemActiveStatus(itemId, isActive);
+    const result = await toggle_item_active_status(itemId, isActive);
     if (result.success) {
       setItems(prev => prev.map(item =>
         item.id === itemId ? { ...item, is_active: isActive } : item
@@ -59,7 +59,7 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
   };
 
   const handleToggleStock = async (itemId: string, stockStatus: string) => {
-    const result = await toggleItemStockStatus(itemId, stockStatus);
+    const result = await toggle_item_stock_status(itemId, stockStatus);
     if (result.success) {
       setItems(prev => prev.map(item =>
         item.id === itemId ? { ...item, stock_status: stockStatus } : item

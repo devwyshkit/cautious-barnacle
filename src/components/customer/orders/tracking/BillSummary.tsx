@@ -11,8 +11,10 @@ import { Button } from '@/components/ui/button';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { logger } from '@/lib/logging/logger';
 
+import { OrderDetail } from '@/lib/types/order';
+
 interface BillSummaryProps {
-    order: any;
+    order: OrderDetail;
 }
 
 export function BillSummary({ order }: BillSummaryProps) {
@@ -23,25 +25,25 @@ export function BillSummary({ order }: BillSummaryProps) {
     const handleDownloadInvoice = () => {
         try {
             const data = {
-                orderNumber: order.order_number,
-                date: new Date(order.created_at).toLocaleDateString(),
+                order_number: order.order_number || '',
+                date: new Date(order.created_at || Date.now()).toLocaleDateString(),
                 order_items: order.order_items,
                 partner: {
-                    name: order.partner_name || order.partner?.[0]?.name || 'WyshKit Partner',
+                    name: order.partner_name || 'WyshKit Partner',
                     address: 'Bangalore, India', // Placeholder if address missing
-                    gstin: order.partner_gstin
+                    gstin: order.gstin || undefined
                 },
-                customerName: order.customer_name || 'Valued Customer', // Should come from order or auth
+                customer_name: order.users?.full_name || 'Valued Customer',
                 totals: {
-                    itemTotal: order.subtotal || 0,
-                    deliveryFee: order.delivery_fee || 0,
-                    platformFee: order.platform_fee || 0,
-                    gstAmount: order.tax_amount || 0,
-                    grandTotal: order.total || 0,
+                    item_total: order.subtotal || 0,
+                    delivery_fee: order.delivery_fee || 0,
+                    platform_fee: order.platform_fee || 0,
+                    gst_amount: order.gst || 0,
+                    grand_total: order.total || 0,
                     discount: (order.discount || 0) + (order.cashback_amount || 0)
                 }
             };
-            generateTaxInvoicePDF(data);
+            generateTaxInvoicePDF(data as any);
             toast.success('Invoice downloaded');
         } catch (error) {
             logger.error('Invoice generation failed', error as Error);
@@ -95,25 +97,25 @@ export function BillSummary({ order }: BillSummaryProps) {
                             <span className="text-zinc-900">{formatCurrency(order.subtotal || 0)}</span>
                         </div>
 
-                        {(order.delivery_fee > 0 || order.delivery_fee === 0) && (
+                        {(order.delivery_fee !== undefined && order.delivery_fee !== null) && (
                             <div className="flex justify-between text-[11px] font-bold text-zinc-600">
                                 <span>Delivery Fee</span>
                                 <span className="text-zinc-900">
-                                    {order.delivery_fee === 0 ? 'FREE' : formatCurrency(order.delivery_fee)}
+                                    {order.delivery_fee === 0 ? 'FREE' : formatCurrency(order.delivery_fee || 0)}
                                 </span>
                             </div>
                         )}
 
-                        {(order.platform_fee > 0) && (
+                        {(order.platform_fee && order.platform_fee > 0) && (
                             <div className="flex justify-between text-[11px] font-bold text-zinc-600">
                                 <span>Platform Fee</span>
-                                <span className="text-zinc-900">{formatCurrency(order.platform_fee)}</span>
+                                <span className="text-zinc-900">{formatCurrency(order.platform_fee || 0)}</span>
                             </div>
                         )}
 
                         <div className="flex justify-between text-[11px] font-black text-zinc-950">
                             <span>GST & Taxes</span>
-                            <span>{formatCurrency(order.tax_amount || 0)}</span>
+                            <span>{formatCurrency(order.gst || 0)}</span>
                         </div>
 
                         {((order.discount || 0) + (order.cashback_amount || 0)) > 0 && (

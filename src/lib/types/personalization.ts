@@ -58,6 +58,8 @@ export interface DraftLineItem {
   variant_name?: string;
   personalization_price?: number | null;
   addons_price?: number | null;
+  partner_city?: string | null;
+  partner_prep_hours?: number | null;
   // WYSHKIT 2026: Metadata for hasItemPersonalization and IdentityForm
   personalization_options?: PersonalizationOption[];
   item_addons?: ItemAddon[];
@@ -68,7 +70,14 @@ export interface DraftLineItem {
 export interface DraftTransaction {
   items: DraftLineItem[];
   partner_id: string | null;
+  // Financials - Standardized snake_case
   subtotal: number;
+  personalization_charges: number;
+  delivery_fee: number;
+  platform_fee: number;
+  gst: number;
+  discount: number;
+  wallet_discount: number;
   total: number;
   item_count: number;
 }

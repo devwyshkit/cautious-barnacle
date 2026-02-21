@@ -1,5 +1,5 @@
 import { getPartnerFromSession } from '@/lib/auth/server';
-import { getPartnerStats, getPartnerOrders } from '@/lib/actions/partner-actions';
+import { get_partner_stats, get_partner_orders } from "@/lib/actions/partner-actions";
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import {
@@ -18,9 +18,11 @@ export default async function PartnerDashboard() {
   const partner = await getPartnerFromSession();
   if (!partner) redirect('/partner/login');
 
+  const partner_id = partner.id; // Define partner_id as per instruction's usage
+
   const [statsResult, ordersResult] = await Promise.all([
-    getPartnerStats(partner.id),
-    getPartnerOrders(partner.id, ['PLACED', 'DETAILS_RECEIVED', 'DETAILS_RECEIVED'])
+    get_partner_stats(partner_id),
+    get_partner_orders(partner_id, ['PLACED', 'CONFIRMED', 'DETAILS_RECEIVED', 'PREVIEW_READY', 'REVISION_REQUESTED', 'APPROVED', 'IN_PRODUCTION'])
   ]);
 
   const stats = statsResult.data;
@@ -46,7 +48,7 @@ export default async function PartnerDashboard() {
               </div>
               <div>
                 <p className="text-2xl font-semibold text-zinc-900">
-                  {stats?.todayOrders || 0}
+                  {stats?.today_orders || 0}
                 </p>
                 <p className="text-xs text-zinc-500">Orders today</p>
               </div>
@@ -62,7 +64,7 @@ export default async function PartnerDashboard() {
               </div>
               <div>
                 <p className="text-2xl font-semibold text-zinc-900">
-                  ₹{(stats?.todayRevenue || 0).toLocaleString('en-IN')}
+                  ₹{(stats?.today_revenue || 0).toLocaleString('en-IN')}
                 </p>
                 <p className="text-xs text-zinc-500">Revenue today</p>
               </div>
@@ -78,7 +80,7 @@ export default async function PartnerDashboard() {
               </div>
               <div>
                 <p className="text-2xl font-semibold text-zinc-900">
-                  {stats?.pendingOrders || 0}
+                  {stats?.pending_orders || 0}
                 </p>
                 <p className="text-xs text-zinc-500">Pending</p>
               </div>
@@ -94,7 +96,7 @@ export default async function PartnerDashboard() {
               </div>
               <div>
                 <p className="text-2xl font-semibold text-zinc-900">
-                  {stats?.avgRating?.toFixed(1) || '-'}
+                  {stats?.avg_rating?.toFixed(1) || '-'}
                 </p>
                 <p className="text-xs text-zinc-500">Rating</p>
               </div>
@@ -112,11 +114,11 @@ export default async function PartnerDashboard() {
           <CardContent>
             <div className="flex items-end justify-between">
               <div>
-                <p className="text-3xl font-bold tracking-tight">₹{(stats?.totalEarnings || 0).toLocaleString('en-IN')}</p>
+                <p className="text-3xl font-bold tracking-tight">₹{(stats?.total_earnings || 0).toLocaleString('en-IN')}</p>
                 <p className="text-xs text-zinc-400 mt-1">Total Settled Earnings</p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-semibold text-emerald-400">₹{(stats?.pendingSettlement || 0).toLocaleString('en-IN')}</p>
+                <p className="text-lg font-semibold text-emerald-400">₹{(stats?.pending_settlement || 0).toLocaleString('en-IN')}</p>
                 <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Pending</p>
               </div>
             </div>
@@ -125,7 +127,7 @@ export default async function PartnerDashboard() {
       </div>
 
       {/* Low Stock Alert */}
-      {stats?.lowStockCount !== undefined && stats.lowStockCount > 0 && (
+      {stats?.low_stock_count !== undefined && stats.low_stock_count > 0 && (
         <Card className="border-amber-100 bg-amber-50/50">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
@@ -134,7 +136,7 @@ export default async function PartnerDashboard() {
                   <AlertCircle className="size-5 text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-amber-900">{stats.lowStockCount} Items Low on Stock</p>
+                  <p className="text-sm font-bold text-amber-900">{stats.low_stock_count} Items Low on Stock</p>
                   <p className="text-xs text-amber-700">Refill soon to avoid order cancellations</p>
                 </div>
               </div>
@@ -166,7 +168,7 @@ export default async function PartnerDashboard() {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3">
-              {pendingOrders.slice(0, 3).map((order) => (
+              {pendingOrders.slice(0, 3).map((order: any) => (
                 <Link
                   key={order.id}
                   href="/partner/orders"

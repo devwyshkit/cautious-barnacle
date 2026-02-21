@@ -2,39 +2,17 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { Database } from '@/lib/supabase/database.types';
 import { useRealtime } from '@/providers/RealtimeProvider';
 import { OrderStatus } from '@/lib/types/order-status';
-import { OrderItemDetail, OrderDetail } from '@/lib/types/order';
+import { OrderItemDetail, OrderDetail, PreviewSubmission } from '@/lib/types/order';
 
 export type RequirementStatus = 'pending' | 'submitted' | 'accepted' | 'clarification_needed' | 'approved' | 'rejected' | null;
 
-interface OrderUpdate {
+interface OrderUpdate extends Partial<OrderDetail> {
   id: string;
-  status: string;
-  order_number?: string;
-  payment_status: string | null;
+  status: Database["public"]["Enums"]["order_status"];
   updated_at: string;
-  has_personalization?: boolean;
-  personalization_input?: Record<string, unknown> | null;
-  personalization_status?: string | null;
-  change_request_count?: number | null;
-  max_change_requests?: number | null;
-  awb_number?: string | null;
-  courier_partner?: string | null;
-  delivery_address?: Record<string, unknown> | null;
-  items?: Record<string, unknown>[] | null;
-  discount?: number;
-  cashback_amount?: number;
-  total?: number;
-  subtotal?: number;
-  details_submitted_at?: string | null;
-  partner_name?: string;
-  design_deadline_at?: string | null;
-  delivery_fee?: number | null;
-  tax_amount?: number | null;
-  platform_fee?: number | null;
-  personalization_charges?: number | null;
-  order_items?: OrderItemDetail[];
 }
 
 interface TimelineEvent {
@@ -47,14 +25,7 @@ interface TimelineEvent {
   created_at: string;
 }
 
-export interface PreviewSubmission {
-  id: string;
-  order_item_id?: string; // Relational Mapping
-  preview_url: string;
-  status: 'pending' | 'approved' | 'change_requested';
-  partner_notes: string | null;
-  submitted_at: string;
-}
+// PreviewSubmission is imported from order.ts
 
 interface UseOrderRealtimeOptions {
   orderId: string;
@@ -78,7 +49,7 @@ export function useOrderRealtime({
   onTimelineEvent,
   onPreviewUploaded,
 }: UseOrderRealtimeOptions) {
-  const { channel, isConnected } = useRealtime(); // WYSHKIT 2026: Shared Pulse
+  const { channel, isConnected } = useRealtime();
   const [order, setOrder] = useState<OrderUpdate | null>(null);
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
   const [previews, setPreviews] = useState<PreviewSubmission[]>([]);
@@ -96,13 +67,14 @@ export function useOrderRealtime({
       const [orderRes, timelineRes, previewsRes, itemsRes] = await Promise.all([
         supabase.from('orders').select('id, status, order_number, payment_status, updated_at, has_personalization, personalization_input, personalization_status, change_request_count, max_change_requests, awb_number, courier_partner, delivery_address, items, discount, cashback_amount, total, subtotal, design_deadline_at, delivery_fee, tax_amount, platform_fee, personalization_charges, partner_name:partners(name)').eq('id', orderId).maybeSingle(),
         supabase.from('order_status_history').select('id, order_id, type, title, description, metadata, created_at').eq('order_id', orderId).order('created_at', { ascending: false }),
-        supabase.from('preview_submissions').select('id, order_item_id, preview_url, status, partner_notes, submitted_at').eq('order_id', orderId).order('submitted_at', { ascending: false }),
+        supabase.from('preview_submissions').select('id, order_id, order_item_id, preview_url, status, partner_notes, submitted_at, version').eq('order_id', orderId).order('submitted_at', { ascending: false }),
         supabase.from('order_items').select('id, item_id, item_name, quantity, unit_price, total_price, item_image_url, is_personalized, personalization_config, personalization_details, status, selected_addons').eq('order_id', orderId)
       ]);
 
       if (orderRes.data) {
         const orderData = orderRes.data as unknown as OrderUpdate;
-        const rawOrder = orderRes.data as any;
+        // Properly handle relation data without 'any'
+        const rawOrder = orderRes.data as unknown as { partners: { name: string } | null };
         if (rawOrder.partners?.name) orderData.partner_name = rawOrder.partners.name;
 
         if (itemsRes.data) orderData.order_items = itemsRes.data as unknown as OrderItemDetail[];

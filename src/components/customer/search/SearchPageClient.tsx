@@ -17,8 +17,8 @@ import Link from 'next/link';
 interface SearchPageClientProps {
   searchParams: Promise<{ q?: string; category?: string }>;
   initialResults?: {
-    items: Tables<'v_item_listings'>[];
-    partners: Tables<'v_partners_detailed'>[];
+    items: any[];
+    partners: any[];
     total: number;
   };
 }
@@ -46,8 +46,8 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
 
   // WYSHKIT 2026: Use server-provided initial results (data comes to user)
   const [results, setResults] = useState<{
-    items: Tables<'v_item_listings'>[];
-    partners: Tables<'v_partners_detailed'>[];
+    items: any[];
+    partners: any[];
   }>(() => ({
     items: initialResults?.items || [],
     partners: initialResults?.partners || [],
@@ -253,7 +253,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                           id={partner.id as any}
                           name={(partner.name as any) || 'Store'}
                           city={(partner.city as any) || 'City'}
-                          imageUrl={partner.image_url ?? '/images/logo.png'}
+                          image_url={partner.image_url ?? '/images/logo.png'}
                           rating={partner.rating as any}
                           variant="row"
                           className="bg-zinc-50/50 p-2"
@@ -269,9 +269,9 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                     <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4 px-1">Items from Stores</h3>
                     <div className="space-y-6">
                       {Object.entries(
-                        results.items.reduce((acc: Record<string, { partnerName: string, items: any[] }>, item) => {
-                          const pId = (item as any).partnerId || (item as any).partner_id || 'unknown';
-                          if (!acc[pId]) acc[pId] = { partnerName: (item as any).partner_name || 'Partner', items: [] };
+                        results.items.reduce((acc: Record<string, { partnerName: string, items: any[] }>, item: any) => {
+                          const pId = item.partner_id || 'unknown';
+                          if (!acc[pId]) acc[pId] = { partnerName: item.partner_name || 'Partner', items: [] };
                           acc[pId].items.push(item);
                           return acc;
                         }, {})
@@ -296,7 +296,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                                   className="w-full flex items-center gap-3 p-3 bg-zinc-50 rounded-2xl hover:bg-zinc-100 transition-all text-left group border border-zinc-100/50"
                                 >
                                   <div className="size-14 rounded-xl overflow-hidden shrink-0 bg-zinc-100 relative border border-zinc-100">
-                                    <Image src={(item.images as any)?.[0] ?? '/images/logo.png'} alt={(item.name as any) || 'Item'} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="56px" />
+                                    <Image src={(item.images as any)?.[0] || (item as any).image_url || '/images/logo.png'} alt={(item.name as any) || 'Item'} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="56px" />
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-bold text-zinc-900 truncate tracking-tight">{item.name as any}</p>

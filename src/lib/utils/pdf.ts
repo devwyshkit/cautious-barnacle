@@ -21,7 +21,7 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   doc.setFontSize(10);
   doc.setTextColor(104, 107, 120); // #686B78
   doc.setFont('helvetica', 'normal');
-  doc.text(`Order #${order.orderNumber} • ${new Date(order.createdAt).toLocaleDateString('en-IN')}`, margin, y);
+  doc.text(`Order #${order.order_number} • ${new Date(order.created_at).toLocaleDateString('en-IN')}`, margin, y);
 
   y += 15;
   doc.setDrawColor(217, 27, 36);
@@ -38,11 +38,11 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   y += 10;
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Partner: ${order.partners?.name || 'N/A'}`, margin, y);
+  doc.text(`Partner: ${order.partner?.name || 'N/A'}`, margin, y);
   y += 7;
-  doc.text(`Order Number: ${order.orderNumber}`, margin, y);
+  doc.text(`Order Number: ${order.order_number}`, margin, y);
   y += 7;
-  doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`, margin, y);
+  doc.text(`Date: ${new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`, margin, y);
 
   y += 15;
   // Items Table Header
@@ -58,11 +58,11 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
 
   // Items
   doc.setFont('helvetica', 'normal');
-  (order.orderItems || []).forEach((item: any) => {
-    doc.text(item.itemName.substring(0, 40), margin, y);
-    doc.text(item.quantity.toString(), 140, y, { align: 'right' });
-    doc.text(`Rs ${Number(item.unitPrice).toFixed(2)}`, 165, y, { align: 'right' });
-    doc.text(`Rs ${Number(item.totalPrice).toFixed(2)}`, 190, y, { align: 'right' });
+  (order.order_items || []).forEach((item: any) => {
+    doc.text((item.item_name || 'Item').substring(0, 40), margin, y);
+    doc.text((item.quantity || 1).toString(), 140, y, { align: 'right' });
+    doc.text(`Rs ${Number(item.unit_price || 0).toFixed(2)}`, 165, y, { align: 'right' });
+    doc.text(`Rs ${Number(item.total_price || 0).toFixed(2)}`, 190, y, { align: 'right' });
     y += 8;
   });
 
@@ -79,7 +79,7 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   doc.text(`Rs ${Number(order.subtotal || 0).toFixed(2)}`, 190, y, { align: 'right' });
   y += 7;
   doc.text('Delivery Fee:', 140, y, { align: 'right' });
-  doc.text(`Rs ${Number(order.deliveryFee || 0).toFixed(2)}`, 190, y, { align: 'right' });
+  doc.text(`Rs ${Number(order.delivery_fee || 0).toFixed(2)}`, 190, y, { align: 'right' });
   y += 7;
   doc.text('Total Amount:', 140, y, { align: 'right' });
   doc.setFont('helvetica', 'bold');
@@ -124,9 +124,9 @@ export function generateGSTINPDF(order: OrderForPDF, partner: PartnerForPDF): Bl
 
   const details = [
     ['Partner Name:', partner.name],
-    ['Business Type:', partner.businessType || 'N/A'],
-    ['Order Number:', order.orderNumber],
-    ['Order Date:', new Date(order.createdAt).toLocaleDateString('en-IN')],
+    ['Business Type:', partner.business_type || 'N/A'],
+    ['Order Number:', order.order_number],
+    ['Order Date:', new Date(order.created_at).toLocaleDateString('en-IN')],
     ['Total Amount:', `Rs ${Number(order.total || 0).toFixed(2)}`]
   ];
 

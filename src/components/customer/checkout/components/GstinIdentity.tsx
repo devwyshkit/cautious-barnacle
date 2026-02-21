@@ -8,14 +8,14 @@ import { toast } from 'sonner';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
 import { getPartnerInfo } from '@/lib/actions/draft-order';
 import { DraftLineItem } from '@/lib/types/personalization';
-import { PricingResult } from '@/lib/actions/payment';
+import type { PricingBreakdown } from '@/lib/constants/pricing';
 import { Address } from '@/lib/types/address';
 import type { User } from '@supabase/supabase-js';
 
 interface GstinIdentityProps {
     initialGstin: string;
     items: DraftLineItem[];
-    pricing: PricingResult;
+    pricing: PricingBreakdown;
     user: User | null;
     selectedAddress: Address | null;
     onGstinChange?: (gstin: string) => void;
@@ -84,9 +84,9 @@ export function GstinIdentity({
 
         generateEstimatePDF({
             date: new Date().toLocaleDateString(),
-            customerName: user?.user_metadata?.full_name || user?.email || "Valued Customer",
-            businessName: businessName || undefined,
-            billingAddress: selectedAddress,
+            customer_name: user?.user_metadata?.full_name || user?.email || "Valued Customer",
+            business_name: businessName || undefined,
+            billing_address: selectedAddress,
             gstin: gstin || undefined,
             partner: partner
                 ? {
@@ -96,27 +96,23 @@ export function GstinIdentity({
                 }
                 : { name: 'Partner', address: 'Bangalore, India' },
             totals: {
-                itemTotal: pricing.subtotal,
-                deliveryFee: pricing.delivery_fee,
-                platformFee: pricing.platform_fee || 0,
-                gstAmount: pricing.gst || 0,
-                grandTotal: pricing.total,
+                item_total: pricing.subtotal,
+                delivery_fee: pricing.delivery_fee,
+                platform_fee: pricing.platform_fee || 0,
+                gst_amount: pricing.gst || 0,
+                grand_total: pricing.total,
                 discount: pricing.discount || 0
             },
             order_items: items.map(it => ({
                 id: it.id || '',
-                itemId: it.item_id,
                 item_id: it.item_id,
                 item_name: it.item_name || 'Product',
                 quantity: it.quantity,
                 quantity_number: it.quantity,
-                unitPrice: it.unit_price,
                 unit_price: it.unit_price,
-                totalPrice: it.total_price,
                 total_price: it.total_price,
                 is_personalized: it.is_personalized || false,
-                status: 'DRAFT',
-                name: it.item_name || 'Product'
+                status: 'DRAFT'
             }))
         });
 

@@ -16,7 +16,7 @@ import {
 import type { Database } from '@/lib/supabase/database.types';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import { updateVariantStock } from '@/lib/actions/partner-actions';
+import { update_variant_stock } from '@/lib/actions/partner-actions';
 import { toast } from 'sonner';
 
 type Variant = {
@@ -227,7 +227,7 @@ function VariantStockItem({ variant }: { variant: Variant }) {
   const handleUpdate = async () => {
     if (qty === variant.stock_quantity) return;
     setUpdating(true);
-    const res = await updateVariantStock(variant.id, qty);
+    const res = await update_variant_stock(variant.id, qty);
     if (res.success) {
       toast.success(`Updated ${variant.name} stock`);
     } else {

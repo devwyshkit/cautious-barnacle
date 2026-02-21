@@ -18,10 +18,8 @@ export type {
   DraftTransaction
 } from './personalization';
 
-export type {
-  Cart,
-  CartItem
-} from './cart';
+// export * from './cart'; // Purged 2026
+
 
 
 export type {

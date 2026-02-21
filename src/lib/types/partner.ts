@@ -12,10 +12,10 @@ export type Partner = Tables<'partners'>;
 export interface MappedPartner {
   id: string;
   name: string;
-  image_url: string;
-  rating: number;
+  image_url: string | null;
+  rating: number | null;
   city: string | null;
-  prep_hours: number;
+  prep_hours: number | null;
   delivery_fee: number;
   slug: string | null;
   business_type: string | null;

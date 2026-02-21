@@ -56,8 +56,8 @@ export function useSearch(params: SearchParams) {
 
         if (!cancelled) {
           setResults({
-            items: (result.items || []) as Tables<'v_item_listings'>[],
-            partners: (result.partners || []) as Tables<'v_partners_detailed'>[],
+            items: (result.items || []) as any[],
+            partners: (result.partners || []) as any[],
             total: result.total || (result.items?.length || 0) + (result.partners?.length || 0),
           });
         }

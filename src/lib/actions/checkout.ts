@@ -6,32 +6,32 @@ import { getWalletInfo } from './wallet'
 import { calculateOrderTotalRPC } from './pricing'
 import { logError } from '@/lib/utils/error-handler'
 import { calculateHaversineDistance } from '@/lib/utils/distance'
-import { getDeliveryFeeByDistance } from '@/lib/utils/pricing'
 import { hasItemPersonalization } from '@/lib/utils/personalization'
-import type { HydratedDraftItem, PricingBreakdown } from '@/components/customer/checkout/types'
+import type { PricingBreakdown } from '@/components/customer/checkout/types'
+import type { DraftLineItem } from '@/lib/types/personalization'
 import type { Address } from '@/lib/types/address'
 import type { WalletInfo } from './wallet'
 import type { UpsellItem } from '@/components/features/UpsellGrid'
 
 export interface CheckoutData {
-    items: HydratedDraftItem[]
+    items: DraftLineItem[]
     addresses: Address[]
-    walletInfo: WalletInfo | null
+    wallet_info: WalletInfo | null
     pricing: PricingBreakdown | null
-    appliedCoupon: {
+    applied_coupon: {
         code: string
         discount: number
     } | null
-    useWallet: boolean
+    use_wallet: boolean
     gstin?: string | null
     user: {
         id: string
         email?: string
         name?: string
     } | null
-    partnerName?: string
-    partnerCity?: string
-    partnerPrepMins?: number
+    partner_name?: string
+    partner_city?: string
+    partner_prep_mins?: number
     error?: string
 }
 
@@ -73,42 +73,27 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
             return {
                 items: [],
                 addresses: addresses,
-                walletInfo: walletInfo,
+                wallet_info: walletInfo,
                 pricing: null,
-                appliedCoupon: null,
-                useWallet: useWallet,
+                applied_coupon: null,
+                use_wallet: useWallet,
                 user: user ? { id: user.id, email: user.email } : null,
                 error: 'Cart is empty'
             }
         }
 
-        // 2. Hydrate items (Already hydrated from getCart, just map to HydratedDraftItem if needed)
-        // Wyshkit 2026: Strict Type Mapping
-        const hydratedItems: HydratedDraftItem[] = cart.items.map(item => ({
-            itemId: item.item_id,
-            variantId: item.selected_variant_id,
-            personalization: item.personalization || { enabled: false },
-            selectedAddons: item.selected_addons || [],
+        // 2. Draft Items (Already hydrated from getCart)
+        const items = cart.items;
+
+        const pricingItems = items.map(item => ({
+            item_id: item.item_id,
             quantity: item.quantity,
-            id: item.id,
-            name: item.item_name,
-            image: item.item_image || '/images/logo.png',
-            basePrice: item.base_price || item.unit_price,
-            variantPrice: item.variant_price || 0,
-            variantName: item.variant_name,
-            personalizationPrice: item.personalization_price || 0,
-            partnerId: item.partner_id,
-            partnerName: item.partner_name
+            variant_id: item.selected_variant_id,
+            personalization_option_id: item.personalization?.option_id || null,
+            has_personalization: hasItemPersonalization(item),
+            selected_addons: item.selected_addons || []
         }));
 
-        const pricingItems = hydratedItems.map(item => ({
-            item_id: item.itemId,
-            quantity: item.quantity,
-            variant_id: item.variantId,
-            personalization_option_id: item.personalization.option_id || null,
-            has_personalization: hasItemPersonalization(item),
-            selected_addons: item.selectedAddons || []
-        }))
 
         // WYSHKIT 2026: Prioritize the manually selected address from cookie
         let defaultAddress = selectedAddressId
@@ -137,15 +122,16 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         // WYSHKIT 2026: If no address exists (even virtual), we skip RPC but return valid structure
         if (!defaultAddress) {
             return {
-                items: hydratedItems,
+                items: items,
                 addresses: addresses,
-                walletInfo: walletInfo,
+                wallet_info: walletInfo,
                 pricing: null,
-                appliedCoupon: null,
-                useWallet: useWallet,
+                applied_coupon: null,
+                use_wallet: useWallet,
                 user: user ? { id: user.id, email: user.email } : null
             }
         }
+
 
         // WYSHKIT 2026: Extract partner location from the first item (Swiggy Pattern: single store per order)
         const firstItem = cart.items[0];
@@ -165,7 +151,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         const pricingRes = await calculateOrderTotalRPC(
             pricingItems,
             0, // deliveryFee override not needed
-            defaultAddress.id,
+            defaultAddress.id === 'guest_location' ? null : defaultAddress.id,
             appliedCouponCode,
             distanceKm ?? undefined,
             useWallet,
@@ -175,17 +161,18 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         if (pricingRes.error || !pricingRes.data) {
             logError(new Error(pricingRes.error || 'Pricing calculation returned no data'), 'GetCheckoutData:PricingRPC');
             return {
-                items: hydratedItems,
+                items: items,
                 addresses: addresses,
-                walletInfo: walletInfo,
+                wallet_info: walletInfo,
                 pricing: null,
-                appliedCoupon: null,
-                useWallet: useWallet,
+                applied_coupon: null,
+                use_wallet: useWallet,
                 user: user ? { id: user.id, email: user.email } : null,
                 error: pricingRes.error || 'Pricing calculation failed',
                 gstin: gstin || null,
             }
         }
+
 
         const pricing = pricingRes.data;
         let appliedCoupon: { code: string; discount: number } | null = null
@@ -198,18 +185,19 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         }
 
         return {
-            items: hydratedItems,
+            items: items,
             addresses: addresses,
-            walletInfo: walletInfo,
+            wallet_info: walletInfo,
             pricing: pricing,
-            appliedCoupon: appliedCoupon,
-            useWallet: useWallet,
+            applied_coupon: appliedCoupon,
+            use_wallet: useWallet,
             gstin: gstin || null,
             user: user ? { id: user.id, email: user.email } : null,
-            partnerName: hydratedItems[0]?.partnerName,
-            partnerCity: 'Bangalore', // Default city - can be hydrated from partner metadata if needed
-            partnerPrepMins: 30, // Default prep mins
+            partner_name: items[0]?.partner_name,
+            partner_city: items[0]?.partner_city || 'Bangalore',
+            partner_prep_mins: items[0]?.partner_prep_hours ? items[0].partner_prep_hours * 60 : 30,
         }
+
 
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to fetch checkout data';
@@ -217,10 +205,10 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         return {
             items: [],
             addresses: [],
-            walletInfo: null,
+            wallet_info: null,
             pricing: null,
-            appliedCoupon: null,
-            useWallet: false,
+            applied_coupon: null,
+            use_wallet: false,
             user: null,
             error: errorMessage
         }

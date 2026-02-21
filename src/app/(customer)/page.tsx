@@ -37,6 +37,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     <div className="min-h-screen max-w-[1440px] mx-auto animate-in font-sans selection:bg-[#D91B24]/10 bg-white">
       <main className="pb-24">
         {/* Masthead - Real-time system state & trust signals */}
+        <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
         {!category && (
           <Masthead
             locationName={location?.name || 'Koramangala'}
@@ -157,8 +158,8 @@ async function AsyncFeaturedPartners({ category }: { category: string | null }) 
             name={partner.name}
             city={partner.city}
             image_url={partner.image_url}
-            rating={partner.rating}
-            prep_hours={partner.prep_hours}
+            rating={partner.rating ?? 0}
+            prep_hours={partner.prep_hours ?? 0}
             className="w-[160px] md:w-[220px] shrink-0 hover:-translate-y-1 transition-transform duration-300"
           />
         ))}
@@ -191,7 +192,7 @@ async function AsyncPopularNearYouRail() {
 
   if (items.length === 0) return null;
 
-  return <PopularNearYouRail items={items} />;
+  return <PopularNearYouRail items={items as WyshkitItem[]} />;
 }
 
 async function AsyncDiscoveryGrid({ category }: { category: string | null }) {

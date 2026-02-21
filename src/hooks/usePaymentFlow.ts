@@ -44,7 +44,7 @@ export function usePaymentFlow({
         setIsSuccess(true);
 
         const finalOrderId = orderId || order?.id;
-        const finalHasPersonalization = hasPersonalization ?? order?.has_personalization ?? order?.hasPersonalization;
+        const finalHasPersonalization = hasPersonalization ?? order?.has_personalization;
 
         // SWIGGY 2026: Zero-Delay Redirect — no pre-fetching.
         // OrderTracker's useOrderRealtime handles data loading.
@@ -65,10 +65,6 @@ export function usePaymentFlow({
 
     const handlePayment = useCallback(async () => {
         if (!authUser || !data.pricing) return;
-        if (!selectedAddressId) {
-            toast.error('Please select a delivery address');
-            return;
-        }
 
         if (isProcessing || isSuccess || paymentInitiatedRef.current) {
             return;
@@ -78,19 +74,19 @@ export function usePaymentFlow({
             paymentInitiatedRef.current = true;
             setIsProcessing(true);
 
-            const { createPaymentOrder, verifyPaymentSignature } = await import('@/lib/actions/payment');
+            const { create_payment_order, verify_payment_signature } = await import('@/lib/actions/payment');
 
-            const response = await createPaymentOrder(
+            const response = await create_payment_order(
                 Math.round(data.pricing.total * 100),
                 'INR',
                 {
-                    addressId: selectedAddressId,
-                    draftItems: data.items,
+                    address_id: selectedAddressId || '',
+                    draft_items: data.items,
                     pricing: data.pricing,
-                    appliedCoupon: data.appliedCoupon || undefined,
-                    useWallet: data.useWallet,
-                    walletDiscount: data.pricing.walletDiscount || 0,
-                    deliveryInstructions: deliveryInstructions || undefined,
+                    applied_coupon: data.applied_coupon || undefined,
+                    use_wallet: data.use_wallet,
+                    wallet_discount: data.pricing.wallet_discount || 0,
+                    delivery_instructions: deliveryInstructions || undefined,
                 }
             );
 
@@ -117,16 +113,16 @@ export function usePaymentFlow({
                     amount: orderData.amount,
                     currency: orderData.currency,
                     name: 'Wyshkit',
-                    description: `Order from ${data.partnerName || 'Local Store'}`,
+                    description: `Order from ${data.partner_name || 'Local Store'}`,
                     order_id: orderData.id,
                     handler: async (razorpayResponse: any) => {
                         try {
-                            const verifyResponse = await verifyPaymentSignature(
+                            const verifyResponse = await verify_payment_signature(
                                 razorpayResponse.razorpay_order_id,
                                 razorpayResponse.razorpay_payment_id,
                                 razorpayResponse.razorpay_signature,
                                 {
-                                    draftId: orderData.draftId
+                                    draft_id: orderData.draftId
                                 }
                             );
 
@@ -134,9 +130,8 @@ export function usePaymentFlow({
                                 logger.error('Payment verification action failed', { error: verifyResponse.error });
                                 toast.error("Still verifying your order... please don't refresh.");
                             }
-
                             if (verifyResponse.success && !successRef.current) {
-                                handleOrderSuccess(verifyResponse.order || null, verifyResponse.orderId, verifyResponse.hasPersonalization ?? undefined);
+                                handleOrderSuccess(verifyResponse.order || null, verifyResponse.order_id, verifyResponse.has_personalization ?? undefined);
                             }
                         } catch (err) {
                             toast.error(err instanceof Error ? err.message : 'Payment verification failed');
@@ -144,7 +139,9 @@ export function usePaymentFlow({
                             paymentInitiatedRef.current = false;
                         }
                     },
-                    prefill: { name: authUser?.user_metadata?.full_name, phone: authUser?.phone },
+                    prefill: {
+                        name: authUser?.user_metadata?.full_name, phone: authUser?.phone
+                    },
                     theme: { color: '#18181b' },
                     modal: {
                         ondismiss: () => {

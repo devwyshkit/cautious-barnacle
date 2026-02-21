@@ -23,17 +23,15 @@ export default async function OrdersPage() {
 
     // Map DB orders to OrderListItem for the component
     const mappedOrders = (orders || []).map((row: any) => ({
-        id: row.id,
-        orderNumber: row.order_number ?? null,
-        status: row.status,
-        total: row.total ?? 0,
-        createdAt: row.created_at ?? null,
-        partnerName: row.partner_name ?? null,
-        itemCount: row.items?.length || 1,
-        firstItemImage: row.partner_image ?? null,
-        firstItemName: row.items?.map((it: any) => it.item_name || it.itemName).join(', ') || null,
-        hasPersonalization: row.has_personalization || false,
-        personalizationStatus: row.personalization_status || null,
+        ...row,
+        order_number: row.order_number ?? null,
+        created_at: row.created_at ?? null,
+        partner_name: row.partner_name ?? null,
+        item_count: row.items?.length || 1,
+        first_item_image: row.partner_image ?? null,
+        first_item_name: row.items?.map((it: any) => it.item_name).join(', ') || null,
+        has_personalization: row.has_personalization || false,
+        personalization_status: row.personalization_status || null,
     }));
 
     return (

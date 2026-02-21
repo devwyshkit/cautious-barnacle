@@ -14,12 +14,11 @@ import { WyshkitItem } from '@/lib/types/item';
 export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusKm: number = 5) => {
   const supabase = await createClient();
 
-  // WYSHKIT 2026: Bypass generated type issue for RPC with arguments
-  const { data: nearbyItems, error } = await (supabase as any).rpc('get_nearby_items', {
+  const { data: nearbyItems, error } = await supabase.rpc('get_nearby_items', {
     user_lat: lat,
     user_lng: lng,
     radius_km: radiusKm,
-    include_out_of_stock: false // WYSHKIT 2026: Zero Reflection
+    include_out_of_stock: false
   });
 
   if (error) {
@@ -27,11 +26,11 @@ export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusK
     return { items: [], error: error.message };
   }
 
-  // RPC returns item_id, item_name, so we ensure it matches WyshkitItem interface
   const items = (nearbyItems as any[] || []).map((item: any) => ({
     ...item,
     id: item.item_id || item.id,
     name: item.item_name || item.name,
+    image_url: item.images?.[0] || item.image_url,
     distance_km: item.distance_km
   })) as WyshkitItem[];
 
@@ -43,7 +42,7 @@ export const getHomeDiscovery = cache(async (lat?: number, lng?: number) => {
     const supabase = await createClient();
 
     // Categories
-    const { data: categories, error: catError } = await (supabase as any)
+    const { data: categories, error: catError } = await supabase
       .from('categories')
       .select('id, name, slug, image_url, display_order')
       .eq('is_active', true)
@@ -56,7 +55,7 @@ export const getHomeDiscovery = cache(async (lat?: number, lng?: number) => {
     let trendingItems: WyshkitItem[] = [];
 
     if (lat && lng) {
-      const { data: nearbyItems, error: nearbyError } = await (supabase as any).rpc('get_nearby_items', {
+      const { data: nearbyItems, error: nearbyError } = await supabase.rpc('get_nearby_items', {
         user_lat: lat,
         user_lng: lng,
         radius_km: 10,
@@ -135,7 +134,7 @@ export const getFeaturedPartners = cache(async (limit: number = 8) => {
     });
   }
 
-  return { data: Array.from(uniquePartnersMap.values()), error: null };
+  return { data: Array.from(uniquePartnersMap.values()) as MappedPartner[], error: null };
 });
 
 export const getFeaturedItems = cache(async (limit: number = 3) => {

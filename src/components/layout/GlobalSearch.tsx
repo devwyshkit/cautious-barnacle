@@ -103,7 +103,7 @@ export function GlobalSearch() {
                         id={partner.id as any}
                         name={(partner.name as any) || 'Store'}
                         city={(partner.city as any) || 'City'}
-                        imageUrl={partner.image_url ?? '/images/logo.png'}
+                        image_url={partner.image_url ?? '/images/logo.png'}
                         rating={partner.rating as any}
                         variant="row"
                       />

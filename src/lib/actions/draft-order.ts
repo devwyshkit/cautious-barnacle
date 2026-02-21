@@ -9,12 +9,12 @@ function revalidateCartPaths() {
   revalidatePath('/checkout')
 }
 import { DraftTransaction, DraftLineItem, SelectedPersonalization, SelectedAddon } from '@/lib/types/personalization'
-import { calculateItemPrice, calculateCartSubtotal } from '@/lib/utils/pricing'
 import { logError, handleActionError } from '@/lib/utils/error-handler'
 import { getGuestSessionId, getGuestSessionIdReadOnly } from '@/lib/session'
 import { DBItem, DBVariant } from '@/lib/supabase/types'
 import { createAdminClient } from '@/lib/supabase/server'
 import type { Database, Json } from '@/lib/supabase/database.types'
+import { mapRawToDraftLineItem } from '@/lib/utils/mappers'
 
 // Define interfaces for View and Join results
 interface CartItemView {
@@ -81,7 +81,7 @@ export async function getCart(): Promise<GetCartResult> {
 
     if (!user && !guestSessionId) {
       return {
-        cart: { items: [], partner_id: null, subtotal: 0, total: 0, item_count: 0 },
+        cart: { items: [], partner_id: null, subtotal: 0, personalization_charges: 0, delivery_fee: 0, platform_fee: 0, gst: 0, discount: 0, wallet_discount: 0, total: 0, item_count: 0 },
         cartIdentity: 'empty',
         guestSessionId: null
       }
@@ -100,35 +100,10 @@ export async function getCart(): Promise<GetCartResult> {
       logError(totalsError, 'GetCartTotals');
     }
 
-    // Fetch individual cart items for detailed listing
+    // Fetch individual cart items for detailed listing from high-fidelity view
     let itemsQuery = supabase
-      .from('cart_items')
-      .select(`
-        id,
-        item_id,
-        quantity,
-        selected_variant_id,
-        personalization,
-        selected_addons,
-        items:items (
-          id,
-          name,
-          base_price,
-          images,
-          partner_id,
-          partners:partners (
-            name,
-            latitude,
-            longitude
-          ),
-          personalization_options (*),
-          item_addons (*)
-        ),
-        variants:variants (
-          name,
-          price
-        )
-      `)
+      .from('v_active_cart_detailed')
+      .select('*')
       .order('id');
 
     if (user) {
@@ -143,49 +118,8 @@ export async function getCart(): Promise<GetCartResult> {
       logError(itemsError, 'GetCartItems');
     }
 
-    const dbPricing = (totalsData?.pricing as unknown as { subtotal: number; total: number }) || { subtotal: 0, total: 0 };
-
-    // Map DB items to frontend MappedCartItem objects
-    const items: DraftLineItem[] = (itemRows || []).map(row => {
-      const itemNode = row.items as any;
-      const itemBasePrice = Number(itemNode?.base_price || 0);
-      const variantNode = row.variants as any;
-      const variantPrice = variantNode?.price != null ? Number(variantNode.price) : null;
-      const unitPrice = variantPrice !== null ? variantPrice : itemBasePrice;
-      const quantity = Number(row.quantity) || 1;
-
-      const selectedAddons = (row.selected_addons as unknown as SelectedAddon[]) || [];
-      const addonsPrice = selectedAddons.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
-
-      const personalization = (row.personalization as unknown as SelectedPersonalization) || undefined;
-      const personalizationPrice = (personalization?.price || 0);
-
-      return {
-        id: row.id,
-        item_id: row.item_id,
-        item_name: itemNode?.name || 'Product',
-        item_image: itemNode?.images?.[0] || '/placeholder.png',
-        quantity: quantity,
-        unit_price: unitPrice,
-        total_price: (unitPrice + addonsPrice + personalizationPrice) * quantity,
-        selected_variant_id: row.selected_variant_id,
-        personalization: personalization,
-        selected_addons: selectedAddons,
-        partner_name: itemNode?.partners?.name || 'Store',
-        partner_id: itemNode?.partner_id,
-        partner_latitude: itemNode?.partners?.latitude,
-        partner_longitude: itemNode?.partners?.longitude,
-        base_price: itemBasePrice,
-        variant_price: variantPrice,
-        variant_name: variantNode?.name,
-        personalization_price: personalizationPrice,
-        addons_price: addonsPrice,
-        personalization_options: (itemNode?.personalization_options as any[]) || [],
-        item_addons: (itemNode?.item_addons as any[]) || [],
-        is_personalized: !!personalization?.enabled,
-        personalization_details: personalization?.enabled ? personalization : null
-      } as DraftLineItem;
-    });
+    const dbRes = (totalsData?.pricing as any) || {};
+    const items: DraftLineItem[] = (itemRows || []).map(row => mapRawToDraftLineItem(row));
 
     const partnerIds = new Set(items.map(item => item.partner_id).filter(Boolean));
     const partnerId = partnerIds.size === 1 ? Array.from(partnerIds)[0] as string : null;
@@ -193,8 +127,14 @@ export async function getCart(): Promise<GetCartResult> {
     const cart: DraftTransaction = {
       items,
       partner_id: partnerId as string | null,
-      subtotal: Number(dbPricing.subtotal) || 0,
-      total: Number(dbPricing.total) || 0,
+      subtotal: Number(dbRes.subtotal) || 0,
+      personalization_charges: Number(dbRes.personalization_charges || dbRes.personalizationCharges) || 0,
+      delivery_fee: Number(dbRes.delivery_fee || dbRes.deliveryFee) || 0,
+      platform_fee: Number(dbRes.platform_fee || dbRes.platformFee) || 0,
+      gst: Number(dbRes.gst) || 0,
+      discount: Number(dbRes.discount) || 0,
+      wallet_discount: Number(dbRes.wallet_used || dbRes.wallet_discount || dbRes.walletUsed || dbRes.walletDiscount) || 0,
+      total: Number(dbRes.total) || 0,
       item_count: items.reduce((sum, item) => sum + item.quantity, 0),
     };
 
@@ -206,7 +146,7 @@ export async function getCart(): Promise<GetCartResult> {
   } catch (error) {
     logError(error, 'GetCart');
     return {
-      cart: { items: [], partner_id: null, subtotal: 0, total: 0, item_count: 0 },
+      cart: { items: [], partner_id: null, subtotal: 0, personalization_charges: 0, delivery_fee: 0, platform_fee: 0, gst: 0, discount: 0, wallet_discount: 0, total: 0, item_count: 0 },
       error: error instanceof Error ? error.message : 'Failed to fetch cart',
       cartIdentity: 'error-fallback',
       guestSessionId: null
@@ -546,7 +486,7 @@ export async function clearDraftOrder() {
 
     revalidateCartPaths()
 
-    const emptyCart = { items: [], partner_id: null, subtotal: 0, total: 0, item_count: 0 };
+    const emptyCart = { items: [], partner_id: null, subtotal: 0, personalization_charges: 0, delivery_fee: 0, platform_fee: 0, gst: 0, discount: 0, wallet_discount: 0, total: 0, item_count: 0 };
     return { success: true, cart: emptyCart };
   } catch (error) {
     logError(error, 'ClearDraftOrder');
@@ -557,8 +497,8 @@ export async function clearDraftOrder() {
 export async function getGuestCartDetails(payload: Array<{ item_id: string; quantity: number; variant_id?: string | null; personalization?: SelectedPersonalization; selected_addons?: SelectedAddon[] }>) {
   try {
     if (!payload.length) {
-      return { cart: { items: [], partner_id: null, subtotal: 0, total: 0, item_count: 0 } }
-    }
+      return { cart: { items: [], partner_id: null, subtotal: 0, personalization_charges: 0, delivery_fee: 0, platform_fee: 0, gst: 0, discount: 0, wallet_discount: 0, total: 0, item_count: 0 } }
+    };
 
     const supabase = await createClient();
     const item_ids = payload.map(i => i.item_id)
@@ -607,35 +547,37 @@ export async function getGuestCartDetails(payload: Array<{ item_id: string; quan
 
     // Verify items and compute totals atomicly if possible
     // (Actual placement happens in place_secure_order RPC)
-    const { data: pricing, error: pricingError } = await (supabase as any).rpc('calculate_order_total', {
+    const { data: pricing, error: pricingError } = await supabase.rpc('calculate_order_total', {
       p_cart_items: items.map(it => ({
         item_id: it.item_id,
         quantity: it.quantity,
         variant_id: it.selected_variant_id,
         has_personalization: !!it.personalization?.enabled,
         selected_addons: it.selected_addons
-      })),
+      })) as any,
       p_delivery_fee_override: 40,
-      p_distance_km: null,
-      p_coupon_code: null,
-      p_address_id: null,
+      p_distance_km: undefined,
+      p_coupon_code: undefined,
+      p_address_id: undefined,
       p_use_wallet: false,
-      p_user_id: null
-    }) as { data: any, error: any };
+      p_user_id: undefined
+    });
 
 
     if (pricingError) throw pricingError;
+
+    const typedPricing = pricing as any;
 
     return {
       success: true,
       data: {
         id: 'guest', // Placeholder for guest
 
-        subtotal: pricing.subtotal,
-        total: pricing.total,
-        gst: pricing.gst,
-        delivery_fee: pricing.delivery_fee,
-        platform_fee: pricing.platform_fee,
+        subtotal: typedPricing?.subtotal || 0,
+        total: typedPricing?.total || 0,
+        gst: typedPricing?.gst || 0,
+        delivery_fee: typedPricing?.delivery_fee || 0,
+        platform_fee: typedPricing?.platform_fee || 0,
         items
       }
     };

@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logging/logger';
 
 interface ShadowfaxOrderPayload {
-    orderId: string;
+    order_id: string;
     customer: {
         name: string;
         phone: string;
@@ -39,11 +39,11 @@ export const ShadowfaxService = {
 
             // In development or if no key, return mock success for testing flow
             if (!apiKey || process.env.NODE_ENV === 'development') {
-                logger.info('Shadowfax createOrder mocked', payload as unknown as Record<string, unknown>);
+                logger.info(`[Shadowfax] DevMode: Order creation mocked for ${payload.order_id}`);
                 return {
                     success: true,
                     awbNumber: `SFX-MOCK-${Date.now()}`,
-                    trackingUrl: `https://track.shadowfax.in/track?order=${payload.orderId}`
+                    trackingUrl: `https://track.shadowfax.in/track?order=${payload.order_id}`
                 };
             }
 
@@ -56,7 +56,7 @@ export const ShadowfaxService = {
                 },
                 body: JSON.stringify({
                     order_details: {
-                        client_order_id: payload.orderId,
+                        client_order_id: payload.order_id,
                         actual_weight: payload.order_details.total_weight_kg,
                         length: payload.order_details.length_cm,
                         width: payload.order_details.width_cm,

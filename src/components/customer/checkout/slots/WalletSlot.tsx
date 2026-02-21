@@ -63,7 +63,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing }: WalletSlot
                 <div className="flex items-center gap-3">
                     {useWalletBalance && (
                         <span className="text-[11px] font-black text-white/90">
-                            -{formatCurrency(pricing.walletDiscount)}
+                            -{formatCurrency(pricing.wallet_discount)}
                         </span>
                     )}
                     {isPending ? (

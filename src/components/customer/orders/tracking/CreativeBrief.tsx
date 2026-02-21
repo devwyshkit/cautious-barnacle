@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { toast } from 'sonner';
 import { SubmittedIdentity } from './SubmittedIdentity';
-import { PreviewSubmission } from '@/hooks/useOrderRealtime';
+import { PreviewSubmission } from '@/lib/types/order';
 import Image from 'next/image';
 
 import { ORDER_STATUS } from '@/lib/types/order-status';

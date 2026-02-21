@@ -1,5 +1,6 @@
 import { getPartnerFromSession } from '@/lib/auth/server';
-import { getPartnerFinancials, getPartnerPayouts } from '@/lib/actions/partner-actions';
+import { get_partner_financials, get_partner_payouts } from '@/lib/actions/partner-actions';
+import { formatCurrency } from '@/lib/utils/pricing';
 import { redirect } from 'next/navigation';
 import { IndianRupee, Clock, ArrowUpRight, Percent, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,15 +48,14 @@ function SettlementCalendar({ pendingAmount, settlementDays }: { pendingAmount: 
               const isToday = format(day, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
               const isSettlementDay = format(day, 'yyyy-MM-dd') === format(nextSettlement, 'yyyy-MM-dd');
               return (
-                <div 
-                  key={i} 
-                  className={`aspect-square flex items-center justify-center rounded-lg text-sm ${
-                    isSettlementDay 
-                      ? 'bg-emerald-500 text-white font-medium' 
-                      : isToday 
-                        ? 'bg-zinc-900 text-white' 
-                        : 'bg-zinc-50 text-zinc-600'
-                  }`}
+                <div
+                  key={i}
+                  className={`aspect - square flex items - center justify - center rounded - lg text - sm ${isSettlementDay
+                    ? 'bg-emerald-500 text-white font-medium'
+                    : isToday
+                      ? 'bg-zinc-900 text-white'
+                      : 'bg-zinc-50 text-zinc-600'
+                    } `}
                 >
                   {format(day, 'd')}
                 </div>
@@ -77,8 +77,8 @@ export default async function PartnerFinancialsPage() {
   if (!partner) redirect('/partner/login');
 
   const [{ data: financials }, { data: payouts }] = await Promise.all([
-    getPartnerFinancials(partner.id),
-    getPartnerPayouts(partner.id),
+    get_partner_financials(partner.id),
+    get_partner_payouts(partner.id),
   ]);
 
   const settlementDays = partner.settlement_days || 7;
@@ -101,7 +101,7 @@ export default async function PartnerFinancialsPage() {
               </div>
               <div>
                 <p className="text-xl font-semibold text-zinc-900">
-                  ₹{(financials?.totalEarnings || 0).toLocaleString('en-IN')}
+                  ₹{formatCurrency(financials?.total_earnings || 0)}
                 </p>
                 <p className="text-xs text-zinc-500">Total earnings</p>
               </div>
@@ -117,7 +117,7 @@ export default async function PartnerFinancialsPage() {
               </div>
               <div>
                 <p className="text-xl font-semibold text-zinc-900">
-                  ₹{(financials?.pendingSettlement || 0).toLocaleString('en-IN')}
+                  ₹{formatCurrency(financials?.pending_settlement || 0)}
                 </p>
                 <p className="text-xs text-zinc-500">Pending</p>
               </div>
@@ -133,7 +133,7 @@ export default async function PartnerFinancialsPage() {
               </div>
               <div>
                 <p className="text-xl font-semibold text-zinc-900">
-                  {financials?.lastPayout ? `₹${financials.lastPayout.toLocaleString('en-IN')}` : '-'}
+                  {financials?.last_payout ? `₹${formatCurrency(financials.last_payout)}` : 'None yet'}
                 </p>
                 <p className="text-xs text-zinc-500">Last payout</p>
               </div>
@@ -149,21 +149,21 @@ export default async function PartnerFinancialsPage() {
               </div>
               <div>
                 <p className="text-xl font-semibold text-zinc-900">
-                  {financials?.commissionRate || 15}%
+                  {financials?.commission_rate || 0}%
                 </p>
                 <p className="text-xs text-zinc-500">Commission</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        </div>
+      </div>
 
-        <SettlementCalendar 
-          pendingAmount={financials?.pendingSettlement || 0} 
-          settlementDays={settlementDays} 
-        />
+      <SettlementCalendar
+        pendingAmount={financials?.pending_settlement || 0}
+        settlementDays={settlementDays}
+      />
 
-        <Card>
+      <Card>
         <CardHeader>
           <CardTitle className="text-base font-semibold">Payout details</CardTitle>
         </CardHeader>
@@ -172,8 +172,8 @@ export default async function PartnerFinancialsPage() {
             <div className="flex items-center justify-between py-2">
               <span className="text-sm text-zinc-600">Bank account</span>
               <span className="text-sm font-medium text-zinc-900">
-                {partner.payout_account_number 
-                  ? `****${partner.payout_account_number.slice(-4)}`
+                {partner.payout_account_number
+                  ? `**** ${partner.payout_account_number.slice(-4)} `
                   : 'Not set'
                 }
               </span>
@@ -194,50 +194,49 @@ export default async function PartnerFinancialsPage() {
         </CardContent>
       </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold">Recent payouts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {payouts && payouts.length > 0 ? (
-              <div className="space-y-3">
-                {payouts.slice(0, 5).map((payout: { id: string; amount: number; status: string; created_at: string }) => (
-                  <div key={payout.id} className="flex items-center justify-between py-2 border-b border-zinc-100 last:border-0">
-                    <div className="flex items-center gap-3">
-                      <div className={`size-8 rounded-full flex items-center justify-center ${
-                        payout.status === 'completed' ? 'bg-emerald-50' : 'bg-amber-50'
-                      }`}>
-                        {payout.status === 'completed' 
-                          ? <CheckCircle2 className="size-4 text-emerald-600" />
-                          : <AlertCircle className="size-4 text-amber-600" />
-                        }
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-zinc-900">
-                          ₹{payout.amount.toLocaleString('en-IN')}
-                        </p>
-                        <p className="text-xs text-zinc-500">
-                          {format(new Date(payout.created_at), 'd MMM yyyy')}
-                        </p>
-                      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">Recent payouts</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {payouts && payouts.length > 0 ? (
+            <div className="space-y-3">
+              {payouts.slice(0, 5).map((payout: { id: string; amount: number; status: string; created_at: string }) => (
+                <div key={payout.id} className="flex items-center justify-between py-2 border-b border-zinc-100 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <div className={`size - 8 rounded - full flex items - center justify - center ${payout.status === 'completed' ? 'bg-emerald-50' : 'bg-amber-50'
+                      } `}>
+                      {payout.status === 'completed'
+                        ? <CheckCircle2 className="size-4 text-emerald-600" />
+                        : <AlertCircle className="size-4 text-amber-600" />
+                      }
                     </div>
-                    <Badge variant="outline" className={
-                      payout.status === 'completed' 
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                        : 'bg-amber-50 text-amber-700 border-amber-200'
-                    }>
-                      {payout.status}
-                    </Badge>
+                    <div>
+                      <p className="text-sm font-medium text-zinc-900">
+                        ₹{payout.amount.toLocaleString('en-IN')}
+                      </p>
+                      <p className="text-xs text-zinc-500">
+                        {format(new Date(payout.created_at), 'd MMM yyyy')}
+                      </p>
+                    </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <p className="text-sm text-zinc-500">No payouts yet</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <Badge variant="outline" className={
+                    payout.status === 'completed'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-amber-50 text-amber-700 border-amber-200'
+                  }>
+                    {payout.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-sm text-zinc-500">No payouts yet</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

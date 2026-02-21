@@ -25,7 +25,7 @@ export default async function ItemPage({
     <div className="min-h-screen">
       <PartnerStorePage
         partnerId={id}
-        initialData={partner}
+        initialData={partner as any}
         initialItems={items}
       />
       <InterceptedItemSheet

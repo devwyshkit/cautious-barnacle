@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
-import { updateOrderStatus } from '@/lib/actions/partner-actions';
+import { update_order_status } from '@/lib/actions/partner-actions';
 import { logger } from '@/lib/logging/logger';
 import { ORDER_STATUS } from '@/lib/types/order-status';
 
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (targetStatus) {
-      const result = await updateOrderStatus(client_order_id, targetStatus);
+      const result = await update_order_status(client_order_id, targetStatus);
 
       if (!result.success) {
         logger.error('Shadowfax Webhook: Status update failed', result.error, { client_order_id, targetStatus });
@@ -62,8 +62,8 @@ export async function POST(req: NextRequest) {
       // WYSHKIT 2026: Trigger Financial Settlements & Rewards on Delivery
       if (targetStatus === ORDER_STATUS.DELIVERED) {
         try {
-          const { triggerPostDeliveryEvents } = await import('@/lib/actions/settlement');
-          await triggerPostDeliveryEvents(client_order_id);
+          const { trigger_post_delivery_events } = await import('@/lib/actions/settlement');
+          await trigger_post_delivery_events(client_order_id);
           logger.info('Shadowfax Webhook: Post-delivery business logic triggered', { client_order_id });
         } catch (postDeliveryError) {
           logger.error('Shadowfax Webhook: Post-delivery trigger failed', postDeliveryError, { client_order_id });

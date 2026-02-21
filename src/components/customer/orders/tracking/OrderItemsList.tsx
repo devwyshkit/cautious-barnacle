@@ -10,7 +10,7 @@ import { ORDER_STATUS, getItemStatusConfig } from '@/lib/types/order-status';
 import { IdentityForm } from '../IdentityForm';
 import { SubmittedIdentity } from './SubmittedIdentity';
 import { PreviewApproval } from '../PreviewApproval';
-import { approvePreview, requestChange } from '@/lib/actions/orders';
+import { approve_preview, request_change } from '@/lib/actions/orders';
 import { toast } from 'sonner';
 
 interface OrderItemsListProps {
@@ -122,7 +122,7 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                                         onApprove={async () => {
                                             setIsApproving(true);
                                             try {
-                                                const result = await approvePreview(itemPreviews[selectedPreviewItem.id].id, order.id);
+                                                const result = await approve_preview(itemPreviews[selectedPreviewItem.id].id, order.id);
                                                 if (result.success) {
                                                     toast.success('Item approved! Production has started.');
                                                     setSelectedPreviewItem(null);
@@ -140,7 +140,7 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                                         onRequestChange={async (feedback: string) => {
                                             setIsRequestingChange(true);
                                             try {
-                                                const result = await requestChange(itemPreviews[selectedPreviewItem.id].id, order.id, feedback);
+                                                const result = await request_change(itemPreviews[selectedPreviewItem.id].id, order.id, feedback);
                                                 if (result.success) {
                                                     toast.success('Feedback sent. Partner will upload a new preview.');
                                                     setSelectedPreviewItem(null);

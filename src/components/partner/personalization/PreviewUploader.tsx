@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { Upload, X, Camera, Image as ImageIcon, Loader2, SwitchCamera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { uploadPreview } from '@/lib/actions/partner-actions';
+import { upload_preview } from '@/lib/actions/partner-actions';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import Image from 'next/image';
@@ -149,7 +149,7 @@ export function PreviewUploader({ orderId, orderItemId, orderNumber, isOpen, onC
         .from('order-assets')
         .getPublicUrl(data.path);
 
-      const result = await uploadPreview(orderId, orderItemId, publicUrl);
+      const result = await upload_preview(orderId, orderItemId, publicUrl);
 
       if (result.success) {
         toast.success('Preview uploaded');

@@ -279,6 +279,13 @@ export type Database = {
             foreignKeyName: "cart_reservations_cart_item_id_fkey"
             columns: ["cart_item_id"]
             isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_reservations_cart_item_id_fkey"
+            columns: ["cart_item_id"]
+            isOneToOne: false
             referencedRelation: "v_cart_items"
             referencedColumns: ["id"]
           },
@@ -397,6 +404,13 @@ export type Database = {
             foreignKeyName: "category_commissions_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
+          },
+          {
+            foreignKeyName: "category_commissions_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
             referencedRelation: "v_cart_items_complete"
             referencedColumns: ["partner_id"]
           },
@@ -475,6 +489,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupons_created_by_partner_id_fkey"
+            columns: ["created_by_partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "coupons_created_by_partner_id_fkey"
@@ -571,6 +592,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "deliveries_partner_id_fkey"
@@ -1091,6 +1119,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "products_vendor_id_fkey"
@@ -1668,6 +1703,13 @@ export type Database = {
             foreignKeyName: "orders_vendor_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
             referencedRelation: "v_cart_items_complete"
             referencedColumns: ["partner_id"]
           },
@@ -1725,6 +1767,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_delivery_zones_store_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "store_delivery_zones_store_id_fkey"
@@ -1819,6 +1868,13 @@ export type Database = {
             foreignKeyName: "partner_payouts_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
+          },
+          {
+            foreignKeyName: "partner_payouts_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
             referencedRelation: "v_cart_items_complete"
             referencedColumns: ["partner_id"]
           },
@@ -1906,6 +1962,13 @@ export type Database = {
             foreignKeyName: "partner_reviews_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
+          },
+          {
+            foreignKeyName: "partner_reviews_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
             referencedRelation: "v_cart_items_complete"
             referencedColumns: ["partner_id"]
           },
@@ -1964,6 +2027,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_users_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "partner_users_partner_id_fkey"
@@ -2657,6 +2727,13 @@ export type Database = {
             foreignKeyName: "storefronts_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
+          },
+          {
+            foreignKeyName: "storefronts_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
             referencedRelation: "v_cart_items_complete"
             referencedColumns: ["partner_id"]
           },
@@ -2975,6 +3052,84 @@ export type Database = {
         }
         Relationships: []
       }
+      v_active_cart_detailed: {
+        Row: {
+          base_price: number | null
+          created_at: string | null
+          id: string | null
+          item_id: string | null
+          item_image: string | null
+          item_is_active: boolean | null
+          item_name: string | null
+          partner_city: string | null
+          partner_id: string | null
+          partner_latitude: number | null
+          partner_longitude: number | null
+          partner_name: string | null
+          partner_prep_hours: number | null
+          personalization: Json | null
+          personalization_options: Json | null
+          quantity: number | null
+          selected_addons: Json | null
+          selected_variant_id: string | null
+          session_id: string | null
+          updated_at: string | null
+          user_id: string | null
+          variant_name: string | null
+          variant_price: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "v_item_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "v_item_listings_search"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "v_items_detailed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "v_trending_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_selected_variant_id_fkey"
+            columns: ["selected_variant_id"]
+            isOneToOne: false
+            referencedRelation: "variants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_items_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_active_cart_totals: {
         Row: {
           cart_owner_id: string | null
@@ -3068,6 +3223,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "products_vendor_id_fkey"
@@ -3254,6 +3416,13 @@ export type Database = {
             foreignKeyName: "products_vendor_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
             referencedRelation: "v_cart_items_complete"
             referencedColumns: ["partner_id"]
           },
@@ -3311,6 +3480,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "products_vendor_id_fkey"
@@ -3376,6 +3552,13 @@ export type Database = {
             foreignKeyName: "products_vendor_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
             referencedRelation: "v_cart_items_complete"
             referencedColumns: ["partner_id"]
           },
@@ -3421,6 +3604,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "orders_vendor_id_fkey"
@@ -3477,6 +3667,13 @@ export type Database = {
             foreignKeyName: "orders_vendor_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
             referencedRelation: "v_cart_items_complete"
             referencedColumns: ["partner_id"]
           },
@@ -3528,6 +3725,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "orders_vendor_id_fkey"
@@ -3685,6 +3889,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "partners"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
           },
           {
             foreignKeyName: "products_vendor_id_fkey"

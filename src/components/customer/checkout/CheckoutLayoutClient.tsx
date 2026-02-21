@@ -45,6 +45,7 @@ function CheckoutLayoutClientInner({
   const { clearDraftOrder, addToDraftOrder } = useCart();
   const addressContext = useCheckoutAddress();
   const selectedAddressId = addressContext?.selectedAddressId ?? null;
+  const isValidAddress = selectedAddressId && selectedAddressId !== 'guest_location';
 
   const [gstin, setGstin] = useState<string>((data.gstin as string) || '');
   const [businessName, setBusinessName] = useState<string | null>(null);
@@ -133,8 +134,8 @@ function CheckoutLayoutClientInner({
                 <ChevronLeft className="size-6" />
               </button>
               <div className="flex flex-col">
-                <h2 className="text-lg font-bold text-zinc-900 leading-tight tracking-tight">{data.partnerName || 'Checkout'}</h2>
-                <p className="text-[11px] font-bold text-zinc-400 leading-tight">{data.partnerCity || 'Local Store'}</p>
+                <h2 className="text-lg font-bold text-zinc-900 leading-tight tracking-tight">{data.partner_name || 'Checkout'}</h2>
+                <p className="text-[11px] font-bold text-zinc-400 leading-tight">{data.partner_city || 'Local Store'}</p>
               </div>
             </div>
           </header>
@@ -142,7 +143,7 @@ function CheckoutLayoutClientInner({
           <main className="flex-1 overflow-y-auto">
             <div className="flex flex-col px-5 md:px-0 py-4 divide-y divide-zinc-100 max-w-2xl mx-auto w-full">
               <section className="pb-6">
-                <CartSlot initialHydratedItems={data.items as any} />
+                <CartSlot initialHydratedItems={data.items} />
               </section>
 
               {/* Redundant Upsells removed for Swiggy 2026 Purification */}
@@ -151,15 +152,15 @@ function CheckoutLayoutClientInner({
               <Suspense fallback={<div className="py-8 flex items-center justify-center"><Loader2 className="size-5 animate-spin text-zinc-400" /></div>}>
                 <section className="py-6 space-y-4">
                   <AddressSlot
-                    initialAddresses={data.addresses as any}
-                    currentAddress={data.addresses?.find(a => a.id === selectedAddressId) as any}
+                    initialAddresses={data.addresses}
+                    currentAddress={data.addresses?.find(a => a.id === selectedAddressId) || undefined}
                   />
-                  {selectedAddressId && (
+                  {isValidAddress && (
                     <p className="text-xs text-[var(--primary)] font-bold uppercase tracking-tight">
-                      Ready in ~{data.partnerPrepMins || 30} mins
+                      Ready in ~{data.partner_prep_mins || 30} mins
                     </p>
                   )}
-                  {selectedAddressId && (
+                  {isValidAddress && (
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
                         <label htmlFor="delivery-instructions" className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
@@ -185,10 +186,10 @@ function CheckoutLayoutClientInner({
 
               {authUser && (
                 <section className="py-4 space-y-4">
-                  <CouponSlot appliedCoupon={data.appliedCoupon} />
+                  <CouponSlot appliedCoupon={data.applied_coupon} />
                   <WalletSlot
-                    walletInfo={data.walletInfo}
-                    useWalletBalance={data.useWallet}
+                    walletInfo={data.wallet_info}
+                    useWalletBalance={data.use_wallet}
                     pricing={data.pricing}
                   />
                 </section>
@@ -216,32 +217,32 @@ function CheckoutLayoutClientInner({
                         <span>Subtotal ({items.length} item{items.length > 1 ? 's' : ''})</span>
                         <span className="tabular-nums font-semibold text-zinc-950">{formatCurrency(pricing.subtotal)}</span>
                       </div>
-                      {pricing.personalizationCharges > 0 && (
+                      {pricing.personalization_charges > 0 && (
                         <div className="flex justify-between text-sm text-zinc-600">
                           <span>Personalization</span>
-                          <span className="tabular-nums font-semibold text-zinc-950">{formatCurrency(pricing.personalizationCharges)}</span>
+                          <span className="tabular-nums font-semibold text-zinc-950">{formatCurrency(pricing.personalization_charges)}</span>
                         </div>
                       )}
                       <div className="flex justify-between text-sm text-zinc-600">
                         <span className="flex items-center gap-1.5">
                           <Truck className="size-4" />
                           Delivery
-                          {selectedAddressId && pricing.deliveryFee === 0 && <span className="text-[10px] text-emerald-600 font-bold px-1.5 py-0.5 bg-emerald-50 rounded-md">FREE</span>}
+                          {isValidAddress && pricing.delivery_fee === 0 && <span className="text-[10px] text-emerald-600 font-bold px-1.5 py-0.5 bg-emerald-50 rounded-md">FREE</span>}
                         </span>
                         <span className="tabular-nums font-semibold text-zinc-950">
-                          {!selectedAddressId ? '—' : (pricing.deliveryFee === 0 ? 'FREE' : formatCurrency(pricing.deliveryFee))}
+                          {!isValidAddress ? '—' : (pricing.delivery_fee === 0 ? 'FREE' : formatCurrency(pricing.delivery_fee))}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm text-zinc-600">
                         <span>Platform fee</span>
                         <span className="tabular-nums font-semibold text-zinc-950">
-                          {!selectedAddressId ? '—' : formatCurrency(pricing.platformFee)}
+                          {!isValidAddress ? '—' : formatCurrency(pricing.platform_fee)}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm text-zinc-600">
                         <span>GST</span>
                         <span className="tabular-nums font-semibold text-zinc-950">
-                          {!selectedAddressId ? '—' : formatCurrency(pricing.gst)}
+                          {!isValidAddress ? '—' : formatCurrency(pricing.gst)}
                         </span>
                       </div>
                     </div>
@@ -251,9 +252,9 @@ function CheckoutLayoutClientInner({
                         <span className="text-lg font-bold text-zinc-950">Sum to pay</span>
                         <span className="text-xl font-black text-zinc-950 tabular-nums">{formatCurrency(pricing.total)}</span>
                       </div>
-                      {((pricing.discount || 0) + (pricing.walletDiscount || 0)) > 0 && (
+                      {((pricing.discount || 0) + (pricing.wallet_discount || 0)) > 0 && (
                         <p className="text-xs font-semibold text-emerald-600 mt-1">
-                          You saved {formatCurrency((pricing.discount || 0) + (pricing.walletDiscount || 0))}
+                          You saved {formatCurrency((pricing.discount || 0) + (pricing.wallet_discount || 0))}
                         </p>
                       )}
                     </div>
@@ -320,7 +321,7 @@ function CheckoutLayoutClientInner({
                       <span className="text-sm font-black text-white">Login to continue</span>
                       <span className="text-[10px] font-bold text-white/70">Securely checkout after login</span>
                     </button>
-                  ) : !selectedAddressId ? (
+                  ) : !isValidAddress ? (
                     <div className="w-full h-16 bg-zinc-100 rounded-[24px] flex items-center justify-center border border-zinc-200">
                       <span className="text-xs font-semibold text-zinc-400">Select delivery address</span>
                     </div>

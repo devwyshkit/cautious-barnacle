@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { updatePartnerOnlineStatus } from '@/lib/actions/partner-actions';
+import { update_partner_online_status } from '@/lib/actions/partner-actions';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -37,7 +37,7 @@ export function PartnerTopBar({ partner }: PartnerTopBarProps) {
 
   const handleOnlineToggle = async (checked: boolean) => {
     setIsUpdating(true);
-    const result = await updatePartnerOnlineStatus(partner.id, checked);
+    const result = await update_partner_online_status(partner.id, checked);
     if (result.success) {
       setIsOnline(checked);
       toast.success(checked ? 'Store is now online' : 'Store is now offline');

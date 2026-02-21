@@ -25,11 +25,12 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import Image from 'next/image';
 import { useOrderRealtime } from '@/hooks/useOrderRealtime';
 import { ORDER_STATUS } from '@/lib/types/order-status';
+import { OrderDetail } from '@/lib/types/order';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { IdentityForm } from './IdentityForm';
 import { PreviewApproval } from './PreviewApproval';
-import { approvePreview, requestChange } from '@/lib/actions/orders';
+import { approve_preview, request_change } from '@/lib/actions/orders';
 import { generateEstimatePDF, generateTaxInvoicePDF } from '@/lib/services/pdf-service';
 import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -236,13 +237,13 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
           </SurfaceErrorBoundaryWithRouter>
 
           <SurfaceErrorBoundaryWithRouter surfaceName="Order Status">
-            <StatusCard order={order} />
+            <StatusCard order={order as OrderDetail} />
           </SurfaceErrorBoundaryWithRouter>
 
           {!showIdentityForm && (
             <SurfaceErrorBoundaryWithRouter surfaceName="Creative Brief">
               <CreativeBrief
-                order={order}
+                order={order as OrderDetail}
                 previews={previews || []}
                 isOptimisticSubmitted={isIdentitySubmittedOptimistic}
                 onOpenPersonalization={() => setProactivePersonalizationOpen(true)}
@@ -252,7 +253,7 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
 
           <SurfaceErrorBoundaryWithRouter surfaceName="Items List">
             <OrderItemsList
-              order={order}
+              order={order as OrderDetail}
               itemPreviews={itemPreviews}
               onPersonalizationSubmitted={handlePersonalizationSubmitted}
             />
@@ -270,8 +271,8 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
           )}
 
           <div className="space-y-4">
-            <DeliveryInfo order={order} />
-            <BillSummary order={order} />
+            <DeliveryInfo order={order as OrderDetail} />
+            <BillSummary order={order as OrderDetail} />
           </div>
 
           <SurfaceErrorBoundaryWithRouter surfaceName="Order Timeline">

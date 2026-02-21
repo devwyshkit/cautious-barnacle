@@ -21,11 +21,11 @@ export const PRICING = {
 
 export interface PricingBreakdown {
   subtotal: number;
-  personalizationCharges: number;
-  deliveryFee: number;
-  platformFee: number;
+  personalization_charges: number;
+  delivery_fee: number;
+  platform_fee: number;
   gst: number;
   discount: number;         // Added for coupons
-  walletDiscount: number;   // Added for wallet
+  wallet_discount: number;   // Added for wallet
   total: number;
 }

@@ -22,80 +22,56 @@ export type OrderPersonalization = Tables<'order_personalization'>;
  */
 export interface OrderListItem extends ViewOrderDetailed {
   // Computed/UI-only fields that might not be in the view but are needed for legacy UI
-  // We keep them as optional while we transition to full snake_case
   item_count?: number;
   first_item_image?: string | null;
   first_item_name?: string | null;
-
-  // Deprecated: Remove these once components are updated to snake_case
-  /** @deprecated use order_number */
-  orderNumber?: string | null;
-  /** @deprecated use created_at */
-  createdAt?: string | null;
-  /** @deprecated use partner_name */
-  partnerName?: string | null;
-  /** @deprecated use itemCount */
-  itemCount?: number;
-  /** @deprecated use first_item_image */
-  firstItemImage?: string | null;
-  /** @deprecated use first_item_name */
-  firstItemName?: string | null;
-  /** @deprecated use has_personalization */
-  hasPersonalization?: boolean;
-  /** @deprecated use personalization_status */
-  personalizationStatus?: string | null;
 }
 
 export interface OrderForPDF {
-  orderNumber: string;
-  createdAt: string;
+  order_number: string;
+  created_at: string;
   subtotal: number;
-  deliveryFee: number;
-  platformFee: number;
+  delivery_fee: number;
+  platform_fee: number;
+  gst: number;
+  personalization_charges: number;
+  discount: number;
   total: number;
-  partners: {
+  partner: {
     name: string;
     gstin?: string;
   };
-  orderItems: Array<{
-    itemName: string;
+  order_items: Array<{
+    item_name: string;
     quantity: number;
-    unitPrice: number;
-    totalPrice: number;
+    unit_price: number;
+    total_price: number;
   }>;
 }
 
 export interface PartnerForPDF {
   name: string;
   gstin?: string;
-  businessType?: string;
-  panNumber?: string;
+  business_type?: string;
+  pan_number?: string;
 }
 
 export interface PreviewSubmission {
   id: string;
-  orderId: string;
-  previewUrl: string;
+  order_id: string;
+  preview_url: string;
   version: number;
   status: 'pending' | 'approved' | 'change_requested';
-  partnerNotes?: string;
-  customerFeedback?: string;
-  submittedAt: string;
+  partner_notes?: string;
+  customer_feedback?: string;
+  submitted_at: string;
 }
 
 export interface OrderItemDetail {
   id: string;
-  itemId: string;
-  name: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  personalizationConfig?: unknown;
-  imageUrl?: string;
-
-  // Swiggy 2026: Snake-case standardized fields
   item_id: string;
   item_name: string;
+  quantity: number;
   quantity_number: number;
   unit_price: number;
   total_price: number;
@@ -104,100 +80,49 @@ export interface OrderItemDetail {
   personalization_config?: PersonalizationConfig;
   personalization_details?: SelectedPersonalization;
   selected_addons?: SelectedAddon[];
-
-  /** @deprecated use item_name */
-  itemName?: string;
 }
 
 export interface OrderStatusHistory {
   id: string;
-  orderId: string;
+  order_id: string;
   type: string;
   title: string;
   description: string;
-  createdAt: string;
+  created_at: string;
   metadata?: Record<string, unknown>;
 }
 
-export interface OrderDetail extends Omit<ViewOrderDetailed, 'delivery_address'> {
-  // Financials - snake_case preferred, keep camelCase as deprecated while moving
+export interface OrderDetail extends ViewOrderDetailed {
+  // Financials - snake_case strictly
   subtotal?: number;
   personalization_charges?: number;
   delivery_fee?: number;
   platform_fee?: number;
   gst?: number;
   discount?: number;
-
-  /** @deprecated use personalization_charges */
-  personalizationCharges?: number;
-  /** @deprecated use delivery_fee */
-  deliveryFee?: number;
-  /** @deprecated use platform_fee */
-  platformFee?: number;
+  gstin?: string | null;
+  cashback_amount?: number | null;
 
   has_personalization: boolean | null;
-  /** @deprecated use has_personalization */
-  hasPersonalization: boolean | null;
-
   personalization_input: Record<string, unknown> | null;
-  /** @deprecated use personalization_input */
-  personalizationInput?: Record<string, unknown> | null;
-
   personalization_status: string | null;
-  /** @deprecated use personalization_status */
-  personalizationStatus?: string | null;
-
   placed_at: string | null;
-  /** @deprecated use placed_at */
-  placedAt?: string | null;
-
   paid_at: string | null;
-  /** @deprecated use paid_at */
-  paidAt?: string | null;
-
   details_submitted_at?: string | null;
   approved_at?: string | null;
+  design_deadline_at?: string | null;
+  cancellation_reason?: string | null;
 
   preview_submissions?: PreviewSubmission[];
-  /** @deprecated use preview_submissions */
-  previewSubmissions?: PreviewSubmission[];
-
   personalizations?: OrderPersonalization[];
-
   order_items?: OrderItemDetail[];
-  /** @deprecated use order_items */
-  orderItems?: OrderItemDetail[];
-
   order_status_history?: OrderStatusHistory[];
-  /** @deprecated use order_status_history */
-  orderStatusHistory?: OrderStatusHistory[];
 
-  partners?: {
-    name?: string;
-    gstin?: string;
-    business_type?: string;
-    pan_number?: string;
-    /** @deprecated use business_type */
-    businessType?: string;
-    /** @deprecated use pan_number */
-    panNumber?: string;
-  };
-  users?: {
-    full_name?: string;
-    email?: string;
-    /** @deprecated use full_name */
-    fullName?: string;
-  };
-  delivery_address?: {
-    address_line1: string;
-    address_line2?: string;
-    city: string;
-    state?: string;
-    pincode?: string;
-    country?: string;
-    name?: string;
-    phone?: string;
-    /** @deprecated use address_line1 */
-    addressLine1?: string;
-  } | null;
+  // Composite/Joins
+  partners?: Pick<Tables<'partners'>, 'name' | 'image_url'> | null;
+  users?: Pick<Tables<'users'>, 'full_name' | 'email'> | null;
+
+  // Mapped for UI Convenience (snake_case)
+  partner_name: string | null;
+  partner_image: string | null;
 }

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { XCircle, FileText, ChevronDown, ChevronUp } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { ActionSlider } from '@/components/ui/ActionSlider';
-import type { PreviewSubmission } from '@/hooks/useOrderRealtime';
+import { PreviewSubmission } from '@/lib/types/order';
 import { SubmittedIdentity } from './tracking/SubmittedIdentity';
 
 interface PreviewApprovalProps {

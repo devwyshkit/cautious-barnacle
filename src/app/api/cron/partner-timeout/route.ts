@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
-import { refundPayment } from '@/lib/services/razorpay';
+import { refund_payment } from '@/lib/services/razorpay';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
                         // In `verify_phase1` test, `total` was 70.8. That looks like Rupees.
                         // So we must convert to paise.
                         const refundAmountPaise = Math.round(Number(order.total) * 100);
-                        const refund = await refundPayment(order.payment_id, refundAmountPaise, {
+                        const refund = await refund_payment(order.payment_id, refundAmountPaise, {
                             reason: 'Partner Timeout (Auto-Cancel)',
                             order_id: order.id
                         });

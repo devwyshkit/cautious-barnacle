@@ -1,5 +1,5 @@
 import { getPartnerFromSession } from '@/lib/auth/server';
-import { getPartnerItems } from '@/lib/actions/partner-actions';
+import { get_partner_items } from '@/lib/actions/partner-actions';
 import { CatalogListClient } from '@/components/partner/catalog/CatalogListClient';
 import { redirect } from 'next/navigation';
 
@@ -7,7 +7,7 @@ export default async function PartnerCatalogPage() {
   const partner = await getPartnerFromSession();
   if (!partner) redirect('/partner/login');
 
-  const { data: items } = await getPartnerItems(partner.id);
+  const { data: items } = await get_partner_items(partner.id);
 
   return (
     <div className="px-4 py-6">
@@ -18,8 +18,8 @@ export default async function PartnerCatalogPage() {
         </p>
       </div>
 
-      <CatalogListClient 
-        initialItems={items || []} 
+      <CatalogListClient
+        initialItems={items || []}
         partnerId={partner.id}
       />
     </div>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateWebhookSignature } from '@/lib/services/razorpay';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { log } from '@/lib/logging/logger';
-import { createOrder } from '@/lib/actions/orders';
+import { create_order } from '@/lib/actions/orders';
 import { handleAPIError } from '@/lib/utils/error-handler';
 import Razorpay from 'razorpay';
 
@@ -84,29 +84,39 @@ export async function POST(req: NextRequest) {
 
         // Place order using draft data (Trigger-first model)
         const metadata = (draft.metadata as any) || {};
-        const result = await createOrder({
-          addressId: draft.address_id,
-          items: draft.items as any,
-          razorpayOrderId,
-          paymentId: razorpayPaymentId,
-          couponCode: metadata.couponCode,
-          useWallet: metadata.useWallet,
+        const orderData = {
+          address_id: draft.address_id,
+          items: (draft.items as any[]).map(item => ({
+            item_id: item.item_id,
+            variant_id: item.variant_id,
+            quantity: item.quantity,
+            has_personalization: item.has_personalization,
+            personalization_config: item.personalization_config,
+            selected_addons: item.selected_addons
+          })),
+          razorpay_order_id: razorpayOrderId,
+          payment_id: razorpayPaymentId,
+          coupon_code: metadata.coupon_code || metadata.couponCode,
+          use_wallet: metadata.use_wallet || metadata.useWallet || false,
           gstin: metadata.gstin,
-          deliveryInstructions: metadata.deliveryInstructions,
-          distanceKm: metadata.distanceKm,
-          userId: userId,
-          useAdmin: true
-        });
+          delivery_instructions: metadata.delivery_instructions || metadata.deliveryInstructions,
+          distance_km: metadata.distance_km || metadata.distanceKm,
+          user_id: userId,
+          use_admin: true
+        };
+
+        const result = await create_order(orderData);
 
         if ('error' in result) {
-          throw new Error(result.error || 'Failed to create order atomicly');
+          throw new Error((result as any).error || 'Failed to create order atomically');
         }
 
         // Cleanup draft after successful placement
         await supabase.from('draft_orders').delete().eq('id', draft.id);
 
-        log.info('[webhooks/razorpay] Order created atomicly via triggers and draft cleaned', { orderId: result.orderId, razorpayOrderId });
-        return NextResponse.json({ received: true, orderId: result.orderId });
+        log.info('[webhooks/razorpay] Order created atomically via triggers and draft cleaned', { orderId: (result as any).orderId, razorpayOrderId });
+        return NextResponse.json({ received: true, orderId: (result as any).orderId });
+
       } catch (error) {
         log.error('[webhooks/razorpay] Error creating order from payment', error, { razorpayOrderId });
         return NextResponse.json({ error: 'Failed to create order, will retry' }, { status: 500 });

@@ -4,11 +4,11 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DraftSummaryBlock } from "@/components/customer/checkout/blocks/DraftSummaryBlock";
 import { useCart } from '@/components/customer/CartProvider';
-import type { HydratedDraftItem } from "@/components/customer/checkout/types";
+import type { DraftLineItem } from "@/lib/types/personalization";
 import { toast } from "sonner";
 
 interface CartSlotProps {
-  initialHydratedItems?: HydratedDraftItem[];
+  initialHydratedItems?: DraftLineItem[];
 }
 
 /**
@@ -27,15 +27,7 @@ export function CartSlot({ initialHydratedItems = [] }: CartSlotProps) {
   // We prefer live items from context if available, fallback to SSR items
   const displayItems = useMemo(() => {
     if (draftOrder.items.length > 0) {
-      return draftOrder.items.map((it) => ({
-        ...it,
-        name: it.itemName,
-        image: it.itemImage || '',
-        basePrice: it.basePrice || 0,
-        variantPrice: it.variantPrice || 0,
-        variantId: it.selectedVariantId,
-        personalizationPrice: it.personalizationPrice || 0
-      })) as unknown as HydratedDraftItem[];
+      return draftOrder.items;
     }
     return initialHydratedItems;
   }, [draftOrder.items, initialHydratedItems]);

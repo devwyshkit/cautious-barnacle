@@ -8,7 +8,7 @@ import { ActionSlider } from '@/components/ui/ActionSlider';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logging/logger';
-import { submitOrderPersonalization } from '@/lib/actions/orders';
+import { submit_order_personalization } from '@/lib/actions/orders';
 import { cn } from '@/lib/utils';
 import imageCompression from 'browser-image-compression';
 import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
@@ -43,7 +43,7 @@ export function IdentityForm({
     designDeadline,
     isAutoOpenedForSuccess
 }: IdentityFormProps) {
-    const [formData, setFormData] = useState<Record<string, { text?: string; imageUrl?: string }>>({});
+    const [formData, setFormData] = useState<Record<string, { text?: string; image_url?: string }>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isOptimisticSuccess, setIsOptimisticSuccess] = useState(false);
     const [uploadingItems, setUploadingItems] = useState<Record<string, number>>({});
@@ -71,7 +71,7 @@ export function IdentityForm({
     const personalizedItems = items;
     const allOptional = isAllOptional(personalizedItems);
 
-    const handleInputChange = (itemId: string, field: 'text' | 'imageUrl', value: string) => {
+    const handleInputChange = (itemId: string, field: 'text' | 'image_url', value: string) => {
         setFormData(prev => ({
             ...prev,
             [itemId]: {
@@ -131,7 +131,7 @@ export function IdentityForm({
                 .from('order-assets')
                 .getPublicUrl(data.path);
 
-            handleInputChange(itemId, 'imageUrl', publicUrl);
+            handleInputChange(itemId, 'image_url', publicUrl);
             triggerHaptic(HapticPattern.SUCCESS);
 
             setTimeout(() => {
@@ -181,7 +181,7 @@ export function IdentityForm({
                 toast.error(`${item.item_name} text exceeds limit of ${config.char_limit} chars`);
                 return { success: false };
             }
-            if (config.image_required && !input.imageUrl) {
+            if (config.image_required && !input.image_url) {
                 toast.error(`Please upload an image for ${item.item_name}`);
                 return { success: false };
             }
@@ -199,13 +199,13 @@ export function IdentityForm({
 
                 acc[item.id] = {
                     text: itemFormData.text || null,
-                    image_url: itemFormData.imageUrl || null,
+                    image_url: itemFormData.image_url || null,
                     addons: addons.filter(a => a.requires_preview).map(a => a.name)
                 };
                 return acc;
             }, {});
 
-            const result = await submitOrderPersonalization(orderId, personalizationData);
+            const result = await submit_order_personalization(orderId, personalizationData);
             if (result.success) {
                 triggerHaptic(HapticPattern.SUCCESS);
                 // WYSHKIT 2026: Clear draft on success
@@ -436,13 +436,13 @@ export function IdentityForm({
                                             </div>
                                         )}
 
-                                        {input.imageUrl && (
+                                        {input.image_url && (
                                             <div className="relative aspect-video rounded-2xl overflow-hidden border border-zinc-100 group shadow-sm bg-zinc-50 animate-in zoom-in-95 duration-500">
-                                                <img src={input.imageUrl} alt="Preview" className="size-full object-cover" />
+                                                <img src={input.image_url} alt="Preview" className="size-full object-cover" />
                                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
                                                 <button
                                                     type="button"
-                                                    onClick={() => handleInputChange(item.id, 'imageUrl', '')}
+                                                    onClick={() => handleInputChange(item.id, 'image_url', '')}
                                                     className="absolute top-3 right-3 size-10 bg-white shadow-xl rounded-full flex items-center justify-center text-zinc-900 hover:scale-110 active:scale-95 transition-all z-10"
                                                 >
                                                     <X className="size-5" />

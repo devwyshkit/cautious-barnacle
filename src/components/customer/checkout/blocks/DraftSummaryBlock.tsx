@@ -3,18 +3,18 @@
 import React from 'react';
 import Image from 'next/image';
 import { ShieldAlert, Plus, Minus, Trash2, Edit3 } from 'lucide-react';
-import type { HydratedDraftItem } from '../types';
+import type { DraftLineItem } from '@/lib/types/personalization';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
-import { formatCurrency, calculateItemPrice } from '@/lib/utils/pricing';
+import { formatCurrency } from '@/lib/utils/pricing';
 
 const FALLBACK_IMAGE = '/images/logo.png';
 
 interface DraftSummaryBlockProps {
-  items: HydratedDraftItem[];
+  items: DraftLineItem[];
   onUpdateQuantity?: (itemId: string, variantId: string | null, quantity: number) => void;
   onRemoveItem?: (itemId: string, variantId: string | null) => void;
   editable?: boolean;
@@ -48,15 +48,15 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
 
       <div className="space-y-1.5">
         {items.map((item) => {
-          const totalPrice = calculateItemPrice(item);
-          const unitPrice = totalPrice / item.quantity;
+          const totalPrice = item.total_price;
+          const unitPrice = item.unit_price;
 
           return (
-            <div key={`${item.itemId}-${item.variantId}`} className="flex gap-2.5 p-2 bg-zinc-50/50 rounded-lg">
+            <div key={`${item.item_id}-${item.selected_variant_id}`} className="flex gap-2.5 p-2 bg-zinc-50/50 rounded-lg">
               <div className="relative size-14 bg-white rounded-lg overflow-hidden shrink-0 border border-zinc-100">
                 <Image
-                  src={item.image || FALLBACK_IMAGE}
-                  alt={item.name}
+                  src={item.item_image || FALLBACK_IMAGE}
+                  alt={item.item_name}
                   fill
                   className="object-cover"
                   sizes="56px"
@@ -66,10 +66,10 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <h4 className="text-[13px] font-medium text-zinc-900 truncate leading-tight">
-                      {item.name}
+                      {item.item_name}
                     </h4>
-                    {item.variantName && (
-                      <p className="text-[10px] text-zinc-500 font-medium mt-0.5">{item.variantName}</p>
+                    {item.variant_name && (
+                      <p className="text-[10px] text-zinc-500 font-medium mt-0.5">{item.variant_name}</p>
                     )}
                   </div>
                   <span className="text-[13px] font-semibold text-zinc-900 tabular-nums shrink-0">
@@ -83,7 +83,7 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                   {editable && onUpdateQuantity && onRemoveItem ? (
                     <div className="flex items-center gap-0.5">
                       <button
-                        onClick={() => handleQuantityChange(item.itemId, item.variantId, item.quantity, -1)}
+                        onClick={() => handleQuantityChange(item.item_id, item.selected_variant_id, item.quantity, -1)}
                         className={cn(
                           "size-6 flex items-center justify-center rounded-md transition-colors",
                           item.quantity === 1
@@ -97,7 +97,7 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => handleQuantityChange(item.itemId, item.variantId, item.quantity, 1)}
+                        onClick={() => handleQuantityChange(item.item_id, item.selected_variant_id, item.quantity, 1)}
                         className="size-6 flex items-center justify-center rounded-md bg-zinc-100 text-zinc-600 hover:bg-zinc-200 transition-colors"
                       >
                         <Plus className="size-3" />
@@ -126,9 +126,9 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                   {editable && (
                     <button
                       onClick={() => {
-                        const partnerId = (item as any).partnerId || 'unknown';
-                        const addonIds = (item.selectedAddons || []).map((a: any) => a.id).join(',');
-                        router.push(`/partner/${partnerId}/item/${item.itemId}?edit=true&cartItemId=${item.id}&variantId=${item.variantId || ''}&quantity=${item.quantity}&addons=${addonIds}`);
+                        const partnerId = item.partner_id || 'unknown';
+                        const addonIds = (item.selected_addons || []).map((a: any) => a.id).join(',');
+                        router.push(`/partner/${partnerId}/item/${item.item_id}?edit=true&cartItemId=${item.id}&variantId=${item.selected_variant_id || ''}&quantity=${item.quantity}&addons=${addonIds}`);
                       }}
                       className="text-[9px] font-bold text-[var(--primary)] flex items-center gap-0.5 hover:underline"
                     >

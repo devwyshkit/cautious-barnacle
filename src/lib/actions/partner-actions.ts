@@ -35,13 +35,13 @@ export type PartnerOrder = Omit<DBOrder, 'delivery_address' | 'partner'> & {
 };
 
 export type PartnerStats = {
-  todayOrders: number;
-  todayRevenue: number;
-  pendingOrders: number;
-  avgRating: number | null;
-  lowStockCount: number;
-  totalEarnings: number;
-  pendingSettlement: number;
+  today_orders: number;
+  today_revenue: number;
+  pending_orders: number;
+  avg_rating: number | null;
+  low_stock_count: number;
+  total_earnings: number;
+  pending_settlement: number;
 };
 
 function logError(error: unknown, context: string) {
@@ -67,10 +67,10 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   REFUNDED: [],
 };
 
-function validateStatusTransition(
+function validate_status_transition(
   from: string,
   to: string,
-  hasPersonalization: boolean
+  has_personalization: boolean
 ): string | null {
 
 
@@ -86,16 +86,16 @@ function validateStatusTransition(
     return 'Orders must be marked as "Preparing" (IN_PRODUCTION) before they can be marked as Ready (PACKED).';
   }
 
-  const validNextStatuses = VALID_TRANSITIONS[from];
-  if (!validNextStatuses || !validNextStatuses.includes(to)) {
+  const valid_next_statuses = VALID_TRANSITIONS[from];
+  if (!valid_next_statuses || !valid_next_statuses.includes(to)) {
     return `Invalid transition from "${from}" to "${to}".`;
   }
 
   return null;
 }
 
-export async function getPartnerOrders(
-  partnerId: string,
+export async function get_partner_orders(
+  partner_id: string,
   status?: string[]
 ): Promise<{ data?: PartnerOrder[]; error?: string }> {
   try {
@@ -110,7 +110,7 @@ export async function getPartnerOrders(
         delivery_address:addresses(*),
         partner:partners(*)
       `)
-      .eq('partner_id', partnerId);
+      .eq('partner_id', partner_id);
 
     if (status && status.length > 0) {
       query = query.in('status', status as any);
@@ -120,19 +120,19 @@ export async function getPartnerOrders(
 
     if (error) throw error;
 
-    const mappedData = (data as any[]).map(order => ({
+    const mapped_data = (data as any[]).map(order => ({
       ...order,
       latest_preview: order.preview_submissions?.[0] || null
     })) as PartnerOrder[];
 
-    return { data: mappedData };
+    return { data: mapped_data };
   } catch (error) {
-    logError(error, `getPartnerOrders:${partnerId}`);
+    logError(error, `get_partner_orders:${partner_id}`);
     return { error: 'Failed to fetch orders' };
   }
 }
 
-export async function getPartnerStats(partnerId: string): Promise<{ data?: PartnerStats; error?: string }> {
+export async function get_partner_stats(partner_id: string): Promise<{ data?: PartnerStats; error?: string }> {
   try {
     const supabase = await createClient();
 
@@ -140,126 +140,126 @@ export async function getPartnerStats(partnerId: string): Promise<{ data?: Partn
     today.setHours(0, 0, 0, 0);
 
     // 1. Orders and Revenue for today
-    const { data: todayOrders, error: ordersError } = await supabase
+    const { data: today_orders_data, error: orders_error } = await supabase
       .from('orders')
       .select('id, total, status')
-      .eq('partner_id', partnerId)
+      .eq('partner_id', partner_id)
       .gte('created_at', today.toISOString());
 
-    if (ordersError) throw ordersError;
-    const orders = todayOrders || [];
-    const completedOrders = orders.filter((o) => o.status === 'DELIVERED');
+    if (orders_error) throw orders_error;
+    const orders = today_orders_data || [];
+    const completed_orders = orders.filter((o) => o.status === 'DELIVERED');
 
     // 2. Partner Rating
-    const { data: partner, error: partnerError } = await supabase
+    const { data: partner, error: partner_error } = await supabase
       .from('partners')
       .select('rating')
-      .eq('id', partnerId)
+      .eq('id', partner_id)
       .single();
 
-    if (partnerError) throw partnerError;
+    if (partner_error) throw partner_error;
 
     // 3. Pending Orders (Not Delivered/Cancelled)
-    const { count: pendingCount, error: pendingError } = await supabase
+    const { count: pending_count, error: pending_error } = await supabase
       .from('orders')
       .select('id', { count: 'exact', head: true })
-      .eq('partner_id', partnerId)
+      .eq('partner_id', partner_id)
       .neq('status', 'DELIVERED')
       .neq('status', 'CANCELLED')
       .neq('status', 'REFUNDED');
 
-    if (pendingError) logError(pendingError, 'getPartnerStats:pendingCount');
+    if (pending_error) logError(pending_error, 'get_partner_stats:pending_count');
 
 
     // WYSHKIT 2026: More efficient low stock check
-    const { data: partnerItems } = await supabase.from('items').select('id').eq('partner_id', partnerId);
-    const partnerItemIds = partnerItems?.map(i => i.id) || [];
+    const { data: partner_items_data } = await supabase.from('items').select('id').eq('partner_id', partner_id);
+    const partner_item_ids = partner_items_data?.map(i => i.id) || [];
 
-    const { count: actualLowStockCount } = await supabase
+    const { count: actual_low_stock_count } = await supabase
       .from('variants')
       .select('id', { count: 'exact', head: true })
-      .in('item_id', partnerItemIds)
+      .in('item_id', partner_item_ids)
       .lt('stock_quantity', 5);
 
     // 5. Financials
-    const financialsRes = await getPartnerFinancials(partnerId);
-    const financials = financialsRes.data || { totalEarnings: 0, pendingSettlement: 0 };
+    const financials_res = await get_partner_financials(partner_id);
+    const financials = financials_res.data || { total_earnings: 0, pending_settlement: 0 };
 
     return {
       data: {
-        todayOrders: orders.length,
-        todayRevenue: completedOrders.reduce((sum, o) => sum + Number(o.total || 0), 0),
-        pendingOrders: pendingCount || 0,
-        avgRating: partner?.rating ? Number(partner.rating) : null,
-        lowStockCount: actualLowStockCount || 0,
-        totalEarnings: financials.totalEarnings,
-        pendingSettlement: financials.pendingSettlement
+        today_orders: orders.length,
+        today_revenue: completed_orders.reduce((sum, o) => sum + Number(o.total || 0), 0),
+        pending_orders: pending_count || 0,
+        avg_rating: partner?.rating ? Number(partner.rating) : null,
+        low_stock_count: actual_low_stock_count || 0,
+        total_earnings: financials.total_earnings,
+        pending_settlement: financials.pending_settlement
       }
     };
   } catch (error) {
-    logError(error, 'getPartnerStats');
+    logError(error, 'get_partner_stats');
     return { error: 'Failed to fetch stats' };
   }
 }
 
-export async function updateOrderStatus(
-  orderId: string,
+export async function update_order_status(
+  order_id: string,
   status: OrderStatus | string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
 
-    const { data: rawOrder, error: orderError } = await supabase
+    const { data: raw_order_data, error: order_error } = await supabase
       .from('orders')
       .select(`
         *,
         delivery_address:addresses(*),
         partner:partners(*)
       `)
-      .eq('id', orderId)
+      .eq('id', order_id)
       .single();
 
-    if (orderError || !rawOrder) throw new Error('Order not found');
+    if (order_error || !raw_order_data) throw new Error('Order not found');
 
-    const order = (rawOrder as unknown) as PartnerOrder;
-    const currentStatus = order.status as OrderStatus;
-    const hasPersonalization = order.has_personalization === true;
+    const order = (raw_order_data as unknown) as PartnerOrder;
+    const current_status = order.status as OrderStatus;
+    const has_personalization = order.has_personalization === true;
 
-    const validationError = validateStatusTransition(currentStatus, status, hasPersonalization);
-    if (validationError) {
-      return { success: false, error: validationError };
+    const validation_error = validate_status_transition(current_status, status, has_personalization);
+    if (validation_error) {
+      return { success: false, error: validation_error };
     }
 
     if (status === 'PACKED') {
       try {
-        const { dispatchOrder } = await import('@/lib/services/dispatch');
-        const dispatchResult = await dispatchOrder({ orderId });
-        if (dispatchResult.success) {
-          logger.info(`[updateOrderStatus] Auto-dispatch successful for ${orderId}, moving to DISPATCHED.`);
+        const { dispatch_order } = await import('@/lib/services/dispatch');
+        const dispatch_result = await dispatch_order({ order_id: order_id });
+        if (dispatch_result.success) {
+          logger.info(`[update_order_status] Auto-dispatch successful for ${order_id}, moving to DISPATCHED.`);
           status = ORDER_STATUS.DISPATCHED; // Automatically move to DISPATCHED
         } else {
-          logger.error('Auto-dispatch failed during PACKED transition', undefined, { orderId, error: dispatchResult.error });
+          logger.error('Auto-dispatch failed during PACKED transition', undefined, { order_id, error: dispatch_result.error });
         }
-      } catch (dispatchError) {
-        logger.error('Dispatch trigger failed', dispatchError, { orderId });
+      } catch (dispatch_error) {
+        logger.error('Dispatch trigger failed', dispatch_error, { order_id });
       }
     }
 
-    let paymentStatusUpdate: Database['public']['Tables']['orders']['Update'] = {};
+    let payment_status_update: Database['public']['Tables']['orders']['Update'] = {};
     if (status === 'CANCELLED') {
       if (order.payment_status === 'paid' || order.payment_status === 'captured') {
-        const paymentId = order.payment_id;
-        if (paymentId) {
+        const payment_id = order.payment_id;
+        if (payment_id) {
           try {
-            const { refundPayment } = await import('@/lib/services/razorpay');
-            await refundPayment(paymentId);
-            paymentStatusUpdate = {
+            const { refund_payment } = await import('@/lib/services/razorpay');
+            await refund_payment(payment_id);
+            payment_status_update = {
               payment_status: 'refunded',
               return_status: 'auto_refunded'
             };
-            logger.info('Auto-refund successful', { orderId, paymentId });
-          } catch (refundError) {
-            logger.error('Auto-refund failed', refundError, { orderId, paymentId });
+            logger.info('Auto-refund successful', { order_id, payment_id });
+          } catch (refund_error) {
+            logger.error('Auto-refund failed', refund_error, { order_id, payment_id });
           }
         }
       }
@@ -267,34 +267,34 @@ export async function updateOrderStatus(
 
     // WYSHKIT 2026: Auto-transition to DETAILS_RECEIVED if details were pre-uploaded during PLACED.
     // This maintains "Commitment Before Creativity" (Partner accepted) while honoring "Instant Momentum" (Customer uploaded).
-    let targetStatus = status as OrderStatus;
+    let target_status = status as OrderStatus;
     if (status === ORDER_STATUS.CONFIRMED && order.has_personalization && order.personalization_status === 'submitted') {
-      logger.info(`[updateOrderStatus] Auto-transitioning ${orderId} to DETAILS_RECEIVED as personalization already present.`);
-      targetStatus = ORDER_STATUS.DETAILS_RECEIVED;
+      logger.info(`[update_order_status] Auto-transitioning ${order_id} to DETAILS_RECEIVED as personalization already present.`);
+      target_status = ORDER_STATUS.DETAILS_RECEIVED;
     }
 
-    const statusUpdates: Database['public']['Tables']['orders']['Update'] = {
-      status: targetStatus,
-      ...paymentStatusUpdate,
+    const status_updates: Database['public']['Tables']['orders']['Update'] = {
+      status: target_status,
+      ...payment_status_update,
       updated_at: new Date().toISOString()
     };
 
     // WYSHKIT 2026: Set design deadline when partner accepts a personalized order
-    if (status === 'CONFIRMED' && hasPersonalization) {
+    if (status === 'CONFIRMED' && has_personalization) {
       const deadline = new Date();
       deadline.setHours(deadline.getHours() + 24); // 24-hour window for details
-      statusUpdates.design_deadline_at = deadline.toISOString();
+      status_updates.design_deadline_at = deadline.toISOString();
     }
 
-    const { error } = await supabase
+    const { error: update_error } = await supabase
       .from('orders')
-      .update(statusUpdates)
-      .eq('id', orderId);
+      .update(status_updates)
+      .eq('id', order_id);
 
-    if (error) throw error;
+    if (update_error) throw update_error;
 
     await (supabase as any).rpc('log_order_status_history', {
-      p_order_id: orderId,
+      p_order_id: order_id,
       p_type: 'status_update',
       p_title: `Status: ${status}`,
       p_description: `Order status updated to ${status} by partner.`,
@@ -303,27 +303,27 @@ export async function updateOrderStatus(
 
     if (status === 'DELIVERED') {
       try {
-        const { creditCashbackOnDelivery } = await import('@/lib/actions/cashback');
-        await creditCashbackOnDelivery(orderId, order.user_id, Number(order.total));
-        logger.info('Cashback credited successfully on delivery', { orderId });
-      } catch (cashbackError) {
-        logger.error('Failed to credit cashback on delivery', cashbackError, { orderId });
+        const { credit_cashback_on_delivery } = await import('@/lib/actions/cashback');
+        await credit_cashback_on_delivery(order_id, order.user_id, Number(order.total));
+        logger.info('Cashback credited successfully on delivery', { order_id });
+      } catch (cashback_error) {
+        logger.error('Failed to credit cashback on delivery', cashback_error, { order_id });
       }
     }
 
     return { success: true };
   } catch (error) {
-    logError(error, `updateOrderStatus:${orderId}:${status}`);
+    logError(error, `update_order_status:${order_id}:${status}`);
     return { success: false, error: 'Failed to update order status' };
   }
 }
 
-export async function acceptOrder(orderId: string): Promise<{ success: boolean; error?: string }> {
-  return updateOrderStatus(orderId, 'CONFIRMED');
+export async function accept_order(order_id: string): Promise<{ success: boolean; error?: string }> {
+  return update_order_status(order_id, 'CONFIRMED');
 }
 
-export async function rejectOrder(
-  orderId: string,
+export async function reject_order(
+  order_id: string,
   reason: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
@@ -337,12 +337,12 @@ export async function rejectOrder(
         cancelled_by: 'partner',
         updated_at: new Date().toISOString()
       })
-      .eq('id', orderId);
+      .eq('id', order_id);
 
     if (error) throw error;
 
     await (supabase as any).rpc('log_order_status_history', {
-      p_order_id: orderId,
+      p_order_id: order_id,
       p_type: 'status_update',
       p_title: 'Status: CANCELLED',
       p_description: `Order rejected by partner. Reason: ${reason}`,
@@ -351,7 +351,7 @@ export async function rejectOrder(
 
     return { success: true };
   } catch (error) {
-    logError(error, `rejectOrder:${orderId}`);
+    logError(error, `reject_order:${order_id}`);
     return { success: false, error: 'Failed to reject order' };
   }
 }
@@ -364,14 +364,14 @@ export type ItemWithCounts = Item & {
   personalization_options: Tables<'personalization_options'>[];
 };
 
-export async function getPartnerItems(partnerId: string): Promise<{ data?: ItemWithCounts[]; error?: string }> {
+export async function get_partner_items(partner_id: string): Promise<{ data?: ItemWithCounts[]; error?: string }> {
   try {
     const supabase = await createClient();
 
     const { data: items, error } = await supabase
       .from('items')
       .select('*')
-      .eq('partner_id', partnerId)
+      .eq('partner_id', partner_id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -380,109 +380,94 @@ export async function getPartnerItems(partnerId: string): Promise<{ data?: ItemW
       return { data: [] };
     }
 
-    const itemIds = items.map(i => i.id);
+    const item_ids = items.map(i => i.id);
 
-    const [variantsRes, personalizationRes] = await Promise.all([
+    const [variants_res, personalization_res] = await Promise.all([
       supabase
         .from('variants')
         .select('item_id, stock_quantity')
-        .in('item_id', itemIds),
+        .in('item_id', item_ids),
       supabase
         .from('personalization_options')
         .select('item_id')
-        .in('item_id', itemIds),
+        .in('item_id', item_ids),
     ]);
 
-    const variantsData = variantsRes.data || [];
-    const personalizationData = personalizationRes.data || [];
+    const variants_data = variants_res.data || [];
+    const personalization_data = personalization_res.data || [];
 
-    const variantsByItem = new Map<string, { count: number; stock: number }>();
-    variantsData.forEach(v => {
-      if (!v.item_id) return;
-      const existing = variantsByItem.get(v.item_id) || { count: 0, stock: 0 };
-      variantsByItem.set(v.item_id, {
-        count: existing.count + 1,
-        stock: existing.stock + (v.stock_quantity || 0),
-      });
-    });
-
-    const personalizationByItem = new Map<string, number>();
-    personalizationData.forEach(p => {
-      personalizationByItem.set(p.item_id, (personalizationByItem.get(p.item_id) || 0) + 1);
-    });
-
-    const enrichedItems: ItemWithCounts[] = (items as Item[]).map(item => {
-      const itemVariants = variantsData.filter(v => v.item_id === item.id);
-      const itemPersonalization = personalizationData.filter(p => p.item_id === item.id);
+    const enriched_items: ItemWithCounts[] = (items as Item[]).map(item => {
+      const item_variants = variants_data.filter(v => v.item_id === item.id);
+      const item_personalization = personalization_data.filter(p => p.item_id === item.id);
 
       return {
         ...item,
-        variants_count: itemVariants.length,
-        total_stock: itemVariants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0),
-        personalization_count: itemPersonalization.length,
-        variants: itemVariants as any,
-        personalization_options: itemPersonalization as any
+        variants_count: item_variants.length,
+        total_stock: item_variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0),
+        personalization_count: item_personalization.length,
+        variants: item_variants as any,
+        personalization_options: item_personalization as any
       };
     });
 
-    return { data: enrichedItems };
+    return { data: enriched_items };
   } catch (error) {
-    logError(error, 'getPartnerItems');
+    logError(error, 'get_partner_items');
     return { error: 'Failed to fetch items' };
   }
 }
 
-export async function getPartnerFinancials(partnerId: string): Promise<{
+export async function get_partner_financials(partner_id: string): Promise<{
   data?: {
-    totalEarnings: number;
-    pendingSettlement: number;
-    lastPayout: number | null;
-    commissionRate: number;
+    total_earnings: number;
+    pending_settlement: number;
+    last_payout: number | null;
+    commission_rate: number;
   };
   error?: string
 }> {
   try {
     const supabase = await createClient();
 
-    const { data: partner, error: partnerError } = await supabase
+    const { data: partner, error: partner_error } = await supabase
       .from('partners')
       .select('commission_percentage')
-      .eq('id', partnerId)
+      .eq('id', partner_id)
       .single();
 
-    if (partnerError) throw partnerError;
+    if (partner_error) throw partner_error;
 
-    const { data: orders, error: ordersError } = await supabase
+    const { data: orders, error: orders_error } = await supabase
       .from('orders')
       .select('total, net_settlement_amount, payout_status, status')
-      .eq('partner_id', partnerId)
+      .eq('partner_id', partner_id)
       .eq('status', 'DELIVERED');
 
-    if (ordersError) throw ordersError;
+    if (orders_error) throw orders_error;
 
-    const deliveredOrders = orders || [];
-    const totalEarnings = deliveredOrders.reduce(
+    const delivered_orders = orders || [];
+    const total_earnings = delivered_orders.reduce(
       (sum, o) => sum + Number(o.net_settlement_amount || 0), 0
     );
-    const pendingSettlement = deliveredOrders
+    const pending_settlement = delivered_orders
       .filter(o => o.payout_status !== 'completed')
       .reduce((sum, o) => sum + Number(o.net_settlement_amount || 0), 0);
 
     return {
       data: {
-        totalEarnings,
-        pendingSettlement,
-        lastPayout: null,
-        commissionRate: Number(partner.commission_percentage || 15),
+        total_earnings,
+        pending_settlement,
+        last_payout: null,
+        commission_rate: Number(partner.commission_percentage || 15),
       }
     };
   } catch (error) {
-    logError(error, 'getPartnerFinancials');
+    logError(error, 'get_partner_financials');
     return { error: 'Failed to fetch financials' };
   }
 }
 
-export async function getPartnerPayouts(partnerId: string): Promise<{
+export async function get_partner_payouts(partner_id: string): Promise<{
   data?: { id: string; amount: number; status: string; created_at: string }[];
   error?: string;
 }> {
@@ -492,57 +477,57 @@ export async function getPartnerPayouts(partnerId: string): Promise<{
     const { data, error } = await (supabase as any)
       .from('partner_payouts')
       .select('id, amount, status, created_at')
-      .eq('partner_id', partnerId)
+      .eq('partner_id', partner_id)
       .order('created_at', { ascending: false })
       .limit(10);
 
     if (error) throw error;
     return { data: data as any };
   } catch (error) {
-    logError(error, 'getPartnerPayouts');
+    logError(error, 'get_partner_payouts');
     return { error: 'Failed to fetch payouts' };
   }
 }
 
-export async function getPartnerProfile(partnerId: string): Promise<{ data?: DBPartner; error?: string }> {
+export async function get_partner_profile(partner_id: string): Promise<{ data?: DBPartner; error?: string }> {
   try {
     const supabase = await createClient();
 
     const { data, error } = await supabase
       .from('partners')
       .select('id, name, business_name, owner_name, email, phone, rating, commission_percentage, is_online, is_active, kyc_status, address, city, pincode, base_delivery_charge, gstin, pan')
-      .eq('id', partnerId)
+      .eq('id', partner_id)
       .single();
 
     if (error) throw error;
     return { data: (data as unknown) as DBPartner };
   } catch (error) {
-    logError(error, 'getPartnerProfile');
+    logError(error, 'get_partner_profile');
     return { error: 'Failed to fetch partner profile' };
   }
 }
 
-export async function updatePartnerOnlineStatus(
-  partnerId: string,
-  isOnline: boolean
+export async function update_partner_online_status(
+  partner_id: string,
+  is_online: boolean
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
 
     const { error } = await supabase
       .from('partners')
-      .update({ is_online: isOnline })
-      .eq('id', partnerId);
+      .update({ is_online: is_online })
+      .eq('id', partner_id);
 
     if (error) throw error;
     return { success: true };
   } catch (error) {
-    logError(error, 'updatePartnerOnlineStatus');
+    logError(error, 'update_partner_online_status');
     return { success: false, error: 'Failed to update status' };
   }
 }
 
-export async function getPersonalizationQueue(partnerId: string): Promise<{
+export async function get_personalization_queue(partner_id: string): Promise<{
   data?: PartnerOrder[];
   error?: string;
 }> {
@@ -556,7 +541,7 @@ export async function getPersonalizationQueue(partnerId: string): Promise<{
         order_items (*),
         order_personalization (*)
       `)
-      .eq('partner_id', partnerId)
+      .eq('partner_id', partner_id)
       .eq('has_personalization', true)
       .in('status', ['DETAILS_RECEIVED', 'PREVIEW_READY', 'REVISION_REQUESTED'])
       .order('created_at', { ascending: true });
@@ -565,28 +550,21 @@ export async function getPersonalizationQueue(partnerId: string): Promise<{
 
     if (!orders || orders.length === 0) return { data: [] };
 
-    const orderIds = orders.map(o => o.id);
+    const order_ids = orders.map(o => o.id);
     const { data: previews } = await supabase
       .from('preview_submissions')
       .select('order_id, preview_url, status, submitted_at, customer_feedback, partner_notes')
-      .in('order_id', orderIds)
+      .in('order_id', order_ids)
       .order('submitted_at', { ascending: false });
 
-    const previewByItem = new Map<string, PreviewSubmission>();
-    ((previews as unknown as PreviewSubmission[]) || []).forEach(p => {
-      if (p.order_item_id && !previewByItem.has(p.order_item_id)) {
-        previewByItem.set(p.order_item_id, p);
-      }
-    });
-
-    const enrichedOrders: PartnerOrder[] = (orders as unknown as PartnerOrder[]).map(order => {
-      const orderItems = (order.order_items || []).map(item => ({
+    const enriched_orders: PartnerOrder[] = (orders as unknown as PartnerOrder[]).map(order => {
+      const order_items = (order.order_items || []).map(item => ({
         ...item,
         personalization_entry: order.order_personalization?.find(p => p.order_item_id === item.id) || null
       }));
 
       // For latest_preview at order level, we'll take the most recent one overall
-      const latestPreview = ((previews as unknown as PreviewSubmission[]) || [])
+      const latest_preview = ((previews as unknown as PreviewSubmission[]) || [])
         .filter(p => p.order_id === order.id)
         .sort((a, b) => {
           const aTime = a.submitted_at ? new Date(a.submitted_at).getTime() : 0;
@@ -596,75 +574,75 @@ export async function getPersonalizationQueue(partnerId: string): Promise<{
 
       return {
         ...order,
-        order_items: orderItems,
-        latest_preview: latestPreview,
+        order_items: order_items,
+        latest_preview: latest_preview,
       };
     });
 
-    return { data: enrichedOrders };
+    return { data: enriched_orders };
   } catch (error) {
-    logError(error, 'getPersonalizationQueue');
+    logError(error, 'get_personalization_queue');
     return { error: 'Failed to fetch personalization queue' };
   }
 }
 
-export async function uploadPreview(
-  orderId: string,
-  orderItemId: string,
-  previewUrl: string,
-  partnerNotes?: string
+export async function upload_preview(
+  order_id: string,
+  order_item_id: string,
+  preview_url: string,
+  partner_notes?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
 
-    const { data: order, error: fetchError } = await supabase
+    const { data: order, error: fetch_error } = await supabase
       .from('orders')
       .select('status, has_personalization')
-      .eq('id', orderId)
+      .eq('id', order_id)
       .single();
 
-    if (fetchError || !order) throw new Error('Order not found');
+    if (fetch_error || !order) throw new Error('Order not found');
 
-    const validationError = validateStatusTransition(
+    const validation_error = validate_status_transition(
       order.status,
       'PREVIEW_READY',
       !!order.has_personalization
     );
 
-    if (validationError) {
-      return { success: false, error: validationError };
+    if (validation_error) {
+      return { success: false, error: validation_error };
     }
 
     // WYSHKIT 2026: If order is still PLACED, auto-transition to CONFIRMED first
     if (order.status === ORDER_STATUS.PLACED) {
-      logger.info(`[uploadPreview] Auto-confirming order ${orderId} before preview upload.`);
-      const confirmRes = await updateOrderStatus(orderId, 'CONFIRMED');
-      if (!confirmRes.success) return confirmRes;
+      logger.info(`[upload_preview] Auto-confirming order ${order_id} before preview upload.`);
+      const confirm_res = await update_order_status(order_id, 'CONFIRMED');
+      if (!confirm_res.success) return confirm_res;
     }
 
     // WYSHKIT 2026: Combined Update (Stateless/Atomic)
     // We insert the preview linked to the specific item
-    const { error: previewError } = await supabase
+    const { error: preview_error } = await supabase
       .from('preview_submissions')
       .insert({
-        order_id: orderId,
-        order_item_id: orderItemId, // Relational Mapping
-        preview_url: previewUrl,
-        partner_notes: partnerNotes || null,
+        order_id: order_id,
+        order_item_id: order_item_id, // Relational Mapping
+        preview_url: preview_url,
+        partner_notes: partner_notes || null,
         status: 'pending',
         submitted_at: new Date().toISOString(),
       });
 
-    if (previewError) throw previewError;
+    if (preview_error) throw preview_error;
 
     // Update the specific order_item status
     await supabase
       .from('order_items')
       .update({ status: 'preview_ready' })
-      .eq('id', orderItemId);
+      .eq('id', order_item_id);
 
     // Update order level metadata
-    const { error: metadataError } = await supabase
+    const { error: metadata_error } = await supabase
       .from('orders')
       .update({
         preview_status: 'uploaded',
@@ -672,59 +650,59 @@ export async function uploadPreview(
         preview_ready_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
-      .eq('id', orderId);
+      .eq('id', order_id);
 
-    if (metadataError) throw metadataError;
+    if (metadata_error) throw metadata_error;
 
-    return updateOrderStatus(orderId, 'PREVIEW_READY');
+    return update_order_status(order_id, 'PREVIEW_READY');
   } catch (error) {
-    logError(error, 'uploadPreview');
+    logError(error, 'upload_preview');
     return { success: false, error: 'Failed to upload preview' };
   }
 }
 
-export async function toggleItemActiveStatus(
-  itemId: string,
-  isActive: boolean
+export async function toggle_item_active_status(
+  item_id: string,
+  is_active: boolean
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
 
     const { error } = await supabase
       .from('items')
-      .update({ is_active: isActive })
-      .eq('id', itemId);
+      .update({ is_active: is_active })
+      .eq('id', item_id);
 
     if (error) throw error;
     return { success: true };
   } catch (error) {
-    logError(error, 'toggleItemActiveStatus');
+    logError(error, 'toggle_item_active_status');
     return { success: false, error: 'Failed to update item status' };
   }
 }
 
-export async function toggleItemStockStatus(
-  itemId: string,
-  stockStatus: string
+export async function toggle_item_stock_status(
+  item_id: string,
+  stock_status: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
 
     const { error } = await supabase
       .from('items')
-      .update({ stock_status: stockStatus })
-      .eq('id', itemId);
+      .update({ stock_status: stock_status })
+      .eq('id', item_id);
 
     if (error) throw error;
     return { success: true };
   } catch (error) {
-    logError(error, 'toggleItemStockStatus');
+    logError(error, 'toggle_item_stock_status');
     return { success: false, error: 'Failed to update stock status' };
   }
 }
 
-export async function updateVariantStock(
-  variantId: string,
+export async function update_variant_stock(
+  variant_id: string,
   quantity: number
 ): Promise<{ success: boolean; error?: string }> {
   try {
@@ -737,13 +715,13 @@ export async function updateVariantStock(
         stock_quantity: quantity,
         updated_at: new Date().toISOString()
       })
-      .eq('id', variantId);
+      .eq('id', variant_id);
 
     if (error) throw error;
 
     return { success: true };
   } catch (error) {
-    logError(error, `updateVariantStock:${variantId}`);
+    logError(error, `update_variant_stock:${variant_id}`);
     return { success: false, error: 'Failed to update stock' };
   }
 }

@@ -5,7 +5,7 @@ import { logger } from '@/lib/logging/logger'
 
 export async function checkServiceability(pincode: string) {
     try {
-        const supabase = await createClient() as any
+        const supabase = await createClient()
 
         const { data, error } = await supabase
             .from('serviceable_pincodes')

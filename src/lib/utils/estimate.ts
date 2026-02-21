@@ -3,7 +3,7 @@ import { OrderForPDF } from '@/lib/types/order';
 
 export function downloadEstimate(order: OrderForPDF) {
   const pdfBlob = generateEstimatePDF(order);
-  downloadPDF(pdfBlob, `WyshKit-Estimate-${order.orderNumber}.pdf`);
+  downloadPDF(pdfBlob, `WyshKit-Estimate-${order.order_number}.pdf`);
 
   // Open in new window for printing
   const url = URL.createObjectURL(pdfBlob);

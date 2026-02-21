@@ -11,15 +11,15 @@ export function useCartValidation(targetPartnerId?: string | null) {
     const { draftOrder } = useCart();
 
     const isMismatch = useMemo(() => {
-        if (!draftOrder.partnerId || !targetPartnerId) return false;
-        return draftOrder.partnerId !== targetPartnerId;
-    }, [draftOrder.partnerId, targetPartnerId]);
+        if (!draftOrder.partner_id || !targetPartnerId) return false;
+        return draftOrder.partner_id !== targetPartnerId;
+    }, [draftOrder.partner_id, targetPartnerId]);
 
     const hasItemsInCart = draftOrder.items.length > 0;
 
     return {
         isMismatch: isMismatch && hasItemsInCart,
-        currentCartPartnerId: draftOrder.partnerId,
+        currentCartPartnerId: draftOrder.partner_id,
         hasItemsInCart
     };
 }

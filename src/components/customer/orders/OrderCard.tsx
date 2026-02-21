@@ -14,11 +14,11 @@ interface OrderCardProps {
 
 export function OrderCard({ order }: OrderCardProps) {
   const orderId = order.id ?? '';
-  const orderNumber = order.orderNumber ?? '—';
+  const orderNumber = order.order_number ?? '—';
   const status = order.status ?? 'UNKNOWN';
   const total = order.total ?? 0;
-  const createdAt = order.createdAt ?? '';
-  const itemCount = order.itemCount ?? 1;
+  const created_at = order.created_at ?? '';
+  const item_count = order.item_count ?? 1;
 
   const isActive = ['PLACED', 'DETAILS_RECEIVED', 'PREVIEW_READY', 'REVISION_REQUESTED', 'IN_PRODUCTION', 'OUT_FOR_DELIVERY'].includes(status);
 
@@ -31,8 +31,8 @@ export function OrderCard({ order }: OrderCardProps) {
       <div className="flex items-start gap-4">
         {/* Partner Avatar / Image */}
         <div className="size-14 rounded-2xl bg-zinc-50 border border-zinc-100 overflow-hidden shrink-0 flex items-center justify-center relative">
-          {order.firstItemImage ? (
-            <img src={order.firstItemImage} alt={order.partnerName || 'Store'} className="size-full object-cover" />
+          {order.first_item_image ? (
+            <img src={order.first_item_image} alt={order.partner_name || 'Store'} className="size-full object-cover" />
           ) : (
             <Package className="size-6 text-zinc-300" />
           )}
@@ -45,7 +45,7 @@ export function OrderCard({ order }: OrderCardProps) {
           <div className="flex items-start justify-between">
             <div>
               <h3 className="text-sm font-black text-zinc-900 truncate leading-tight group-hover:text-[var(--primary)] transition-colors">
-                {order.partnerName || "Wyshkit Partner"}
+                {order.partner_name || "Wyshkit Partner"}
               </h3>
               <p className="text-[10px] font-bold text-zinc-400 mt-0.5 uppercase tracking-wider">
                 Order #{orderNumber}
@@ -64,33 +64,33 @@ export function OrderCard({ order }: OrderCardProps) {
               {getOrderStatusDisplay(status)}
             </span>
 
-            {order.hasPersonalization && (
+            {order.has_personalization && (
               <span className={cn(
                 "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1",
-                order.personalizationStatus === 'SUBMITTED' ? "bg-amber-50 text-amber-600" :
-                  order.personalizationStatus === 'APPROVED' ? "bg-emerald-50 text-emerald-600" :
+                order.personalization_status === 'SUBMITTED' ? "bg-amber-50 text-amber-600" :
+                  order.personalization_status === 'APPROVED' ? "bg-emerald-50 text-emerald-600" :
                     "bg-zinc-100 text-zinc-500"
               )}>
                 <div className={cn(
                   "size-1 rounded-full",
-                  order.personalizationStatus === 'SUBMITTED' ? "bg-amber-500 animate-pulse" :
-                    order.personalizationStatus === 'APPROVED' ? "bg-emerald-500" :
+                  order.personalization_status === 'SUBMITTED' ? "bg-amber-500 animate-pulse" :
+                    order.personalization_status === 'APPROVED' ? "bg-emerald-500" :
                       "bg-zinc-400"
                 )} />
-                {order.personalizationStatus || 'Design Pending'}
+                {order.personalization_status || 'Design Pending'}
               </span>
             )}
           </div>
 
           <p className="text-[11px] font-medium text-zinc-500 mt-3 line-clamp-1">
-            {order.firstItemName || "Order Details"}
+            {order.first_item_name || "Order Details"}
           </p>
         </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-zinc-50 flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold">
-          {createdAt ? format(new Date(createdAt), "MMM d, yyyy") : '—'}
+          {created_at ? format(new Date(created_at), "MMM d, yyyy") : '—'}
         </div>
         <div className={cn(
           "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",

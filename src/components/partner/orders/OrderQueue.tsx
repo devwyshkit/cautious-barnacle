@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { OrderCard } from './OrderCard';
-import { updateOrderStatus, rejectOrder } from '@/lib/actions/partner-actions';
-import { markOrderAsPacked } from '@/lib/actions/orders'; // SWIGGY 2026: Added for trigger consistency
+import { update_order_status, reject_order } from '@/lib/actions/partner-actions';
+import { mark_order_as_packed } from '@/lib/actions/orders'; // SWIGGY 2026: Added for trigger consistency
 import type { PartnerOrder } from '@/lib/actions/partner-actions';
 import { toast } from 'sonner';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/types/order-status';
@@ -128,7 +128,7 @@ export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
     setUpdating(orderId);
     try {
       const nextStatus = ORDER_STATUS.CONFIRMED;
-      const result = await updateOrderStatus(orderId, nextStatus);
+      const result = await update_order_status(orderId, nextStatus);
 
       if (result.success) {
         setOrders(prev => prev.map(o =>
@@ -148,7 +148,7 @@ export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
   const handleReject = async (orderId: string, reason: string) => {
     setUpdating(orderId);
     try {
-      const result = await rejectOrder(orderId, reason);
+      const result = await reject_order(orderId, reason);
       if (result.success) {
         setOrders(prev => prev.map(o =>
           o.id === orderId ? { ...o, status: ORDER_STATUS.CANCELLED } : o
@@ -167,7 +167,7 @@ export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
   const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
     setUpdating(orderId);
     try {
-      const result = await updateOrderStatus(orderId, newStatus);
+      const result = await update_order_status(orderId, newStatus);
       if (result.success) {
         setOrders(prev => prev.map(o =>
           o.id === orderId ? { ...o, status: newStatus as PartnerOrder['status'] } : o

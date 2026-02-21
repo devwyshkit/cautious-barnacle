@@ -42,15 +42,14 @@ export function OrderList({ initialOrders }: OrderListProps) {
       }
 
       const mapped: OrderListItem[] = (data || []).map((row: any) => ({
-        id: row.id,
-        orderNumber: row.order_number ?? null,
-        status: row.status as any,
-        total: row.total ?? 0,
-        createdAt: row.created_at ?? null,
-        partnerName: row.partner_name ?? null,
-        itemCount: row.items?.length || 1,
-        firstItemImage: row.partner_image ?? null,
-        firstItemName: row.items?.map((it: any) => it.item_name || it.itemName).join(', ') || null,
+        ...row,
+        order_number: row.order_number,
+        created_at: row.created_at,
+        partner_name: row.partner_name,
+        // UI-only computed fields
+        item_count: row.items?.length || 1,
+        first_item_image: row.partner_image || null,
+        first_item_name: row.items?.map((it: any) => it.item_name).join(', ') || null,
       }));
       setOrders(mapped);
     } catch (err: unknown) {

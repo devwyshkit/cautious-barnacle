@@ -51,7 +51,7 @@ async function AsyncPartnerContent({ id }: { id: string }) {
   return (
     <PartnerStorePage
       partnerId={id}
-      initialData={partner || undefined}
+      initialData={(partner as any) || undefined}
       initialItems={items}
     />
   );

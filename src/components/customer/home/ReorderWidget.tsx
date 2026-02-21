@@ -106,10 +106,10 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
           [],
           item.quantity,
           {
-            itemName: item.item_name,
-            itemImage: item.images?.[0],
-            unitPrice: 0,
-            partnerName: order.partner_name,
+            item_name: item.item_name,
+            item_image: item.images?.[0],
+            unit_price: 0,
+            partner_name: order.partner_name,
           }
         );
 

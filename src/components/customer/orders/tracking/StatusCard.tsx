@@ -10,8 +10,10 @@ import { toast } from 'sonner';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { PRICING } from '@/lib/constants/pricing';
 
+import { OrderDetail } from '@/lib/types/order';
+
 interface StatusCardProps {
-    order: any;
+    order: OrderDetail;
 }
 
 export function StatusCard({ order }: StatusCardProps) {
@@ -127,7 +129,7 @@ export function StatusCard({ order }: StatusCardProps) {
                         ? "bg-rose-50 text-[var(--primary)]"
                         : order.status === ORDER_STATUS.DELIVERED ? "bg-emerald-50 text-emerald-600" : "bg-zinc-100 text-zinc-600",
                 )}>
-                    {getStatusIcon(order.status)}
+                    {getStatusIcon(order.status || '')}
                     {deadline && (
                         <div className="absolute -bottom-1 -right-1 size-5 bg-white rounded-full flex items-center justify-center shadow-sm border border-zinc-100">
                             <Timer className="size-3 text-zinc-950 animate-pulse" />
@@ -137,7 +139,7 @@ export function StatusCard({ order }: StatusCardProps) {
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
                         <h2 className="text-lg font-black text-zinc-900 uppercase tracking-tight leading-tight">
-                            {getStatusText(order.status)}
+                            {getStatusText(order.status || '')}
                         </h2>
                         {(() => {
                             const pendingCount = (order.order_items || []).filter((item: any) => {
@@ -170,7 +172,7 @@ export function StatusCard({ order }: StatusCardProps) {
                         </div>
                     ) : (
                         <div className="space-y-1.5 mt-1">
-                            <p className="text-xs font-bold text-zinc-900 leading-tight">{getNextStep(order.status, order.has_personalization)}</p>
+                            <p className="text-xs font-bold text-zinc-900 leading-tight">{getNextStep(order.status || '', !!order.has_personalization)}</p>
                             {deadline && (
                                 <HyperlocalTimer
                                     deadline={deadline}
@@ -198,7 +200,7 @@ export function StatusCard({ order }: StatusCardProps) {
                         [ORDER_STATUS.OUT_FOR_DELIVERY]: 3,
                         [ORDER_STATUS.DELIVERED]: 4,
                     };
-                    const currentStep = stepStatuses[order.status] ?? 0;
+                    const currentStep = stepStatuses[order.status || ''] ?? 0;
                     const isActive = i < currentStep;
                     const isCurrent = i === currentStep;
 
@@ -221,19 +223,22 @@ export function StatusCard({ order }: StatusCardProps) {
                     onClick={() => {
                         const orderData = order as any;
                         generateEstimatePDF({
-                            orderNumber: orderData.order_number,
-                            date: new Date(orderData.created_at || Date.now()).toLocaleDateString(),
-                            order_items: orderData.order_items,
-                            customerName: (orderData.delivery_address as any)?.name,
-                            billingAddress: orderData.delivery_address,
-                            gstin: orderData.gstin,
-                            partner: orderData.partner?.[0] || { name: 'Partner', address: 'Bangalore' },
+                            order_number: order.order_number || '',
+                            date: new Date(order.created_at || Date.now()).toLocaleDateString(),
+                            order_items: order.order_items,
+                            customer_name: order.users?.full_name || 'Valued Customer',
+                            billing_address: order.delivery_address as any,
+                            gstin: order.gstin || undefined,
+                            partner: {
+                                name: order.partner_name || 'Partner',
+                                address: 'Bangalore, India'
+                            },
                             totals: {
-                                itemTotal: Number(orderData.subtotal) || 0,
-                                deliveryFee: Number(orderData.delivery_fee) || 0,
-                                platformFee: PRICING.PLATFORM_FEE,
-                                gstAmount: Number(orderData.tax_amount) || 0,
-                                grandTotal: Number(orderData.total) || 0
+                                item_total: Number(order.subtotal) || 0,
+                                delivery_fee: Number(order.delivery_fee) || 0,
+                                platform_fee: Number(order.platform_fee) || PRICING.PLATFORM_FEE,
+                                gst_amount: Number(order.gst) || 0,
+                                grand_total: Number(order.total) || 0
                             }
                         });
                     }}
@@ -247,19 +252,22 @@ export function StatusCard({ order }: StatusCardProps) {
                         onClick={() => {
                             const orderData = order as any;
                             generateTaxInvoicePDF({
-                                orderNumber: orderData.order_number,
+                                order_number: order.order_number || '',
                                 date: new Date().toLocaleDateString(),
-                                order_items: orderData.order_items,
-                                customerName: (orderData.delivery_address as any)?.name,
-                                billingAddress: orderData.delivery_address,
-                                gstin: orderData.gstin,
-                                partner: orderData.partner?.[0] || { name: 'Partner', address: 'Bangalore' },
+                                order_items: order.order_items,
+                                customer_name: order.users?.full_name || 'Valued Customer',
+                                billing_address: order.delivery_address as any,
+                                gstin: order.gstin || undefined,
+                                partner: {
+                                    name: order.partner_name || 'Partner',
+                                    address: 'Bangalore, India'
+                                },
                                 totals: {
-                                    itemTotal: Number(orderData.subtotal) || 0,
-                                    deliveryFee: Number(orderData.delivery_fee) || 0,
-                                    platformFee: PRICING.PLATFORM_FEE,
-                                    gstAmount: Number(orderData.tax_amount) || 0,
-                                    grandTotal: Number(orderData.total) || 0
+                                    item_total: Number(order.subtotal) || 0,
+                                    delivery_fee: Number(order.delivery_fee) || 0,
+                                    platform_fee: Number(order.platform_fee) || PRICING.PLATFORM_FEE,
+                                    gst_amount: Number(order.gst) || 0,
+                                    grand_total: Number(order.total) || 0
                                 }
                             });
                         }}

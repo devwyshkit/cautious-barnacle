@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Cart } from '@/lib/types/cart';
+import { DraftTransaction as Cart, DraftLineItem } from '@/lib/types/personalization';
 import { Address } from '@/lib/types/address';
 import { OrderItemDetail } from '@/lib/types/order';
 
@@ -8,15 +8,15 @@ import { OrderItemDetail } from '@/lib/types/order';
 const _autoTable = autoTable;
 
 interface DocumentData {
-    orderNumber?: string;
+    order_number?: string;
     date: string;
     cart?: Cart; // For checkout estimates
     order_items?: OrderItemDetail[]; // For post-order documents
     gstin?: string;
-    customerName?: string;
-    businessName?: string;
-    billingAddress?: Address | null;
-    shippingAddress?: Address | null;
+    customer_name?: string;
+    business_name?: string;
+    billing_address?: Address | null;
+    shipping_address?: Address | null;
     partner: {
         name: string;
         address: string;
@@ -24,11 +24,11 @@ interface DocumentData {
         phone?: string;
     };
     totals: {
-        itemTotal: number;
-        deliveryFee: number;
-        platformFee: number;
-        gstAmount: number;
-        grandTotal: number;
+        item_total: number;
+        delivery_fee: number;
+        platform_fee: number;
+        gst_amount: number;
+        grand_total: number;
         discount?: number;
     };
 }
@@ -73,18 +73,18 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     doc.text('BILL TO:', col2, y2);
     doc.setFont('helvetica', 'normal');
     y2 += 5;
-    if (data.businessName) {
+    if (data.business_name) {
         doc.setFont('helvetica', 'bold');
-        doc.text(data.businessName, col2, y2);
+        doc.text(data.business_name, col2, y2);
         doc.setFont('helvetica', 'normal');
         y2 += 5;
     } else {
-        doc.text(data.customerName || 'Customer', col2, y2);
+        doc.text(data.customer_name || 'Customer', col2, y2);
         y2 += 5;
     }
-    if (data.billingAddress) {
+    if (data.billing_address) {
         const addrLines = doc.splitTextToSize(
-            `${data.billingAddress.address_line1 || ''}, ${data.billingAddress.city || ''}`,
+            `${data.billing_address.address_line1 || ''}, ${data.billing_address.city || ''}`,
             (pageWidth / 2) - 20
         );
         doc.text(addrLines, col2, y2);
@@ -99,19 +99,26 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     y = Math.max(y, y2) + 10;
 
     // Order Info
-    doc.text(`Doc No: ${data.orderNumber || 'PRE-AUTH'}`, col1, y);
+    doc.text(`Doc No: ${data.order_number || 'PRE-AUTH'}`, col1, y);
     doc.text(`Date: ${data.date}`, col2, y);
     y += 10;
 
     // Table
     const items = data.order_items || data.cart?.items || [];
-    const tableBody = items.map(item => [
-        item.item_name || (item as any).itemName || (item as any).name || 'Product',
-        (item as any).hsn_code || '6912',
-        item.quantity || (item as any).quantity_number || 1,
-        `₹${item.unit_price || (item as any).unitPrice || 0}`,
-        `₹${(item.total_price || (item as any).totalPrice || 0)}`
-    ]);
+    const tableBody = items.map(item => {
+        const itemName = item.item_name || 'Product';
+        const quantity = item.quantity || 1;
+        const unitPrice = item.unit_price || 0;
+        const totalPrice = item.total_price || 0;
+
+        return [
+            itemName,
+            (item as any).hsn_code || '6912',
+            quantity,
+            `₹${unitPrice}`,
+            `₹${totalPrice}`
+        ];
+    });
 
     autoTable(doc, {
         startY: y,
@@ -134,15 +141,15 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
 
     doc.setFont('helvetica', 'normal');
     doc.text('Subtotal:', totalsX, y);
-    doc.text(`₹${data.totals.itemTotal.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
+    doc.text(`₹${data.totals.item_total.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
 
     y += 6;
     doc.text('Delivery Fee:', totalsX, y);
-    doc.text(`₹${data.totals.deliveryFee.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
+    doc.text(`₹${data.totals.delivery_fee.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
 
     y += 6;
     doc.text('GST (18%):', totalsX, y);
-    doc.text(`₹${data.totals.gstAmount.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
+    doc.text(`₹${data.totals.gst_amount.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
 
     if (data.totals.discount) {
         y += 6;
@@ -154,7 +161,7 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(12);
     doc.text('TOTAL:', totalsX, y);
-    doc.text(`₹${data.totals.grandTotal.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
+    doc.text(`₹${data.totals.grand_total.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
 
     // Footer
     y += 20;
@@ -172,10 +179,10 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
 
 export const generateEstimatePDF = (data: DocumentData): void => {
     const doc = generateBasePDF('ESTIMATE', data);
-    doc.save(`WyshKit_Estimate_${data.orderNumber || 'Draft'}_${Date.now()}.pdf`);
+    doc.save(`WyshKit_Estimate_${data.order_number || 'Draft'}_${Date.now()}.pdf`);
 };
 
 export const generateTaxInvoicePDF = (data: DocumentData): void => {
     const doc = generateBasePDF('TAX INVOICE', data);
-    doc.save(`WyshKit_Invoice_${data.orderNumber}_${Date.now()}.pdf`);
+    doc.save(`WyshKit_Invoice_${data.order_number}_${Date.now()}.pdf`);
 };

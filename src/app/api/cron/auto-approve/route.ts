@@ -21,12 +21,12 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        const { enforceDesignDeadlines } = await import('@/lib/services/deadlines');
-        const result = await enforceDesignDeadlines();
+        const { enforce_design_deadlines } = await import('@/lib/services/deadlines');
+        const { count } = await enforce_design_deadlines();
 
         return NextResponse.json({
             success: true,
-            processed: result.count,
+            processed: count,
             message: 'Auto-approve cron completed'
         });
     } catch (error) {

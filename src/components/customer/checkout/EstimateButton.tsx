@@ -8,12 +8,12 @@ import { getPartnerInfo } from '@/lib/actions/draft-order';
 import { toast } from 'sonner';
 
 import { DraftLineItem } from '@/lib/types/personalization';
-import { PricingResult } from '@/lib/actions/payment';
+import { type PricingBreakdown } from '@/lib/constants/pricing';
 import { Address } from '@/lib/types/address';
 
 interface EstimateButtonProps {
     items: DraftLineItem[];
-    pricing: PricingResult;
+    pricing: PricingBreakdown;
     businessName?: string;
     billingAddress?: Address | null;
     gstin?: string;
@@ -44,9 +44,9 @@ export function EstimateButton({
 
             generateEstimatePDF({
                 date: new Date().toLocaleDateString(),
-                customerName,
-                businessName,
-                billingAddress,
+                customer_name: customerName,
+                business_name: businessName,
+                billing_address: billingAddress,
                 gstin,
                 partner: partner
                     ? {
@@ -56,27 +56,23 @@ export function EstimateButton({
                     }
                     : { name: 'Partner', address: 'Bangalore, India' },
                 totals: {
-                    itemTotal: pricing.subtotal,
-                    deliveryFee: pricing.delivery_fee,
-                    platformFee: pricing.platform_fee || 0,
-                    gstAmount: pricing.gst || 0,
-                    grandTotal: pricing.total,
+                    item_total: pricing.subtotal,
+                    delivery_fee: pricing.delivery_fee,
+                    platform_fee: pricing.platform_fee || 0,
+                    gst_amount: pricing.gst || 0,
+                    grand_total: pricing.total,
                     discount: pricing.discount || 0
                 },
                 order_items: items.map(it => ({
                     id: it.id || '',
-                    itemId: it.item_id,
                     item_id: it.item_id,
                     item_name: it.item_name || 'Product',
                     quantity: it.quantity,
                     quantity_number: it.quantity,
-                    unitPrice: it.unit_price,
                     unit_price: it.unit_price,
-                    totalPrice: it.total_price,
                     total_price: it.total_price,
                     is_personalized: it.is_personalized || false,
-                    status: 'DRAFT',
-                    name: it.item_name || 'Product'
+                    status: 'DRAFT'
                 }))
             });
 

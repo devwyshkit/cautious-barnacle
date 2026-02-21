@@ -33,4 +33,40 @@ describe('Supabase RPC Contracts', () => {
         };
         expect(validArgs).toBeDefined();
     });
+
+    it('calculate_order_total RPC expects p_cart_items as Json', () => {
+        type PricingArgs = Functions['calculate_order_total']['Args'];
+        // The contract is that it's Json, but our actions now send snake_case
+        const samplePayload: PricingArgs = {
+            p_cart_items: [
+                {
+                    item_id: 'some-item',
+                    variant_id: 'some-variant',
+                    quantity: 1,
+                    has_personalization: false,
+                    selected_addons: []
+                }
+            ]
+        };
+        expect(samplePayload).toBeDefined();
+    });
+
+    it('place_secure_order RPC expects items as Json', () => {
+        type OrderArgs = Functions['place_secure_order']['Args'];
+        const samplePayload: OrderArgs = {
+            p_address_id: 'addr-123',
+            p_items: [
+                {
+                    item_id: 'item-123',
+                    variant_id: 'var-123',
+                    quantity: 1,
+                    has_personalization: true,
+                    personalization: {},
+                    selected_addons: []
+                }
+            ],
+            p_razorpay_order_id: 'order-123'
+        };
+        expect(samplePayload).toBeDefined();
+    });
 });

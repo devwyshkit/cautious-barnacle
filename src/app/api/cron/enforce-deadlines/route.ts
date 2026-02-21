@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { enforceAcceptanceDeadlines } from '@/lib/services/deadlines';
+import { enforce_acceptance_deadlines, enforce_design_deadlines } from '@/lib/services/deadlines';
 import { logger } from '@/lib/logging/logger';
 
 /**
@@ -15,15 +15,15 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { enforceAcceptanceDeadlines, enforceDesignDeadlines } = await import('@/lib/services/deadlines');
-
-        const acceptanceResult = await enforceAcceptanceDeadlines();
-        const designResult = await enforceDesignDeadlines();
+        const [acceptance, design] = await Promise.all([
+            enforce_acceptance_deadlines(),
+            enforce_design_deadlines()
+        ]);
 
         return NextResponse.json({
             success: true,
-            processedAcceptance: acceptanceResult.count,
-            processedDesign: designResult.count,
+            processedAcceptance: acceptance.count,
+            processedDesign: design.count,
             timestamp: new Date().toISOString()
         });
 
