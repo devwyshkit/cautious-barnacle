@@ -1,12 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useTransition, useOptimistic } from "react";
-import { Cart, SelectedPersonalization } from "@/lib/types/cart";
+import { DraftTransaction as Cart, SelectedPersonalization, SelectedAddon, DraftLineItem } from "@/lib/types/personalization";
 import { useAuth } from "@/hooks/useAuth";
 import * as draftOrderActions from "@/lib/actions/draft-order";
 import { createClient } from "@/lib/supabase/client";
 import { logger } from "@/lib/logging/logger";
 import { calculateItemPrice } from "@/lib/utils/pricing";
+import { cartOptimisticReducer } from "@/lib/utils/cart-logic";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -19,26 +20,34 @@ import {
 } from "@/components/ui/alert-dialog";
 import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
 
+export interface CartActionResult {
+    success: boolean;
+    error?: string;
+    code?: string;
+    requiresCartClear?: boolean;
+    cart?: Cart;
+}
+
 interface CartContextType {
     draftOrder: Cart;
     loading: boolean;
     isPending: boolean;
     isGuest: boolean;
     addToDraftOrder: (
-        itemId: string,
-        variantId: string | null,
+        item_id: string,
+        variant_id: string | null,
         personalization: SelectedPersonalization,
-        selectedAddons?: any[],
+        selected_addons?: SelectedAddon[],
         quantity?: number,
-        optimisticData?: {
-            itemName?: string;
-            itemImage?: string;
-            unitPrice?: number;
-            partnerId?: string;
-            partnerName?: string;
-            updateItemId?: string;
+        optimistic_data?: {
+            item_name?: string;
+            item_image?: string;
+            unit_price?: number;
+            partner_id?: string;
+            partner_name?: string;
+            update_item_id?: string;
         }
-    ) => Promise<any>;
+    ) => Promise<CartActionResult>;
     removeFromDraftOrder: (itemId: string, variantId?: string | null) => Promise<void>;
     updateQuantity: (itemId: string, variantId: string | null, quantity: number) => Promise<void>;
     clearDraftOrder: () => Promise<void>;
@@ -73,90 +82,31 @@ export function CartProvider({
     guestSessionId?: string | null
 }) {
     const { user, loading: authLoading } = useAuth();
-    const [draftOrder, setDraftOrder] = useState<Cart>(initialCart || { items: [], partnerId: null, subtotal: 0, total: 0, itemCount: 0 });
+    const [draftOrder, setDraftOrder] = useState<Cart>(initialCart || { items: [], partner_id: null, subtotal: 0, total: 0, item_count: 0 });
     const [loading, setLoading] = useState(!initialCart);
     const [isPending, startTransition] = useTransition();
 
     // WYSHKIT 2026: Global Replace Cart Dialog state
     const [showReplaceCartDialog, setShowReplaceCartDialog] = useState(false);
     const [pendingItem, setPendingItem] = useState<{
-        itemId: string;
-        variantId: string | null;
+        item_id: string;
+        variant_id: string | null;
         personalization: SelectedPersonalization;
-        selectedAddons?: any[];
+        selected_addons?: SelectedAddon[];
         quantity: number;
-        optimisticData?: any;
+        optimistic_data?: {
+            item_name?: string;
+            item_image?: string;
+            unit_price?: number;
+            partner_id?: string;
+            partner_name?: string;
+            update_item_id?: string;
+        };
     } | null>(null);
 
-    // WYSHKIT 2026: Optimistic cart updates
     const [optimisticCart, addOptimisticCart] = useOptimistic(
         draftOrder,
-        (state: Cart, newItem: { itemId: string; variantId: string | null; personalization: SelectedPersonalization; selectedAddons?: any[]; quantity: number; itemName?: string; itemImage?: string; unitPrice?: number; partnerId?: string; partnerName?: string }) => {
-
-            const newItemAddonsKey = (newItem.selectedAddons || []).map(a => a.id).sort().join(',');
-            const newItemPersKey = newItem.personalization?.enabled
-                ? `enabled:${newItem.personalization.option_id || 'default'}`
-                : 'disabled';
-
-            const existingItemIndex = state.items.findIndex(
-                i => i.itemId === newItem.itemId &&
-                    (i.selectedVariantId ?? null) === newItem.variantId &&
-                    ((i.selectedAddons || []).map(a => a.id).sort().join(',') === newItemAddonsKey) &&
-                    (i.personalization?.enabled === newItem.personalization?.enabled &&
-                        (i.personalization?.option_id ?? null) === (newItem.personalization?.option_id ?? null))
-            );
-
-            let newItems;
-            if (existingItemIndex >= 0) {
-                newItems = state.items.map((item, idx) => {
-                    if (idx === existingItemIndex) {
-                        const updatedQuantity = item.quantity + newItem.quantity;
-                        const updatedItem = { ...item, quantity: updatedQuantity };
-                        return {
-                            ...updatedItem,
-                            totalPrice: calculateItemPrice(updatedItem as any)
-                        };
-                    }
-                    return item;
-                });
-            } else {
-                const tempId = `optimistic-${newItem.itemId}-${newItem.variantId || 'base'}-${Date.now()}`;
-                const newItemObj = {
-                    id: tempId,
-                    itemId: newItem.itemId,
-                    itemName: newItem.itemName || 'Loading...',
-                    itemImage: newItem.itemImage || '/images/logo.png',
-                    quantity: newItem.quantity,
-                    unitPrice: newItem.unitPrice || 0,
-                    totalPrice: 0,
-                    selectedVariantId: newItem.variantId,
-                    personalization: newItem.personalization,
-                    selectedAddons: newItem.selectedAddons,
-                    partnerName: newItem.partnerName,
-                    partnerId: newItem.partnerId,
-                };
-
-                newItems = [
-                    ...state.items,
-                    {
-                        ...newItemObj,
-                        totalPrice: calculateItemPrice(newItemObj as any)
-                    },
-                ];
-            }
-
-            const newItemCount = newItems.reduce((sum, i) => sum + i.quantity, 0);
-            const newSubtotal = newItems.reduce((sum, i) => sum + i.totalPrice, 0);
-
-            return {
-                ...state,
-                items: newItems,
-                itemCount: newItemCount,
-                subtotal: newSubtotal,
-                total: newSubtotal,
-                partnerId: newItem.partnerId || state.partnerId,
-            };
-        }
+        cartOptimisticReducer
     );
 
     // WYSHKIT 2026: Anti-Zombie Mechanism (Mutation Dominance)
@@ -174,7 +124,7 @@ export function CartProvider({
 
         try {
             const result = await draftOrderActions.getCart();
-            const cart = result.cart ?? { items: [], partnerId: null, subtotal: 0, total: 0, itemCount: 0 };
+            const cart = result.cart ?? { items: [], partner_id: null, subtotal: 0, total: 0, item_count: 0 };
 
             startTransition(() => {
                 setDraftOrder(cart);
@@ -235,58 +185,66 @@ export function CartProvider({
     }, [user, authLoading, guestSessionId]);
 
     const addToDraftOrder = async (
-        itemId: string,
-        variantId: string | null,
+        item_id: string,
+        variant_id: string | null,
         personalization: SelectedPersonalization,
-        selectedAddons?: any[],
+        selected_addons?: SelectedAddon[],
         quantity: number = 1,
-        optimisticData?: { itemName?: string; itemImage?: string; unitPrice?: number; partnerId?: string; partnerName?: string }
+        optimistic_data?: { item_name?: string; item_image?: string; unit_price?: number; partner_id?: string; partner_name?: string }
     ) => {
         lastActionTimeRef.current = Date.now();
         isMutatingRef.current = true;
 
-        if (optimisticData) {
+        if (optimistic_data) {
             startTransition(() => {
                 addOptimisticCart({
-                    itemId,
-                    variantId,
+                    item_id,
+                    variant_id,
                     personalization,
-                    selectedAddons,
+                    selected_addons,
                     quantity,
-                    ...optimisticData,
+                    ...optimistic_data,
                 });
             });
         }
 
         try {
             let result;
-            const updateItemId = optimisticData && 'updateItemId' in optimisticData ? (optimisticData as any).updateItemId : undefined;
+            const update_item_id = optimistic_data && 'update_item_id' in optimistic_data ? (optimistic_data as any).update_item_id : undefined;
 
-            if (updateItemId) {
-                result = await draftOrderActions.updateCartItem(updateItemId, {
-                    variantId,
+            if (update_item_id) {
+                result = await draftOrderActions.updateCartItem(update_item_id, {
+                    variant_id: variant_id,
                     personalization,
-                    selectedAddons,
+                    selected_addons: selected_addons,
                     quantity
                 });
             } else {
-                result = await draftOrderActions.addToCart({ itemId, variantId, personalization, selectedAddons, quantity });
+                result = await draftOrderActions.addToCart({
+                    item_id: item_id,
+                    variant_id: variant_id,
+                    personalization,
+                    selected_addons: selected_addons,
+                    quantity
+                });
             }
 
             if (result && (result as any).error === 'PARTNER_MISMATCH') {
                 triggerHaptic(HapticPattern.ERROR);
-                setPendingItem({ itemId, variantId, personalization, selectedAddons, quantity, optimisticData });
+                setPendingItem({ item_id, variant_id, personalization, selected_addons, quantity, optimistic_data });
                 setShowReplaceCartDialog(true);
-                return result;
+                return { success: false, error: 'PARTNER_MISMATCH' };
             }
 
             const cart = (result as { cart?: Cart; success?: boolean })?.cart;
             if (cart && !('error' in result)) {
                 startTransition(() => setDraftOrder(cart));
-            } else {
-                await fetchDraftOrder();
             }
-            return result;
+            if (result.error) {
+                return { success: false, error: result.error };
+            }
+
+            return { success: true };
         } finally {
             isMutatingRef.current = false;
         }
@@ -301,26 +259,26 @@ export function CartProvider({
         // WYSHKIT 2026: Zero-Flicker Transition
         // Immediately clear local state and add the pending item optimistically
         startTransition(() => {
-            setDraftOrder({ items: [], partnerId: null, subtotal: 0, total: 0, itemCount: 0 });
+            setDraftOrder({ items: [], partner_id: null, subtotal: 0, total: 0, item_count: 0 });
             addOptimisticCart({
-                itemId: pendingItem.itemId,
-                variantId: pendingItem.variantId,
+                item_id: pendingItem.item_id,
+                variant_id: pendingItem.variant_id,
                 personalization: pendingItem.personalization,
-                selectedAddons: pendingItem.selectedAddons,
+                selected_addons: pendingItem.selected_addons,
                 quantity: pendingItem.quantity,
-                ...pendingItem.optimisticData,
+                ...pendingItem.optimistic_data,
             });
         });
 
         try {
             await clearDraftOrder();
             await addToDraftOrder(
-                pendingItem.itemId,
-                pendingItem.variantId,
+                pendingItem.item_id,
+                pendingItem.variant_id,
                 pendingItem.personalization,
-                pendingItem.selectedAddons,
+                pendingItem.selected_addons,
                 pendingItem.quantity,
-                pendingItem.optimisticData
+                pendingItem.optimistic_data
             );
             setPendingItem(null);
         } catch (error) {
@@ -335,7 +293,7 @@ export function CartProvider({
 
         const normalizedVariantId = variantId ?? null;
         const cartItem = draftOrder.items.find(
-            i => i.itemId === itemId && (i.selectedVariantId ?? null) === normalizedVariantId
+            (i: DraftLineItem) => i.item_id === itemId && (i.selected_variant_id ?? null) === normalizedVariantId
         );
         if (!cartItem) {
             isMutatingRef.current = false;
@@ -365,7 +323,7 @@ export function CartProvider({
 
         const normalizedVariantId = variantId ?? null;
         const cartItem = draftOrder.items.find(
-            i => i.itemId === itemId && (i.selectedVariantId ?? null) === normalizedVariantId
+            (i: DraftLineItem) => i.item_id === itemId && (i.selected_variant_id ?? null) === normalizedVariantId
         );
         if (!cartItem) {
             isMutatingRef.current = false;
@@ -392,7 +350,7 @@ export function CartProvider({
     const clearDraftOrder = async () => {
         lastActionTimeRef.current = Date.now();
         isMutatingRef.current = true;
-        setDraftOrder({ items: [], partnerId: null, subtotal: 0, total: 0, itemCount: 0 });
+        setDraftOrder({ items: [], partner_id: null, subtotal: 0, total: 0, item_count: 0 });
 
         startTransition(async () => {
             try {

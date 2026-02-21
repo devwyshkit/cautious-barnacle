@@ -40,6 +40,7 @@ export function useSearch(params: SearchParams) {
     }
 
     let cancelled = false;
+    let timeoutId: NodeJS.Timeout;
 
     async function fetchSearch() {
       setIsLoading(true);
@@ -71,10 +72,14 @@ export function useSearch(params: SearchParams) {
       }
     }
 
-    fetchSearch();
+    // WYSHKIT 2026: Debounce search to prevent server thrashing
+    timeoutId = setTimeout(() => {
+      fetchSearch();
+    }, 300);
 
     return () => {
       cancelled = true;
+      clearTimeout(timeoutId);
     };
   }, [params.q, params.type, params.category, params.city, params.limit, params.offset, isEnabled]);
 

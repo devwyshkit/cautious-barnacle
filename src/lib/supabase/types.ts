@@ -54,15 +54,6 @@ export interface OrderDetails extends Order {
     // Computed/Mapped properties for frontend
     partner_name: string | null;
     partner_image?: string | null;
-    orderNumber?: string | null;
-    createdAt?: string | null;
-    userId?: string | null;
-    partnerId?: string | null;
-    partnerName?: string | null;
-    hasPersonalization?: boolean | null;
-    personalizationStatus?: string | null;
-    orderStatusHistory?: OrderStatusHistory[];
-    orderItems?: OrderItem[];
 }
 
 export type ItemWithPartner = Item & {

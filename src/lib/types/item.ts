@@ -27,21 +27,29 @@ export type ItemAddon = DBItemAddon;
 
 /**
  * WyshkitItem: The standard item shape for all discovery components.
- * Extends DB types with joined data and UI computed fields.
+ * Derives directly from Supabase 'items' table plus joins.
  */
-export interface WyshkitItem extends Omit<ItemWithFullSpec, 'variants'> {
+export interface WyshkitItem extends Omit<Tables<'items'>, 'personalization_options' | 'variants'> {
   // UI Computed & Joined fields
-  price?: number;
+  price?: number; // Normalized price (base_price or variant price)
   image_url?: string | null;
   partner_name?: string | null;
   distance_km?: number | null;
   distance_meters?: number | null;
-  is_online?: boolean | null;
   is_promoted: boolean | null;
-  has_personalization: boolean | null;
 
-  // Refined types for already present fields (if needed for frontend convenience)
-  variants: (DBVariant & { price: number | null; stock_quantity: number | null })[];
+  // Joins
+  partners?: {
+    id: string;
+    name: string;
+    display_name?: string;
+    city?: string;
+    rating?: number;
+    image_url?: string;
+  } | null;
+  variants?: Array<Tables<'variants'> & { price: number | null; stock_quantity: number | null }>;
+  item_addons?: Tables<'item_addons'>[];
+  personalization_options?: Tables<'personalization_options'>[];
 }
 
 export interface PersonalizationOption {
@@ -50,9 +58,9 @@ export interface PersonalizationOption {
   label?: string;
   price: number;
   description?: string;
-  previewTimeMinutes?: number;
-  productionTimeMinutes?: number;
-  productionTimeHours?: number;
+  preview_time_minutes?: number;
+  production_time_minutes?: number;
+  production_time_hours?: number;
   type: 'text' | 'image' | 'both';
   required?: boolean;
   placeholder?: string;

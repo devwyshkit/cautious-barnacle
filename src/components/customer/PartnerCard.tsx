@@ -11,10 +11,10 @@ interface PartnerCardProps {
   name: string;
   rating?: number;
   city?: string | null;
-  imageUrl: string | null;
+  image_url: string | null;
   deliveryTime?: { min: number; max: number } | null;
   distance?: number | null; // WYSHKIT 2026: Input for time calculation
-  prepHours?: number | null; // WYSHKIT 2026: Fallback for time calculation
+  prep_hours?: number | null; // WYSHKIT 2026: Fallback for time calculation
   className?: string;
   variant?: 'portrait' | 'landscape' | 'row';
   priority?: boolean;
@@ -29,21 +29,21 @@ export function PartnerCard({
   name,
   rating,
   city,
-  imageUrl,
+  image_url,
   deliveryTime,
   distance,
-  prepHours,
+  prep_hours,
   className,
   variant = 'portrait',
   priority = false,
 }: PartnerCardProps) {
-  // Logic: 10 mins per km + 20 mins prep. Fallback to prepHours if available.
+  // Logic: 10 mins per km + 20 mins prep. Fallback to prep_hours if available.
   const timeEstimate = deliveryTime || (distance ? {
     min: Math.max(25, Math.ceil(distance * 10) + 20),
     max: Math.max(35, Math.ceil(distance * 10) + 30)
-  } : prepHours ? {
-    min: prepHours * 60,
-    max: prepHours * 60 + 30
+  } : prep_hours ? {
+    min: prep_hours * 60,
+    max: prep_hours * 60 + 30
   } : null);
   const isPortrait = variant === 'portrait';
   const isLandscape = variant === 'landscape';
@@ -62,7 +62,7 @@ export function PartnerCard({
         isRow ? "size-14 shrink-0 rounded-lg overflow-hidden" : "inset-0 absolute"
       )}>
         <Image
-          src={imageUrl || FALLBACK_IMAGE}
+          src={image_url || FALLBACK_IMAGE}
           alt={name}
           fill
           className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"

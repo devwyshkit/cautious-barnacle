@@ -156,9 +156,9 @@ async function AsyncFeaturedPartners({ category }: { category: string | null }) 
             id={partner.id}
             name={partner.name}
             city={partner.city}
-            imageUrl={partner.imageUrl}
+            image_url={partner.image_url}
             rating={partner.rating}
-            prepHours={partner.prepHours}
+            prep_hours={partner.prep_hours}
             className="w-[160px] md:w-[220px] shrink-0 hover:-translate-y-1 transition-transform duration-300"
           />
         ))}

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ORDER_STATUS } from "@/lib/types/order-status";
-import { getOrderStatusDisplay, getOrderStatusColor } from "@/lib/utils/order-status";
+import { getOrderStatusDisplay, getOrderStatusColor } from "@/lib/types/order-status";
 import { formatCurrency } from "@/lib/utils/pricing";
 
 interface OrderCardProps {
@@ -61,7 +61,7 @@ export function OrderCard({ order }: OrderCardProps) {
                 isActive ? "bg-amber-50 text-[var(--primary)]" :
                   "bg-zinc-100 text-zinc-600"
             )}>
-              {status.replace(/_/g, ' ')}
+              {getOrderStatusDisplay(status)}
             </span>
 
             {order.hasPersonalization && (

@@ -10,15 +10,15 @@ import { Button } from '@/components/ui/button';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 interface AddToCartButtonProps {
-    itemId: string;
-    itemName: string;
-    itemImage?: string;
-    unitPrice?: number;
-    partnerId?: string;
-    partnerName?: string;
-    isIdentityAvailable?: boolean;
-    hasVariants?: boolean;
-    stockQuantity?: number;
+    item_id: string;
+    item_name: string;
+    item_image?: string | null;
+    unit_price?: number;
+    partner_id?: string | null;
+    partner_name?: string;
+    is_identity_available?: boolean;
+    has_variants?: boolean;
+    stock_quantity?: number;
     className?: string;
 }
 
@@ -27,15 +27,15 @@ interface AddToCartButtonProps {
  * Swiggy 2026 Pattern: User stays where they are, cart updates instantly
  */
 export function AddToCartButton({
-    itemId,
-    itemName,
-    itemImage,
-    unitPrice,
-    partnerId,
-    partnerName,
-    isIdentityAvailable,
-    hasVariants,
-    stockQuantity,
+    item_id,
+    item_name,
+    item_image,
+    unit_price,
+    partner_id,
+    partner_name,
+    is_identity_available,
+    has_variants,
+    stock_quantity,
     className,
 }: AddToCartButtonProps) {
     const router = useRouter();
@@ -52,17 +52,16 @@ export function AddToCartButton({
         triggerHaptic(HapticPattern.ACTION);
 
         // WYSHKIT 2026: If item needs selection (identity addition OR variants), navigate to store sheet
-        if (isIdentityAvailable || hasVariants) {
-            if (partnerId) {
+        if (is_identity_available || has_variants) {
+            if (partner_id) {
                 // Swiggy Pattern: Portal Navigation
                 // Redirect user to the item detail sheet to make selections
-                router.push(`/partner/${partnerId}/item/${itemId}${pathname === '/search' ? '?context=search' : ''}`, { scroll: false });
+                router.push(`/partner/${partner_id}/item/${item_id}${pathname === '/search' ? '?context=search' : ''}`, { scroll: false });
             }
             return;
         }
 
         setIsAdding(true);
-        const startCoords = { x: e.clientX, y: e.clientY };
 
         setJustAdded(true);
         triggerHaptic(HapticPattern.SUCCESS);
@@ -70,15 +69,15 @@ export function AddToCartButton({
         const revertTimer = setTimeout(() => setJustAdded(false), 1500);
 
         try {
-            const optimisticData = {
-                itemName: itemName || 'Item',
-                itemImage: itemImage || '/images/logo.png',
-                unitPrice: unitPrice || 0,
-                partnerId: partnerId || undefined,
-                partnerName: partnerName || undefined
+            const optimistic_data = {
+                item_name: item_name || 'Item',
+                item_image: item_image || '/images/logo.png',
+                unit_price: unit_price || 0,
+                partner_id: partner_id || undefined,
+                partner_name: partner_name || undefined
             };
 
-            const result = await addToDraftOrder(itemId, null, { enabled: false }, [], 1, optimisticData);
+            const result = await addToDraftOrder(item_id, null, { enabled: false }, [], 1, optimistic_data);
 
             if (result && (result as any).error === 'PARTNER_MISMATCH') {
                 clearTimeout(revertTimer);
@@ -87,20 +86,20 @@ export function AddToCartButton({
             } else if (result && 'error' in result) {
                 throw new Error(result.error);
             }
-        } catch (error) {
+        } catch (error: any) {
             clearTimeout(revertTimer);
             setJustAdded(false);
             triggerHaptic(HapticPattern.ERROR);
-            toast.error('Failed to add item');
+            toast.error(error.message || 'Failed to add item');
         } finally {
             setIsAdding(false);
         }
     };
 
-    const isOutOfStock = typeof stockQuantity === 'number' && stockQuantity <= 0;
+    const isOutOfStock = typeof stock_quantity === 'number' && stock_quantity <= 0;
     const isDisabled = isAdding || isPending || isOutOfStock;
 
-    if (isOutOfStock && !hasVariants) {
+    if (isOutOfStock && !has_variants) {
         return (
             <div className={cn(
                 "h-8 px-3 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center",
@@ -115,7 +114,7 @@ export function AddToCartButton({
         <Button
             size="sm"
             onClick={handleQuickAdd}
-            aria-label={`Add ${itemName} to cart`}
+            aria-label={`Add ${item_name} to cart`}
             data-testid="add-to-cart-quick"
             disabled={isDisabled}
             className={cn(

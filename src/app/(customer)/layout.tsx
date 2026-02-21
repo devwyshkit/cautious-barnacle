@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import Script from "next/script";
 import { FloatingCartBar } from "@/components/customer/FloatingCartBar";
 import { OrderTrackingBar } from "@/components/customer/OrderTrackingBar";
-import { RouteSlotGuard } from "@/components/layout/RouteSlotGuard";
 import { CartProvider } from "@/components/customer/CartProvider";
 import { CartErrorBoundary } from "@/components/error/CartErrorBoundary";
 import { getCart } from "@/lib/actions/draft-order";
@@ -15,14 +14,12 @@ import { NavShell } from "@/components/layout/NavShell";
 
 export default function CustomerLayout({
   children,
-  sheet,
 }: {
   children: React.ReactNode;
-  sheet: React.ReactNode;
 }) {
   return (
     <Suspense fallback={<LayoutSkeleton />}>
-      <AsyncLayoutContent sheet={sheet}>
+      <AsyncLayoutContent>
         {children}
       </AsyncLayoutContent>
     </Suspense>
@@ -36,16 +33,29 @@ export default function CustomerLayout({
  */
 async function AsyncLayoutContent({
   children,
-  sheet
 }: {
   children: React.ReactNode;
-  sheet: React.ReactNode;
 }) {
-  // Parallel fetch: No waterfall
-  const [cartResult, location] = await Promise.all([
-    getCart(),
-    getServerLocation()
-  ]);
+  let cartResult: any = { cart: null };
+  let location: any = null;
+
+  try {
+    // Parallel fetch: No waterfall
+    const results = await Promise.all([
+      getCart().catch(err => {
+        console.error('[DEBUG] getCart failed:', err);
+        return { cart: null, cartIdentity: 'error', guestSessionId: null };
+      }),
+      getServerLocation().catch(err => {
+        console.error('[DEBUG] getServerLocation failed:', err);
+        return null;
+      })
+    ]);
+    cartResult = results[0];
+    location = results[1];
+  } catch (error) {
+    console.error('[DEBUG] AsyncLayoutContent Error:', error);
+  }
 
   const initialCart = cartResult.cart || { items: [], partnerId: null, subtotal: 0, total: 0, itemCount: 0 };
   const cartIdentity = cartResult.cartIdentity ?? 'empty';
@@ -54,9 +64,7 @@ async function AsyncLayoutContent({
   return (
     <CartProvider key={cartIdentity} initialCart={initialCart} guestSessionId={guestSessionId}>
       <NavShell initialLocation={location}>
-        <RouteSlotGuard sheet={sheet}>
-          {children}
-        </RouteSlotGuard>
+        {children}
       </NavShell>
       <CartErrorBoundary>
         <FloatingCartBar />

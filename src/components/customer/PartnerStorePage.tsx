@@ -16,7 +16,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useEffect, useMemo } from 'react';
 import { InterceptedItemSheet } from '@/components/customer/item/InterceptedItemSheet';
-import { formatPrepTime } from '@/lib/utils/sla-format';
+import { formatPrepTime, formatDeliveryTime } from '@/lib/utils/sla';
 import { useCartValidation } from '@/hooks/useCartValidation';
 import { AlertCircle } from 'lucide-react';
 
@@ -66,12 +66,12 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
 
 
   const displayName = partner?.name || 'Partner';
-  const displayImage = partner?.imageUrl || FALLBACK_IMAGE;
+  const displayImage = partner?.image_url || FALLBACK_IMAGE;
   const displayRating = partner?.rating;
   const displayCity = partner?.city || 'Local Partner';
-  const displayPrepHours = initialData?.prepHours || 0.75;
+  const displayPrepHours = partner?.prep_hours || 0.75;
   const prepTimeText = formatPrepTime(displayPrepHours);
-  const displayDeliveryFee = initialData?.deliveryFee ?? 0;
+  const displayDeliveryFee = partner?.delivery_fee ?? 0;
   const displayDescription = partner?.description || 'Discover quality items from this local partner.';
 
   if (!initialData || !initialItems) {
@@ -237,8 +237,9 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
                   style={{ animationDelay: `${index * 60}ms` }}
                 >
                   <ItemCard
+                    key={item.id}
                     item={item}
-                    partnerId={partnerId}
+                    partner_id={partnerId}
                     priority={index < 8}
                     className="hover:-translate-y-2 transition-transform duration-500 ease-out"
                   />

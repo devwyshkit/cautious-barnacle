@@ -7,11 +7,15 @@ import { generateEstimatePDF } from '@/lib/services/pdf-service';
 import { getPartnerInfo } from '@/lib/actions/draft-order';
 import { toast } from 'sonner';
 
+import { DraftLineItem } from '@/lib/types/personalization';
+import { PricingResult } from '@/lib/actions/payment';
+import { Address } from '@/lib/types/address';
+
 interface EstimateButtonProps {
-    items: any[];
-    pricing: any;
+    items: DraftLineItem[];
+    pricing: PricingResult;
     businessName?: string;
-    billingAddress?: any;
+    billingAddress?: Address | null;
     gstin?: string;
     customerName?: string;
 }
@@ -34,7 +38,8 @@ export function EstimateButton({
 
         setLoading(true);
         try {
-            const partnerId = items[0]?.partnerId;
+            const partnerId = items[0]?.partner_id;
+            if (!partnerId) throw new Error("Partner ID missing");
             const { data: partner } = await getPartnerInfo(partnerId);
 
             generateEstimatePDF({
@@ -50,24 +55,29 @@ export function EstimateButton({
                         gstin: partner.gstin || undefined,
                     }
                     : { name: 'Partner', address: 'Bangalore, India' },
-                cart: {
-                    items: items.map((it: any) => ({
-                        itemName: it.name || "Item",
-                        quantity: it.quantity || 1,
-                        unitPrice: it.unitPrice || 0,
-                        totalPrice: (it.unitPrice || 0) * (it.quantity || 1),
-                    })),
-                    subtotal: pricing.subtotal,
-                    total: pricing.total
-                } as any,
                 totals: {
                     itemTotal: pricing.subtotal,
-                    deliveryFee: pricing.deliveryFee,
-                    platformFee: pricing.platformFee,
-                    gstAmount: pricing.gst,
+                    deliveryFee: pricing.delivery_fee,
+                    platformFee: pricing.platform_fee || 0,
+                    gstAmount: pricing.gst || 0,
                     grandTotal: pricing.total,
-                    discount: (pricing.discount || 0) + (pricing.walletDiscount || 0)
-                }
+                    discount: pricing.discount || 0
+                },
+                order_items: items.map(it => ({
+                    id: it.id || '',
+                    itemId: it.item_id,
+                    item_id: it.item_id,
+                    item_name: it.item_name || 'Product',
+                    quantity: it.quantity,
+                    quantity_number: it.quantity,
+                    unitPrice: it.unit_price,
+                    unit_price: it.unit_price,
+                    totalPrice: it.total_price,
+                    total_price: it.total_price,
+                    is_personalized: it.is_personalized || false,
+                    status: 'DRAFT',
+                    name: it.item_name || 'Product'
+                }))
             });
 
             toast.success("Estimate downloaded");

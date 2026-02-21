@@ -1,8 +1,6 @@
-import { getItemWithFullSpec } from '@/lib/actions/item-actions';
 import { getPartnerStoreData } from '@/lib/actions/discovery';
 import { PartnerStorePage } from '@/components/customer/PartnerStorePage';
 import { InterceptedItemSheet } from '@/components/customer/item/InterceptedItemSheet';
-import { WyshkitItem } from '@/lib/types/item';
 import { notFound } from 'next/navigation';
 
 export default async function ItemPage({
@@ -15,12 +13,11 @@ export default async function ItemPage({
 
   // WYSHKIT 2026: Immersive Store Context
   // Tapping a shared link to an item should show the store in the background, not a standalone page.
-  const [partnerRes, itemRes] = await Promise.all([
-    getPartnerStoreData(id, includeInactive),
-    getItemWithFullSpec(itemId)
-  ]);
+  const { partner, items, error } = await getPartnerStoreData(id, includeInactive);
 
-  if (!partnerRes.partner || !itemRes.data) {
+  const item = items?.find(i => String(i.id) === itemId);
+
+  if (!partner || !item || error) {
     notFound();
   }
 
@@ -28,11 +25,11 @@ export default async function ItemPage({
     <div className="min-h-screen">
       <PartnerStorePage
         partnerId={id}
-        initialData={partnerRes.partner}
-        initialItems={partnerRes.items}
+        initialData={partner}
+        initialItems={items}
       />
       <InterceptedItemSheet
-        item={itemRes.data as WyshkitItem}
+        item={item}
         onCloseOverride={`/partner/${id}`}
       />
     </div>

@@ -1,18 +1,17 @@
+import { Suspense } from "react";
+import { getCheckoutData } from "@/lib/actions/checkout";
+import { CheckoutLayoutClient } from "@/components/customer/checkout/CheckoutLayoutClient";
+
 /**
  * WYSHKIT 2026: Intent-Based Checkout Page
- * Route: /checkout?items=[...]
- * 
- * Swiggy 2026 Pattern: URL-addressable checkout with Parallel Routes
- * - Guests can access checkout (progressive auth)
- * - Auth required only at payment step
- * - Intent captured: /checkout?items=...&intent=payment
- * - Uses Parallel Routes layout for slot-based architecture
- * 
- * Note: Content is handled by Parallel Routes slots via layout.
- * The layout's CheckoutLayoutWrapper reads searchParams from URL.
- * Data fetching happens in CheckoutLayoutWrapper via Server Actions
- * (called immediately, not in useEffect) to achieve "data comes to user" pattern.
+ * Swiggy 2026 Pattern: Server-side data hydration in Page (Zero Reinvention)
  */
-export default function CheckoutPage() {
-  return null; // Content rendered by slots in layout
+export default async function CheckoutPage() {
+  const checkoutData = await getCheckoutData();
+
+  return (
+    <Suspense fallback={null}>
+      <CheckoutLayoutClient data={checkoutData} />
+    </Suspense>
+  );
 }

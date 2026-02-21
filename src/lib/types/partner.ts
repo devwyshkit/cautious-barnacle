@@ -8,19 +8,20 @@ import type { Tables } from '@/lib/supabase/database.types';
 
 // ✅ Use Supabase table type for partner data (zero data mismatch)
 export type Partner = Tables<'partners'>;
-
+// ✅ UI-optimized partner shape (Subset of table for performance & clarity)
 export interface MappedPartner {
   id: string;
   name: string;
-  imageUrl: string;
-  rating?: number;
-  city?: string | null;
-  prepHours?: number | null;
-  deliveryFee?: number | null;
-  description?: string | null;
-  slug?: string | null;
-  businessType?: string | null;
-  isOnline?: boolean;
+  image_url: string;
+  rating: number;
+  city: string | null;
+  prep_hours: number;
+  delivery_fee: number;
+  slug: string | null;
+  business_type: string | null;
+  is_online: boolean;
+  description: string | null;
+  gstin?: string | null;
 }
 
 // ✅ Use Supabase table type for full partner data

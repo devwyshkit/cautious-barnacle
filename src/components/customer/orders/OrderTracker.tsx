@@ -224,7 +224,7 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
                   <div className="p-4 pt-2">
                     <IdentityForm
                       orderId={order?.id || orderId}
-                      items={personalizedItemsPending.length > 0 ? personalizedItemsPending : (order ? [] : [{ id: 'pending', name: 'Order Loading...', is_personalized: true }])}
+                      items={personalizedItemsPending.length > 0 ? personalizedItemsPending : (order ? [] : [{ id: 'pending', item_name: 'Order Loading...', is_personalized: true }])}
                       designDeadline={order ? (order as any).design_deadline_at : undefined}
                       isAutoOpenedForSuccess={showSuccess || showIdentityParam}
                       onSubmitted={handlePersonalizationSubmitted}
@@ -263,7 +263,7 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
               orderId={orderId}
               items={order.order_items?.map((item: any) => ({
                 id: item.item_id,
-                name: item.item_name || item.name
+                name: item.item_name
               })) || []}
               onComplete={() => { }}
             />

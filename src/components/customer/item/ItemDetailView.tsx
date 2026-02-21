@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Plus, Minus, Star, Check, Loader2, PlayCircle, Clock, ShieldCheck, Info, AlertTriangle, Sparkles, IndianRupee } from 'lucide-react';
 import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
-import { useCart } from '@/components/customer/CartProvider';
+import { useCart, CartActionResult } from '@/components/customer/CartProvider';
 
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { formatCurrency } from '@/lib/utils/pricing';
@@ -60,15 +60,15 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
     const personalizationArray = Array.isArray(item?.personalization_options) ? item.personalization_options : [];
 
     const selectedVariant = useMemo(() => {
-        return variantsArray.find((v: any) => String(v.id) === selectedVariantId) || null;
+        return variantsArray.find(v => String(v.id) === selectedVariantId) || null;
     }, [variantsArray, selectedVariantId]);
 
     const selectedAddons = useMemo(() => {
-        return addonsArray.filter((addon: any) => selectedAddonIds.has(addon.id));
+        return addonsArray.filter(addon => selectedAddonIds.has(String(addon.id)));
     }, [addonsArray, selectedAddonIds]);
 
     const selectedPersonalizations = useMemo(() => {
-        return personalizationArray.filter((p: any) => selectedAddonIds.has(p.id));
+        return personalizationArray.filter(p => selectedAddonIds.has(String(p.id)));
     }, [personalizationArray, selectedAddonIds]);
 
     const isOutOfStock = useMemo(() => {
@@ -85,8 +85,8 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
         // WYSHKIT 2026: Variant price is an override, not an addition. Standard Swiggy pattern.
         const effectiveBasePrice = selectedVariant ? (Number(selectedVariant.price) || 0) : basePrice;
 
-        const addonsSum = selectedAddons.reduce((sum: number, addon: any) => sum + (Number(addon.price) || 0), 0);
-        const personalizationSum = selectedPersonalizations.reduce((sum: number, p: any) => sum + (Number(p.price) || 0), 0);
+        const addonsSum = selectedAddons.reduce((sum, addon) => sum + (Number(addon.price) || 0), 0);
+        const personalizationSum = selectedPersonalizations.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
         return effectiveBasePrice + addonsSum + personalizationSum;
     }, [item.base_price, selectedVariant, selectedAddons, selectedPersonalizations]);
 
@@ -100,16 +100,16 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
         setContinuing(true);
         try {
             const allSelectedAddons = [
-                ...selectedAddons.map((a: any) => ({
-                    id: a.id,
-                    name: a.name,
-                    price: a.price,
-                    requires_preview: a.requires_preview
+                ...selectedAddons.map(a => ({
+                    id: String(a.id),
+                    name: a.name || 'Add-on',
+                    price: Number(a.price) || 0,
+                    requires_preview: a.requires_preview || false
                 })),
-                ...selectedPersonalizations.map((p: any) => ({
-                    id: p.id,
-                    name: p.name,
-                    price: p.price, // DYNAMIC PRICE from DB
+                ...selectedPersonalizations.map(p => ({
+                    id: String(p.id),
+                    name: p.name || 'Personalization',
+                    price: Number(p.price) || 0, // DYNAMIC PRICE from DB
                     requires_preview: true
                 }))
             ];
@@ -127,12 +127,12 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     allSelectedAddons,
                     quantity,
                     {
-                        itemName: item.name,
-                        itemImage: item.images?.[0] || FALLBACK_IMAGE,
-                        unitPrice: unitPrice,
-                        partnerId: item.partner_id!,
-                        partnerName: item.partners?.name || item.partners?.display_name || partnerId,
-                        updateItemId: initialState.cartItemId
+                        item_name: item.name,
+                        item_image: item.images?.[0] || FALLBACK_IMAGE,
+                        unit_price: unitPrice,
+                        partner_id: item.partner_id!,
+                        partner_name: item.partners?.name || item.partners?.display_name || partnerId,
+                        update_item_id: initialState.cartItemId
                     }
                 );
             } else {
@@ -143,16 +143,16 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     allSelectedAddons,
                     quantity,
                     {
-                        itemName: item.name,
-                        itemImage: item.images?.[0] || FALLBACK_IMAGE,
-                        unitPrice: unitPrice,
-                        partnerId: item.partner_id!,
-                        partnerName: item.partners?.name || item.partners?.display_name || partnerId,
+                        item_name: item.name,
+                        item_image: item.images?.[0] || FALLBACK_IMAGE,
+                        unit_price: unitPrice,
+                        partner_id: item.partner_id!,
+                        partner_name: item.partners?.name || item.partners?.display_name || partnerId,
                     }
                 );
             }
 
-            if (result && 'success' in result && result.success) {
+            if (result && result.success) {
                 triggerHaptic(HapticPattern.SUCCESS);
                 // Wyshkit 2026: Direct dismissal for "One-Tap-Feel"
                 if (onBack) {
@@ -160,9 +160,9 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                 } else {
                     router.back();
                 }
-            } else if (result && (result as any).error === 'PARTNER_MISMATCH') {
-                // Handled globally by CartProvider
-            } else if (result && 'error' in result) {
+            } else if (result && result.code === 'PARTNER_MISMATCH') {
+                // Handled globally by CartProvider (shows Replace Cart Dialog)
+            } else if (result && result.error) {
                 toast.error(result.error || "Could not save changes");
             }
         } catch (err) {
@@ -183,6 +183,17 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
         <div className="flex flex-col h-full bg-white font-sans overflow-hidden">
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar">
+                {/* Immersive Navigation Bar */}
+                <div className="fixed top-0 left-0 right-0 z-50 p-4 pointer-events-none">
+                    <button
+                        onClick={handleBack}
+                        className="size-10 rounded-full bg-white/80 backdrop-blur-md shadow-xl flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-black/5"
+                        aria-label="Back"
+                    >
+                        <Plus className="size-5 rotate-45 text-zinc-900" />
+                    </button>
+                </div>
+
                 {/* Image Section */}
                 <div className="relative bg-white w-full aspect-[4/3] md:aspect-square">
                     <div
@@ -297,7 +308,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                 <span className="text-[11px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 uppercase tracking-widest">REQUIRED</span>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
-                                {variantsArray.map((v: any) => {
+                                {variantsArray.map((v) => {
                                     const isSelected = selectedVariantId === String(v.id);
                                     const isOutOfStock = typeof v.stock_quantity === 'number' && v.stock_quantity <= 0;
                                     return (
@@ -321,7 +332,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                             <span className="text-sm font-black block leading-tight">{v.name}</span>
                                             <div className="flex items-baseline gap-1 mt-1">
                                                 <span className={cn("text-xs font-bold", isSelected ? "text-white" : isOutOfStock ? "text-zinc-300" : "text-zinc-900")}>
-                                                    {formatCurrency(v.price)}
+                                                    {formatCurrency(v.price || 0)}
                                                 </span>
                                                 {isOutOfStock && <span className="text-[11px] font-black text-rose-500 uppercase tracking-tighter ml-1">Sold Out</span>}
                                             </div>
@@ -372,7 +383,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                             </div>
 
                             <div className="space-y-3">
-                                {personalizationArray.map((p: any) => {
+                                {personalizationArray.map((p) => {
                                     const isSelected = selectedAddonIds.has(p.id);
                                     return (
                                         <button
@@ -402,7 +413,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                                     <span className="text-[11px] font-bold uppercase tracking-widest mt-1.5 opacity-60 block italic">Requires Design Approval</span>
                                                 </div>
                                             </div>
-                                            <span className="text-[15px] font-black tabular-nums">+{formatCurrency(p.price)}</span>
+                                            <span className="text-[15px] font-black tabular-nums">+{formatCurrency(p.price || 0)}</span>
                                         </button>
                                     );
                                 })}
@@ -415,7 +426,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                         <section className="space-y-4">
                             <h3 className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em]">Complementary Gifts</h3>
                             <div className="space-y-3">
-                                {addonsArray.map((addon: any) => {
+                                {addonsArray.map((addon) => {
                                     const isSelected = selectedAddonIds.has(addon.id);
                                     return (
                                         <button
@@ -449,7 +460,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                                     <span className="text-[15px] font-black block leading-none">{addon.name}</span>
                                                 </div>
                                             </div>
-                                            <span className="text-[15px] font-black tabular-nums">+{formatCurrency(addon.price)}</span>
+                                            <span className="text-[15px] font-black tabular-nums">+{formatCurrency(addon.price || 0)}</span>
                                         </button>
                                     );
                                 })}

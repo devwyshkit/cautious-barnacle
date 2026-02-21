@@ -9,9 +9,7 @@ import { Database } from '@/lib/supabase/database.types';
 import { MappedPartner } from '@/lib/types/partner';
 import { WyshkitItem } from '@/lib/types/item';
 
-import { mapPartner, mapWyshkitItem } from '@/lib/utils/mappers';
-
-// WYSHKIT 2026: Mapping interfaces now centralized in mappers.ts
+// WYSHKIT 2026: Zero Reinvention - Consuming native snake_case directly
 
 export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusKm: number = 5) => {
   const supabase = await createClient();
@@ -29,11 +27,14 @@ export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusK
     return { items: [], error: error.message };
   }
 
-  // RPC returns any (Json), so we map it safely
-  const items = (nearbyItems as any[] || []).map(mapWyshkitItem).map((item: any, idx: number) => ({
+  // RPC returns item_id, item_name, so we ensure it matches WyshkitItem interface
+  const items = (nearbyItems as any[] || []).map((item: any) => ({
     ...item,
-    distance_km: (nearbyItems as any[])[idx].distance_km
-  }));
+    id: item.item_id || item.id,
+    name: item.item_name || item.name,
+    distance_km: item.distance_km
+  })) as WyshkitItem[];
+
   return { items, error: null };
 });
 
@@ -52,34 +53,31 @@ export const getHomeDiscovery = cache(async (lat?: number, lng?: number) => {
       logError(catError, 'GetHomeDiscoveryCategories');
     }
 
-
-    let trendingItems: any[] | undefined;
+    let trendingItems: WyshkitItem[] = [];
 
     if (lat && lng) {
       const { data: nearbyItems, error: nearbyError } = await (supabase as any).rpc('get_nearby_items', {
         user_lat: lat,
         user_lng: lng,
         radius_km: 10,
-        include_out_of_stock: false // WYSHKIT 2026: Push to RPC if supported, fallback below
+        include_out_of_stock: false
       });
 
       if (nearbyError) {
         logError(nearbyError, 'GetHomeDiscoveryNearby');
       } else if (nearbyItems && (nearbyItems as any[]).length > 0) {
-        trendingItems = (nearbyItems as any[]).map(mapWyshkitItem).map((item: any, idx: number) => ({
+        trendingItems = (nearbyItems as any[]).map((item: any) => ({
           ...item,
-          distance_km: (nearbyItems as any[])[idx].distance_km
-        }));
+          id: item.item_id || item.id,
+          name: item.item_name || item.name,
+          distance_km: item.distance_km
+        })) as WyshkitItem[];
       }
-    }
-
-    if (!trendingItems) {
-      trendingItems = [];
     }
 
     return {
       categories: categories || [],
-      trendingItems: trendingItems || [],
+      trendingItems,
     };
   } catch (error) {
     logError(error, 'GetHomeDiscovery');
@@ -103,14 +101,13 @@ export async function getCategories() {
 
 export const getTrendingItems = cache(async (): Promise<WyshkitItem[]> => {
   const supabase = await createClient();
-  // WYSHKIT 2026: Cast to any because v_trending_items is missing in types
-  const { data } = await (supabase as any)
+  // WYSHKIT 2026: Consuming purified view (Zero Reinvention)
+  const { data } = await supabase
     .from('v_trending_items')
-    .select('id, name, "basePrice", images, "partnerId", "businessName", stock_status')
-    .neq('stock_status', 'out_of_stock') // WYSHKIT 2026: Zero Reflection
+    .select('*')
     .limit(15);
 
-  return (data || []).map(mapWyshkitItem);
+  return (data || []) as unknown as WyshkitItem[];
 });
 
 export const getFeaturedPartners = cache(async (limit: number = 8) => {
@@ -128,12 +125,12 @@ export const getFeaturedPartners = cache(async (limit: number = 8) => {
   }
 
   // WYSHKIT 2026: Strict deduplication by ID to prevent repeated store cards
-  const uniquePartnersMap = new Map<string, MappedPartner>();
+  const uniquePartnersMap = new Map<string, any>();
 
   if (data) {
     (data as any[]).forEach((p) => {
       if (!uniquePartnersMap.has(p.id)) {
-        uniquePartnersMap.set(p.id, mapPartner(p));
+        uniquePartnersMap.set(p.id, p);
       }
     });
   }
@@ -168,9 +165,7 @@ export const getFeaturedItems = cache(async (limit: number = 3) => {
       return { items: [], error: error.message };
     }
 
-    const items: WyshkitItem[] = (data as any[] || []).map((item) => mapWyshkitItem(item));
-
-    return { items, error: null };
+    return { items: (data || []) as WyshkitItem[], error: null };
   } catch (error) {
     logger.error('Unexpected error in getFeaturedItems', error);
     return { items: [], error: 'Failed to fetch featured items' };
@@ -189,8 +184,7 @@ export const getPartnerStoreData = cache(async (partnerId: string, includeInacti
 
     const supabase = await createClient();
 
-    // WYSHKIT 2026: Parallel Fetching - Parallelize partner and items fetch
-    // This solves the waterfall problem and ensures sub-1s loads.
+    // WYSHKIT 2026: Parallel Fetching
     const [partnerRes, itemsRes] = await Promise.all([
       supabase
         .from('partners')
@@ -249,21 +243,18 @@ export const getPartnerStoreData = cache(async (partnerId: string, includeInacti
       logger.error('Items fetch failed in getPartnerStoreData', itemsError, { partnerId });
     }
 
-    const partner = mapPartner(partnerData);
-    const rawItems = (itemsData || []) as any[];
-
-    // WYSHKIT 2026: Zero Reflection - Sort out-of-stock to bottom server-side
-    const items = rawItems.map(mapWyshkitItem).sort((a: any, b: any) => {
+    const partner = partnerData;
+    const items = (itemsData || []).sort((a: any, b: any) => {
       const aOut = a.is_active === false || a.stock_status === 'out_of_stock' || (typeof a.stock_quantity === 'number' && a.stock_quantity <= 0);
       const bOut = b.is_active === false || b.stock_status === 'out_of_stock' || (typeof b.stock_quantity === 'number' && b.stock_quantity <= 0);
       if (aOut && !bOut) return 1;
       if (!aOut && bOut) return -1;
       return 0;
-    });
+    }) as WyshkitItem[];
 
     return {
       partner,
-      items: items as WyshkitItem[],
+      items,
       error: null
     };
   } catch (error) {

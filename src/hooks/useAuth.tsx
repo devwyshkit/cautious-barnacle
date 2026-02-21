@@ -15,16 +15,11 @@ export function useAuth() {
 
   const signInWithPhone = async (phone: string) => {
     try {
-      const normalizedPhone = normalizePhone(phone);
-
-      // WYSHKIT 2026: Elite Certification Bypass
-      if (normalizedPhone === '+917624845361' || phone === '7624845361') {
-        logger.info('Elite Certification: Bypassing OTP send for test number');
-        return { success: true };
-      }
+      // Swiggy 2026: Strict normalization for all phone numbers
+      const authPhone = normalizePhone(phone);
 
       const { error } = await supabase.auth.signInWithOtp({
-        phone: normalizedPhone,
+        phone: authPhone,
         options: { channel: "sms" },
       });
       if (error) throw error;
@@ -48,52 +43,22 @@ export function useAuth() {
 
   const verifyOTP = async (phone: string, token: string) => {
     try {
-      const normalizedPhone = normalizePhone(phone);
+      // Swiggy 2026: KISS - Consistent E.164 normalization for all numbers
+      const authPhone = normalizePhone(phone);
 
-      // WYSHKIT 2026: Elite Certification Bypass
-      if ((normalizedPhone === '+917624845361' || phone === '7624845361') && token === '123456') {
-        logger.info('Elite Certification: Bypassing OTP verification for test credentials');
-        const { data, error } = await supabase.auth.signInWithPassword({
-          phone: normalizedPhone,
-          password: 'Wyshkit2026!',
-        });
-
-        if (!error && data.user) {
-          await Promise.all([
-            mergeGuestCartToUser().catch(e => logger.error('Cart merge failed', e as Error)),
-            refreshSession()
-          ]);
-          router.refresh();
-          return { success: true, user: data.user };
-        }
-      }
-
-      let result = await supabase.auth.verifyOtp({
-        phone: normalizedPhone,
+      const result = await supabase.auth.verifyOtp({
+        phone: authPhone,
         token,
         type: "sms",
       });
 
-      // WYSHKIT 2026: Legacy Fallback (Handle test users with raw numbers)
-      if (result.error && phone !== normalizedPhone) {
-        const fallbackResult = await supabase.auth.verifyOtp({
-          phone: phone,
-          token,
-          type: "sms",
-        });
-        if (!fallbackResult.error) {
-          result = fallbackResult;
-        }
-      }
-
       if (!result.error && result.data.user) {
-        // WYSHKIT 2026: Parallelize critical path for faster Time-to-Interactive
+        // Swiggy 2026: Parallelize critical path for faster Time-to-Interactive
         await Promise.all([
           mergeGuestCartToUser().catch(e => logger.error('Cart merge failed', e as Error)),
           refreshSession()
         ]);
 
-        router.refresh();
         return { success: true, user: result.data.user };
       }
 

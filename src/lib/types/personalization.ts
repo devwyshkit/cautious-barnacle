@@ -35,38 +35,40 @@ export interface SelectedAddon {
   requires_preview?: boolean;
 }
 
+import type { PersonalizationOption, ItemAddon } from '@/lib/supabase/types';
+
 export interface DraftLineItem {
   id: string;
-  itemId: string;
-  itemName: string;
-  itemImage?: string | null;
+  item_id: string;
+  item_name: string;
+  item_image?: string | null;
   quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  selectedVariantId: string | null;
+  unit_price: number;
+  total_price: number;
+  selected_variant_id: string | null;
   personalization?: SelectedPersonalization;
-  selectedAddons?: SelectedAddon[];
-  partnerName?: string;
-  partnerId?: string | null;
-  partnerLatitude?: number | null;
-  partnerLongitude?: number | null;
+  selected_addons?: SelectedAddon[];
+  partner_name?: string;
+  partner_id?: string | null;
+  partner_latitude?: number | null;
+  partner_longitude?: number | null;
   // WYSHKIT 2026: Hydration fields for Checkout
-  basePrice?: number | null;
-  variantPrice?: number | null;
-  variantName?: string;
-  personalizationPrice?: number | null;
-  addonsPrice?: number | null;
+  base_price?: number | null;
+  variant_price?: number | null;
+  variant_name?: string;
+  personalization_price?: number | null;
+  addons_price?: number | null;
   // WYSHKIT 2026: Metadata for hasItemPersonalization and IdentityForm
-  personalization_options?: any[];
-  item_addons?: any[];
+  personalization_options?: PersonalizationOption[];
+  item_addons?: ItemAddon[];
   is_personalized?: boolean;
-  personalization_details?: any;
+  personalization_details?: SelectedPersonalization | null;
 }
 
 export interface DraftTransaction {
   items: DraftLineItem[];
-  partnerId: string | null;
+  partner_id: string | null;
   subtotal: number;
   total: number;
-  itemCount: number;
+  item_count: number;
 }

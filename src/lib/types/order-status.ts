@@ -47,12 +47,18 @@ export const ORDER_STATUS = {
 
 // WYSHKIT 2026: Centralized Status Configuration
 // Used by OrderTrackingBar and OrderTracker for consistent UI
-export function getStatusConfig(order: { status: string; has_personalization: boolean; order_number?: string; id?: string }): StatusConfig {
+export function getStatusConfig(order: {
+  status: string;
+  has_personalization: boolean;
+  order_number?: string;
+  id?: string;
+  personalization_status?: string;
+}): StatusConfig {
   // 1. Action Needed: Personalization (STRICT: Only if has_personalization is true and order is CONFIRMED or PLACED)
   // Swiggy 2026: Allow immediate input after payment (PLACED) to maintain momentum.
   if ((order.status === ORDER_STATUS.CONFIRMED || order.status === ORDER_STATUS.PLACED) &&
     order.has_personalization &&
-    (order as any).personalization_status !== 'submitted') {
+    order.personalization_status !== 'submitted') {
     return {
       label: "Design Input Needed",
       subLabel: "Upload your design details now",
@@ -126,20 +132,21 @@ const STATUS_DISPLAY: Record<string, string> = {
 };
 
 // Color classes for statuses - Wyshkit 2026 Design Language
+// Optimized for inclusive GST and high-contrast accessibility
 const STATUS_COLORS: Record<string, string> = {
-  PLACED: 'text-[var(--primary)]',
-  CONFIRMED: 'text-[#60B246]',
-  DETAILS_RECEIVED: 'text-amber-500',
-  PREVIEW_READY: 'text-blue-500',
-  REVISION_REQUESTED: 'text-orange-500',
-  APPROVED: 'text-[#60B246]',
-  IN_PRODUCTION: 'text-zinc-600',
-  PACKED: 'text-[#60B246]',
-  DISPATCHED: 'text-zinc-900',
-  OUT_FOR_DELIVERY: 'text-zinc-900',
-  DELIVERED: 'text-[#60B246]',
-  CANCELLED: 'text-zinc-400',
-  REFUNDED: 'text-zinc-400',
+  PLACED: 'bg-rose-50 text-[var(--primary)] border-rose-100',
+  CONFIRMED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
+  DETAILS_RECEIVED: 'bg-amber-50 text-amber-600 border-amber-100',
+  PREVIEW_READY: 'bg-rose-50 text-[var(--primary)] border-rose-100',
+  REVISION_REQUESTED: 'bg-rose-50 text-[var(--primary)] border-rose-100',
+  APPROVED: 'bg-blue-50 text-blue-600 border-blue-100',
+  IN_PRODUCTION: 'bg-amber-50 text-amber-600 border-amber-100',
+  PACKED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
+  DISPATCHED: 'bg-amber-50 text-amber-600 border-amber-100',
+  OUT_FOR_DELIVERY: 'bg-amber-50 text-amber-600 border-amber-100',
+  DELIVERED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
+  CANCELLED: 'bg-zinc-100 text-zinc-500 border-zinc-200',
+  REFUNDED: 'bg-zinc-100 text-zinc-500 border-zinc-200',
 };
 
 export function getOrderStatusDisplay(status: string): string {
@@ -147,15 +154,13 @@ export function getOrderStatusDisplay(status: string): string {
 }
 
 export function getOrderStatusColor(status: string): string {
-  return STATUS_COLORS[status as OrderStatus] || 'text-zinc-600';
+  return STATUS_COLORS[status as OrderStatus] || 'bg-zinc-50 text-zinc-400 border-zinc-100';
 }
 
 // Status grouping helpers (for UI/logic)
 export const STATUS_GROUPS = {
   // Customer action required
   CUSTOMER_ACTION: [
-    ORDER_STATUS.CONFIRMED, // 2026: Customer needs to provide details
-    ORDER_STATUS.DETAILS_RECEIVED,
     ORDER_STATUS.PREVIEW_READY,
   ] as const,
 
@@ -184,8 +189,20 @@ export const STATUS_GROUPS = {
   TERMINAL: [
     ORDER_STATUS.CANCELLED,
     ORDER_STATUS.REFUNDED,
+    ORDER_STATUS.DELIVERED, // Delivered is terminal for the standard flow
   ] as const,
 } as const;
+
+/**
+ * WYSHKIT 2026: Deterministic State Machine Helpers
+ */
+export function isFinalStatus(status: string): boolean {
+  return [ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED, ORDER_STATUS.REFUNDED].includes(status as any);
+}
+
+export function canCancelOrder(status: string): boolean {
+  return [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED, ORDER_STATUS.DETAILS_RECEIVED].includes(status as any);
+}
 // WYSHKIT 2026: Item-level status configuration
 // Used by OrderItemsList and CreativeBrief for consistent item status badges
 export function getItemStatusConfig(status: string) {

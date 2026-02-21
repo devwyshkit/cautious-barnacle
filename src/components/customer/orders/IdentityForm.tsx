@@ -14,21 +14,16 @@ import imageCompression from 'browser-image-compression';
 import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
 import { Progress } from '@/components/ui/progress';
 
-import { PersonalizationConfig } from '@/lib/types/personalization';
+import { PersonalizationConfig, SelectedPersonalization, SelectedAddon } from '@/lib/types/personalization';
 
 interface OrderItem {
     id: string;
-    item_name?: string;
-    name?: string;
+    item_name: string;
     is_personalized?: boolean;
     personalization_config?: PersonalizationConfig;
-    personalization?: {
-        enabled: boolean;
-        [key: string]: any;
-    };
-    selected_addons?: any[];
-    selectedAddons?: any[];
-    personalization_details?: any;
+    personalization?: SelectedPersonalization;
+    selected_addons?: SelectedAddon[];
+    personalization_details?: SelectedPersonalization;
 }
 
 interface IdentityFormProps {
@@ -148,9 +143,10 @@ export function IdentityForm({
             }, 1000);
 
             toast.success("Image added to design");
-        } catch (error: any) {
-            logger.error('Image upload error in IdentityForm', error);
-            toast.error(error.message || 'Failed to upload image');
+        } catch (error) {
+            const err = error as Error;
+            logger.error('Image upload error in IdentityForm', err);
+            toast.error(err.message || 'Failed to upload image');
             setUploadingItems(prev => {
                 const next = { ...prev };
                 delete next[itemId];
@@ -161,15 +157,15 @@ export function IdentityForm({
 
     const handleSubmit = async () => {
         for (const item of personalizedItems) {
-            const legacyConfig = (item as any).personalization_config || {};
-            const addons = (item.selected_addons as any[])?.filter((a: any) => a.requires_preview) || [];
+            const legacyConfig = item.personalization_config || ({} as PersonalizationConfig);
+            const addons = item.selected_addons?.filter(a => a.requires_preview) || [];
 
             const isAddonFlow = addons.length > 0;
-            const config = isAddonFlow ? {
+            const config: PersonalizationConfig = isAddonFlow ? {
                 text_required: true,
                 image_required: false,
                 char_limit: 500,
-                text_label: `Details for ${addons.map((a: any) => a.name).join(', ')}`,
+                text_label: `Details for ${addons.map(a => a.name).join(', ')}`,
                 placeholder: "Please describe how you want this personalized...",
                 allow_text: true,
                 allow_image: true
@@ -197,14 +193,14 @@ export function IdentityForm({
         triggerHaptic(HapticPattern.SUCCESS);
 
         try {
-            const personalizationData = personalizedItems.reduce((acc: any, item: OrderItem) => {
+            const personalizationData = personalizedItems.reduce((acc: Record<string, any>, item: OrderItem) => {
                 const itemFormData = formData[item.id] || {};
-                const addons = item.selected_addons || item.selectedAddons || [];
+                const addons = item.selected_addons || [];
 
                 acc[item.id] = {
                     text: itemFormData.text || null,
                     image_url: itemFormData.imageUrl || null,
-                    addons: (addons as any[]).filter((a: any) => a.requires_preview).map((a: any) => a.name)
+                    addons: addons.filter(a => a.requires_preview).map(a => a.name)
                 };
                 return acc;
             }, {});
@@ -307,12 +303,12 @@ export function IdentityForm({
 
             <div className="space-y-6">
                 {personalizedItems.map((item: OrderItem) => {
-                    const legacyConfig = item.personalization_config || (item.personalization?.enabled ? item.personalization : {});
-                    const addons = (item.selected_addons || item.selectedAddons || [])?.filter((a: any) => a.requires_preview) || [];
+                    const legacyConfig: PersonalizationConfig = item.personalization_config || (item.personalization as unknown as PersonalizationConfig) || {};
+                    const addons = (item.selected_addons || [])?.filter(a => a.requires_preview) || [];
                     const isAddonFlow = addons.length > 0;
-                    const itemName = item.item_name || item.name;
+                    const itemName = item.item_name;
 
-                    const config = isAddonFlow ? {
+                    const config: PersonalizationConfig = isAddonFlow ? {
                         text_required: true,
                         image_required: false,
                         char_limit: 500,
@@ -322,10 +318,10 @@ export function IdentityForm({
                         allow_image: true,
                         instructions: "Our partner will use these details for your preview."
                     } : {
-                        ...(legacyConfig as any),
-                        allow_text: (legacyConfig as any).allow_text ?? true,
-                        text_label: (legacyConfig as any).text_label || (legacyConfig as any).prompt || 'details',
-                        text_required: (legacyConfig as any).text_required ?? true
+                        ...legacyConfig,
+                        allow_text: legacyConfig.allow_text ?? true,
+                        text_label: legacyConfig.text_label ?? (legacyConfig as any).prompt ?? 'details',
+                        text_required: legacyConfig.text_required ?? true
                     };
 
                     const input = formData[item.id] || {};
@@ -507,7 +503,7 @@ export function IdentityForm({
 }
 
 // Helper to determine if all items are optional
-const isAllOptional = (items: any[]) => items.every(item => {
+const isAllOptional = (items: OrderItem[]) => items.every(item => {
     const config = item.personalization_config || {};
     return !config.text_required && !config.image_required;
 });

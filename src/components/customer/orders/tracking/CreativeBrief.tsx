@@ -11,9 +11,10 @@ import Image from 'next/image';
 
 import { ORDER_STATUS } from '@/lib/types/order-status';
 import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
+import { OrderDetail } from '@/lib/types/order';
 
 interface CreativeBriefProps {
-    order: any;
+    order: OrderDetail;
     previews: PreviewSubmission[];
     onOpenPersonalization?: () => void;
     isOptimisticSubmitted?: boolean;
@@ -29,11 +30,11 @@ interface CreativeBriefProps {
  */
 export function CreativeBrief({ order, previews, onOpenPersonalization, isOptimisticSubmitted }: CreativeBriefProps) {
     const latestPreview = previews[0];
-    const personalizedItems = order.order_items?.filter((i: any) => i.is_personalized) || [];
+    const personalizedItems = order.order_items?.filter(i => i.is_personalized) || [];
 
     // WYSHKIT 2026: Align with single status truth
     const hasSubmittedBrief = isOptimisticSubmitted ||
-        personalizedItems.some((i: any) =>
+        personalizedItems.some(i =>
             i.status === ORDER_STATUS.DETAILS_RECEIVED ||
             i.personalization_details
         );
@@ -125,10 +126,10 @@ export function CreativeBrief({ order, previews, onOpenPersonalization, isOptimi
                                 )}
                             </div>
 
-                            {onOpenPersonalization && personalizedItems.some((i: any) => {
+                            {onOpenPersonalization && personalizedItems.some(i => {
                                 const s = (i.status || ORDER_STATUS.PLACED).toUpperCase();
-                                const activeStates = [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED];
-                                return activeStates.includes(s as any) && !i.personalization_details && !isOptimisticSubmitted;
+                                const activeStates: string[] = [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED];
+                                return activeStates.includes(s) && !i.personalization_details && !isOptimisticSubmitted;
                             }) && (
                                     <button
                                         onClick={() => {
@@ -152,11 +153,11 @@ export function CreativeBrief({ order, previews, onOpenPersonalization, isOptimi
                     <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Design Hub • Brief Details</span>
                 </div>
                 <div className="grid gap-2">
-                    {personalizedItems.map((item: any) => (
+                    {personalizedItems.map(item => (
                         <SubmittedIdentity
                             key={item.id}
                             details={item.personalization_details || {}}
-                            itemName={item.item_name || item.name}
+                            itemName={item.item_name}
                             isOptimisticSubmitted={isOptimisticSubmitted}
                         />
                     ))}

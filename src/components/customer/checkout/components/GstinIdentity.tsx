@@ -7,13 +7,17 @@ import { validateGSTINAction } from '@/lib/actions/gstin';
 import { toast } from 'sonner';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
 import { getPartnerInfo } from '@/lib/actions/draft-order';
+import { DraftLineItem } from '@/lib/types/personalization';
+import { PricingResult } from '@/lib/actions/payment';
+import { Address } from '@/lib/types/address';
+import type { User } from '@supabase/supabase-js';
 
 interface GstinIdentityProps {
     initialGstin: string;
-    items: any[];
-    pricing: any;
-    user: any;
-    selectedAddress: any;
+    items: DraftLineItem[];
+    pricing: PricingResult;
+    user: User | null;
+    selectedAddress: Address | null;
     onGstinChange?: (gstin: string) => void;
     onBusinessNameUpdate?: (name: string | null) => void;
 }
@@ -69,17 +73,18 @@ export function GstinIdentity({
     };
 
     const handleDownloadEstimate = async () => {
-        if (!items.length || !pricing) {
-            toast.error("No items in cart");
+        const firstItem = items[0];
+        const partnerId = firstItem.partner_id;
+        if (!partnerId) {
+            toast.error("Partner information missing");
             return;
         }
 
-        const partnerId = (items[0] as any).partnerId;
         const { data: partner } = await getPartnerInfo(partnerId);
 
         generateEstimatePDF({
             date: new Date().toLocaleDateString(),
-            customerName: user?.user_metadata?.full_name || "Valued Customer",
+            customerName: user?.user_metadata?.full_name || user?.email || "Valued Customer",
             businessName: businessName || undefined,
             billingAddress: selectedAddress,
             gstin: gstin || undefined,
@@ -90,24 +95,29 @@ export function GstinIdentity({
                     gstin: partner.gstin || undefined,
                 }
                 : { name: 'Partner', address: 'Bangalore, India' },
-            cart: {
-                items: items.map((it: any) => ({
-                    itemName: it.name || "Item",
-                    quantity: it.quantity || 1,
-                    unitPrice: it.unitPrice || 0,
-                    totalPrice: (it.unitPrice || 0) * (it.quantity || 1),
-                })),
-                subtotal: pricing.subtotal,
-                total: pricing.total
-            } as any,
             totals: {
                 itemTotal: pricing.subtotal,
-                deliveryFee: pricing.deliveryFee,
-                platformFee: pricing.platformFee,
-                gstAmount: pricing.gst,
+                deliveryFee: pricing.delivery_fee,
+                platformFee: pricing.platform_fee || 0,
+                gstAmount: pricing.gst || 0,
                 grandTotal: pricing.total,
-                discount: (pricing.discount || 0) + (pricing.walletDiscount || 0)
-            }
+                discount: pricing.discount || 0
+            },
+            order_items: items.map(it => ({
+                id: it.id || '',
+                itemId: it.item_id,
+                item_id: it.item_id,
+                item_name: it.item_name || 'Product',
+                quantity: it.quantity,
+                quantity_number: it.quantity,
+                unitPrice: it.unit_price,
+                unit_price: it.unit_price,
+                totalPrice: it.total_price,
+                total_price: it.total_price,
+                is_personalized: it.is_personalized || false,
+                status: 'DRAFT',
+                name: it.item_name || 'Product'
+            }))
         });
 
         toast.success("Estimate downloaded");

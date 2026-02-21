@@ -23,7 +23,7 @@ export function FloatingCartBar() {
   const displayCart = draftOrder;
 
   const isCheckoutOpen = pathname.startsWith('/checkout');
-  const hasItems = displayCart && displayCart.itemCount > 0;
+  const hasItems = displayCart && displayCart.item_count > 0;
 
   // WYSHKIT 2026: Visibility Logic
   // Show cart whenever there are items; don't hide for unrelated active orders.
@@ -34,7 +34,7 @@ export function FloatingCartBar() {
     // WYSHKIT 2026: Immediate haptic feedback for checkout initiation
     triggerHaptic(HapticPattern.ACTION);
 
-    if (!displayCart || displayCart.itemCount === 0) return;
+    if (!displayCart || displayCart.item_count === 0) return;
 
     // WYSHKIT 2026: Connected Experience
     // Both Auth and Guest users have their cart on the server (session-based for guests)
@@ -42,9 +42,9 @@ export function FloatingCartBar() {
     router.push('/checkout');
   };
 
-  const firstItemImage = displayCart?.items?.[0]?.itemImage;
+  const firstItemImage = displayCart?.items?.[0]?.item_image;
   const hasPersonalization = hasAnyPersonalization(displayCart?.items || []);
-  const displayCount = displayCart?.itemCount || 0;
+  const displayCount = displayCart?.item_count || 0;
   const displayTotal = displayCart?.total || 0;
   // WYSHKIT 2026: Loading state - show loading when fetching cart data
   const isLoading = loading;
@@ -104,11 +104,13 @@ export function FloatingCartBar() {
           <button
             onClick={handleCheckout}
             disabled={isLoading}
+            data-testid="floating-cart-checkout-btn"
             className={cn(
               "w-full flex items-center justify-between p-3.5 transition-all active:scale-[0.98]",
               isLoading && "opacity-70 pointer-events-none"
             )}
           >
+
             <div className="flex items-center gap-3.5 min-w-0">
               <div className="relative">
                 <div className="relative size-12 rounded-2xl bg-zinc-800 overflow-hidden ring-2 ring-zinc-700/50 shadow-inner">
@@ -146,7 +148,7 @@ export function FloatingCartBar() {
                   )}
                 </div>
                 <span className="text-[11px] font-bold text-zinc-500 truncate max-w-[140px] uppercase tracking-wider mt-1">
-                  {displayCart?.items?.[0]?.partnerName || 'Local store'}
+                  {displayCart?.items?.[0]?.partner_name || 'Local store'}
                 </span>
               </div>
             </div>
@@ -165,16 +167,16 @@ export function FloatingCartBar() {
         <div className="h-px bg-white/[0.05]" />
 
         <div className="flex items-center justify-between px-7 py-3 bg-white/[0.02]">
-          {displayCart?.partnerId && (
+          {displayCart?.partner_id && (
             <button
               onClick={() => {
                 triggerHaptic(HapticPattern.ACTION);
-                router.push(`/partner/${displayCart.partnerId}`);
+                router.push(`/partner/${displayCart.partner_id}`);
               }}
               className="group flex items-center gap-2"
             >
               <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.15em] group-hover:text-zinc-300 transition-colors truncate max-w-[200px]">
-                View {displayCart?.items?.[0]?.partnerName || 'Store'}
+                View {displayCart?.items?.[0]?.partner_name || 'Store'}
               </span>
               <ChevronRight className="size-3 text-zinc-700 group-hover:text-zinc-400 transition-colors" />
             </button>

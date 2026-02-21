@@ -9,8 +9,10 @@ import {
     CarouselItem,
 } from "@/components/ui/carousel";
 
+import { WyshkitItem } from '@/lib/types/item';
+
 interface PopularNearYouRailProps {
-    items: any[];
+    items: WyshkitItem[];
 }
 
 export function PopularNearYouRail({ items }: PopularNearYouRailProps) {

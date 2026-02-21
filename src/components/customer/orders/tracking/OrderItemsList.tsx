@@ -55,10 +55,10 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                                 className="w-full p-4 flex gap-4 text-left hover:bg-zinc-50 active:scale-[0.99] transition-all outline-none relative z-10"
                             >
                                 <div className="size-16 bg-zinc-50 rounded-xl relative overflow-hidden border border-zinc-100 shrink-0">
-                                    {(item.item_image_url || item.image_url) ? (
+                                    {item.item_image_url ? (
                                         <Image
-                                            src={item.item_image_url || item.image_url}
-                                            alt={item.item_name || item.name}
+                                            src={item.item_image_url}
+                                            alt={item.item_name}
                                             fill
                                             className="object-cover"
                                         />
@@ -70,7 +70,7 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-start justify-between gap-2 mb-1">
-                                        <p className="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight">{item.item_name || item.name}</p>
+                                        <p className="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight">{item.item_name}</p>
                                         <p className="text-xs font-bold text-zinc-900 tabular-nums">x{item.quantity}</p>
                                     </div>
 
@@ -182,7 +182,7 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                                                 {selectedPreviewItem.personalization_details ? (
                                                     <SubmittedIdentity
                                                         details={selectedPreviewItem.personalization_details as any}
-                                                        itemName={selectedPreviewItem.item_name || selectedPreviewItem.name}
+                                                        itemName={selectedPreviewItem.item_name}
                                                     />
                                                 ) : (
                                                     <div className="p-8 text-center bg-zinc-50 rounded-3xl border border-zinc-100">

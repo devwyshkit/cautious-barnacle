@@ -15,19 +15,18 @@ export async function searchFiltered(options: SearchOptions = {}) {
   const supabase = await createClient();
   const { q, category, limit = 20 } = options;
 
-  // Build items query
+  // WYSHKIT 2026: Use purified view (Zero Reinvention)
   let itemsQuery = supabase
-    .from('items')
-    .select('id, name, slug, images, base_price, category, partner_id, stock_status, stock_quantity, partners!inner(name, display_name)')
-    .eq('is_active', true)
-    .eq('approval_status', 'approved')
-    .neq('stock_status', 'out_of_stock') // WYSHKIT 2026: Zero Reflection
+    .from('v_item_listings_search')
+    .select('*')
     .limit(limit);
 
-  // Apply search query
+  // WYSHKIT 2026: Use Postgres Full-Text Search (FTS) for superior ranking
   if (q && q.length >= 2) {
-    const searchPattern = `%${q}%`;
-    itemsQuery = itemsQuery.or(`name.ilike.${searchPattern},category.ilike.${searchPattern}`);
+    itemsQuery = itemsQuery.textSearch('fts_vector', q, {
+      type: 'websearch',
+      config: 'english'
+    });
   }
 
   // Apply category filter (Case-insensitive)
@@ -37,13 +36,14 @@ export async function searchFiltered(options: SearchOptions = {}) {
 
   // Build partners query
   let partnersQuery = supabase
-    .from('partners')
-    .select('id, name, slug, rating, city, display_name, image_url')
-    .eq('status', 'active')
+    .from('v_partner_listings')
+    .select('*')
     .limit(Math.floor(limit / 2));
 
-  // Apply search query to partners
+  // WYSHKIT 2026: Use FTS for Partner search too
   if (q && q.length >= 2) {
+    // Note: v_partner_listings doesn't have fts_vector yet, fallback to ilike on name
+    // or we could add FTS to v_partner_listings later. For now, keep it simple.
     partnersQuery = partnersQuery.ilike('name', `%${q}%`);
   }
 
@@ -55,13 +55,12 @@ export async function searchFiltered(options: SearchOptions = {}) {
 
   return {
     items: (itemsResponse.data || []).map((item) => ({
-      ...item as any,
+      ...item,
       image: item.images?.[0] || '/images/logo.png',
-      partner_name: (item as any).partners?.display_name || (item as any).partners?.name || 'Store',
-      basePrice: item.base_price
+      // Purified: items already have partner_name from view
     })),
     partners: (partnersResponse.data || []).map((p) => ({
-      ...p as Partner,
+      ...p,
       image: p.image_url || '/images/logo.png'
     })),
     total: (itemsResponse.data?.length || 0) + (partnersResponse.data?.length || 0)

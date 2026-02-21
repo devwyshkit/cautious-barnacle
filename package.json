@@ -9,7 +9,13 @@
     "build:clean": "rm -rf .next .turbo && npm run build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "echo 'Run this SQL file in your Supabase SQL editor: supabase/seed.sql'"
+    "seed": "echo 'Run this SQL file in your Supabase SQL editor: supabase/seed.sql'",
+    "seed:rich": "npx tsx scripts/seed-rich-data.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:seed": "npm run seed:rich && playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -67,14 +73,20 @@
     "@eslint/eslintrc": "^3.3.1",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.1.4",
     "dotenv": "^17.3.1",
     "eslint": "^9.38.0",
     "eslint-config-next": "15.1.6",
+    "jsdom": "^28.1.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^4.0.18"
   }
 }

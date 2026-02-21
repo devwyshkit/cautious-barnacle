@@ -19,18 +19,18 @@ export function getDeliveryFeeByDistance(distanceKm: number | null): number {
  * Swiggy 2026: Single Logic Path
  * This must match the Postgres RPC `calculate_order_total` exactly.
  */
-export function calculateItemPrice(item: any): number {
+export function calculateItemPrice(item: DraftLineItem): number {
     // 1. Resolve Base/Variant Price
-    // Handle both DraftLineItem (unitPrice) and HydratedDraftItem (basePrice/variantPrice)
-    const basePrice = Number(item.variantPrice ?? item.basePrice ?? item.unitPrice) || 0;
+    // Handle both DraftLineItem (unit_price) and HydratedDraftItem (base_price/variant_price)
+    const basePrice = Number(item.variant_price ?? item.base_price ?? item.unit_price) || 0;
     const quantity = Number(item.quantity) || 1;
 
     // 2. Addons Sum
-    const addonsTotal = (item.selectedAddons || []).reduce((sum: number, addon: any) => sum + (Number(addon.price) || 0), 0);
+    const addonsTotal = (item.selected_addons || []).reduce((sum: number, addon: any) => sum + (Number(addon.price) || 0), 0);
 
     // 3. Personalization Fee
-    // RPC currently uses 50 as standard if enabled, unless overridden by personalizationPrice
-    const personalizationFee = item.personalizationPrice ?? (item.personalization?.enabled ? (Number(item.personalization.price) || 50) : 0);
+    // RPC currently uses 50 as standard if enabled, unless overridden by personalization_price
+    const personalizationFee = item.personalization_price ?? (item.personalization?.enabled ? (Number(item.personalization.price) || 50) : 0);
 
     return (basePrice + addonsTotal + personalizationFee) * quantity;
 }

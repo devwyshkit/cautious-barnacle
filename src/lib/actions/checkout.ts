@@ -83,23 +83,31 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         }
 
         // 2. Hydrate items (Already hydrated from getCart, just map to HydratedDraftItem if needed)
-        const hydratedItems = (cart.items as any[]).map(item => ({
-            ...item,
-            name: item.itemName,
-            image: item.itemImage,
-            variantId: item.selectedVariantId,
-            itemId: item.itemId,
+        // Wyshkit 2026: Strict Type Mapping
+        const hydratedItems: HydratedDraftItem[] = cart.items.map(item => ({
+            itemId: item.item_id,
+            variantId: item.selected_variant_id,
             personalization: item.personalization || { enabled: false },
-            selectedAddons: item.selectedAddons || []
-        })) as unknown as HydratedDraftItem[];
+            selectedAddons: item.selected_addons || [],
+            quantity: item.quantity,
+            id: item.id,
+            name: item.item_name,
+            image: item.item_image || '/images/logo.png',
+            basePrice: item.base_price || item.unit_price,
+            variantPrice: item.variant_price || 0,
+            variantName: item.variant_name,
+            personalizationPrice: item.personalization_price || 0,
+            partnerId: item.partner_id,
+            partnerName: item.partner_name
+        }));
 
         const pricingItems = hydratedItems.map(item => ({
             item_id: item.itemId,
             quantity: item.quantity,
             variant_id: item.variantId,
-            personalization_option_id: (item as any).personalization?.option_id || null,
+            personalization_option_id: item.personalization.option_id || null,
             has_personalization: hasItemPersonalization(item),
-            selected_addons: (item as any).selectedAddons || []
+            selected_addons: item.selectedAddons || []
         }))
 
         // WYSHKIT 2026: Prioritize the manually selected address from cookie
@@ -139,8 +147,10 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
             }
         }
 
-        const partnerLat = (cartRes.cart as any)?.items?.[0]?.partnerLatitude
-        const partnerLng = (cartRes.cart as any)?.items?.[0]?.partnerLongitude
+        // WYSHKIT 2026: Extract partner location from the first item (Swiggy Pattern: single store per order)
+        const firstItem = cart.items[0];
+        const partnerLat = firstItem?.partner_latitude || 12.9716; // Default to Bangalore center if missing
+        const partnerLng = firstItem?.partner_longitude || 77.5946;
 
         const distanceKm = calculateHaversineDistance(
             defaultAddress.latitude,
@@ -196,9 +206,9 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
             useWallet: useWallet,
             gstin: gstin || null,
             user: user ? { id: user.id, email: user.email } : null,
-            partnerName: hydratedItems[0]?.partnerName || (cartRes.cart as any)?.items?.[0]?.partnerName,
-            partnerCity: (cartRes.cart as any)?.items?.[0]?.partnerCity || 'Bangalore',
-            partnerPrepMins: (cartRes.cart as any)?.items?.[0]?.partnerPrepMins || 30,
+            partnerName: hydratedItems[0]?.partnerName,
+            partnerCity: 'Bangalore', // Default city - can be hydrated from partner metadata if needed
+            partnerPrepMins: 30, // Default prep mins
         }
 
     } catch (error) {

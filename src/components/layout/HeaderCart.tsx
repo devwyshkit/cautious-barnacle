@@ -7,6 +7,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/components/customer/CartProvider';
 import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
+import { formatCurrency } from '@/lib/utils/pricing';
 import { Button } from '@/components/ui/button';
 
 export function HeaderCart() {
@@ -16,27 +17,22 @@ export function HeaderCart() {
 
     // WYSHKIT 2026: Single source of truth
     const displayCart = draftOrder;
-    const hasItems = displayCart && displayCart.itemCount > 0;
+    const hasItems = displayCart && displayCart.item_count > 0;
     const isCheckoutOpen = pathname.startsWith('/checkout');
 
-    // Use server state or optimistic state based on what's available
-    // But we want to sync animation. 
-    // If count increases, we delay the update to match animation?
-
-    const displayCount = displayCart?.itemCount || 0;
+    const itemCount = displayCart?.item_count || 0;
     const displayTotal = displayCart?.total || 0;
 
-    const [visualCount, setVisualCount] = useState(displayCount);
+    const [visualCount, setVisualCount] = useState(itemCount);
     const [shouldBounce, setShouldBounce] = useState(false);
-    const prevCount = useRef(displayCount);
+    const prevCount = useRef(itemCount);
 
     // WYSHKIT 2026: Animation Sync Logic
-    // When count increases (add to cart), delay the visual update to match 'fly' animation landing.
     useEffect(() => {
-        if (displayCount > prevCount.current) {
+        if (itemCount > prevCount.current) {
             // Increment: Wait for fly animation (approx 800ms)
             const timer = setTimeout(() => {
-                setVisualCount(displayCount);
+                setVisualCount(itemCount);
                 setShouldBounce(true);
                 triggerHaptic(HapticPattern.SUCCESS);
                 setTimeout(() => setShouldBounce(false), 300);
@@ -44,13 +40,10 @@ export function HeaderCart() {
             return () => clearTimeout(timer);
         } else {
             // Decrement/Initial: Update instantly
-            setVisualCount(displayCount);
+            setVisualCount(itemCount);
         }
-        prevCount.current = displayCount;
-    }, [displayCount]);
-
-    // If loading, show loading state? Or just fallback to 0?
-    // We use `visualCount` for display.
+        prevCount.current = itemCount;
+    }, [itemCount]);
 
     const handleCheckout = () => {
         triggerHaptic(HapticPattern.ACTION);
@@ -82,7 +75,7 @@ export function HeaderCart() {
                 </div>
                 <div className="flex flex-col items-start leading-none">
                     <span className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider">Cart</span>
-                    <span className="tabular-nums">₹{displayTotal.toFixed(0)}</span>
+                    <span className="tabular-nums">{formatCurrency(displayTotal)}</span>
                 </div>
             </Button>
         </div>

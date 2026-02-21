@@ -18,18 +18,16 @@ export function InterceptedItemSheet({ item, onCloseOverride }: InterceptedItemS
 
     const handleClose = React.useCallback(() => {
         setOpen(false);
+        // Swiggy 2026: Elite navigation stability.
+        // We favor explicit paths over history.back() for intercepted sheets
+        // to ensure we never land on a "dead end" or redirect loop.
         const partnerPath = `/partner/${item.partner_id || searchParams.get('id')}`;
+        const targetPath = onCloseOverride || partnerPath;
 
+        // Small delay to allow drawer closing animation
         setTimeout(() => {
-            if (onCloseOverride) {
-                router.push(onCloseOverride);
-            } else if (window.history.length <= 1) {
-                // Dead end case: Push to partner store
-                router.push(partnerPath);
-            } else {
-                router.back();
-            }
-        }, 100);
+            router.push(targetPath);
+        }, 150);
     }, [item.partner_id, onCloseOverride, router, searchParams]);
 
     const isEditMode = searchParams.get('edit') === 'true';

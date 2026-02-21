@@ -14,7 +14,7 @@ import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 interface RecentOrder {
   id: string;
-  orderNumber: string;
+  order_number: string;
   items: Array<{
     item_id: string;
     item_name: string;
@@ -27,8 +27,8 @@ interface RecentOrder {
     };
   }>;
   total: number;
-  createdAt: string;
-  partnerName?: string;
+  created_at: string;
+  partner_name?: string;
 }
 
 interface ReorderWidgetProps {
@@ -61,19 +61,10 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
         .limit(3);
 
       if (!error && data) {
-        // Map snake_case from DB to camelCase for component
-        const mapped = (data as any[]).map(d => ({
-          id: d.id,
-          orderNumber: d.order_number,
-          items: d.items,
-          total: Number(d.total),
-          createdAt: d.created_at,
-          partnerName: d.partner_name
-        }));
-        setRecentOrders(mapped as RecentOrder[]);
+        setRecentOrders(data as RecentOrder[]);
 
         // Fetch current stock for these items
-        const itemIds = Array.from(new Set(mapped.flatMap(order => order.items.map((i: any) => i.item_id))));
+        const itemIds = Array.from(new Set((data as any[]).flatMap(order => order.items.map((i: any) => i.item_id))));
         if (itemIds.length > 0) {
           const { data: stockData } = await supabase
             .from('items')
@@ -118,7 +109,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
             itemName: item.item_name,
             itemImage: item.images?.[0],
             unitPrice: 0,
-            partnerName: order.partnerName,
+            partnerName: order.partner_name,
           }
         );
 
@@ -234,9 +225,9 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
                 <div className="flex-1 p-3 flex flex-col min-w-0">
                   <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 mb-1">
                     <Clock className="size-3" />
-                    <span>{formatDate(order.createdAt)}</span>
+                    <span>{formatDate(order.created_at)}</span>
                     <span>•</span>
-                    <span className="truncate">{order.partnerName}</span>
+                    <span className="truncate">{order.partner_name}</span>
                   </div>
 
                   <p className="text-sm font-semibold text-zinc-900 truncate">

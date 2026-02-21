@@ -18,8 +18,12 @@ import {
   Plus,
   Loader2,
   ChevronLeft,
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  Store,
+  CreditCard
 } from 'lucide-react';
+import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { OrderList } from '@/components/customer/orders/OrderList';
 import { getAddresses, setDefaultAddress, deleteAddress } from '@/lib/actions/addresses';
@@ -33,7 +37,7 @@ interface ProfileSurfaceProps {
   initialAddresses?: Address[];
 }
 
-export function ProfilePage({ initialAddresses = [] }: ProfileSurfaceProps = {}) {
+export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, permissions, signOut } = useAuth();
@@ -177,30 +181,34 @@ export function ProfilePage({ initialAddresses = [] }: ProfileSurfaceProps = {})
         {activeTab === 'account' && (
           <div className="p-6 space-y-6">
             {(permissions?.isPartner || permissions?.isAdmin) && (
-              <section className="bg-zinc-900 rounded-2xl p-4 text-white relative overflow-hidden shadow-lg mb-6">
+              <section className="bg-zinc-900 rounded-[2.5rem] p-6 text-white relative overflow-hidden shadow-xl mb-6">
+                <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                  <Logo variant="minimal" className="size-32" />
+                </div>
+
                 <div className="relative z-10">
-                  <h3 className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] mb-3">Workspaces</h3>
-                  <div className="flex flex-col gap-2">
+                  <h3 className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-4">Professional Access</h3>
+                  <div className="space-y-3">
                     {permissions.isPartner && (
-                      <Link href="/partner" className="flex items-center justify-between p-3 bg-white/10 rounded-xl hover:bg-white/15 transition-colors border border-white/5">
-                        <div className="flex items-center gap-3">
-                          <Package className="size-5 text-white" />
-                          <div>
-                            <p className="text-sm font-bold">Partner Dashboard</p>
-                            <p className="text-[10px] font-medium text-white/50">Manage orders & inventory</p>
-                          </div>
+                      <Link href="/partner" className="flex items-center gap-4 p-4 bg-white/10 rounded-3xl hover:bg-white/15 transition-all border border-white/5 group">
+                        <div className="size-12 rounded-2xl bg-indigo-500 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                          <Store className="size-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-black">Partner Dashboard</p>
+                          <p className="text-[10px] font-medium text-white/50 mt-0.5">Manage your catalog & orders</p>
                         </div>
                         <ChevronRight className="size-4 text-white/30" />
                       </Link>
                     )}
                     {permissions.isAdmin && (
-                      <Link href="/admin" className="flex items-center justify-between p-3 bg-white/10 rounded-xl hover:bg-white/15 transition-colors border border-white/5">
-                        <div className="flex items-center gap-3">
-                          <Settings className="size-5 text-white" />
-                          <div>
-                            <p className="text-sm font-bold">Admin Control</p>
-                            <p className="text-[10px] font-medium text-white/50">System health & configuration</p>
-                          </div>
+                      <Link href="/admin" className="flex items-center gap-4 p-4 bg-white/10 rounded-3xl hover:bg-white/15 transition-all border border-white/5 group">
+                        <div className="size-12 rounded-2xl bg-rose-500 flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/20 group-hover:scale-105 transition-transform">
+                          <ShieldCheck className="size-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-black">Admin Control</p>
+                          <p className="text-[10px] font-medium text-white/50 mt-0.5">Platform operations & overrides</p>
                         </div>
                         <ChevronRight className="size-4 text-white/30" />
                       </Link>
@@ -248,6 +256,19 @@ export function ProfilePage({ initialAddresses = [] }: ProfileSurfaceProps = {})
                 </div>
                 <ChevronRight className="size-4 text-zinc-300" />
               </button>
+            </section>
+
+            {/* Support Section */}
+            <section className="pt-8">
+              <div className="p-8 bg-zinc-900 rounded-[2.5rem] text-white flex flex-col items-center text-center gap-6 shadow-2xl shadow-zinc-200">
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black">Need help with something?</h3>
+                  <p className="text-zinc-400 text-sm max-w-[200px] mx-auto">Our support team is available 24/7 for you.</p>
+                </div>
+                <Button className="w-full bg-white text-zinc-900 hover:bg-zinc-100 rounded-2xl font-black h-14 text-sm uppercase tracking-widest shadow-xl shadow-white/5">
+                  Contact Support
+                </Button>
+              </div>
             </section>
           </div>
         )}

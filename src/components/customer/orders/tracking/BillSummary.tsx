@@ -27,7 +27,7 @@ export function BillSummary({ order }: BillSummaryProps) {
                 date: new Date(order.created_at).toLocaleDateString(),
                 order_items: order.order_items,
                 partner: {
-                    name: order.partner_name || 'WyshKit Partner',
+                    name: order.partner_name || order.partner?.[0]?.name || 'WyshKit Partner',
                     address: 'Bangalore, India', // Placeholder if address missing
                     gstin: order.partner_gstin
                 },

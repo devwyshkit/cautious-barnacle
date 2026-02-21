@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Cart } from '@/lib/types/cart';
 import { Address } from '@/lib/types/address';
+import { OrderItemDetail } from '@/lib/types/order';
 
 // Initialize autoTable
 const _autoTable = autoTable;
@@ -10,12 +11,12 @@ interface DocumentData {
     orderNumber?: string;
     date: string;
     cart?: Cart; // For checkout estimates
-    order_items?: any[]; // For post-order documents
+    order_items?: OrderItemDetail[]; // For post-order documents
     gstin?: string;
     customerName?: string;
     businessName?: string;
-    billingAddress?: any;
-    shippingAddress?: any;
+    billingAddress?: Address | null;
+    shippingAddress?: Address | null;
     partner: {
         name: string;
         address: string;
@@ -83,7 +84,7 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     }
     if (data.billingAddress) {
         const addrLines = doc.splitTextToSize(
-            `${data.billingAddress.address_line1 || data.billingAddress.line1 || ''}, ${data.billingAddress.city || ''}`,
+            `${data.billingAddress.address_line1 || ''}, ${data.billingAddress.city || ''}`,
             (pageWidth / 2) - 20
         );
         doc.text(addrLines, col2, y2);
@@ -104,12 +105,12 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
 
     // Table
     const items = data.order_items || data.cart?.items || [];
-    const tableBody = items.map((item: any) => [
-        item.item_name || item.itemName || item.name || 'Product',
-        item.hsn_code || '6912',
-        item.quantity,
-        `₹${item.unit_price || item.unitPrice}`,
-        `₹${item.total_price || item.totalPrice}`
+    const tableBody = items.map(item => [
+        item.item_name || (item as any).itemName || (item as any).name || 'Product',
+        (item as any).hsn_code || '6912',
+        item.quantity || (item as any).quantity_number || 1,
+        `₹${item.unit_price || (item as any).unitPrice || 0}`,
+        `₹${(item.total_price || (item as any).totalPrice || 0)}`
     ]);
 
     autoTable(doc, {

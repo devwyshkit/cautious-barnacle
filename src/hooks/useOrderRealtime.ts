@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRealtime } from '@/providers/RealtimeProvider';
 import { OrderStatus } from '@/lib/types/order-status';
+import { OrderItemDetail, OrderDetail } from '@/lib/types/order';
 
 export type RequirementStatus = 'pending' | 'submitted' | 'accepted' | 'clarification_needed' | 'approved' | 'rejected' | null;
 
@@ -33,20 +34,7 @@ interface OrderUpdate {
   tax_amount?: number | null;
   platform_fee?: number | null;
   personalization_charges?: number | null;
-  order_items?: Array<{
-    id: string;
-    item_id: string;
-    item_name: string;
-    quantity: number;
-    unit_price: number;
-    total_price: number;
-    item_image_url: string | null;
-    is_personalized: boolean;
-    personalization_config: any;
-    personalization_details: any;
-    status: string | null;
-    selected_addons: any;
-  }>;
+  order_items?: OrderItemDetail[];
 }
 
 interface TimelineEvent {
@@ -113,13 +101,14 @@ export function useOrderRealtime({
       ]);
 
       if (orderRes.data) {
-        const orderData = orderRes.data as any;
-        if (orderData.partners?.name) orderData.partner_name = orderData.partners.name;
+        const orderData = orderRes.data as unknown as OrderUpdate;
+        const rawOrder = orderRes.data as any;
+        if (rawOrder.partners?.name) orderData.partner_name = rawOrder.partners.name;
 
+        if (itemsRes.data) orderData.order_items = itemsRes.data as unknown as OrderItemDetail[];
         setOrder(orderData);
-        if (itemsRes.data) orderData.order_items = itemsRes.data as any;
-        if (timelineRes.data) setTimelineEvents(timelineRes.data as any);
-        if (previewsRes.data) setPreviews(previewsRes.data as any);
+        if (timelineRes.data) setTimelineEvents(timelineRes.data as unknown as TimelineEvent[]);
+        if (previewsRes.data) setPreviews(previewsRes.data as unknown as PreviewSubmission[]);
         setError(null);
         setIsPolling(false);
         return orderData;
@@ -136,12 +125,12 @@ export function useOrderRealtime({
 
       setIsPolling(false);
       return null;
-    } catch (err: any) {
+    } catch (err) {
       if (retryCount < MAX_RETRIES) {
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
         return fetchInitialData(retryCount + 1);
       }
-      setError(err.message || 'Failed to fetch order');
+      setError(err instanceof Error ? err.message : 'Failed to fetch order');
       setIsPolling(false);
       return null;
     }
@@ -228,7 +217,7 @@ export function useOrderRealtime({
       (payload) => {
         // WYSHKIT 2026: Optimistic Update for Zero Latency
         if (payload.eventType === 'UPDATE' && payload.new) {
-          const updatedItem = payload.new as any; // Cast to ensure compatibility
+          const updatedItem = payload.new as OrderItemDetail;
           setOrder((prev) => {
             if (!prev || !prev.order_items) return prev;
             return {
