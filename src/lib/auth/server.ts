@@ -1,25 +1,10 @@
 import type { User } from '@supabase/supabase-js';
-import { type UserRole, type UserPermissions, resolveUserRole, resolveUserPermissions } from './core';
+import { type UserRole, type UserPermissions, resolveUserPermissions } from './core';
 import type { Database } from '@/lib/supabase/database.types';
 
 type Partner = Database['public']['Tables']['partners']['Row'];
 
-/**
- * Server-side helper: Resolves role using the server-side Supabase client
- * This file is server-only and should only be imported in server components/actions.
- */
-export async function resolveUserRoleServer(userId: string, user?: User | null): Promise<UserRole> {
-  const { createClient } = await import('@/lib/supabase/server');
-  const supabase = await createClient();
 
-  let currentUser = user;
-  if (!currentUser) {
-    const { data } = await supabase.auth.getUser();
-    currentUser = data.user;
-  }
-
-  return resolveUserRole(supabase, userId);
-}
 
 /**
  * Server-side helper: Resolves permissions using the server-side Supabase client

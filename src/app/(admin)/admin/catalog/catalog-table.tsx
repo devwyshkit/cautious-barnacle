@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Search, Star } from 'lucide-react'
-import { toggleItemStatus, toggleItemSponsored } from '@/lib/actions/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 
 interface CatalogTableProps {
   items: any[]
@@ -27,12 +27,22 @@ export function CatalogTable({ items }: CatalogTableProps) {
   )
 
   const handleToggleActive = async (id: string, current: boolean) => {
-    await toggleItemStatus(id, !current)
+    await executeAdminIntent({
+      entity: 'item',
+      action: 'TOGGLE_STATUS',
+      ids: [id],
+      metadata: { isActive: !current }
+    })
     router.refresh()
   }
 
   const handleToggleSponsored = async (id: string, current: boolean) => {
-    await toggleItemSponsored(id, !current)
+    await executeAdminIntent({
+      entity: 'item',
+      action: 'TOGGLE_SPONSORED',
+      ids: [id],
+      metadata: { isSponsored: !current }
+    })
     router.refresh()
   }
 

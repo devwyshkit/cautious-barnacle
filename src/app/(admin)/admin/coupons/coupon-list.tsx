@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus } from 'lucide-react'
-import { createCoupon, toggleCouponStatus } from '@/lib/actions/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import type { Coupon, DiscountType } from '@/lib/types/admin.types'
 
 interface CouponListProps {
@@ -33,13 +33,17 @@ export function CouponList({ coupons }: CouponListProps) {
   const handleCreate = async () => {
     if (!form.code || !form.discount_value) return
     setLoading(true)
-    await createCoupon({
-      code: form.code.toUpperCase(),
-      discount_type: form.discount_type,
-      discount_value: parseFloat(form.discount_value),
-      min_order_value: form.min_order_value ? parseFloat(form.min_order_value) : undefined,
-      max_discount_amount: form.max_discount_amount ? parseFloat(form.max_discount_amount) : undefined,
-      usage_limit: form.usage_limit ? parseInt(form.usage_limit) : undefined,
+    await executeAdminIntent({
+      entity: 'coupon',
+      action: 'CREATE',
+      metadata: {
+        code: form.code.toUpperCase(),
+        discount_type: form.discount_type,
+        discount_value: parseFloat(form.discount_value),
+        min_order_value: form.min_order_value ? parseFloat(form.min_order_value) : undefined,
+        max_discount_amount: form.max_discount_amount ? parseFloat(form.max_discount_amount) : undefined,
+        usage_limit: form.usage_limit ? parseInt(form.usage_limit) : undefined,
+      }
     })
     setForm({ code: '', discount_type: 'percentage', discount_value: '', min_order_value: '', max_discount_amount: '', usage_limit: '' })
     setOpen(false)
@@ -48,7 +52,12 @@ export function CouponList({ coupons }: CouponListProps) {
   }
 
   const handleToggle = async (id: string, current: boolean) => {
-    await toggleCouponStatus(id, !current)
+    await executeAdminIntent({
+      entity: 'coupon',
+      action: 'TOGGLE_STATUS',
+      id,
+      metadata: { isActive: !current }
+    })
     router.refresh()
   }
 

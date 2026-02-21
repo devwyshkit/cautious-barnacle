@@ -1,28 +1,11 @@
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from './database.types'
-
-function validateEnv() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!url || !key) {
-    const missing = []
-    if (!url) missing.push('NEXT_PUBLIC_SUPABASE_URL')
-    if (!key) missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY')
-
-    throw new Error(
-      `Missing required environment variables: ${missing.join(', ')}. ` +
-      'Please check your .env.local file.'
-    )
-  }
-
-  return { url, key }
-}
+import { getSupabaseEnv } from '@/lib/env'
 
 export async function createClient() {
   const { cookies } = await import('next/headers')
   const cookieStore = await cookies()
-  const { url, key } = validateEnv()
+  const { url, key } = getSupabaseEnv()
 
   return createServerClient<Database>(
     url,
@@ -58,6 +41,24 @@ export async function createAdminClient() {
   return createServerClient<Database>(
     url,
     serviceRoleKey,
+    {
+      cookies: {
+        getAll: () => [],
+        setAll: () => { },
+      },
+    }
+  )
+}
+
+/**
+ * WYSHKIT 2026: createAnonClient
+ * Suitable for use inside unstable_cache as it does not access cookies().
+ */
+export async function createAnonClient() {
+  const { url, key } = getSupabaseEnv()
+  return createServerClient<Database>(
+    url,
+    key,
     {
       cookies: {
         getAll: () => [],

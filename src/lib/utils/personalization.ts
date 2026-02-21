@@ -4,9 +4,9 @@
  */
 
 export interface PersonalizationCheckItem {
-  hasPersonalization?: boolean;
+  has_personalization?: boolean;
   personalization?: { enabled?: boolean; option_id?: string } | null;
-  selectedAddons?: Array<{ id: string; name?: string; price?: number; requires_preview?: boolean }>;
+  selected_addons?: Array<{ id: string; name?: string; price?: number; requires_preview?: boolean }>;
 }
 
 /**

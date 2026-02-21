@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Logo } from '@/components/ui/Logo';
 import { HeaderCart } from './HeaderCart';
-import { LocationData } from '@/lib/actions/location';
+import { LocationData } from '@/lib/actions/discovery/location';
 
 
 interface TopHeaderProps {

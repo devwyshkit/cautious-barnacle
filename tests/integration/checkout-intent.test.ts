@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createClient } from '@/lib/supabase/server';
-import { create_payment_order, verify_payment_signature } from '@/lib/actions/payment';
+import { create_payment_order, verify_payment_signature } from '@/lib/actions/checkout/payment';
 
 // Mock Razorpay
 vi.mock('@/lib/services/razorpay', () => ({
@@ -9,7 +9,7 @@ vi.mock('@/lib/services/razorpay', () => ({
 }));
 
 // Mock API Actions used within payment flow
-vi.mock('@/lib/actions/pricing', () => ({
+vi.mock('@/lib/actions/checkout/pricing', () => ({
     calculateOrderTotalRPC: vi.fn().mockResolvedValue({
         data: {
             subtotal: 100,
@@ -25,7 +25,7 @@ vi.mock('@/lib/actions/pricing', () => ({
 }));
 
 // Mock Orders Actions
-vi.mock('@/lib/actions/orders', () => ({
+vi.mock('@/lib/actions/commerce/orders', () => ({
     create_order: vi.fn().mockResolvedValue({
         success: true,
         order_id: 'test-order-id-123',
@@ -141,8 +141,8 @@ describe('Checkout Intent Flow Automation', () => {
         expect(builders.draft_orders.delete).toHaveBeenCalled();
 
         // Ensure create_order was triggered properly passing the baton
-        const { create_order } = await import('@/lib/actions/orders');
-        expect(create_order).toHaveBeenCalledWith(expect.objectContaining({
+        const { executeCommerceIntent } = await import('@/lib/actions/commerce/intent-engine');
+        expect(executeCommerceIntent).toHaveBeenCalledWith(expect.objectContaining({
             razorpay_order_id: 'order_rzp_123',
             user_id: 'user-123',
             items: expect.any(Array)

@@ -3,6 +3,10 @@ import "./globals.css";
 import Script from "next/script";
 import ErrorReporter from "@/components/ErrorReporter";
 import { Providers } from "@/components/Providers";
+import { validateEnv, checkRecommendedEnv } from "@/lib/env";
+
+validateEnv();
+checkRecommendedEnv();
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
@@ -50,8 +54,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="min-h-screen w-full selection:bg-rose-100 selection:text-rose-900">
-      <body className="antialiased min-h-screen w-full bg-zinc-50" suppressHydrationWarning>
+    <html lang="en" className="min-h-screen w-full selection:bg-rose-100 selection:text-rose-900">
+      <body className="antialiased min-h-screen w-full bg-zinc-50">
         <ErrorReporter />
         <Providers>
           {children}

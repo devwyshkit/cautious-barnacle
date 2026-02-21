@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PreviewUploader } from './PreviewUploader';
-import type { PartnerOrder } from '@/lib/actions/partner-actions';
+import type { PartnerOrder } from '@/lib/actions/partner/partner-actions';
 import { ORDER_STATUS, getOrderStatusDisplay } from '@/lib/types/order-status';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';

@@ -1,10 +1,20 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import React from "react";
-import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
+import { ResponsiveSurface } from "@/components/ui/ResponsiveSurface";
 import { ItemDetailView } from '@/components/customer/item/ItemDetailView';
+import { z } from 'zod';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { WyshkitItem } from '@/lib/types/item';
+
+const checkoutStateSchema = z.object({
+    edit: z.string().optional(),
+    cartItemId: z.string().uuid().optional(),
+    variantId: z.string().uuid().nullable().optional(),
+    quantity: z.coerce.number().int().min(1).default(1),
+    addons: z.string().optional()
+});
+
 interface InterceptedItemSheetProps {
     item: WyshkitItem;
     onCloseOverride?: string;
@@ -30,42 +40,33 @@ export function InterceptedItemSheet({ item, onCloseOverride }: InterceptedItemS
         }, 150);
     }, [item.partner_id, onCloseOverride, router, searchParams]);
 
-    const isEditMode = searchParams.get('edit') === 'true';
-    const cartItemId = searchParams.get('cartItemId');
-    const variantId = searchParams.get('variantId');
-    const quantity = parseInt(searchParams.get('quantity') || '1');
-    const addonIds = searchParams.get('addons')?.split(',').filter(Boolean) || [];
+    const params = Object.fromEntries(searchParams.entries());
+    const validated = checkoutStateSchema.safeParse(params);
+    const checkoutState = validated.success ? validated.data : null;
 
-    const initialState = isEditMode && cartItemId ? {
-        cartItemId,
-        variantId: variantId || null,
-        quantity,
-        addonIds
+    const initialState = checkoutState?.edit === 'true' && checkoutState?.cartItemId ? {
+        cartItemId: checkoutState.cartItemId,
+        variantId: checkoutState.variantId || null,
+        quantity: checkoutState.quantity,
+        addonIds: checkoutState.addons?.split(',').filter(Boolean) || []
     } : undefined;
 
     return (
-        <Drawer
+        <ResponsiveSurface
             open={open}
-            onOpenChange={(v) => {
-                if (!v) handleClose();
-            }}
+            onOpenChange={(v) => { if (!v) handleClose(); }}
+            title={item.name || 'Product Details'}
+            description={`View details and add ${item.name || 'this item'} to your cart.`}
+            className="md:max-w-[520px]"
+            showClose={false}
         >
-            <DrawerContent
-                className="h-[92dvh] max-h-[92dvh] rounded-t-[32px] border-x border-t border-zinc-100 overflow-hidden p-0 gap-0 md:max-w-[520px] md:left-1/2 md:right-auto md:-translate-x-1/2 flex flex-col bg-white"
-            >
-                <DrawerTitle className="sr-only">{item.name || 'Product Details'}</DrawerTitle>
-                <DrawerDescription className="sr-only">
-                    View details and add {item.name || 'this item'} to your cart.
-                </DrawerDescription>
-
-                <div className="flex-1 overflow-hidden relative min-h-0">
-                    <ItemDetailView
-                        item={item}
-                        onBack={handleClose}
-                        initialState={initialState}
-                    />
-                </div>
-            </DrawerContent>
-        </Drawer>
+            <div className="flex-1 overflow-y-auto relative">
+                <ItemDetailView
+                    item={item}
+                    onBack={handleClose}
+                    initialState={initialState}
+                />
+            </div>
+        </ResponsiveSurface>
     );
 }

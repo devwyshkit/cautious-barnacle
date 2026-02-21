@@ -1,7 +1,7 @@
 import { SurfaceErrorBoundaryWithRouter } from "@/components/error/SurfaceErrorBoundary";
 import Script from "next/script";
 
-export const experimental_ppr = true;
+// export const experimental_ppr = true;
 
 /**
  * WYSHKIT 2026: Checkout Layout Shell

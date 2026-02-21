@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { update_partner_online_status } from '@/lib/actions/partner-actions';
+import { update_partner_online_status } from '@/lib/actions/partner/partner-actions';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';

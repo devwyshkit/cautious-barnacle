@@ -30,7 +30,7 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { IdentityForm } from './IdentityForm';
 import { PreviewApproval } from './PreviewApproval';
-import { approve_preview, request_change } from '@/lib/actions/orders';
+import { approve_preview, request_change } from '@/lib/actions/commerce/orders';
 import { generateEstimatePDF, generateTaxInvoicePDF } from '@/lib/services/pdf-service';
 import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -136,12 +136,12 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
         )}>
           <div className="flex flex-col gap-6 p-4">
             {showIdentityParam ? (
-              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-white rounded-[32px] p-1 border border-zinc-100 shadow-xl shadow-zinc-200/50 overflow-hidden relative">
+              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-white rounded-[32px] p-1 border border-zinc-100 glass-morphism shadow-xl shadow-zinc-200/50 overflow-hidden relative">
                 <div className="flex flex-col gap-6 p-4">
                   <div className="space-y-6 animate-pulse">
-                    <div className="h-10 w-24 bg-zinc-100 rounded-full" />
-                    <div className="h-32 w-full bg-zinc-50 rounded-[2.5rem] border border-zinc-100" />
-                    <div className="h-48 w-full bg-white rounded-[2.5rem] border border-zinc-100" />
+                    <div className="h-10 w-24 bg-zinc-100/50 rounded-full" />
+                    <div className="h-32 w-full bg-white/30 rounded-[2.5rem] border border-zinc-100" />
+                    <div className="h-48 w-full bg-white/50 rounded-[2.5rem] border border-zinc-100" />
                   </div>
                 </div>
               </div>
@@ -168,7 +168,7 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
         isSheet ? "w-full h-full max-h-[90dvh]" : "max-w-md min-h-screen"
       )}>
         {!isConnected && (
-          <div className="bg-amber-500 text-white text-[10px] font-bold uppercase tracking-widest py-2 px-4 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-300">
+          <div className="glass-morphism bg-[var(--primary)] text-white text-[10px] font-bold uppercase tracking-widest py-3 px-4 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-300 z-50 sticky top-0">
             <RefreshCw className="size-3 animate-spin" />
             Reconnecting to order pulse...
           </div>
@@ -179,9 +179,9 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
         )}>
           <SurfaceErrorBoundaryWithRouter surfaceName="Success & Identity Overlay">
             {(showSuccess || showIdentityForm) && (
-              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-white rounded-[32px] p-1 border border-zinc-100 shadow-xl shadow-zinc-200/50 overflow-hidden relative">
+              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-white rounded-[32px] p-1 border border-zinc-100 shadow-2xl shadow-zinc-200/50 overflow-hidden relative">
                 {showSuccess && !showIdentityForm && (
-                  <div className="bg-zinc-950 p-7 text-white rounded-[30px] mb-1 relative overflow-hidden">
+                  <div className="gradient-vibrant p-7 text-white rounded-[30px] mb-1 relative overflow-hidden">
                     {showCelebration && <Confetti />}
                     <div className="absolute top-0 right-0 p-4 opacity-10">
                       <Sparkles className="size-20 text-white rotate-12" />

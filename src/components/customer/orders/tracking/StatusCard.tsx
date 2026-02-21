@@ -32,10 +32,10 @@ export function StatusCard({ order }: StatusCardProps) {
             return;
         }
 
-        // Fallback to createdAt based SLA
+        // Fallback to createdAt based SLA: use prep_hours if available from partner
         const createdAt = new Date(order.created_at || Date.now()).getTime();
-        const baseSLA = order.has_personalization ? 120 : 30; // mins
-        setDeadline(new Date(createdAt + baseSLA * 60000).toISOString());
+        const prepMins = ((order as any).partners?.prep_hours || (order.has_personalization ? 2 : 0.5)) * 60;
+        setDeadline(new Date(createdAt + prepMins * 60000).toISOString());
     }, [order?.status, order?.created_at, order?.has_personalization, order?.design_deadline_at]);
 
     const handleShare = async () => {
@@ -236,7 +236,7 @@ export function StatusCard({ order }: StatusCardProps) {
                             totals: {
                                 item_total: Number(order.subtotal) || 0,
                                 delivery_fee: Number(order.delivery_fee) || 0,
-                                platform_fee: Number(order.platform_fee) || PRICING.PLATFORM_FEE,
+                                platform_fee: Number(order.platform_fee) || 0,
                                 gst_amount: Number(order.gst) || 0,
                                 grand_total: Number(order.total) || 0
                             }
@@ -265,7 +265,7 @@ export function StatusCard({ order }: StatusCardProps) {
                                 totals: {
                                     item_total: Number(order.subtotal) || 0,
                                     delivery_fee: Number(order.delivery_fee) || 0,
-                                    platform_fee: Number(order.platform_fee) || PRICING.PLATFORM_FEE,
+                                    platform_fee: Number(order.platform_fee) || PRICING.DEPRECATED_ESTIMATE_PLATFORM_FEE,
                                     gst_amount: Number(order.gst) || 0,
                                     grand_total: Number(order.total) || 0
                                 }

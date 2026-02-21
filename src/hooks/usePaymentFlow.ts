@@ -6,14 +6,17 @@ import { toast } from "sonner";
 import { logger } from "@/lib/logging/logger";
 import { createClient } from "@/lib/supabase/client";
 import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
-import { CheckoutData } from "@/lib/actions/checkout";
+import { CheckoutData } from "@/lib/actions/checkout/checkout";
+import { OrderDetail } from "@/lib/types/order";
+import type { User } from "@supabase/supabase-js";
+import { SelectedPersonalization, SelectedAddon } from "@/lib/types/personalization";
 
 interface UsePaymentFlowProps {
     data: CheckoutData;
     selectedAddressId: string | null;
     deliveryInstructions?: string;
     clearDraftOrder: () => Promise<void>;
-    authUser: any;
+    authUser: User | null;
 }
 
 export function usePaymentFlow({
@@ -26,14 +29,14 @@ export function usePaymentFlow({
     const router = useRouter();
     const [isProcessing, setIsProcessing] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [uploadOrder, setUploadOrder] = useState<any>(null);
+    const [uploadOrder, setUploadOrder] = useState<OrderDetail | null>(null);
     const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null);
 
     const successRef = useRef(false);
     const paymentInitiatedRef = useRef(false);
     const activeRazorpayOrderIdRef = useRef<string | null>(null);
 
-    const handleOrderSuccess = useCallback(async (order: any, orderId?: string, hasPersonalization?: boolean) => {
+    const handleOrderSuccess = useCallback(async (order: OrderDetail | null, orderId?: string, hasPersonalization?: boolean) => {
         // WYSHKIT 2026: Strict idempotency guard
         if (successRef.current) return;
         successRef.current = true;
@@ -74,7 +77,7 @@ export function usePaymentFlow({
             paymentInitiatedRef.current = true;
             setIsProcessing(true);
 
-            const { create_payment_order, verify_payment_signature } = await import('@/lib/actions/payment');
+            const { create_payment_order, verify_payment_signature } = await import('@/lib/actions/checkout/payment');
 
             const response = await create_payment_order(
                 Math.round(data.pricing.total * 100),
@@ -87,6 +90,8 @@ export function usePaymentFlow({
                     use_wallet: data.use_wallet,
                     wallet_discount: data.pricing.wallet_discount || 0,
                     delivery_instructions: deliveryInstructions || undefined,
+                    distance_km: data.distance_km || undefined,
+                    gstin: data.gstin || undefined,
                 }
             );
 
@@ -131,7 +136,7 @@ export function usePaymentFlow({
                                 toast.error("Still verifying your order... please don't refresh.");
                             }
                             if (verifyResponse.success && !successRef.current) {
-                                handleOrderSuccess(verifyResponse.order || null, verifyResponse.order_id, verifyResponse.has_personalization ?? undefined);
+                                handleOrderSuccess(verifyResponse.order as unknown as OrderDetail || null, verifyResponse.order_id, verifyResponse.has_personalization ?? undefined);
                             }
                         } catch (err) {
                             toast.error(err instanceof Error ? err.message : 'Payment verification failed');

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowLeft, Package, Truck, User, Store, CreditCard, Clock, Loader2 } from 'lucide-react'
-import { updateOrderStatus } from '@/lib/actions/admin-actions'
+import { updateOrderStatus } from '@/lib/actions/commerce/admin-actions'
 import { ORDER_STATUS } from '@/lib/types/admin.types'
 import type { Tables, Json } from '@/lib/supabase/database.types'
 

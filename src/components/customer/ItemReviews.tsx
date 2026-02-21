@@ -8,7 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
-import { getItemReviews, submitItemReview } from "@/lib/actions/item-actions";
+import { getItemReviews } from "@/lib/actions/discovery/items";
+import { submitItemReview } from "@/lib/actions/partner/catalog";
 import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
 
 interface ItemReviewsProps {

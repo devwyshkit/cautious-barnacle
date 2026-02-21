@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Search, Plus, Loader2 } from 'lucide-react'
-import { creditWallet } from '@/lib/actions/admin-actions'
+import { creditWallet } from '@/lib/actions/commerce/admin-actions'
 import type { Database } from '@/lib/supabase/database.types'
 
 type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']

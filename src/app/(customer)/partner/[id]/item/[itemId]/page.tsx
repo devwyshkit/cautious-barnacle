@@ -1,7 +1,9 @@
-import { getPartnerStoreData } from '@/lib/actions/discovery';
+import { getPartnerStoreData } from '@/lib/actions/discovery/partners';
 import { PartnerStorePage } from '@/components/customer/PartnerStorePage';
 import { InterceptedItemSheet } from '@/components/customer/item/InterceptedItemSheet';
 import { notFound } from 'next/navigation';
+import { MappedPartner } from '@/lib/types/partner';
+
 
 export default async function ItemPage({
   params,
@@ -25,9 +27,10 @@ export default async function ItemPage({
     <div className="min-h-screen">
       <PartnerStorePage
         partnerId={id}
-        initialData={partner as any}
+        initialData={(partner as unknown) as MappedPartner}
         initialItems={items}
       />
+
       <InterceptedItemSheet
         item={item}
         onCloseOverride={`/partner/${id}`}

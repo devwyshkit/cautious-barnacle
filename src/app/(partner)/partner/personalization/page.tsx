@@ -1,5 +1,5 @@
 import { getPartnerFromSession } from '@/lib/auth/server';
-import { get_personalization_queue } from "@/lib/actions/partner-actions";
+import { get_personalization_queue } from "@/lib/actions/partner/partner-actions";
 import { PersonalizationQueueClient } from '@/components/partner/personalization/PersonalizationQueueClient';
 import { redirect } from 'next/navigation';
 

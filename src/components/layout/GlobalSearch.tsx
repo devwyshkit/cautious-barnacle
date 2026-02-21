@@ -10,7 +10,7 @@ import { useSearch } from "@/hooks/useSearch";
 import type { Tables } from "@/lib/supabase/database.types";
 import { ActionSlider } from "@/components/ui/ActionSlider";
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-import { PartnerCard } from "@/components/customer/PartnerCard";
+import { EntityCard, type EntityItem, type EntityPartner } from "@/components/ui/EntityCard";
 
 export function GlobalSearch() {
   const router = useRouter();
@@ -39,8 +39,8 @@ export function GlobalSearch() {
   // WYSHKIT 2026: React 19 Compiler handles memoization automatically
   // No manual useMemo needed - React Compiler optimizes this calculation
   const results = {
-    items: (searchResults?.items || []) as Tables<'v_item_listings'>[],
-    partners: (searchResults?.partners || []) as Tables<'v_partners_detailed'>[],
+    items: (searchResults?.items || []) as EntityItem[],
+    partners: (searchResults?.partners || []) as EntityPartner[],
   };
 
   const hasResults = results.items.length > 0 || results.partners.length > 0;
@@ -99,12 +99,9 @@ export function GlobalSearch() {
                       key={partner.id as any}
                       onClick={() => triggerHaptic(HapticPattern.ACTION)}
                     >
-                      <PartnerCard
-                        id={partner.id as any}
-                        name={(partner.name as any) || 'Store'}
-                        city={(partner.city as any) || 'City'}
-                        image_url={partner.image_url ?? '/images/logo.png'}
-                        rating={partner.rating as any}
+                      <EntityCard
+                        type="partner"
+                        data={partner}
                         variant="row"
                       />
                     </div>
@@ -119,27 +116,27 @@ export function GlobalSearch() {
                 <div className="space-y-2">
                   {results.items.map((item) => (
                     <button
-                      key={item.id as any}
+                      key={item.id || 'new'}
                       onClick={() => {
                         // WYSHKIT 2026: Momentum Haptic
                         triggerHaptic(HapticPattern.ACTION);
 
                         // WYSHKIT 2026: Navigate to item via partner route
-                        const partnerId = (item as any).partnerId || (item as any).partner_id;
+                        const partnerId = item.partner_id || (item as any).partnerId;
                         if (partnerId) {
-                          router.push(`/partner/${partnerId}?item=${item.id as any}`);
+                          router.push(`/partner/${partnerId}?item=${item.id}`);
                         } else {
                           // No partner context — navigate to search with item ID for intent resolution
-                          router.push(`/search?q=${encodeURIComponent(item.name as any)}&item=${item.id as any}`);
+                          router.push(`/search?q=${encodeURIComponent(item.name || '')}&item=${item.id}`);
                         }
                       }}
                       className="w-full flex items-center gap-3 p-3 bg-zinc-50 rounded-xl hover:bg-zinc-100 transition-colors text-left"
                     >
                       <div className="size-12 rounded-lg overflow-hidden shrink-0 bg-zinc-50 relative border border-zinc-100">
-                        <Image src={(item.images as any)?.[0] ?? '/images/logo.png'} alt={(item.name as any) || 'Item'} fill className="object-cover" sizes="48px" />
+                        <Image src={(item as any).image_url || ((item as any).images?.[0]) || '/images/logo.png'} alt={item.name || 'Item'} fill className="object-cover" sizes="48px" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-zinc-900 truncate">{item.name as any}</p>
+                        <p className="text-sm font-semibold text-zinc-900 truncate">{item.name}</p>
                         <p className="text-xs text-zinc-500">{(item.partner_name || 'Store')} · ₹{item.base_price}</p>
                       </div>
                     </button>

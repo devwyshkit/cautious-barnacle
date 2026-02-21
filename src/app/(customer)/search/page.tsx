@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { SearchPageClient } from "@/components/customer/search/SearchPageClient";
-import { searchFiltered } from "@/lib/actions/search";
+import { searchFiltered } from "@/lib/actions/discovery/search";
 import { SearchSkeleton } from "@/components/customer/search/SearchSkeleton";
 import { SurfaceErrorBoundaryWithRouter } from "@/components/error/SurfaceErrorBoundary";
 
@@ -17,7 +17,7 @@ import { SurfaceErrorBoundaryWithRouter } from "@/components/error/SurfaceErrorB
  * - Suspense boundary ensures progressive streaming
  * - Skeleton matches exact layout dimensions (zero CLS)
  */
-export const experimental_ppr = true;
+// export const experimental_ppr = true;
 
 export default async function SearchPage({
   searchParams,

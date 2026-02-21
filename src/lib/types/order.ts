@@ -13,8 +13,8 @@ import type { PersonalizationConfig, SelectedPersonalization, SelectedAddon } fr
 // View type from Supabase
 export type ViewOrderDetailed = Tables<'v_orders_detailed'>;
 
-export type OrderItem = Tables<'order_items'>;
-export type OrderPersonalization = Tables<'order_personalization'>;
+import type { OrderItem, OrderPersonalization } from '@/lib/supabase/types';
+export type { OrderItem, OrderPersonalization };
 
 /**
  * OrderListItem: Unified shape for order lists.
@@ -59,12 +59,13 @@ export interface PartnerForPDF {
 export interface PreviewSubmission {
   id: string;
   order_id: string;
+  order_item_id: string;
   preview_url: string;
-  version: number;
   status: 'pending' | 'approved' | 'change_requested';
   partner_notes?: string;
   customer_feedback?: string;
   submitted_at: string;
+  reviewed_at?: string;
 }
 
 export interface OrderItemDetail {
@@ -77,9 +78,10 @@ export interface OrderItemDetail {
   total_price: number;
   is_personalized: boolean;
   status: string;
-  personalization_config?: PersonalizationConfig;
-  personalization_details?: SelectedPersonalization;
-  selected_addons?: SelectedAddon[];
+  personalization_config?: any;
+  personalization_details?: any;
+  selected_addons?: any[];
+
 }
 
 export interface OrderStatusHistory {

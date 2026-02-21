@@ -55,17 +55,44 @@ export function getStockSLASignal(item: any): SLASignal | null {
     return null;
 }
 
-export function calculateTravelTime(distanceKm?: number): { min: number; max: number } | null {
-    if (!distanceKm) return null;
+import { PRICING } from '@/lib/constants/pricing';
 
-    // Standard hyperlocal speed: ~4-5 mins per km + 10 mins base prep/buffer
-    const baseTime = 10;
-    const travelTime = distanceKm * 5;
+/**
+ * WYSHKIT 2026: Geo Utilities
+ * Consistently uses Haversine formula for distance estimation.
+ */
+export function calculateHaversineDistance(
+    lat1: number | null | undefined,
+    lon1: number | null | undefined,
+    lat2: number | null | undefined,
+    lon2: number | null | undefined
+): number | null {
+    if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) {
+        return null;
+    }
 
-    const min = Math.round(baseTime + travelTime);
-    const max = min + 10;
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
 
-    return { min, max };
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+export function calculateTravelTime(distanceKm?: number | null): { min: number; max: number } | null {
+    if (distanceKm == null || distanceKm === undefined) return null;
+
+    // SWIGGY 2026: ~5 mins per 1km in city traffic + 10 mins buffer.
+    const baseMins = Math.ceil(distanceKm * 5);
+    return {
+        min: baseMins + 5,
+        max: baseMins + 10
+    };
 }
 
 /**

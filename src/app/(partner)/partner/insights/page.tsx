@@ -1,5 +1,5 @@
 import { getPartnerFromSession } from '@/lib/auth/server';
-import { get_partner_stats, get_partner_orders } from "@/lib/actions/partner-actions";
+import { get_partner_stats, get_partner_orders } from "@/lib/actions/partner/partner-actions";
 import { redirect } from 'next/navigation';
 import { Package, TrendingUp, BarChart3, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,18 +11,18 @@ export default async function PartnerInsightsPage() {
   const partner_id = partner.id; // Define partner_id for clarity
 
   const { data: stats } = await get_partner_stats(partner_id);
-  const { data: orders } = await get_partner_orders(partner_id, ['DELIVERED', 'CANCELLED', 'REFUNDED', 'PENDING', 'PROCESSING', 'SHIPPED']); // Fetch all orders for breakdown
+  const { data: orders } = await get_partner_orders(partner_id, ['DELIVERED', 'CANCELLED', 'REFUNDED', 'PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED', 'DISPATCHED', 'OUT_FOR_DELIVERY']); // Fetch all orders for breakdown
 
   const allOrders = orders || [];
 
-  const deliveredOrders = allOrders.filter((o: any) => o.status === 'DELIVERED');
-  const cancelledOrders = allOrders.filter((o: any) => o.status === 'CANCELLED');
+  const deliveredOrders = allOrders.filter(o => o.status === 'DELIVERED');
+  const cancelledOrders = allOrders.filter(o => o.status === 'CANCELLED');
 
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
-  const last7DaysOrders = (orders || []).filter((o: any) => new Date(o.created_at) > weekAgo);
+  const last7DaysOrders = allOrders.filter(o => o.created_at && new Date(o.created_at) > weekAgo);
 
-  const totalRevenue = last7DaysOrders.reduce((sum: number, o: any) => sum + Number(o.total || 0), 0);
+  const totalRevenue = last7DaysOrders.reduce((sum: number, o) => sum + Number(o.total || 0), 0);
   const avgOrderValue = deliveredOrders.length > 0
     ? totalRevenue / deliveredOrders.length
     : 0;

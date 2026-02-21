@@ -55,7 +55,7 @@ export async function enforce_design_deadlines() {
                     ...payment_updates
                 }).eq('id', order.id);
 
-                await (supabase as any).rpc('log_order_status_history', {
+                await (supabase as unknown as { rpc: any }).rpc('log_order_status_history', {
                     p_order_id: order.id,
                     p_type: 'auto_cancelled_timeout',
                     p_title: 'Order Cancelled',
@@ -67,6 +67,7 @@ export async function enforce_design_deadlines() {
                         partner_stake: partner_stake
                     }
                 });
+
                 processed_count++;
             }
         }
@@ -98,13 +99,14 @@ export async function enforce_design_deadlines() {
                         updated_at: now_iso
                     }).eq('id', order.id);
 
-                    await (supabase as any).rpc('log_order_status_history', {
+                    await (supabase as unknown as { rpc: any }).rpc('log_order_status_history', {
                         p_order_id: order.id,
                         p_type: 'auto_approved',
                         p_title: 'Design Auto-Approved',
                         p_description: 'The design has been auto-approved after 24 hours of inactivity. Production will begin shortly.',
                         p_metadata: { reason: 'preview_timeout' }
                     });
+
                     processed_count++;
                 }
             }
@@ -161,12 +163,12 @@ export async function enforce_acceptance_deadlines() {
                 ...payment_updates
             }).eq('id', order.id);
 
-            await (supabase as any).rpc('log_order_status_history', {
+            await supabase.rpc('log_order_status_history', {
                 p_order_id: order.id,
                 p_type: 'auto_cancelled_deadline',
                 p_title: 'Order Expired',
                 p_description: 'Order automatically cancelled as the partner did not accept it within the deadline. Full refund initiated.',
-                p_metadata: { reason: 'acceptance_timeout' }
+                p_metadata: { reason: 'acceptance_timeout' } as unknown as any
             });
             processed_count++;
         }

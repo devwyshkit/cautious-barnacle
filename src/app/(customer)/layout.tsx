@@ -1,12 +1,15 @@
 import { Suspense } from "react";
-import Script from "next/script";
 import { FloatingCartBar } from "@/components/customer/FloatingCartBar";
 import { OrderTrackingBar } from "@/components/customer/OrderTrackingBar";
 import { CartProvider } from "@/components/customer/CartProvider";
 import { CartErrorBoundary } from "@/components/error/CartErrorBoundary";
-import { getCart } from "@/lib/actions/draft-order";
-import { getServerLocation } from "@/lib/actions/location";
+import { getCart } from "@/lib/actions/cart/get-cart";
+import { getServerLocation } from "@/lib/actions/discovery/location";
 import { NavShell } from "@/components/layout/NavShell";
+import { logger } from "@/lib/logging/logger";
+import { DraftTransaction } from "@/lib/types/personalization";
+import { LocationData } from "@/lib/actions/discovery/location";
+import { EMPTY_CART } from "@/lib/constants/cart";
 
 /**
  * WYSHKIT 2026: Customer Layout - Singleton State & Route-Based Navigation
@@ -14,12 +17,14 @@ import { NavShell } from "@/components/layout/NavShell";
 
 export default function CustomerLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <Suspense fallback={<LayoutSkeleton />}>
-      <AsyncLayoutContent>
+      <AsyncLayoutContent modal={modal}>
         {children}
       </AsyncLayoutContent>
     </Suspense>
@@ -33,38 +38,48 @@ export default function CustomerLayout({
  */
 async function AsyncLayoutContent({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
-  let cartResult: any = { cart: null };
-  let location: any = null;
+  let cartResult: { cart?: DraftTransaction, cartIdentity?: string, guestSessionId?: string | null } = {
+    cart: EMPTY_CART,
+    cartIdentity: 'empty',
+    guestSessionId: null
+  };
+  let location: LocationData = { name: 'Select location', address: '', pincode: '' };
 
   try {
     // Parallel fetch: No waterfall
     const results = await Promise.all([
       getCart().catch(err => {
-        console.error('[DEBUG] getCart failed:', err);
-        return { cart: null, cartIdentity: 'error', guestSessionId: null };
+        logger.error('getCart failed:', err);
+        return {
+          cart: EMPTY_CART,
+          cartIdentity: 'error',
+          guestSessionId: null
+        };
       }),
       getServerLocation().catch(err => {
-        console.error('[DEBUG] getServerLocation failed:', err);
-        return null;
+        logger.error('getServerLocation failed:', err);
+        return { name: 'Select location', address: '', pincode: '' };
       })
     ]);
     cartResult = results[0];
     location = results[1];
   } catch (error) {
-    console.error('[DEBUG] AsyncLayoutContent Error:', error);
+    logger.error('AsyncLayoutContent Error:', error);
   }
 
-  const initialCart = cartResult.cart || { items: [], partnerId: null, subtotal: 0, total: 0, itemCount: 0 };
-  const cartIdentity = cartResult.cartIdentity ?? 'empty';
+  const initialCart = cartResult.cart || EMPTY_CART;
   const guestSessionId = cartResult.guestSessionId ?? null;
 
   return (
-    <CartProvider key={cartIdentity} initialCart={initialCart} guestSessionId={guestSessionId}>
+    <CartProvider initialCart={initialCart} guestSessionId={guestSessionId}>
       <NavShell initialLocation={location}>
         {children}
+        {modal}
       </NavShell>
       <CartErrorBoundary>
         <FloatingCartBar />
@@ -74,11 +89,6 @@ async function AsyncLayoutContent({
   );
 }
 
-/**
- * WYSHKIT 2026: Static Shell Skeleton
- * Rendered during the initial stream. Must NOT render page children here —
- * they use useCart and require CartProvider, which only exists after AsyncLayoutContent loads.
- */
 function LayoutSkeleton() {
   return (
     <div className="min-h-screen bg-white">

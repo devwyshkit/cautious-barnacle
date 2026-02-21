@@ -1,5 +1,5 @@
 import { getPartnerFromSession } from '@/lib/auth/server';
-import { get_partner_financials, get_partner_payouts } from '@/lib/actions/partner-actions';
+import { get_partner_financials, get_partner_payouts } from '@/lib/actions/partner/partner-actions';
 import { formatCurrency } from '@/lib/utils/pricing';
 import { redirect } from 'next/navigation';
 import { IndianRupee, Clock, ArrowUpRight, Percent, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';

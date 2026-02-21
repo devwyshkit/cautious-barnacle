@@ -18,7 +18,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { ArrowLeft, Check, X, Loader2, ExternalLink } from 'lucide-react'
-import { approvePartnerKYC, rejectPartnerKYC, togglePartnerStatus, updatePartnerCommission } from '@/lib/actions/admin-actions'
+import { approvePartnerKYC, rejectPartnerKYC, togglePartnerStatus, updatePartnerCommission } from '@/lib/actions/commerce/admin-actions'
 import type { Partner } from '@/lib/types/admin.types'
 
 interface PartnerDetailViewProps {

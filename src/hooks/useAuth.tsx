@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { normalizePhone } from "@/lib/utils/phone";
 import { logger } from "@/lib/logging/logger";
 import { useAuthContext } from "@/providers/AuthProvider";
-import { mergeGuestCartToUser } from "@/lib/actions/draft-order";
+import { mergeGuestCartToUser } from "@/lib/actions/cart/logic";
 
 export function useAuth() {
   const { user, permissions, loading, error, signOut: signOutContext, refreshSession } = useAuthContext();

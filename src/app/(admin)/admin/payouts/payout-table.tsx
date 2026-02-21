@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, Check } from 'lucide-react'
-import { processPartnerPayout } from '@/lib/actions/admin-actions'
+import { processPartnerPayout } from '@/lib/actions/commerce/admin-actions'
 import type { Database } from '@/lib/supabase/database.types'
 
 type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']

@@ -28,10 +28,11 @@ export async function GET(req: NextRequest) {
         // These are rows where the 10-minute lock has passed. 
         // We delete them to free up table space and ensure index efficiency.
         // (Logic already ignores them via `expires_at > now()`, but physical delete is good).
-        const { error: resError, count: resCount } = await (supabase as any)
+        const { error: resError, count: resCount } = await supabase
             .from('cart_reservations')
             .delete({ count: 'exact' })
             .lt('expires_at', new Date().toISOString());
+
 
         if (resError) {
             logger.error('Cron: Failed to cleanup reservations', resError);

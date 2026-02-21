@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { searchFiltered } from '@/lib/actions/search';
+import { searchFiltered } from '@/lib/actions/discovery/search';
 import type { Tables } from '@/lib/supabase/database.types';
 
 interface SearchParams {

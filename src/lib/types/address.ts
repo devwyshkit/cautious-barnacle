@@ -4,10 +4,4 @@
  * Uses Supabase table types directly.
  */
 
-import type { Tables } from '@/lib/supabase/database.types';
-
-// ✅ Use Supabase table type directly (zero data mismatch)
-// ✅ Use Supabase table type directly (zero data mismatch)
-export type Address = Tables<'addresses'> & {
-    gstin?: string | null;
-};
+export type { Address } from '@/lib/supabase/types';

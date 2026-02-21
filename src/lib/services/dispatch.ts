@@ -35,27 +35,37 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
 
         if (order.awb_number) return { success: true };
 
-        // 2. Resolve Logistics
-        const address = Array.isArray(order.delivery_address) ? order.delivery_address[0] : order.delivery_address;
-        const partner = Array.isArray(order.partner) ? order.partner[0] : order.partner;
-        const order_items = (order.order_items as any[]) || [];
+        // 2. Resolve Logistics (Swiggy 2026: Flow Completeness)
+        const address = (order as any).delivery_address as Record<string, any>;
+        const partner = (order as any).partner as Record<string, any>;
+        const order_items = (order as any).order_items as any[] || [];
+
 
         let total_weight = 0;
+        let missing_weight_count = 0;
+
         order_items.forEach((item: any) => {
+            if (!item.weight_kg) {
+                missing_weight_count++;
+            }
             total_weight += (Number(item.weight_kg) || 0.1) * (item.quantity || 1);
         });
+
+        if (missing_weight_count > 0) {
+            logger.warn(`DispatchService: ${missing_weight_count} items missing weight_kg for order ${order.order_number}. Using default 0.1kg per item.`);
+        }
 
         const shadowfax_payload = {
             order_id: order.id,
             customer: {
-                name: (address as any)?.name || 'Customer',
-                phone: (address as any)?.phone || '',
-                address: `${(address as any)?.address_line1 || ''}`.trim(),
-                city: (address as any)?.city || '',
-                pincode: (address as any)?.pincode || '',
+                name: address?.name || 'Customer',
+                phone: address?.phone || '',
+                address: `${address?.address_line1 || ''}`.trim(),
+                city: address?.city || '',
+                pincode: address?.pincode || '',
             },
             pickup: {
-                name: partner?.business_name || 'Partner',
+                name: partner?.business_name || partner?.name || 'Partner',
                 phone: String(partner?.whatsapp_number || ''),
                 address: `${partner?.address || ''}`.trim(),
                 city: partner?.city || '',
@@ -66,42 +76,54 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
             }
         };
 
-        // 3. Orchestrate 3 Attempts
-        let attempts = 0;
-        let last_error = '';
-        let dispatch_result;
+        // 3. Persist Intent (Swiggy 2026: Absolute Persistence)
+        const { data: attempt, error: attempt_error } = await supabase
+            .from('dispatch_attempts')
+            .insert({
+                order_id: order.id,
+                payload: shadowfax_payload,
+                status: 'PROCESSING',
+                attempts: 1
+            })
+            .select()
+            .single();
 
-        while (attempts < 3) {
-            attempts++;
-            logger.info(`[Dispatch] Attempt ${attempts} for ${order.order_number}`);
-
-            dispatch_result = await ShadowfaxService.createOrder(shadowfax_payload);
-
-            if (dispatch_result.success) break;
-
-            last_error = dispatch_result.error || 'Shadowfax error';
-            if (attempts < 3) await new Promise(r => setTimeout(r, 30000)); // 30s interval
+        if (attempt_error) {
+            logger.error('DispatchService: Failed to persist intent', attempt_error);
+            return { success: false, error: 'Database persistence error' };
         }
 
-        // 4. Finalize
-        if (dispatch_result?.success) {
-            await supabase.from('orders').update({
-                awb_number: dispatch_result.awbNumber,
-                courier_partner: 'Shadowfax',
-                tracking_url: dispatch_result.trackingUrl,
-                updated_at: new Date().toISOString()
-            }).eq('id', payload.order_id);
+        // 4. Perform First Attempt
+        logger.info(`[Dispatch] Initial attempt for order ${order.order_number}`);
+        const dispatch_result = await ShadowfaxService.createOrder(shadowfax_payload);
+
+        // 5. Update Intent Status
+        if (dispatch_result.success) {
+            await Promise.all([
+                supabase.from('dispatch_attempts').update({
+                    status: 'SUCCESS',
+                    updated_at: new Date().toISOString()
+                }).eq('id', attempt.id),
+                supabase.from('orders').update({
+                    awb_number: dispatch_result.awbNumber,
+                    courier_partner: 'Shadowfax',
+                    tracking_url: dispatch_result.trackingUrl,
+                    updated_at: new Date().toISOString()
+                }).eq('id', payload.order_id)
+            ]);
 
             return { success: true };
         } else {
-            // FALLBACK: Manual
-            logger.error(`[Dispatch] All Shadowfax attempts failed. Manual fallback for ${order.id}`);
-            await supabase.from('orders').update({
-                courier_partner: 'Manual/Partner',
+            const error_msg = dispatch_result.error || 'Shadowfax API Error';
+            await supabase.from('dispatch_attempts').update({
+                status: 'FAILED',
+                last_error: error_msg,
+                next_attempt_at: new Date(Date.now() + 60000).toISOString(), // 1 min retry boundary
                 updated_at: new Date().toISOString()
-            }).eq('id', payload.order_id);
+            }).eq('id', attempt.id);
 
-            return { success: true, error: last_error }; // Return success so UI doesn't block, but error logged
+            logger.warn(`[Dispatch] Initial attempt failed for ${order.id}. Intent preserved for retry worker.`);
+            return { success: true, error: `Initial dispatch failed but persistent intent created: ${error_msg}` };
         }
 
     } catch (error) {

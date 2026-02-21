@@ -37,21 +37,23 @@ export function HomeClient({ children, initialLat, initialLng }: HomeClientProps
   }, [searchParams, pathname, router]);
 
   useEffect(() => {
-    // If location is already in searchParams, don't ask again immediately
+    // WYSHKIT 2026: Zero URL Pollution
+    // If location is already resolved on server, don't trigger client-side geolocation
     if (initialLat && initialLng) return;
 
-    // Check if we can get the location
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
 
-          // Update URL with location without refreshing
-          const params = new URLSearchParams(searchParams.toString());
-          params.set("lat", latitude.toString());
-          params.set("lng", longitude.toString());
+          // WYSHKIT 2026: Cookie-Only Source of Truth
+          // Set location via Server Action (sets cookies + revalidates page)
+          // Avoids injecting lat/lng into the URL.
+          const { setLocationFromCoords } = await import("@/lib/actions/discovery/location");
+          await setLocationFromCoords(latitude, longitude);
 
-          router.replace(`${pathname}?${params.toString()}`);
+          // Trigger a silent refresh to pick up new location data from cookies
+          router.refresh();
         },
         () => {
           // Geolocation denied or unavailable - silent fail
@@ -59,7 +61,7 @@ export function HomeClient({ children, initialLat, initialLng }: HomeClientProps
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 300000 }
       );
     }
-  }, [initialLat, initialLng, pathname, router, searchParams]);
+  }, [initialLat, initialLng, router]);
 
   return (
     <div className="relative">

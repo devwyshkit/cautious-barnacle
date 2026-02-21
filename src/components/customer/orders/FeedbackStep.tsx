@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Star, MessageSquare, CheckCircle2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { submitItemReview } from '@/lib/actions/item-actions';
+import { submitItemReview } from '@/lib/actions/partner/catalog';
 import { toast } from 'sonner';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { ActionSlider } from '@/components/ui/ActionSlider';

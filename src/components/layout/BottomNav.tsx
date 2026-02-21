@@ -1,88 +1,57 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { Home, Search, Package, User } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Home, Search, ShoppingBag, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /**
- * WYSHKIT 2026: Intent-Based Navigation - BottomNav uses routes instead of Zustand
- * Swiggy 2026 Pattern: URL state is the single source of truth
+ * WYSHKIT 2026: Mobile Bottom Navigation
+ * Persistent tab bar for mobile-first experience.
  */
+const navItems = [
+  { label: "Home", href: "/", icon: Home },
+  { label: "Search", href: "/search", icon: Search },
+  { label: "Orders", href: "/profile?tab=orders", icon: ShoppingBag },
+  { label: "Profile", href: "/profile", icon: User },
+];
+
 export function BottomNav() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [mounted, setMounted] = React.useState(false);
-  const { user } = useAuth();
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleAccountClick = () => {
-    if (user) {
-      // WYSHKIT 2026: Intent-Based Navigation - Use route instead of Zustand
-      router.push('/profile');
-    } else {
-      // WYSHKIT 2026: Intent-Based Navigation - Use route with returnUrl
-      router.push('/auth?intent=signin&returnUrl=/profile');
-    }
-  };
-
-  const NAV_ITEMS = [
-    {
-      label: 'Home',
-      icon: Home,
-      onClick: () => {
-        router.push('/');
-      },
-      isActive: mounted && pathname === '/'
-    },
-    {
-      label: 'Search',
-      icon: Search,
-      onClick: () => router.push('/search'),
-      isActive: mounted && pathname === '/search'
-    },
-    {
-      label: 'Orders',
-      icon: Package,
-      onClick: () => router.push(user ? '/orders' : '/auth?intent=signin&returnUrl=/orders'),
-      isActive: mounted && pathname.startsWith('/orders')
-    },
-    {
-      label: 'Account',
-      icon: User,
-      onClick: handleAccountClick,
-      isActive: mounted && (pathname === '/profile' || pathname.startsWith('/auth'))
-    },
-  ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-zinc-100 md:hidden pb-safe">
-      <div className="flex items-center justify-around h-16 max-w-md mx-auto">
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          const isActive = item.isActive;
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-safe">
+      <div className="glass-morphism mx-4 mb-4 rounded-[28px] px-2 py-2 flex items-center justify-around translate-y-0 transition-transform duration-500">
+        {navItems.map(({ label, href, icon: Icon }) => {
+          // Strict matching for home, startsWith for others
+          const isActive = href === "/"
+            ? pathname === "/"
+            : pathname.startsWith(href.split('?')[0]);
 
           return (
-            <button
-              key={item.label}
-              onClick={item.onClick}
-              className="flex-1 flex flex-col items-center justify-center gap-1 py-1 transition-transform active:scale-95"
+            <Link
+              key={label}
+              href={href}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1.5 min-w-[64px] py-1.5 transition-all duration-300 rounded-[20px]",
+                isActive
+                  ? "bg-rose-50/50 text-rose-600 scale-105"
+                  : "text-zinc-400 hover:text-zinc-600"
+              )}
             >
-              <Icon className={cn(
-                "size-5",
-                isActive ? "text-zinc-950" : "text-zinc-400"
-              )} />
+              <Icon
+                className={cn(
+                  "size-5.5 transition-all duration-500",
+                  isActive ? "fill-rose-600/10 stroke-[2.5px]" : "stroke-[2px]"
+                )}
+              />
               <span className={cn(
-                "text-[11px] tracking-tight",
-                isActive ? "font-bold text-zinc-950" : "font-medium text-zinc-400"
+                "text-[10px] font-black uppercase tracking-[0.05em] transition-opacity duration-300",
+                isActive ? "opacity-100" : "opacity-0"
               )}>
-                {item.label}
+                {label}
               </span>
-            </button>
+            </Link>
           );
         })}
       </div>

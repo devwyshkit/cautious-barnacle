@@ -10,7 +10,7 @@ import { ORDER_STATUS, getItemStatusConfig } from '@/lib/types/order-status';
 import { IdentityForm } from '../IdentityForm';
 import { SubmittedIdentity } from './SubmittedIdentity';
 import { PreviewApproval } from '../PreviewApproval';
-import { approve_preview, request_change } from '@/lib/actions/orders';
+import { approve_preview, request_change } from '@/lib/actions/commerce/orders';
 import { toast } from 'sonner';
 
 interface OrderItemsListProps {

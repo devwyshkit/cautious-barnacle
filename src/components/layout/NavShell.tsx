@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useRef, useEffect } from 'react';
 import { TopHeader } from './TopHeader';
 import { BottomNav } from './BottomNav';
-import { LocationData } from '@/lib/actions/location';
+import { LocationData } from '@/lib/actions/discovery/location';
 import { ComplianceFooter } from './ComplianceFooter';
 
 interface NavShellProps {

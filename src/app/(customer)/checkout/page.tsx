@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { getCheckoutData } from "@/lib/actions/checkout";
+import { getCheckoutData } from "@/lib/actions/checkout/checkout";
 import { CheckoutLayoutClient } from "@/components/customer/checkout/CheckoutLayoutClient";
 
 /**

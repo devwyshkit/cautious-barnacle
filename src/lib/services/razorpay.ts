@@ -22,12 +22,12 @@ function getRazorpayInstance() {
 
       // Return a mock instance that throws descriptive errors
       return {
-        orders: { create: () => { throw new Error('Razorpay API keys missing. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET environment variables.'); } },
-        payments: { fetch: () => { throw new Error('Razorpay API keys missing. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET environment variables.'); } },
-        invoices: { create: () => { throw new Error('Razorpay API keys missing. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET environment variables.'); } },
-        fundAccount: { create: () => { throw new Error('Razorpay API keys missing. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET environment variables.'); } },
-        contacts: { create: () => { throw new Error('Razorpay API keys missing. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET environment variables.'); } },
-        payouts: { create: () => { throw new Error('Razorpay API keys missing. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET environment variables.'); } },
+        orders: { create: () => { throw new Error('Razorpay API keys missing.'); } },
+        payments: { fetch: () => { throw new Error('Razorpay API keys missing.'); }, refund: () => { throw new Error('Razorpay API keys missing.'); } },
+        invoices: { create: () => { throw new Error('Razorpay API keys missing.'); } },
+        fundAccount: { create: () => { throw new Error('Razorpay API keys missing.'); } },
+        contacts: { create: () => { throw new Error('Razorpay API keys missing.'); } },
+        payouts: { create: () => { throw new Error('Razorpay API keys missing.'); } },
       } as unknown as Razorpay;
     }
 
@@ -43,6 +43,7 @@ function getRazorpayInstance() {
   }
   return razorpayInstance;
 }
+
 
 export interface RazorpayOrderOptions {
   amount: number;
@@ -118,7 +119,8 @@ export async function fetch_payment(payment_id: string) {
  * @param notes Optional notes
  */
 export async function refund_payment(payment_id: string, amount?: number, notes?: Record<string, string>) {
-  const options: Record<string, any> = { notes };
+  const options: { amount?: number; notes?: Record<string, string> } = { notes };
+
   if (amount) options.amount = Math.round(amount);
 
   return getRazorpayInstance().payments.refund(payment_id, options);
@@ -187,7 +189,15 @@ export async function create_invoice(
     invoice_data.expire_by = options.expire_by;
   }
 
-  return getRazorpayInstance().invoices.create(invoice_data as any);
+  const razorpay = getRazorpayInstance();
+  if (!razorpay) {
+    throw new Error('Razorpay instance not initialized.');
+  }
+  // The Razorpay library's `invoices.create` method expects a specific type.
+  // Casting to `any` here is a pragmatic choice if the library's types are not fully aligned
+  // with the `invoice_data` structure, or if the `invoice_data` is intentionally flexible.
+  // A more precise type could be defined if the exact structure is known and stable.
+  return (razorpay as any).invoices.create(invoice_data);
 }
 
 // ============================================
@@ -230,24 +240,24 @@ export interface PayoutRequest {
 }
 
 export async function create_payout_contact(contact: PayoutContact) {
-  const razorpay = getRazorpayInstance();
-  return (razorpay as any).contacts.create(contact);
+  const razorpay = getRazorpayInstance() as any;
+  return razorpay.contacts.create(contact);
 }
 
 export async function create_fund_account(fund_account: FundAccount) {
-  const razorpay = getRazorpayInstance();
-  return (razorpay as any).fundAccount.create(fund_account);
+  const razorpay = getRazorpayInstance() as any;
+  return razorpay.fundAccount.create(fund_account);
 }
 
 export async function create_payout(payout: PayoutRequest) {
-  const razorpay = getRazorpayInstance();
+  const razorpay = getRazorpayInstance() as any;
   const payout_data = {
     ...payout,
     amount: Math.round(payout.amount * 100),
     currency: payout.currency || 'INR',
     queue_if_low_balance: payout.queue_if_low_balance ?? true,
   };
-  return (razorpay as any).payouts.create(payout_data);
+  return razorpay.payouts.create(payout_data);
 }
 
 export async function initiate_partner_payout(

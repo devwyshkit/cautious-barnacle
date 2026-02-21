@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { updateOrderStatus } from '@/lib/actions/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import { ORDER_STATUS } from '@/lib/types/admin.types'
 import type { Database } from '@/lib/supabase/database.types'
 
@@ -73,7 +73,12 @@ export function OrderTable({ orders, currentStatus, totalCount, currentPage, pag
 
   const handleStatusChange = async (orderId: string, status: string) => {
     setUpdating(orderId)
-    await updateOrderStatus(orderId, status)
+    await executeAdminIntent({
+      entity: 'order',
+      action: 'UPDATE_STATUS',
+      id: orderId,
+      target_status: status
+    })
     setUpdating(null)
     router.refresh()
   }

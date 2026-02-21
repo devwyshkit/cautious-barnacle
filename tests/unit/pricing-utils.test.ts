@@ -25,15 +25,16 @@ describe('formatCurrency', () => {
 
 describe('PRICING constants', () => {
     it('has reasonable delivery fee tiers (ascending by distance)', () => {
-        expect(PRICING.DELIVERY_FEE_3KM).toBeLessThan(PRICING.DELIVERY_FEE_5KM);
-        expect(PRICING.DELIVERY_FEE_5KM).toBeLessThan(PRICING.DELIVERY_FEE_ABOVE_5KM);
+        expect(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_3KM).toBeLessThan(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_5KM);
+        expect(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_5KM).toBeLessThan(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_7KM);
+        expect(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_7KM).toBeLessThan(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_ABOVE_7KM);
     });
 
     it('platform fee is a positive number', () => {
-        expect(PRICING.PLATFORM_FEE).toBeGreaterThan(0);
+        expect(PRICING.DEPRECATED_ESTIMATE_PLATFORM_FEE).toBeGreaterThan(0);
     });
 
     it('high value threshold is sensible', () => {
-        expect(PRICING.HIGH_VALUE_THRESHOLD).toBeGreaterThanOrEqual(10000);
+        expect(PRICING.DEPRECATED_ESTIMATE_HIGH_VALUE_THRESHOLD).toBeGreaterThanOrEqual(10000);
     });
 });

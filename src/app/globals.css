@@ -138,45 +138,57 @@
 }
 
 @layer utilities {
+  .glass-morphism {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  }
+
+  .gradient-vibrant {
+    background: linear-gradient(135deg, #D91B24 0%, #FF4D4D 100%);
+  }
+
   .surface-card {
-    @apply bg-white rounded-[16px] border border-[#F1F1F6] shadow-[0_4px_20px_rgb(0_0_0/0.04)];
+    @apply bg-white rounded-[20px] border border-[#F1F1F6] shadow-[0_4px_30px_rgb(0_0_0/0.03)] transition-all duration-300 hover:shadow-[0_8px_40px_rgb(0_0_0/0.06)];
   }
 
   .surface-elevated {
-    @apply bg-white rounded-[24px] shadow-[0_12px_40px_rgb(0_0_0/0.08)] border border-[#F1F1F6];
+    @apply bg-white rounded-[24px] shadow-[0_12px_45px_rgb(0_0_0/0.08)] border border-[#F1F1F6] transition-all duration-500;
   }
 
   .label-overline {
-    @apply text-[10px] font-black uppercase tracking-[0.1em] text-[#686B78] mb-1.5 block;
+    @apply text-[10px] font-black uppercase tracking-[0.12em] text-[#686B78]/80 mb-1.5 block;
   }
 
   .label-caption {
     @apply text-[11px] text-[#686B78] font-medium leading-none;
   }
 
-  /* High Density Buttons */
+  /* High Density Buttons - Vibrant Standard */
   .btn-primary {
-    @apply h-11 w-full rounded-[12px] bg-[var(--primary)] text-white font-bold text-[14px] active:scale-[0.96] transition-all flex items-center justify-center gap-2 shadow-lg shadow-[var(--primary)]/20;
+    @apply h-12 w-full rounded-[16px] bg-[var(--primary)] text-white font-bold text-[15px] active:scale-[0.97] hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-xl shadow-[var(--primary)]/20;
   }
 
   .btn-secondary {
-    @apply h-11 w-full rounded-[12px] bg-[#F1F1F6] text-[#161824] font-bold text-[14px] active:scale-[0.96] transition-all flex items-center justify-center gap-2;
+    @apply h-12 w-full rounded-[16px] bg-[#F3F3F7] text-[#161824] font-bold text-[15px] active:scale-[0.97] hover:bg-[#EBEBEF] transition-all flex items-center justify-center gap-2;
   }
 
   .input-field {
-    @apply h-11 w-full rounded-[12px] border-none bg-[#F1F1F6] px-4 text-[14px] font-bold placeholder:text-[#686B78]/50 placeholder:font-medium focus:bg-white focus:ring-2 focus:ring-[var(--primary)]/10 transition-all outline-none;
+    @apply h-12 w-full rounded-[16px] border border-transparent bg-[#F3F3F7] px-4 text-[15px] font-semibold placeholder:text-[#686B78]/50 placeholder:font-medium focus:bg-white focus:border-[var(--primary)]/20 focus:ring-4 focus:ring-[var(--primary)]/5 transition-all outline-none;
   }
 
   .list-item {
-    @apply flex items-center gap-3 p-3 -mx-2 rounded-[12px] hover:bg-[#F1F1F6] active:scale-[0.98] transition-all cursor-pointer;
+    @apply flex items-center gap-3 p-4 -mx-2 rounded-[16px] hover:bg-[#F3F3F7] active:scale-[0.98] transition-all cursor-pointer;
   }
 
   .divider {
-    @apply h-[1px] bg-[#F1F1F6] my-4;
+    @apply h-[1px] bg-[#F1F1F6] my-5;
   }
 
   .safe-bottom {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
   }
 
   /* Wyshkit 2026: Ultra-tight scrolling */

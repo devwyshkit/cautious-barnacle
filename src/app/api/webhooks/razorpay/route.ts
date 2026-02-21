@@ -1,10 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateWebhookSignature } from '@/lib/services/razorpay';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { Database, Json } from '@/lib/supabase/database.types';
 import { log } from '@/lib/logging/logger';
-import { create_order } from '@/lib/actions/orders';
+
+import { executeCommerceIntent } from '@/lib/actions/commerce/intent-engine';
 import { handleAPIError } from '@/lib/utils/error-handler';
 import Razorpay from 'razorpay';
+import { z } from 'zod';
+
+const RazorpayWebhookSchema = z.object({
+  event: z.string(),
+  payload: z.object({
+    payment: z.object({
+      entity: z.object({
+        id: z.string(),
+        order_id: z.string().nullable(),
+        amount: z.number(),
+        currency: z.string(),
+        status: z.string(),
+        notes: z.record(z.string(), z.unknown()).optional(),
+        error_description: z.string().optional(),
+      })
+    }).optional(),
+    refund: z.object({
+      entity: z.object({
+        id: z.string(),
+        payment_id: z.string(),
+        amount: z.number(),
+      })
+    }).optional(),
+  })
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +48,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    const event = JSON.parse(body);
+
+    const parseResult = RazorpayWebhookSchema.safeParse(JSON.parse(body));
+    if (!parseResult.success) {
+      log.error('[webhooks/razorpay] Invalid webhook payload', parseResult.error, { body });
+      return NextResponse.json({ error: 'Invalid payload structure' }, { status: 400 });
+    }
+    const event = parseResult.data;
 
     const razorpayInstance = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID!,
@@ -38,8 +71,9 @@ export async function POST(req: NextRequest) {
 
     // Handle payment.captured event (NEW FLOW: Create order from payment)
     if (event.event === 'payment.captured') {
-      const razorpayOrderId = event.payload.payment?.entity?.order_id;
-      const razorpayPaymentId = event.payload.payment?.entity?.id;
+      const paymentEntity = event.payload.payment?.entity;
+      const razorpayOrderId = paymentEntity?.order_id;
+      const razorpayPaymentId = paymentEntity?.id;
 
       if (!razorpayOrderId || !razorpayPaymentId) {
         return NextResponse.json({ received: true, message: 'Missing order_id or payment_id' });
@@ -48,7 +82,7 @@ export async function POST(req: NextRequest) {
       try {
         // Fetch order from Razorpay to get notes (contains draftId, userId)
         const razorpayOrder = await razorpayInstance.orders.fetch(razorpayOrderId);
-        const notes = (razorpayOrder.notes as any) || {};
+        const notes = (razorpayOrder.notes as Record<string, unknown>) || {};
 
         const userId = String(notes.userId || notes.user_id || '');
         const draftId = String(notes.draftId || notes.draft_id || '');
@@ -83,39 +117,33 @@ export async function POST(req: NextRequest) {
         }
 
         // Place order using draft data (Trigger-first model)
-        const metadata = (draft.metadata as any) || {};
-        const orderData = {
-          address_id: draft.address_id,
-          items: (draft.items as any[]).map(item => ({
-            item_id: item.item_id,
-            variant_id: item.variant_id,
-            quantity: item.quantity,
-            has_personalization: item.has_personalization,
-            personalization_config: item.personalization_config,
-            selected_addons: item.selected_addons
-          })),
-          razorpay_order_id: razorpayOrderId,
-          payment_id: razorpayPaymentId,
-          coupon_code: metadata.coupon_code || metadata.couponCode,
-          use_wallet: metadata.use_wallet || metadata.useWallet || false,
-          gstin: metadata.gstin,
-          delivery_instructions: metadata.delivery_instructions || metadata.deliveryInstructions,
-          distance_km: metadata.distance_km || metadata.distanceKm,
-          user_id: userId,
-          use_admin: true
-        };
+        const metadata = (draft.metadata as Record<string, any>) || {};
+        const items = draft.items as unknown as any[];
 
-        const result = await create_order(orderData);
+        const order_result = await executeCommerceIntent({
+          intent: 'PLACE_ORDER',
+          payload: {
+            razorpay_order_id: razorpayOrderId,
+            payment_id: razorpayPaymentId,
+            items: items as any,
+            address_id: draft.address_id || undefined,
+            coupon_code: String(metadata.coupon_code || '') || undefined,
+            use_wallet: Boolean(metadata.use_wallet || false),
+            gstin: metadata.gstin ? String(metadata.gstin) : undefined,
+            delivery_instructions: metadata.delivery_instructions ? String(metadata.delivery_instructions) : undefined,
+            distance_km: metadata.distance_km ? Number(metadata.distance_km) : undefined
+          }
+        });
 
-        if ('error' in result) {
-          throw new Error((result as any).error || 'Failed to create order atomically');
+        if (!order_result.success) {
+          throw new Error(String(order_result.error || 'Failed to create order atomically'));
         }
 
         // Cleanup draft after successful placement
         await supabase.from('draft_orders').delete().eq('id', draft.id);
 
-        log.info('[webhooks/razorpay] Order created atomically via triggers and draft cleaned', { orderId: (result as any).orderId, razorpayOrderId });
-        return NextResponse.json({ received: true, orderId: (result as any).orderId });
+        log.info('[webhooks/razorpay] Order created atomically via triggers and draft cleaned', { order_id: (order_result.data as any).order_id, razorpayOrderId });
+        return NextResponse.json({ received: true, order_id: (order_result.data as any).order_id });
 
       } catch (error) {
         log.error('[webhooks/razorpay] Error creating order from payment', error, { razorpayOrderId });
@@ -125,8 +153,9 @@ export async function POST(req: NextRequest) {
 
     // Handle payment.failed event
     if (event.event === 'payment.failed') {
-      const razorpayOrderId = event.payload.payment?.entity?.order_id;
-      const errorDescription = event.payload.payment?.entity?.error_description || 'Unknown error';
+      const paymentEntity = event.payload.payment?.entity;
+      const razorpayOrderId = paymentEntity?.order_id;
+      const errorDescription = paymentEntity?.error_description || 'Unknown error';
 
       log.warn('[webhooks/razorpay] Payment failed', { razorpayOrderId, errorDescription });
 
@@ -148,15 +177,16 @@ export async function POST(req: NextRequest) {
 
     // Handle refund.processed event
     if (event.event === 'refund.processed') {
-      const paymentId = event.payload.refund?.entity?.payment_id;
-      const refundId = event.payload.refund?.entity?.id;
+      const refundEntity = event.payload.refund?.entity;
+      const paymentId = refundEntity?.payment_id;
+      const refundId = refundEntity?.id;
 
       log.info('[webhooks/razorpay] Refund processed', { paymentId, refundId });
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .select('id, order_number')
-        .eq('payment_id', paymentId)
+        .eq('payment_id', String(paymentId))
         .maybeSingle();
 
       if (order && !orderError) {
@@ -166,12 +196,12 @@ export async function POST(req: NextRequest) {
           updated_at: new Date().toISOString()
         }).eq('id', order.id);
 
-        await (supabase as any).rpc('log_order_status_history', {
+        await supabase.rpc('log_order_status_history', {
           p_order_id: order.id,
           p_type: 'refund',
           p_title: 'Refund Processed',
           p_description: `Payment refund (ID: ${refundId}) has been successfully processed.`,
-          p_metadata: { paymentId, refundId }
+          p_metadata: { paymentId, refundId } as unknown as Json
         });
       }
 

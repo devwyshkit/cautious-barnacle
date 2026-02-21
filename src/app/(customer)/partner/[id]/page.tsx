@@ -1,8 +1,10 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { PartnerStorePage } from '@/components/customer/PartnerStorePage';
-import { getPartnerStoreData } from '@/lib/actions/discovery';
+import { getPartnerStoreData } from '@/lib/actions/discovery/partners';
 import { PartnerSkeleton } from '@/components/customer/PartnerSkeleton';
+import { MappedPartner } from '@/lib/types/partner';
+
 
 /**
  * WYSHKIT 2026: Partner Store Page
@@ -22,7 +24,7 @@ import { PartnerSkeleton } from '@/components/customer/PartnerSkeleton';
  * Note: Suspense boundaries are for Server Components that stream data.
  * Client Components that receive props synchronously don't need Suspense boundaries.
  */
-export const experimental_ppr = true;
+// export const experimental_ppr = true;
 
 export default async function PartnerPage({
   params,
@@ -51,8 +53,9 @@ async function AsyncPartnerContent({ id }: { id: string }) {
   return (
     <PartnerStorePage
       partnerId={id}
-      initialData={(partner as any) || undefined}
+      initialData={(partner as unknown) as MappedPartner}
       initialItems={items}
     />
+
   );
 }

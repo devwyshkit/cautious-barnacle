@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ShieldCheck, ChevronDown, ChevronUp, Loader2, Check, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { validateGSTINAction } from '@/lib/actions/gstin';
+import { validateGSTINAction } from '@/lib/actions/commerce/gstin';
 import { toast } from 'sonner';
 
 interface GstinSectionProps {

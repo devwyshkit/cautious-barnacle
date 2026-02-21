@@ -4,10 +4,9 @@
  * All types derive directly from Supabase database types.
  */
 
-import type { Tables } from '@/lib/supabase/database.types';
+import { ValidatedPartner } from '../validations/discovery';
 
-// ✅ Use Supabase table type for partner data (zero data mismatch)
-export type Partner = Tables<'partners'>;
+export type { Partner } from '@/lib/supabase/types';
 // ✅ UI-optimized partner shape (Subset of table for performance & clarity)
 export interface MappedPartner {
   id: string;
@@ -22,10 +21,6 @@ export interface MappedPartner {
   is_online: boolean;
   description: string | null;
   gstin?: string | null;
+  elite_signals?: ValidatedPartner['elite_signals'];
 }
 
-// ✅ Use Supabase table type for full partner data
-export type PartnerFull = Tables<'partners'>;
-
-// ✅ UI-only list item (subset of table)
-export type PartnerListItem = Tables<'partners'>;

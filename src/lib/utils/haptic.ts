@@ -50,9 +50,12 @@ export function triggerHaptic(pattern: number | readonly number[]): void {
 
   try {
     navigator.vibrate(pattern as number | number[]);
-  } catch (error) {
+  } catch (e: unknown) { // Changed 'error' to 'e' and added 'unknown' type
     if (process.env.NODE_ENV === 'development') {
-      console.debug('Haptic feedback not available:', error);
+      import('@/lib/logging/logger').then(({ logger }) => {
+        // Changed logger.debug to logger.error and updated message to reflect haptic context
+        logger.error('Haptic feedback failed:', { error: String(e) });
+      });
     }
   }
 }

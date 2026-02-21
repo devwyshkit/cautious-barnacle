@@ -2,17 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { OrderCard } from './OrderCard';
-import { update_order_status, reject_order } from '@/lib/actions/partner-actions';
-import { mark_order_as_packed } from '@/lib/actions/orders'; // SWIGGY 2026: Added for trigger consistency
-import type { PartnerOrder } from '@/lib/actions/partner-actions';
+import { update_order_status, reject_order } from '@/lib/actions/partner/partner-actions';
+import type { PartnerOrder } from '@/lib/actions/partner/partner-actions';
+import { usePartnerRealtime } from '@/hooks/usePartnerRealtime';
 import { toast } from 'sonner';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/types/order-status';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { createClient } from '@/lib/supabase/client';
 import { Package } from 'lucide-react';
-import { logger } from '@/lib/logging/logger';
-import { useRealtime } from '@/providers/RealtimeProvider';
 
 type StatusTab = 'new' | 'preparing' | 'ready' | 'done';
 
@@ -45,74 +42,14 @@ interface OrderQueueProps {
 }
 
 export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
-  const [orders, setOrders] = useState<PartnerOrder[]>(initialOrders);
   const [activeTab, setActiveTab] = useState<StatusTab>('new');
   const [updating, setUpdating] = useState<string | null>(null);
 
-  // Audio for new order notification
-  const playNotification = () => {
-    try {
-      const audio = new Audio('/audio/new-order.mp3');
-      audio.play().catch(e => logger.warn('Audio play failed', e));
-    } catch (e) {
-      logger.error('Audio setup failed', e as Error);
-    }
-  };
-
-  // WYSHKIT 2026: Shared Pulse Pattern
-  // We use the singleton connection from RealtimeProvider instead of creating a new client.
-  const { isConnected } = useRealtime();
-
-  useEffect(() => {
-    if (!isConnected) return;
-
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`partner-orders-${partnerId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-          filter: `partner_id=eq.${partnerId}`,
-        },
-        async (payload) => {
-          if (payload.eventType === 'INSERT') {
-            // Fetch full relation data for the new order
-            const { data: newOrder } = await supabase
-              .from('orders')
-              .select(`*, order_items (*), order_personalization (*)`)
-              .eq('id', payload.new.id)
-              .single();
-
-            if (newOrder) {
-              const typedOrder = newOrder as any as PartnerOrder;
-              setOrders(prev => {
-                // Deduplicate
-                if (prev.some(o => o.id === typedOrder.id)) return prev;
-                return [typedOrder, ...prev];
-              });
-
-              toast.info('New order received!', {
-                description: `Order #${typedOrder.order_number}`,
-                duration: 5000,
-              });
-              playNotification();
-            }
-          } else if (payload.eventType === 'UPDATE') {
-            setOrders(prev => prev.map(o =>
-              o.id === payload.new.id ? { ...o, ...payload.new } : o
-            ));
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [partnerId, isConnected]);
+  // WYSHKIT 2026: Standardized Pulse Hook
+  const { orders, setOrders } = usePartnerRealtime({
+    partnerId,
+    initialOrders
+  });
 
   const filteredOrders = orders.filter(order => {
     const tab = STATUS_TABS.find(t => t.id === activeTab);

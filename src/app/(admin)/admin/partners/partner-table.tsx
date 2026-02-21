@@ -24,8 +24,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Search, Check, X } from 'lucide-react'
-import { approvePartnerKYC, rejectPartnerKYC, togglePartnerStatus } from '@/lib/actions/admin-actions'
-import type { Partner, KYC_STATUS } from '@/lib/types/admin.types'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
+import type { Partner } from '@/lib/types/admin.types'
 
 interface PartnerTableProps {
   partners: Partner[]
@@ -81,20 +81,34 @@ export function PartnerTable({ partners, currentStatus, totalCount, currentPage,
 
   const handleApprove = async (id: string) => {
     setLoading(id)
-    await approvePartnerKYC(id)
+    await executeAdminIntent({
+      entity: 'partner',
+      action: 'APPROVE_KYC',
+      id
+    })
     setLoading(null)
     router.refresh()
   }
 
   const handleReject = async (id: string) => {
     setLoading(id)
-    await rejectPartnerKYC(id, 'Documents not valid')
+    await executeAdminIntent({
+      entity: 'partner',
+      action: 'REJECT_KYC',
+      id,
+      metadata: { reason: 'Documents not valid' }
+    })
     setLoading(null)
     router.refresh()
   }
 
   const handleToggle = async (id: string, current: boolean) => {
-    await togglePartnerStatus(id, !current)
+    await executeAdminIntent({
+      entity: 'partner',
+      action: 'TOGGLE_STATUS',
+      id,
+      metadata: { isActive: !current }
+    })
     router.refresh()
   }
 

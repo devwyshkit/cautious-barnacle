@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getAddresses } from "@/lib/actions/addresses";
+import { getAddresses } from "@/lib/actions/user/addresses";
 import { redirect } from "next/navigation";
 import { ProfileSurface } from "@/components/customer/ProfileSurface";
 

@@ -10,7 +10,9 @@ interface GeoResult {
 export const GoogleMapsService = {
     reverseGeocode: async (lat: number, lng: number): Promise<GeoResult | null> => {
         try {
-            const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
+            // WYSHKIT 2026: Security Hardening
+            // Use private key (server-only). Falling back to NEXT_PUBLIC only for backward compatibility during migration.
+            const apiKey = process.env.GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
             if (!apiKey) {
                 logger.warn('Google Maps API key missing');
                 // Fallback or mock for dev if needed
@@ -52,7 +54,7 @@ export const GoogleMapsService = {
     },
     searchPlaces: async (query: string): Promise<any[]> => {
         try {
-            const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
+            const apiKey = process.env.GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
             if (!apiKey) return [];
             const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&key=${apiKey}&components=country:in`;
             const res = await fetch(url);
@@ -65,7 +67,7 @@ export const GoogleMapsService = {
     },
     getPlaceDetails: async (placeId: string): Promise<any> => {
         try {
-            const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
+            const apiKey = process.env.GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
             if (!apiKey) return null;
             const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`;
             const res = await fetch(url);

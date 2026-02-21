@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
-import { updateSetting } from '@/lib/actions/admin-actions'
+import { updateSetting } from '@/lib/actions/commerce/admin-actions'
 
 interface SettingsFormProps {
   settings: Record<string, unknown>

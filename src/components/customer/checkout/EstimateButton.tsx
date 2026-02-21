@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useActionState } from 'react';
 import { FileText, Loader2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
-import { getPartnerInfo } from '@/lib/actions/draft-order';
+import { getPartnerInfo } from '@/lib/actions/discovery/partners';
 import { toast } from 'sonner';
 
 import { DraftLineItem } from '@/lib/types/personalization';
@@ -28,15 +28,13 @@ export function EstimateButton({
     gstin,
     customerName = "Valued Customer"
 }: EstimateButtonProps) {
-    const [loading, setLoading] = useState(false);
+    const [state, dispatch, loading] = useActionState(async () => {
 
-    const handleDownload = async () => {
         if (!items.length || !pricing) {
             toast.error("No items in cart");
             return;
         }
 
-        setLoading(true);
         try {
             const partnerId = items[0]?.partner_id;
             if (!partnerId) throw new Error("Partner ID missing");
@@ -79,21 +77,19 @@ export function EstimateButton({
             toast.success("Estimate downloaded");
         } catch (err) {
             toast.error("Failed to generate estimate");
-        } finally {
-            setLoading(false);
         }
-    };
+    }, null);
 
     return (
-        <div className="flex flex-col gap-3">
+        <form action={dispatch} className="flex flex-col gap-3">
             <div className="flex items-start gap-3 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
                 <Info className="size-4 text-zinc-400 mt-0.5" />
                 <p className="text-[10px] font-bold text-zinc-500 leading-relaxed uppercase tracking-widest">
-                    Need an pro-forma estimate for your business? Click below to generate an PDF.
+                    Need a pro-forma estimate for your business? Click below to generate a PDF.
                 </p>
             </div>
             <Button
-                onClick={handleDownload}
+                type="submit"
                 disabled={loading}
                 variant="outline"
                 className="w-full h-14 rounded-2xl border-2 border-zinc-100 hover:border-zinc-900 gap-3 font-black uppercase tracking-widest text-[11px]"
@@ -105,6 +101,6 @@ export function EstimateButton({
                 )}
                 Get Estimate PDF
             </Button>
-        </div>
+        </form>
     );
 }

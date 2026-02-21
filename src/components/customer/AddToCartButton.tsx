@@ -1,6 +1,4 @@
-'use client';
-
-import { useState } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Plus, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,8 +21,9 @@ interface AddToCartButtonProps {
 }
 
 /**
- * WYSHKIT 2026: AddToCartButton - Instant Add with Optimistic Updates
- * Swiggy 2026 Pattern: User stays where they are, cart updates instantly
+ * WYSHKIT 2026: AddToCartButton (One Thing Pattern)
+ * Swiggy 2026 Pattern: useActionState replaces multiple useState + try/catch blocks.
+ * Eradicates manual loading/error management.
  */
 export function AddToCartButton({
     item_id,
@@ -40,64 +39,52 @@ export function AddToCartButton({
 }: AddToCartButtonProps) {
     const router = useRouter();
     const pathname = usePathname();
-    const { addToDraftOrder, clearDraftOrder, isPending } = useCart();
-
-    const [isAdding, setIsAdding] = useState(false);
+    const { addToDraftOrder, clearDraftOrder } = useCart();
     const [justAdded, setJustAdded] = useState(false);
 
-    const handleQuickAdd = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
+    // ELITE: useActionState handles the entire lifecycle (Action -> Pending -> State)
+    const [state, dispatch, isPending] = useActionState(async (prevState: any, formData: FormData) => {
         triggerHaptic(HapticPattern.ACTION);
 
-        // WYSHKIT 2026: If item needs selection (identity addition OR variants), navigate to store sheet
         if (is_identity_available || has_variants) {
             if (partner_id) {
-                // Swiggy Pattern: Portal Navigation
-                // Redirect user to the item detail sheet to make selections
                 router.push(`/partner/${partner_id}/item/${item_id}${pathname === '/search' ? '?context=search' : ''}`, { scroll: false });
             }
-            return;
+            return { success: true, navigated: true };
         }
 
-        setIsAdding(true);
+        const optimistic_data = {
+            item_name: item_name || 'Item',
+            item_image: item_image || '/images/logo.png',
+            unit_price: unit_price || 0,
+            partner_id: partner_id || undefined,
+            partner_name: partner_name || undefined
+        };
 
-        setJustAdded(true);
-        triggerHaptic(HapticPattern.SUCCESS);
+        const result = await addToDraftOrder(item_id, null, { enabled: false }, [], 1, optimistic_data);
 
-        const revertTimer = setTimeout(() => setJustAdded(false), 1500);
-
-        try {
-            const optimistic_data = {
-                item_name: item_name || 'Item',
-                item_image: item_image || '/images/logo.png',
-                unit_price: unit_price || 0,
-                partner_id: partner_id || undefined,
-                partner_name: partner_name || undefined
-            };
-
-            const result = await addToDraftOrder(item_id, null, { enabled: false }, [], 1, optimistic_data);
-
-            if (result && (result as any).error === 'PARTNER_MISMATCH') {
-                clearTimeout(revertTimer);
-                setJustAdded(false);
-                return;
-            } else if (result && 'error' in result) {
-                throw new Error(result.error);
+        if (result?.success) {
+            triggerHaptic(HapticPattern.SUCCESS);
+            setJustAdded(true);
+            return { success: true };
+        } else {
+            if (result?.error !== 'PARTNER_MISMATCH') {
+                triggerHaptic(HapticPattern.ERROR);
+                toast.error(result?.error || 'Failed to add item');
             }
-        } catch (error: any) {
-            clearTimeout(revertTimer);
-            setJustAdded(false);
-            triggerHaptic(HapticPattern.ERROR);
-            toast.error(error.message || 'Failed to add item');
-        } finally {
-            setIsAdding(false);
+            return { success: false, error: result?.error };
         }
-    };
+    }, null);
+
+    useEffect(() => {
+        if (justAdded) {
+            const timer = setTimeout(() => setJustAdded(false), 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [justAdded]);
 
     const isOutOfStock = typeof stock_quantity === 'number' && stock_quantity <= 0;
-    const isDisabled = isAdding || isPending || isOutOfStock;
+    const isDisabled = isPending || (isOutOfStock && !has_variants);
 
     if (isOutOfStock && !has_variants) {
         return (
@@ -111,34 +98,34 @@ export function AddToCartButton({
     }
 
     return (
-        <Button
-            size="default"
-            onClick={handleQuickAdd}
-            aria-label={`Add ${item_name} to cart`}
-            data-testid="add-to-cart-quick"
-            disabled={isDisabled}
-            className={cn(
-                "h-11 px-4 rounded-xl transition-all z-10 font-black text-[11px] uppercase tracking-widest",
-                justAdded
-                    ? "bg-emerald-500 text-white hover:bg-emerald-600 border-none"
-                    : isOutOfStock ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border-zinc-200" : "bg-white text-zinc-900 hover:bg-zinc-100 shadow-sm border border-zinc-100",
-                "active:scale-95",
-                className
-            )}
-        >
-            {isAdding ? (
-                <Loader2 className="size-4 animate-spin" />
-            ) : justAdded ? (
-                <div className="flex items-center gap-1.5">
-                    <Check className="size-4" />
-                    <span>Added</span>
-                </div>
-            ) : (
-                <div className="flex items-center gap-1.5">
-                    <Plus className="size-4" />
-                    <span>Add</span>
-                </div>
-            )}
-        </Button>
+        <form action={dispatch}>
+            <Button
+                type="submit"
+                size="default"
+                disabled={isDisabled}
+                className={cn(
+                    "h-11 px-4 rounded-xl transition-all z-10 font-black text-[11px] uppercase tracking-widest w-full",
+                    justAdded
+                        ? "bg-emerald-500 text-white hover:bg-emerald-600 border-none"
+                        : isOutOfStock ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border-zinc-200" : "bg-white text-zinc-900 hover:bg-zinc-100 shadow-sm border border-zinc-100",
+                    "active:scale-95",
+                    className
+                )}
+            >
+                {isPending ? (
+                    <Loader2 className="size-4 animate-spin" />
+                ) : justAdded ? (
+                    <div className="flex items-center gap-1.5">
+                        <Check className="size-4" />
+                        <span>Added</span>
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-1.5">
+                        <Plus className="size-4" />
+                        <span>Add</span>
+                    </div>
+                )}
+            </Button>
+        </form>
     );
 }

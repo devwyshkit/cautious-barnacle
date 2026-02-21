@@ -3,8 +3,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface CheckoutAddressContextType {
-  selectedAddressId: string | null;
-  setSelectedAddressId: (id: string | null) => void;
   deliveryInstructions: string;
   setDeliveryInstructions: (value: string) => void;
 }
@@ -15,11 +13,10 @@ export function useCheckoutAddress() {
   return useContext(CheckoutAddressContext);
 }
 
-export function CheckoutAddressProvider({ children, defaultAddressId }: { children: ReactNode; defaultAddressId?: string | null }) {
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(defaultAddressId ?? null);
+export function CheckoutAddressProvider({ children }: { children: ReactNode }) {
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
   return (
-    <CheckoutAddressContext.Provider value={{ selectedAddressId, setSelectedAddressId, deliveryInstructions, setDeliveryInstructions }}>
+    <CheckoutAddressContext.Provider value={{ deliveryInstructions, setDeliveryInstructions }}>
       {children}
     </CheckoutAddressContext.Provider>
   );

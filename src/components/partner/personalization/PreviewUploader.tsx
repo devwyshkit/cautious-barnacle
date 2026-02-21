@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { Upload, X, Camera, Image as ImageIcon, Loader2, SwitchCamera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { upload_preview } from '@/lib/actions/partner-actions';
+import { upload_preview } from '@/lib/actions/partner/partner-actions';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import Image from 'next/image';

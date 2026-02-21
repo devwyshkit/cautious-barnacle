@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -25,7 +25,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Plus, Trash2, Loader2 } from 'lucide-react'
-import { createCategory, toggleCategoryStatus, deleteCategory } from '@/lib/actions/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import type { Category } from '@/lib/types/admin.types'
 
 interface CategoryListProps {
@@ -43,7 +43,14 @@ export function CategoryList({ categories }: CategoryListProps) {
   const handleCreate = async () => {
     if (!name) return
     setLoading(true)
-    await createCategory(name, slug || name.toLowerCase().replace(/\s+/g, '-'))
+    await executeAdminIntent({
+      entity: 'category',
+      action: 'CREATE',
+      metadata: {
+        name,
+        slug: slug || name.toLowerCase().replace(/\s+/g, '-')
+      }
+    })
     setName('')
     setSlug('')
     setOpen(false)
@@ -52,14 +59,23 @@ export function CategoryList({ categories }: CategoryListProps) {
   }
 
   const handleToggle = async (id: string, current: boolean) => {
-    await toggleCategoryStatus(id, !current)
+    await executeAdminIntent({
+      entity: 'category',
+      action: 'TOGGLE_STATUS',
+      id,
+      metadata: { isActive: !current }
+    })
     router.refresh()
   }
 
   const handleDelete = async () => {
     if (!deleteId) return
     setLoading(true)
-    await deleteCategory(deleteId)
+    await executeAdminIntent({
+      entity: 'category',
+      action: 'DELETE',
+      id: deleteId
+    })
     setDeleteId(null)
     setLoading(false)
     router.refresh()
@@ -110,10 +126,10 @@ export function CategoryList({ categories }: CategoryListProps) {
                 <p className="text-xs text-zinc-500">{cat.slug}</p>
               </div>
               <Switch checked={cat.is_active ?? false} onCheckedChange={() => handleToggle(cat.id, cat.is_active ?? false)} />
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setDeleteId(cat.id)} 
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setDeleteId(cat.id)}
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
                 <Trash2 className="size-4" />

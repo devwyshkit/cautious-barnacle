@@ -25,7 +25,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Plus, Search, Trash2, Loader2 } from 'lucide-react'
-import { addPincode, togglePincodeStatus, deletePincode } from '@/lib/actions/admin-actions'
+import { addPincode, togglePincodeStatus, deletePincode } from '@/lib/actions/commerce/admin-actions'
 import type { ServiceablePincode } from '@/lib/types/admin.types'
 
 interface PincodeListProps {

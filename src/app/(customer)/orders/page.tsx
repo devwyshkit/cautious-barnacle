@@ -19,10 +19,11 @@ export default async function OrdersPage() {
         .from('v_orders_detailed')
         .select('id, order_number, status, total, created_at, delivery_address, partner_name, partner_image, items, has_personalization, personalization_status')
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false }) as any;
+        .order('created_at', { ascending: false });
+
 
     // Map DB orders to OrderListItem for the component
-    const mappedOrders = (orders || []).map((row: any) => ({
+    const mappedOrders = ((orders as any[]) || []).map((row) => ({
         ...row,
         order_number: row.order_number ?? null,
         created_at: row.created_at ?? null,
@@ -33,6 +34,7 @@ export default async function OrdersPage() {
         has_personalization: row.has_personalization || false,
         personalization_status: row.personalization_status || null,
     }));
+
 
     return (
         <div className="bg-zinc-50/50 min-h-screen py-6">

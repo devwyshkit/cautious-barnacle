@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ORDER_STATUS, getOrderStatusDisplay, type OrderStatus } from '@/lib/types/order-status';
-import type { PartnerOrder } from '@/lib/actions/partner-actions';
+import type { PartnerOrder } from '@/lib/actions/partner/partner-actions';
 import { cn } from '@/lib/utils';
 
 import { PreviewUploader } from '../personalization/PreviewUploader';

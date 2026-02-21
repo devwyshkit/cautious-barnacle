@@ -32,6 +32,7 @@ import { toast } from 'sonner';
 import {
   createItem,
   updateItem,
+  deleteItem,
   createVariant,
   updateVariant,
   deleteVariant,
@@ -40,7 +41,7 @@ import {
   type ItemInput,
   type VariantInput,
   type PersonalizationOptionInput,
-} from '@/lib/actions/item-actions';
+} from '@/lib/actions/partner/catalog';
 import type { Database } from '@/lib/supabase/database.types';
 
 type Item = Database['public']['Tables']['items']['Row'];

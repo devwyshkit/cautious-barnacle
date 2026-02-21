@@ -1,11 +1,11 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useActionState } from 'react';
 import { Wallet, Loader2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
-import { toggleWalletAction } from '@/lib/actions/checkout';
-import type { WalletInfo } from '@/lib/actions/wallet';
+import { toggleWalletAction } from '@/lib/actions/checkout/checkout';
+import type { WalletInfo } from '@/lib/actions/user/wallet';
 import type { PricingBreakdown } from '../types';
 import { formatCurrency } from '@/lib/utils/pricing';
 
@@ -13,6 +13,7 @@ interface WalletSlotProps {
     walletInfo: WalletInfo | null;
     useWalletBalance: boolean;
     pricing: PricingBreakdown | null;
+    onOptimisticToggle?: (checked: boolean) => void;
 }
 
 /**
@@ -22,15 +23,12 @@ interface WalletSlotProps {
  * - Mutations via Server Actions + router.refresh()
  */
 export function WalletSlot({ walletInfo, useWalletBalance, pricing }: WalletSlotProps) {
-    const [isPending, startTransition] = useTransition();
+    const [state, toggleAction, isPending] = useActionState(async () => {
+        await toggleWalletAction(!useWalletBalance);
+        return { success: true };
+    }, null);
 
     if (!walletInfo || walletInfo.balance <= 0 || !pricing) return null;
-
-    const handleToggle = (checked: boolean) => {
-        startTransition(async () => {
-            await toggleWalletAction(checked);
-        });
-    };
 
     return (
         <div className="py-2">
@@ -71,7 +69,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing }: WalletSlot
                     ) : (
                         <Switch
                             checked={useWalletBalance}
-                            onCheckedChange={handleToggle}
+                            onCheckedChange={() => toggleAction()}
                             disabled={isPending}
                             className={cn(
                                 "data-[state=checked]:bg-emerald-500",

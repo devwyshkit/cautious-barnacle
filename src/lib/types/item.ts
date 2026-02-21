@@ -9,9 +9,10 @@
  */
 
 import type { Tables } from '@/lib/supabase/database.types';
-import type { ItemWithFullSpec, PersonalizationOption as DBPersonalizationOption, Variant as DBVariant, ItemAddon as DBItemAddon } from '@/lib/supabase/types';
+import type { ItemWithFullSpec, PersonalizationOption as DBPersonalizationOption, Variant, ItemAddon } from '@/lib/supabase/types';
+import { ValidatedWyshkitItem } from '../validations/discovery';
 
-export type Item = Tables<'items'>;
+export type { Item } from '@/lib/supabase/types';
 export type ItemListItem = Tables<'items'> & {
   price?: number;
   image_url?: string;
@@ -22,8 +23,7 @@ export type ItemListItem = Tables<'items'> & {
   production_time_minutes?: number;
 };
 
-export type Variant = DBVariant;
-export type ItemAddon = DBItemAddon;
+
 
 /**
  * WyshkitItem: The standard item shape for all discovery components.
@@ -50,18 +50,9 @@ export interface WyshkitItem extends Omit<Tables<'items'>, 'personalization_opti
   variants?: Array<Tables<'variants'> & { price: number | null; stock_quantity: number | null }>;
   item_addons?: Tables<'item_addons'>[];
   personalization_options?: Tables<'personalization_options'>[];
+  elite_signals?: ValidatedWyshkitItem['elite_signals'];
 }
 
-export interface PersonalizationOption {
-  id: string;
-  name: string;
-  label?: string;
-  price: number;
-  description?: string;
-  preview_time_minutes?: number;
-  production_time_minutes?: number;
-  production_time_hours?: number;
-  type: 'text' | 'image' | 'both';
-  required?: boolean;
-  placeholder?: string;
-}
+// Re-export from Supabase Types for consistency
+export type { PersonalizationOption } from '@/lib/supabase/types';
+

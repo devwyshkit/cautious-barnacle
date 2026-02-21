@@ -16,7 +16,7 @@ import {
 import type { Database } from '@/lib/supabase/database.types';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import { update_variant_stock } from '@/lib/actions/partner-actions';
+import { update_variant_stock } from '@/lib/actions/partner/partner-actions';
 import { toast } from 'sonner';
 
 type Variant = {

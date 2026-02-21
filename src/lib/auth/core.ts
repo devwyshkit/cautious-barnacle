@@ -91,17 +91,4 @@ export async function resolveUserPermissionsWithTimeout(
   });
 }
 
-/**
- * @deprecated Use resolveUserPermissions() instead.
- * resolveUserPermissions() provides non-exclusive capability checks.
- */
-export async function resolveUserRole(
-  supabase: SupabaseClient,
-  userId: string
-): Promise<UserRole> {
-  const permissions = await resolveUserPermissions(supabase, userId);
 
-  if (permissions.isAdmin) return 'admin';
-  if (permissions.isPartner) return 'partner';
-  return 'customer';
-}

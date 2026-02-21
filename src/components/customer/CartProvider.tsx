@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useOptimistic, useTransition, useEffect } from "react";
 import { DraftTransaction as Cart, SelectedPersonalization, SelectedAddon, DraftLineItem } from "@/lib/types/personalization";
+import { EMPTY_CART } from "@/lib/constants/cart";
 import { useAuth } from "@/hooks/useAuth";
-import * as draftOrderActions from "@/lib/actions/draft-order";
+import { addToCart, removeCartItem, updateCartItemQuantity, clearDraftOrder } from "@/lib/actions/cart/mutations";
 import { logger } from "@/lib/logging/logger";
 import {
     AlertDialog,
@@ -36,14 +37,7 @@ interface CartContextType {
         personalization: SelectedPersonalization,
         selected_addons?: SelectedAddon[],
         quantity?: number,
-        optimistic_data?: {
-            item_name?: string;
-            item_image?: string;
-            unit_price?: number;
-            partner_id?: string;
-            partner_name?: string;
-            update_item_id?: string;
-        }
+        optimistic_data?: any
     ) => Promise<CartActionResult>;
     removeFromDraftOrder: (itemId: string, variantId?: string | null) => Promise<void>;
     updateQuantity: (itemId: string, variantId: string | null, quantity: number) => Promise<void>;
@@ -60,50 +54,56 @@ export function useCart() {
 }
 
 /**
- * WYSHKIT 2026: CartProvider (Stateless Server Sync)
+ * WYSHKIT 2026: Elite CartProvider (Zero Shadow State)
  * 
- * Swiggy 2026 Pattern: Absolute Validation
- * - NO Optimistic State. The DB is the ONLY source of truth.
- * - Shows loading state during strict server-side calculation.
- * - Prevents all client-side pricing mismatch and DOM UI jitter.
+ * Swiggy 2026 Pattern: Pure Server Authority
+ * - NO local useState for the cart. The DB/RSC is the source of truth.
+ * - useOptimistic provides immediate UI feedback while the Server Action resolves.
+ * - revalidateTag('cart') triggers the RSC update, which flows back into initialCart.
  */
 export function CartProvider({
     children,
-    initialCart,
+    initialCart = EMPTY_CART,
     guestSessionId = null,
 }: {
     children: React.ReactNode,
     initialCart?: Cart,
     guestSessionId?: string | null
 }) {
-    const { user, loading: authLoading } = useAuth();
-    const [draftOrder, setDraftOrder] = useState<Cart>(initialCart || { items: [], partner_id: null, subtotal: 0, personalization_charges: 0, delivery_fee: 0, platform_fee: 0, gst: 0, discount: 0, wallet_discount: 0, total: 0, item_count: 0 });
-    const [loading, setLoading] = useState(!initialCart);
-    const [isPending, setIsPending] = useState(false); // Used for action loaders
+    const { user } = useAuth();
+    const [isPending, startTransition] = useTransition();
+
+    // ELITE: Optimistic state bridges the gap between Action and Revalidation
+    const [optimisticCart, setOptimisticCart] = useOptimistic(
+        initialCart,
+        (state, update: { type: 'add' | 'remove' | 'update' | 'clear', payload: any }) => {
+            switch (update.type) {
+                case 'add':
+                    // Basic optimistic add (doesn't need total calculation, just item presence)
+                    return {
+                        ...state,
+                        items: [...state.items, { id: 'temp', ...update.payload, quantity: update.payload.quantity || 1 }]
+                    };
+                case 'remove':
+                    return {
+                        ...state,
+                        items: state.items.filter(i => i.id !== update.payload)
+                    };
+                case 'update':
+                    return {
+                        ...state,
+                        items: state.items.map(i => i.id === update.payload.id ? { ...i, quantity: update.payload.quantity } : i)
+                    };
+                case 'clear':
+                    return EMPTY_CART;
+                default:
+                    return state;
+            }
+        }
+    );
 
     const [showReplaceCartDialog, setShowReplaceCartDialog] = useState(false);
     const [pendingItem, setPendingItem] = useState<any>(null);
-
-    const fetchDraftOrder = async (): Promise<Cart | null> => {
-        setLoading(true);
-        try {
-            const result = await draftOrderActions.getCart();
-            const cart = result.cart ?? { items: [], partner_id: null, subtotal: 0, personalization_charges: 0, delivery_fee: 0, platform_fee: 0, gst: 0, discount: 0, wallet_discount: 0, total: 0, item_count: 0 };
-            setDraftOrder(cart);
-            return cart;
-        } catch (error) {
-            logger.error('Failed to fetch draft order', error as Error);
-            return null;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (!authLoading) {
-            fetchDraftOrder();
-        }
-    }, [authLoading]);
 
     const addToDraftOrder = async (
         item_id: string,
@@ -112,150 +112,114 @@ export function CartProvider({
         selected_addons?: SelectedAddon[],
         quantity: number = 1,
         optimistic_data?: any
-    ) => {
-        setIsPending(true);
-        try {
-            let result;
-            const update_item_id = optimistic_data?.update_item_id;
-
-            if (update_item_id) {
-                // Not mapped cleanly on actions currently, handle fallback if needed
-                // Swiggy 2026: The action updateCartItem doesn't exist yet we will rely on addToCart merging
-                // Actually wait, let's call addToCart which deduplicates
-                result = await draftOrderActions.addToCart({
-                    item_id,
-                    variant_id,
-                    personalization,
-                    selected_addons,
-                    quantity
+    ): Promise<CartActionResult> => {
+        return new Promise((resolve) => {
+            startTransition(async () => {
+                // Optimistic UI update
+                setOptimisticCart({
+                    type: 'add',
+                    payload: { item_id, selected_variant_id: variant_id, ...optimistic_data }
                 });
-            } else {
-                result = await draftOrderActions.addToCart({
-                    item_id,
-                    variant_id,
-                    personalization,
-                    selected_addons,
-                    quantity
-                });
+
+                try {
+                    const result = await addToCart({
+                        item_id,
+                        variant_id,
+                        personalization,
+                        selected_addons,
+                        quantity
+                    });
+
+                    if (result && (result as any).error === 'PARTNER_MISMATCH') {
+                        triggerHaptic(HapticPattern.ERROR);
+                        setPendingItem({ item_id, variant_id, personalization, selected_addons, quantity, optimistic_data });
+                        setShowReplaceCartDialog(true);
+                        resolve({ success: false, error: 'PARTNER_MISMATCH' });
+                        return;
+                    }
+
+                    if (result.error) {
+                        resolve({ success: false, error: result.error });
+                    } else {
+                        resolve({ success: true });
+                    }
+                } catch (error) {
+                    logger.error('AddToCart Transition Error', error as Error);
+                    resolve({ success: false, error: 'Internal Error' });
+                }
+            });
+        });
+    };
+
+    const removeFromDraftOrder = async (itemId: string, variantId?: string | null) => {
+        const normalizedVariantId = variantId ?? null;
+        const cartItem = optimisticCart.items.find(
+            (i: DraftLineItem) => i.item_id === itemId && (i.selected_variant_id ?? null) === normalizedVariantId
+        );
+        if (!cartItem) return;
+
+        startTransition(async () => {
+            setOptimisticCart({ type: 'remove', payload: cartItem.id });
+            try {
+                await removeCartItem(cartItem.id);
+            } catch (err) {
+                logger.error('Remove Transition Error', err as Error);
             }
+        });
+    };
 
-            if (result && (result as any).error === 'PARTNER_MISMATCH') {
-                triggerHaptic(HapticPattern.ERROR);
-                setPendingItem({ item_id, variant_id, personalization, selected_addons, quantity, optimistic_data });
-                setShowReplaceCartDialog(true);
-                return { success: false, error: 'PARTNER_MISMATCH' };
+    const updateQuantity = async (itemId: string, variantId: string | null, quantity: number) => {
+        const normalizedVariantId = variantId ?? null;
+        const cartItem = optimisticCart.items.find(
+            (i: DraftLineItem) => i.item_id === itemId && (i.selected_variant_id ?? null) === normalizedVariantId
+        );
+        if (!cartItem) return;
+
+        startTransition(async () => {
+            setOptimisticCart({ type: 'update', payload: { id: cartItem.id, quantity } });
+            try {
+                await updateCartItemQuantity(cartItem.id, quantity);
+            } catch (err) {
+                logger.error('Update Transition Error', err as Error);
             }
+        });
+    };
 
-            const cart = (result as { cart?: Cart })?.cart;
-            if (cart) setDraftOrder(cart);
-
-            if (result.error) return { success: false, error: result.error };
-            return { success: true };
-        } finally {
-            setIsPending(false);
-        }
+    const clearCart = async () => {
+        startTransition(async () => {
+            setOptimisticCart({ type: 'clear', payload: null });
+            try {
+                await clearDraftOrder();
+            } catch (err) {
+                logger.error('Clear Transition Error', err as Error);
+            }
+        });
     };
 
     const handleReplaceCart = async () => {
         if (!pendingItem) return;
-        triggerHaptic(HapticPattern.ACTION);
         setShowReplaceCartDialog(false);
-        setIsPending(true);
-
-        try {
-            await draftOrderActions.clearDraftOrder();
-            const result = await draftOrderActions.addToCart({
-                item_id: pendingItem.item_id,
-                variant_id: pendingItem.variant_id,
-                personalization: pendingItem.personalization,
-                selected_addons: pendingItem.selected_addons,
-                quantity: pendingItem.quantity,
-            });
-            const cart = (result as { cart?: Cart })?.cart;
-            if (cart) setDraftOrder(cart);
-            setPendingItem(null);
-        } catch (error) {
-            logger.error('Failed to replace cart', error as Error);
-            await fetchDraftOrder();
-        } finally {
-            setIsPending(false);
-        }
-    };
-
-    const removeFromDraftOrder = async (itemId: string, variantId?: string | null) => {
-        setIsPending(true);
-        const normalizedVariantId = variantId ?? null;
-        const cartItem = draftOrder.items.find(
-            (i: DraftLineItem) => i.item_id === itemId && (i.selected_variant_id ?? null) === normalizedVariantId
+        await clearCart();
+        await addToDraftOrder(
+            pendingItem.item_id,
+            pendingItem.variant_id,
+            pendingItem.personalization,
+            pendingItem.selected_addons,
+            pendingItem.quantity,
+            pendingItem.optimistic_data
         );
-        if (!cartItem) {
-            setIsPending(false);
-            return;
-        }
-
-        try {
-            const result = await draftOrderActions.removeCartItem(cartItem.id);
-            if ((result as any).cart) {
-                setDraftOrder((result as any).cart);
-            } else {
-                await fetchDraftOrder();
-            }
-        } catch (err) {
-            logger.error('CartProvider remove failed', err as Error);
-            await fetchDraftOrder();
-        } finally {
-            setIsPending(false);
-        }
-    };
-
-    const updateQuantity = async (itemId: string, variantId: string | null, quantity: number) => {
-        setIsPending(true);
-        const normalizedVariantId = variantId ?? null;
-        const cartItem = draftOrder.items.find(
-            (i: DraftLineItem) => i.item_id === itemId && (i.selected_variant_id ?? null) === normalizedVariantId
-        );
-        if (!cartItem) {
-            setIsPending(false);
-            return;
-        }
-
-        try {
-            const result = await draftOrderActions.updateCartItemQuantity(cartItem.id, quantity);
-            if ((result as any).cart) {
-                setDraftOrder((result as any).cart);
-            } else {
-                await fetchDraftOrder();
-            }
-        } catch (err) {
-            logger.error('CartProvider update quantity failed', err as Error);
-            await fetchDraftOrder();
-        } finally {
-            setIsPending(false);
-        }
-    };
-
-    const clearDraftOrder = async () => {
-        setIsPending(true);
-        try {
-            const result = await draftOrderActions.clearDraftOrder();
-            if ('cart' in result && result.cart) setDraftOrder(result.cart);
-        } catch (err) {
-            logger.error('CartProvider clear failed', err as Error);
-        } finally {
-            setIsPending(false);
-        }
     };
 
     const value = {
-        draftOrder,
-        loading,
+        draftOrder: optimisticCart,
+        loading: isPending,
         isPending,
         isGuest: !user,
         addToDraftOrder,
         removeFromDraftOrder,
         updateQuantity,
-        clearDraftOrder,
-        refreshDraftOrder: fetchDraftOrder,
+        clearDraftOrder: clearCart,
+        refreshDraftOrder: async () => initialCart,
     };
 
     return (

@@ -25,9 +25,9 @@ export type {
 export type {
   Tables,
   Views,
-  DBItem,
-  DBOrder,
-  DBPartner,
-  DBAddress,
-  DBOrderItem,
+  Item,
+  Order,
+  Partner,
+  Address,
+  OrderItem,
 } from '@/lib/supabase/types';

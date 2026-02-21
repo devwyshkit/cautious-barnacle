@@ -8,7 +8,7 @@ import type { ItemListItem } from '@/lib/types/item';
 
 /** Store page items: partial item shape from getPartnerStoreData select */
 type StorePageItem = Pick<ItemListItem, 'id' | 'name' | 'base_price' | 'images' | 'category' | 'partner_id' | 'has_personalization' | 'approval_status'> & Partial<ItemListItem> & { variants?: Array<{ id: string; name: string | null; price: number | null; stock_quantity: number | null }> };
-import { ItemCard } from '@/components/customer/ItemCard';
+import { EntityCard } from '@/components/ui/EntityCard';
 import { ContextualGrid } from '@/components/customer/ContextualGrid';
 import { ShareButton } from '@/components/ui/ShareButton';
 import Image from 'next/image';
@@ -236,10 +236,10 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
                   className="animate-in fade-in slide-in-from-bottom-8 duration-700 fill-mode-backwards"
                   style={{ animationDelay: `${index * 60}ms` }}
                 >
-                  <ItemCard
+                  <EntityCard
                     key={item.id}
-                    item={item}
-                    partner_id={partnerId}
+                    type="item"
+                    data={{ ...item, partner_id: item.partner_id || partnerId }}
                     priority={index < 8}
                     className="hover:-translate-y-2 transition-transform duration-500 ease-out"
                   />

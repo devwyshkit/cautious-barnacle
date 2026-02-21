@@ -3,9 +3,9 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   experimental: {
-    // ppr: 'incremental',
     serverActions: {
-      allowedOrigins: ["localhost:3000"]
+      allowedOrigins: ["localhost:3000"],
+      bodySizeLimit: '10mb'
     },
   },
   outputFileTracingRoot: path.join(__dirname),
@@ -14,11 +14,16 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'hlvwfzickwpobjaxsbcc.supabase.co',
+        pathname: '/storage/v1/object/public/**',
       },
       {
-        protocol: 'http',
-        hostname: '**',
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'plus.unsplash.com',
       },
     ],
   },

@@ -1,5 +1,5 @@
 import { getPartnerFromSession } from '@/lib/auth/server';
-import { get_partner_items } from '@/lib/actions/partner-actions';
+import { get_partner_items } from '@/lib/actions/partner/partner-actions';
 import { CatalogListClient } from '@/components/partner/catalog/CatalogListClient';
 import { redirect } from 'next/navigation';
 

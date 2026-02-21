@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateHaversineDistance, calculateTravelTime } from '@/lib/utils/distance';
+import { calculateHaversineDistance, calculateTravelTime } from '@/lib/utils/sla';
 
 describe('Haversine Distance Calculation', () => {
     it('calculates Bangalore to Mysore ≈ 128km (straight-line)', () => {

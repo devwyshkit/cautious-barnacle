@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useActionState } from 'react';
 import { Ticket, X, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { applyCouponAction } from '@/lib/actions/checkout';
+import { applyCouponAction } from '@/lib/actions/checkout/checkout';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/pricing';
@@ -20,28 +20,31 @@ interface CouponSlotProps {
  * WYSHKIT 2026: Coupon Slot - Inline expandable (Swiggy pattern, no sheet)
  */
 export function CouponSlot({ appliedCoupon }: CouponSlotProps) {
-    const [isPending, startTransition] = useTransition();
     const [code, setCode] = useState('');
 
-    const handleApply = async () => {
-        if (!code) return;
-        startTransition(async () => {
-            const result = await applyCouponAction(code);
-            if (result.success) {
-                setCode('');
-                toast.success('Coupon applied');
-            } else {
-                toast.error('Invalid coupon');
-            }
-        });
-    };
+    const [applyState, applyAction, isApplying] = useActionState(async (prevState: any, formData: FormData) => {
+        const promoCode = formData.get('promoCode') as string;
+        if (!promoCode) {
+            toast.error('Please enter a coupon code.');
+            return { success: false, message: 'No promo code entered' };
+        }
 
-    const handleRemove = async () => {
-        startTransition(async () => {
-            await applyCouponAction(null);
-            toast.info('Coupon removed');
-        });
-    };
+        const result = await applyCouponAction(promoCode);
+        if (result.success) {
+            setCode('');
+            toast.success('Coupon applied');
+            return { success: true, message: 'Coupon applied successfully' };
+        } else {
+            toast.error('Invalid coupon');
+            return { success: false, message: 'Invalid coupon' };
+        }
+    }, null);
+
+    const [removeState, removeAction, isRemoving] = useActionState(async () => {
+        await applyCouponAction(null);
+        toast.info('Coupon removed');
+        return { success: true, message: 'Coupon removed successfully' };
+    }, null);
 
     return (
         <div className="py-2">
@@ -60,13 +63,15 @@ export function CouponSlot({ appliedCoupon }: CouponSlotProps) {
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={handleRemove}
-                        disabled={isPending}
-                        className="size-8 rounded-full hover:bg-emerald-100 flex items-center justify-center text-emerald-600 transition-colors"
-                    >
-                        {isPending ? <Loader2 className="size-4 animate-spin" /> : <X className="size-4" />}
-                    </button>
+                    <form action={removeAction}>
+                        <button
+                            type="submit"
+                            disabled={isRemoving}
+                            className="size-8 rounded-full hover:bg-emerald-100 flex items-center justify-center text-emerald-600 transition-colors"
+                        >
+                            {isRemoving ? <Loader2 className="size-4 animate-spin" /> : <X className="size-4" />}
+                        </button>
+                    </form>
                 </div>
             ) : (
                 <div className="rounded-2xl border border-zinc-100 overflow-hidden">
@@ -76,22 +81,22 @@ export function CouponSlot({ appliedCoupon }: CouponSlotProps) {
                             <Ticket className="size-4" />
                             <span className="text-xs font-bold tracking-tight">Have a coupon?</span>
                         </div>
-                        <div className="flex gap-2">
+                        <form action={applyAction} className="flex gap-2">
                             <Input
+                                name="promoCode"
                                 placeholder="Enter code"
                                 value={code}
                                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                                 className="h-10 flex-1 rounded-xl border-zinc-200 focus:border-zinc-900 focus:ring-0 px-3 text-[13px] font-bold uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal"
-                                onKeyDown={(e) => e.key === 'Enter' && handleApply()}
                             />
                             <Button
-                                onClick={handleApply}
-                                disabled={!code || isPending}
+                                type="submit"
+                                disabled={!code || isApplying}
                                 className="h-10 rounded-xl px-5 bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-bold shrink-0"
                             >
-                                {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Apply'}
+                                {isApplying ? <Loader2 className="size-4 animate-spin" /> : 'Apply'}
                             </Button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             )}

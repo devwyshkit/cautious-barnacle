@@ -18,13 +18,6 @@ export type ItemAddon = Tables<'item_addons'>;
 export type PersonalizationOption = Tables<'personalization_options'>;
 export type ItemReview = Tables<'item_reviews'>;
 
-// WyshKit 2026: DB Aliases for backward compatibility in internal actions
-export type DBOrder = Order;
-export type DBAddress = Address;
-export type DBPartner = Partner;
-export type DBItem = Item;
-export type DBVariant = Variant;
-export type DBOrderItem = OrderItem;
 
 // WYSHKIT 2026: Composite Types for Joins (Single Source of Truth)
 // Use these instead of `as any` when querying with joins

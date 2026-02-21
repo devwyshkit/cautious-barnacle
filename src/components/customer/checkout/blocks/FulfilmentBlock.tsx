@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { AddressForm } from '@/components/customer/checkout/AddressForm';
-import { getUserAddresses, deleteAddress } from '@/lib/actions/addresses';
+import { getUserAddresses, deleteAddress } from '@/lib/actions/user/addresses';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import type { Address } from '@/lib/types/address';

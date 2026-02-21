@@ -1,12 +1,5 @@
-/**
- * Personalization Types - Wyshkit 2026
- * 
- * Hyperlocal Item Marketplace with Optional Personalization
- * Like Apple engraving - this IS personalization, NOT customization (we don't customize items, we personalize them)
- * 
- * This file contains ONLY personalization-related types.
- * Draft transaction types are in @/surfaces-customer/transaction/types.ts
- */
+import type { PersonalizationOption, ItemAddon } from '@/lib/supabase/types';
+import type { PricingBreakdown } from '@/lib/constants/pricing';
 
 export interface PersonalizationConfig {
   allow_text?: boolean;
@@ -35,8 +28,6 @@ export interface SelectedAddon {
   requires_preview?: boolean;
 }
 
-import type { PersonalizationOption, ItemAddon } from '@/lib/supabase/types';
-
 export interface DraftLineItem {
   id: string;
   item_id: string;
@@ -64,20 +55,17 @@ export interface DraftLineItem {
   personalization_options?: PersonalizationOption[];
   item_addons?: ItemAddon[];
   is_personalized?: boolean;
-  personalization_details?: SelectedPersonalization | null;
+  personalization_details?: any; // Generic JSONB from DB
+
 }
 
-export interface DraftTransaction {
+export interface DraftTransaction extends PricingBreakdown {
   items: DraftLineItem[];
   partner_id: string | null;
-  // Financials - Standardized snake_case
-  subtotal: number;
-  personalization_charges: number;
-  delivery_fee: number;
-  platform_fee: number;
-  gst: number;
-  discount: number;
-  wallet_discount: number;
-  total: number;
   item_count: number;
+  // Session fields
+  applied_coupon?: string | null;
+  use_wallet?: boolean;
+  selected_address_id?: string | null;
+  gstin?: string | null;
 }

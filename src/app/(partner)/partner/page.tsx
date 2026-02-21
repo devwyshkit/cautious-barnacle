@@ -1,5 +1,5 @@
 import { getPartnerFromSession } from '@/lib/auth/server';
-import { get_partner_stats, get_partner_orders } from "@/lib/actions/partner-actions";
+import { get_partner_stats, get_partner_orders } from "@/lib/actions/partner/partner-actions";
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import {

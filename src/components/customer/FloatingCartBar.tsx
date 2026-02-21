@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { ShoppingBag, ChevronRight, Sparkles } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/components/customer/CartProvider';
 import { cn } from '@/lib/utils';
@@ -30,16 +31,14 @@ export function FloatingCartBar() {
   // If tracking bar is present, we LIFT the cart bar to stack above it.
   const isVisible = hasItems && !isCheckoutOpen;
 
-  const handleCheckout = () => {
+  const handleCheckout = (e: React.MouseEvent) => {
     // WYSHKIT 2026: Immediate haptic feedback for checkout initiation
     triggerHaptic(HapticPattern.ACTION);
 
-    if (!displayCart || displayCart.item_count === 0) return;
-
-    // WYSHKIT 2026: Connected Experience
-    // Both Auth and Guest users have their cart on the server (session-based for guests)
-    // No more JSON serialization in URL
-    router.push('/checkout');
+    if (!displayCart || displayCart.item_count === 0) {
+      e.preventDefault();
+      return;
+    }
   };
 
   const firstItemImage = displayCart?.items?.[0]?.item_image;
@@ -85,7 +84,7 @@ export function FloatingCartBar() {
       aria-label="Floating cart summary"
       data-testid="floating-cart-bar"
       className={cn(
-        "fixed z-50 transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "fixed z-50 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
         "left-4 right-4 md:left-auto md:w-[420px] md:right-8",
         isVisible ? "translate-y-0 opacity-100" : "translate-y-32 opacity-0 pointer-events-none"
       )}
@@ -101,10 +100,10 @@ export function FloatingCartBar() {
         )}
       >
         <div className="relative">
-          <button
+          <Link
+            href="/checkout"
             onClick={handleCheckout}
-            disabled={isLoading}
-            data-testid="floating-cart-checkout-btn"
+            aria-disabled={isLoading}
             className={cn(
               "w-full flex items-center justify-between p-3.5 transition-all active:scale-[0.98]",
               isLoading && "opacity-70 pointer-events-none"
@@ -155,13 +154,14 @@ export function FloatingCartBar() {
 
             <div
               className={cn(
-                "flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-black text-sm bg-[#D91B24] text-white shadow-xl shadow-rose-900/20"
+                "flex items-center gap-2.5 px-6 py-3.5 rounded-2xl font-black text-sm bg-[#D91B24] text-white shadow-xl shadow-rose-900/20 relative",
+                isLoading && "opacity-50"
               )}
             >
               <span className="tabular-nums">₹{displayTotal.toFixed(0)}</span>
               <ChevronRight className="size-4 stroke-[3]" />
             </div>
-          </button>
+          </Link>
         </div>
 
         <div className="h-px bg-white/[0.05]" />

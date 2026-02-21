@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { ShieldCheck, Loader2, Check, XCircle, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { validateGSTINAction } from '@/lib/actions/gstin';
+import { validateGSTINAction } from '@/lib/actions/commerce/gstin';
 import { toast } from 'sonner';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
-import { getPartnerInfo } from '@/lib/actions/draft-order';
+import { getPartnerInfo } from '@/lib/actions/discovery/partners';
 import { DraftLineItem } from '@/lib/types/personalization';
 import type { PricingBreakdown } from '@/lib/constants/pricing';
 import { Address } from '@/lib/types/address';
