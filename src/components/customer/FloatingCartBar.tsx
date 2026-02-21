@@ -173,7 +173,7 @@ export function FloatingCartBar() {
                 triggerHaptic(HapticPattern.ACTION);
                 router.push(`/partner/${displayCart.partner_id}`);
               }}
-              className="group flex items-center gap-2"
+              className="group flex items-center gap-2 py-2"
             >
               <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.15em] group-hover:text-zinc-300 transition-colors truncate max-w-[200px]">
                 View {displayCart?.items?.[0]?.partner_name || 'Store'}

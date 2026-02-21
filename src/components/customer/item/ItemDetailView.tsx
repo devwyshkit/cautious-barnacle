@@ -187,7 +187,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                 <div className="fixed top-0 left-0 right-0 z-50 p-4 pointer-events-none">
                     <button
                         onClick={handleBack}
-                        className="size-10 rounded-full bg-white/80 backdrop-blur-md shadow-xl flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-black/5"
+                        className="size-11 rounded-full bg-white/80 backdrop-blur-md shadow-xl flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-black/5"
                         aria-label="Back"
                     >
                         <Plus className="size-5 rotate-45 text-zinc-900" />
@@ -544,7 +544,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                 <div className="flex items-center gap-4">
                     <div className="flex items-center bg-zinc-100 rounded-2xl p-1 shrink-0">
                         <button
-                            className="size-10 flex items-center justify-center rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-20"
+                            className="size-11 flex items-center justify-center rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-20"
                             onClick={() => { setQuantity(Math.max(1, quantity - 1)); triggerHaptic(HapticPattern.ACTION); }}
                             disabled={quantity <= 1 || continuing}
                             aria-label="Decrease quantity"
@@ -553,7 +553,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                         </button>
                         <span className="w-8 text-center text-sm font-black tabular-nums" aria-live="polite">{quantity}</span>
                         <button
-                            className="size-10 flex items-center justify-center rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-20"
+                            className="size-11 flex items-center justify-center rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-20"
                             onClick={() => { setQuantity(quantity + 1); triggerHaptic(HapticPattern.ACTION); }}
                             disabled={continuing}
                             aria-label="Increase quantity"

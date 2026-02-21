@@ -102,23 +102,23 @@ export function AddToCartButton({
     if (isOutOfStock && !has_variants) {
         return (
             <div className={cn(
-                "h-8 px-3 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center",
+                "h-11 px-4 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center",
                 className
             )}>
-                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Sold Out</span>
+                <span className="text-[11px] font-black text-zinc-400 uppercase tracking-widest">Sold Out</span>
             </div>
         );
     }
 
     return (
         <Button
-            size="sm"
+            size="default"
             onClick={handleQuickAdd}
             aria-label={`Add ${item_name} to cart`}
             data-testid="add-to-cart-quick"
             disabled={isDisabled}
             className={cn(
-                "h-8 px-3 rounded-xl transition-all z-10 font-black text-[10px] uppercase tracking-widest",
+                "h-11 px-4 rounded-xl transition-all z-10 font-black text-[11px] uppercase tracking-widest",
                 justAdded
                     ? "bg-emerald-500 text-white hover:bg-emerald-600 border-none"
                     : isOutOfStock ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border-zinc-200" : "bg-white text-zinc-900 hover:bg-zinc-100 shadow-sm border border-zinc-100",
@@ -127,15 +127,15 @@ export function AddToCartButton({
             )}
         >
             {isAdding ? (
-                <Loader2 className="size-3.5 animate-spin" />
+                <Loader2 className="size-4 animate-spin" />
             ) : justAdded ? (
                 <div className="flex items-center gap-1.5">
-                    <Check className="size-3.5" />
+                    <Check className="size-4" />
                     <span>Added</span>
                 </div>
             ) : (
                 <div className="flex items-center gap-1.5">
-                    <Plus className="size-3.5" />
+                    <Plus className="size-4" />
                     <span>Add</span>
                 </div>
             )}
