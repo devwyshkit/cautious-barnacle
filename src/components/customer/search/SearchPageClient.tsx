@@ -10,7 +10,7 @@ import type { Tables } from "@/lib/supabase/database.types";
 import { cn } from "@/lib/utils";
 import { logger } from '@/lib/logging/logger';
 import { EntityCard } from "@/components/ui/EntityCard";
-import { ItemDetailView } from "@/components/customer/item/ItemDetailView";
+import { QuickItemSheet } from "@/components/customer/item/QuickItemSheet";
 import Link from 'next/link';
 
 interface SearchPageClientProps {
@@ -79,6 +79,14 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
   const hasResults = results.items.length > 0 || results.partners.length > 0;
   const hasActiveFilters = currentQ || currentCategory;
 
+  // ELITE: Quick Look State
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  const handleItemClick = (e: React.MouseEvent, item: any) => {
+    e.preventDefault();
+    setSelectedItemId(item.id);
+  };
+
   return (
     <div className="flex flex-col h-full bg-white">
       <div className="p-4 border-b border-zinc-100 flex items-center gap-3">
@@ -98,7 +106,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             placeholder="Search items, stores..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="pl-9 h-10 bg-zinc-50 border-zinc-100 text-sm rounded-lg"
+            className="pl-9 h-10 bg-zinc-50 border-zinc-100 text-sm rounded-lg focus-visible:ring-zinc-200"
           />
           {(inputValue || isPending) && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -177,7 +185,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
               )}
 
               {results.items.length > 0 && (
-                <div>
+                <div className="pb-safe">
                   <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4 px-1">Items from Stores</h3>
                   <div className="space-y-6">
                     {Object.entries(
@@ -198,11 +206,12 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
 
                         <div className="grid grid-cols-1 gap-4">
                           {group.items.map((item) => (
-                            <EntityCard
-                              key={item.id}
-                              type="item"
-                              data={item}
-                            />
+                            <div key={item.id} onClick={(e) => handleItemClick(e, item)}>
+                              <EntityCard
+                                type="item"
+                                data={item}
+                              />
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -214,6 +223,13 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
           </div>
         )}
       </div>
+
+      {/* WYSHKIT 2026: Quick Look Sheet */}
+      <QuickItemSheet
+        itemId={selectedItemId}
+        open={!!selectedItemId}
+        onClose={() => setSelectedItemId(null)}
+      />
     </div>
   );
 }

@@ -159,36 +159,40 @@ export async function approve_preview(preview_submission_id: string, order_id: s
 
     if (preview_error) throw preview_error;
 
-    // 3. Update the specific item status
+    // 3. Update the specific item status to IN_PRODUCTION (Liability Shift)
     if (preview.order_item_id) {
       await admin_supabase
         .from('order_items')
-        .update({ status: 'approved' })
+        .update({
+          status: ORDER_STATUS.IN_PRODUCTION,
+          liability_shifted_at: new Date().toISOString()
+        })
         .eq('id', preview.order_item_id);
     }
 
-    // 4. Check if ALL personalized items are approved
+    // 4. Check if ALL personalized items are approved/in_production
     const { data: items } = await admin_supabase
       .from('order_items')
       .select('id, status, is_personalized')
       .eq('order_id', order_id);
 
     const personalized_items = (items || []).filter(i => i.is_personalized);
-    const all_approved = personalized_items.every(i => i.status === 'approved');
+    const active_personalized_items = personalized_items.filter(i => i.status !== ORDER_STATUS.CANCELLED && i.status !== ORDER_STATUS.REFUNDED);
+    const all_active_approved = active_personalized_items.length > 0 && active_personalized_items.every(i => i.status === ORDER_STATUS.IN_PRODUCTION);
 
     // 5. Update Order Status
     const { error: order_error } = await admin_supabase
       .from('orders')
       .update({
-        status: all_approved ? ORDER_STATUS.APPROVED : ORDER_STATUS.PREVIEW_READY,
-        approved_at: all_approved ? new Date().toISOString() : null,
+        status: all_active_approved ? ORDER_STATUS.IN_PRODUCTION : ORDER_STATUS.PREVIEW_READY,
+        approved_at: all_active_approved ? new Date().toISOString() : null,
         updated_at: new Date().toISOString()
       })
       .eq('id', order_id);
 
     if (order_error) throw order_error;
 
-    await log_order_status_history(order_id, 'preview_approved', 'Preview Approved', `You have approved the preview${personalized_items.length > 1 ? ' for an item' : ''}.`, {
+    await log_order_status_history(order_id, 'preview_approved', 'Preview Approved', `You have approved the preview. Engraving has begun (Liability Shifted).`, {
       preview_submission_id: preview_submission_id,
       order_item_id: preview.order_item_id
     });
@@ -198,6 +202,74 @@ export async function approve_preview(preview_submission_id: string, order_id: s
     return { success: true };
   } catch (error) {
     logError(error, `ApprovePreview:${order_id}`);
+    const { error: errMsg } = handleActionError(error);
+    return { success: false, error: errMsg };
+  }
+}
+
+export async function cancel_order_item(order_item_id: string, order_id: string, reason: string = 'Preview Rejected') {
+  try {
+    const admin_supabase = await createAdminClient();
+
+    // 1. Fetch order item and main order to get Razorpay Payment ID
+    const [itemRes, orderRes] = await Promise.all([
+      admin_supabase.from('order_items').select('*').eq('id', order_item_id).single(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (admin_supabase.from('orders').select('id, razorpay_payment_id, total, status').eq('id', order_id).single() as any)
+    ]);
+
+    if (itemRes.error || !itemRes.data) throw new Error('Order item not found');
+    if (orderRes.error || !orderRes.data) throw new Error('Order not found');
+
+    const item = itemRes.data;
+    const order = orderRes.data;
+
+    // 1.5 Liability Shift Check
+    if (item.liability_shifted_at) {
+      return { success: false, error: 'Cannot cancel once engraving has begun (Liability Shifted)' };
+    }
+
+    // 2. Mark item as CANCELLED
+    const { error: updateError } = await admin_supabase
+      .from('order_items')
+      .update({ status: ORDER_STATUS.CANCELLED })
+      .eq('id', order_item_id);
+
+    if (updateError) throw updateError;
+
+    // 3. Process Razorpay Refund for exactly this line item
+    let refundSuccessful = false;
+    if (order.razorpay_payment_id) {
+      try {
+        const { refund_payment } = await import('@/lib/services/razorpay');
+        // Refund in paise
+        await refund_payment(order.razorpay_payment_id, item.total_price * 100, {
+          reason: 'Partial cancellation: Preview Rejected',
+          order_item_id: order_item_id
+        });
+        refundSuccessful = true;
+      } catch (err) {
+        logger.error(`Failed to refund item ${order_item_id} from payment ${order.razorpay_payment_id}`, err as Error);
+      }
+    }
+
+    // WYSHKIT 2026: Use DB function `recalculate_order_total(order_id)` to eliminate shadow math.
+    // This ensures discounts, delivery fees, and taxes are handled strictly in Postgres.
+    const { error: rpc_error } = await admin_supabase.rpc('recalculate_order_total', { p_order_id: order_id });
+    if (rpc_error) throw rpc_error;
+
+    // Update history
+    await log_order_status_history(order_id, 'item_cancelled', 'Item Cancelled & Refunded', `An item (${item.item_name}) was rejected and cancelled. ${refundSuccessful ? 'Refund initiated.' : 'Refund action logged.'}`, {
+      order_item_id,
+      reason,
+      refunded_amount: item.total_price
+    });
+
+    revalidateTag(`order-${order_id}`);
+    revalidateTag('orders');
+    return { success: true };
+  } catch (error) {
+    logError(error, `CancelOrderItem:${order_item_id}`);
     const { error: errMsg } = handleActionError(error);
     return { success: false, error: errMsg };
   }
@@ -252,7 +324,7 @@ export async function request_change(preview_submission_id: string, order_id: st
     if (preview.order_item_id) {
       await admin_supabase
         .from('order_items')
-        .update({ status: 'revision_requested' })
+        .update({ status: ORDER_STATUS.REVISION_REQUESTED })
         .eq('id', preview.order_item_id);
     }
 

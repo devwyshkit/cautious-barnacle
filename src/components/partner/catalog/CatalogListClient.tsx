@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Search, Package } from 'lucide-react';
 import { CatalogList } from './CatalogList';
 import { ItemForm } from './ItemForm';
-import { toggle_item_active_status, toggle_item_stock_status } from '@/lib/actions/partner/partner-actions';
-import { deleteItem } from '@/lib/actions/partner/catalog';
+import { executePartnerIntent } from '@/lib/actions/partner/engine';
 import { getItemWithFullSpec } from '@/lib/actions/discovery/items';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -48,7 +47,12 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
   );
 
   const handleToggleActive = async (itemId: string, isActive: boolean) => {
-    const result = await toggle_item_active_status(itemId, isActive);
+    const result = await executePartnerIntent({
+      entity: 'item',
+      action: 'TOGGLE_STATUS',
+      id: itemId,
+      metadata: { isActive }
+    });
     if (result.success) {
       setItems(prev => prev.map(item =>
         item.id === itemId ? { ...item, is_active: isActive } : item
@@ -60,7 +64,12 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
   };
 
   const handleToggleStock = async (itemId: string, stockStatus: string) => {
-    const result = await toggle_item_stock_status(itemId, stockStatus);
+    const result = await executePartnerIntent({
+      entity: 'item',
+      action: 'TOGGLE_STOCK',
+      id: itemId,
+      metadata: { stockStatus }
+    });
     if (result.success) {
       setItems(prev => prev.map(item =>
         item.id === itemId ? { ...item, stock_status: stockStatus } : item
@@ -92,7 +101,11 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
   const handleDeleteItem = async () => {
     if (!deletingItem) return;
 
-    const result = await deleteItem(deletingItem.id);
+    const result = await executePartnerIntent({
+      entity: 'item',
+      action: 'DELETE',
+      id: deletingItem.id
+    });
     if (result.success) {
       setItems(prev => prev.filter(item => item.id !== deletingItem.id));
       toast.success('Item deleted');

@@ -10,7 +10,7 @@ import { hasAnyPersonalization } from '@/lib/utils/personalization';
 // We now use the database-level 'calculate_order_total' RPC for authority.
 
 import { DraftLineItem } from '@/lib/types/personalization';
-import { type PricingBreakdown } from '@/lib/constants/pricing';
+import type { PricingBreakdown } from '@/lib/types/pricing';
 import type { WalletInfo } from '../user/wallet';
 import type { Database, Json } from '@/lib/supabase/database.types';
 import { get_order_with_history } from '../commerce/orders';

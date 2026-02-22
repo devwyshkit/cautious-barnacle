@@ -15,6 +15,7 @@ import { setLocationFromCoords, setLocationCookies, searchPlaces, setLocationFro
 import type { Address } from '@/lib/types/address';
 import { LocationSearch } from './location/LocationSearch';
 import { SavedAddresses } from './location/SavedAddresses';
+import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
 
 export function LocationContent({ onSelect }: { onSelect?: () => void }) {
   const router = useRouter();
@@ -209,20 +210,31 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
   );
 }
 
-export function LocationSheet({ isRouteContext, onSelect }: { isRouteContext?: boolean; onSelect?: () => void } = {}) {
-  const pathname = usePathname();
-  const useRouteContext = isRouteContext ?? (pathname === '/location');
+export function LocationSheet({ isOpen, onOpenChange, onSelect, isRouteContext }: { isOpen?: boolean; onOpenChange?: (open: boolean) => void; onSelect?: () => void; isRouteContext?: boolean }) {
+  if (isRouteContext) {
+    return (
+      <div className="flex flex-col h-[100dvh] bg-white">
+        <div className="flex-1 min-h-0">
+          <LocationContent onSelect={onSelect} />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-white">
-      {!useRouteContext && (
-        <div className="flex items-center justify-center h-16 px-6 border-b border-zinc-100 shrink-0">
-          <span className="text-[17px] font-black text-zinc-950 uppercase tracking-tight">Delivery Location</span>
-        </div>
-      )}
-      <div className="flex-1 min-h-0">
-        <LocationContent onSelect={onSelect} />
+    <ResponsiveSurface
+      open={isOpen}
+      onOpenChange={onOpenChange}
+      title="Delivery Location"
+      description="Where should we send your Wysh?"
+      className="md:max-w-lg"
+    >
+      <div className="pb-10 min-h-[400px]">
+        <LocationContent onSelect={() => {
+          if (onSelect) onSelect();
+          if (onOpenChange) onOpenChange(false);
+        }} />
       </div>
-    </div>
+    </ResponsiveSurface>
   );
 }

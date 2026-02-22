@@ -15,6 +15,7 @@ interface InfiniteFlowProps<T> {
     emptyState?: React.ReactNode;
     className?: string;
     gridClassName?: string;
+    renderContainer?: (props: { children: React.ReactNode }) => React.ReactElement;
 }
 
 /**
@@ -34,6 +35,7 @@ export function InfiniteFlow<T extends { id: string | number }>({
     emptyState,
     className,
     gridClassName = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+    renderContainer,
 }: InfiniteFlowProps<T>) {
     const [items, setItems] = useState<T[]>(initialData);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -113,9 +115,15 @@ export function InfiniteFlow<T extends { id: string | number }>({
 
     return (
         <div className={cn("space-y-8", className)}>
-            <div className={gridClassName}>
-                {items.map((item, index) => renderItem(item, index))}
-            </div>
+            {renderContainer ? (
+                renderContainer({
+                    children: items.map((item, index) => renderItem(item, index))
+                })
+            ) : (
+                <div className={gridClassName}>
+                    {items.map((item, index) => renderItem(item, index))}
+                </div>
+            )}
 
             <div ref={loaderRef} className="flex justify-center py-12">
                 {isLoadingMore ? (

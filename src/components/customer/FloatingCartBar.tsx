@@ -3,7 +3,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { ShoppingBag, ChevronRight, Sparkles } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/components/customer/CartProvider';
 import { cn } from '@/lib/utils';
@@ -18,7 +17,7 @@ import { hasAnyPersonalization } from '@/lib/utils/personalization';
 export function FloatingCartBar() {
   const router = useRouter();
   const pathname = usePathname();
-  const { draftOrder, loading } = useCart();
+  const { draftOrder, loading, setCartOpen } = useCart();
 
   // WYSHKIT 2026: Single source of truth - useDraftOrder
   const displayCart = draftOrder;
@@ -27,35 +26,25 @@ export function FloatingCartBar() {
   const hasItems = displayCart && displayCart.item_count > 0;
 
   // WYSHKIT 2026: Visibility Logic
-  // Show cart whenever there are items; don't hide for unrelated active orders.
-  // If tracking bar is present, we LIFT the cart bar to stack above it.
   const isVisible = hasItems && !isCheckoutOpen;
 
-  const handleCheckout = (e: React.MouseEvent) => {
-    // WYSHKIT 2026: Immediate haptic feedback for checkout initiation
+  const handleOpenCart = (e: React.MouseEvent) => {
+    e.preventDefault();
     triggerHaptic(HapticPattern.ACTION);
-
-    if (!displayCart || displayCart.item_count === 0) {
-      e.preventDefault();
-      return;
-    }
+    setCartOpen(true);
   };
 
   const firstItemImage = displayCart?.items?.[0]?.item_image;
   const hasPersonalization = hasAnyPersonalization(displayCart?.items || []);
   const displayCount = displayCart?.item_count || 0;
   const displayTotal = displayCart?.total || 0;
-  // WYSHKIT 2026: Loading state - show loading when fetching cart data
   const isLoading = loading;
 
   const [shouldPulse, setShouldPulse] = useState(false);
-  // WYSHKIT 2026: Visual count for animation sync
   const [visualCount, setVisualCount] = useState(displayCount);
   const prevCount = useRef(displayCount);
-  const prevLoading = useRef(loading);
 
   useEffect(() => {
-    // WYSHKIT 2026: Instant status - satisfy "Badge pops instantly"
     setVisualCount(displayCount);
     if (displayCount !== prevCount.current && displayCount > 0) {
       if (displayCount > prevCount.current) {
@@ -68,16 +57,6 @@ export function FloatingCartBar() {
     }
   }, [displayCount]);
 
-  // WYSHKIT 2026: Sync state when loading completes to ensure server state is reflected
-  useEffect(() => {
-    if (prevLoading.current && !loading) {
-      // Loading just completed - server state is now fresh
-    }
-    prevLoading.current = loading;
-  }, [loading]);
-
-  // WYSHKIT 2026: Always render the container to enable CSS transitions.
-  // Toggle visibility using transform (translate-y) and opacity.
   return (
     <div
       role="region"
@@ -89,7 +68,7 @@ export function FloatingCartBar() {
         isVisible ? "translate-y-0 opacity-100" : "translate-y-32 opacity-0"
       )}
       style={{
-        bottom: `calc(var(--bottom-nav-height, 0px) + var(--tracking-bar-height, 0px) + 16px + env(safe-area-inset-bottom, 0px))`
+        bottom: `calc(var(--cart-bar-offset, 0px) + 24px + env(safe-area-inset-bottom, 0px))`
       }}
     >
       <div
@@ -100,20 +79,14 @@ export function FloatingCartBar() {
         )}
       >
         <div className="relative">
-          <Link
-            href="/checkout"
-            onClick={(e) => {
-              handleCheckout(e);
-              // SWIGGY 2026: Forced navigation
-              router.push('/checkout');
-            }}
-            aria-disabled={isLoading}
+          <button
+            onClick={handleOpenCart}
+            disabled={isLoading}
             className={cn(
-              "w-full flex items-center justify-between p-3.5 transition-all active:scale-[0.98]",
+              "w-full flex items-center justify-between p-3.5 transition-all active:scale-[0.98] text-left",
               isLoading && "opacity-70"
             )}
           >
-
             <div className="flex items-center gap-3.5 min-w-0">
               <div className="relative">
                 <div className="relative size-12 rounded-2xl bg-zinc-800 overflow-hidden ring-2 ring-zinc-700/50 shadow-inner">
@@ -144,7 +117,7 @@ export function FloatingCartBar() {
                     {visualCount} {visualCount === 1 ? 'item' : 'items'}
                   </span>
                   {hasPersonalization && (
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/20">
+                    <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/20">
                       <Sparkles className="size-2.5 text-amber-400" />
                       <span className="text-[8px] font-black text-amber-400 uppercase tracking-tighter">Personalized</span>
                     </div>
@@ -165,7 +138,7 @@ export function FloatingCartBar() {
               <span className="tabular-nums">₹{displayTotal.toFixed(0)}</span>
               <ChevronRight className="size-4 stroke-[3]" />
             </div>
-          </Link>
+          </button>
         </div>
 
         <div className="h-px bg-white/[0.05]" />

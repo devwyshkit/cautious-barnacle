@@ -14,7 +14,7 @@ import type { Address } from '@/lib/types/address'
 import type { WalletInfo } from '../user/wallet'
 import type { CheckoutContext } from '@/lib/types/checkout'
 import type { UpsellItem } from '@/components/customer/checkout/UpsellGrid'
-import { PRICING } from '@/lib/constants/pricing'
+
 
 export interface CheckoutData {
     items: DraftLineItem[]
@@ -74,14 +74,14 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         const guestLng = checkoutSession?.guest_lng;
 
         // 2. WYSHKIT 2026: The "One-Trip" Orchestration
-        const { data: context, error: contextError } = await supabase.rpc('get_checkout_context' as any, {
-            p_user_id: user?.id,
-            p_session_id: guestSessionId,
-            p_selected_address_id: selectedAddressId,
-            p_applied_coupon: appliedCouponCode,
-            p_use_wallet: useWallet,
-            p_guest_lat: guestLat,
-            p_guest_lng: guestLng
+        const { data: context, error: contextError } = await supabase.rpc('get_checkout_context', {
+            p_user_id: user?.id ?? undefined,
+            p_session_id: guestSessionId ?? undefined,
+            p_selected_address_id: selectedAddressId ?? undefined,
+            p_applied_coupon: appliedCouponCode ?? undefined,
+            p_use_wallet: useWallet ?? undefined,
+            p_guest_lat: guestLat ?? undefined,
+            p_guest_lng: guestLng ?? undefined
         });
 
         if (contextError) {

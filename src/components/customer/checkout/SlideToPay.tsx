@@ -142,7 +142,7 @@ export function SlideToPay({
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <ShieldCheck className="size-5" />
-                <span>Place Order · {formatCurrency(amount)}</span>
+                <span>Place order · {formatCurrency(amount)}</span>
             </Button>
         );
     }
@@ -169,7 +169,7 @@ export function SlideToPay({
                 >
                     <ChevronRight className="size-4 text-zinc-400 animate-pulse" />
                     <span className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 select-none">
-                        Slide to Pay {formatCurrency(amount)}
+                        Slide to pay {formatCurrency(amount)}
                     </span>
                 </div>
             </div>

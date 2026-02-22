@@ -3,7 +3,7 @@
 import { createAdminClient } from '@/lib/supabase/server';
 import { credit_cashback_on_delivery } from '../user/cashback';
 import { logger } from '@/lib/logging/logger';
-import { PRICING } from '@/lib/constants/pricing';
+import type { PricingBreakdown } from '@/lib/types/pricing';
 
 /**
  * WYSHKIT 2026: Post-Delivery Business Logic
@@ -39,8 +39,9 @@ export async function trigger_post_delivery_events(order_id: string) {
         }
 
         // 2. SETTLEMENT CALCULATION (Swiggy 2026 Model)
-        // [PURIFIED] trust order.commission_percentage if it exists on the order, fallback to partner default
-        const commission_rate = Number(order.commission_percentage ?? (order.partner as any)?.commission_percentage ?? 15) / 100;
+        // [PURIFIED] trust partner.commission_percentage for settlement authority
+        const partner = order.partner as any;
+        const commission_rate = Number(partner?.commission_percentage ?? 18) / 100;
 
         const total = Number(order.total);
         const subtotal = Number(order.subtotal);
@@ -52,7 +53,7 @@ export async function trigger_post_delivery_events(order_id: string) {
         const commission_amount = Math.round(commission_basis * commission_rate);
 
         // Razorpay Fees (Approx 2% + GST) - captured during payment or estimated if missing
-        const razorpay_fees = Math.round(total * PRICING.RAZORPAY_FEE_PERCENTAGE);
+        const razorpay_fees = Math.round(total * 0.02);
 
         // Net to Partner = Total - Commission - RP Fees - Platform Fee
         const net_settlement = total - commission_amount - razorpay_fees - platform_fee;

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { FloatingCartBar } from "@/components/customer/FloatingCartBar";
 import { OrderTrackingBar } from "@/components/customer/OrderTrackingBar";
+import { CartDrawer } from "@/components/customer/CartDrawer";
 import { CartProvider } from "@/components/customer/CartProvider";
 import { CartErrorBoundary } from "@/components/error/CartErrorBoundary";
 import { getCart } from "@/lib/actions/cart/get-cart";
@@ -85,6 +86,7 @@ async function AsyncLayoutContent({
         <FloatingCartBar key={cartResult.cartIdentity} />
       </CartErrorBoundary>
       <OrderTrackingBar />
+      <CartDrawer />
     </CartProvider>
   );
 }

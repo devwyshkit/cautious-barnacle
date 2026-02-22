@@ -1,5 +1,5 @@
 import type { PersonalizationOption, ItemAddon } from '@/lib/supabase/types';
-import type { PricingBreakdown } from '@/lib/constants/pricing';
+import type { PricingBreakdown } from '@/lib/types/pricing';
 
 export interface PersonalizationConfig {
   allow_text?: boolean;

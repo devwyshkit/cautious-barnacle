@@ -18,8 +18,8 @@ describe('Swiggy 2026 Certification: RLS Policy Simulation', () => {
         expect(orders || []).toHaveLength(0);
 
         // 2. Sensitive Config Table
-        const { data: platformConfig, error: configError } = await supabase
-            .from('platform_config')
+        const { data: platformSettings, error: configError } = await supabase
+            .from('platform_settings')
             .select('*');
 
         // platform_config might be public, but let's check audit_logs

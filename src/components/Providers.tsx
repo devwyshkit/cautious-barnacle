@@ -1,6 +1,7 @@
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { RealtimeProvider } from '@/providers/RealtimeProvider';
+import { SurfaceScribeProvider } from '@/providers/SurfaceScribeProvider';
 
 /**
  * Providers Component
@@ -11,11 +12,13 @@ import { RealtimeProvider } from '@/providers/RealtimeProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider>
-      <RealtimeProvider>
-        {children}
-        <Toaster position="top-center" richColors />
-      </RealtimeProvider>
-    </AuthProvider>
+    <SurfaceScribeProvider>
+      <AuthProvider>
+        <RealtimeProvider>
+          {children}
+          <Toaster position="top-center" richColors />
+        </RealtimeProvider>
+      </AuthProvider>
+    </SurfaceScribeProvider>
   );
 }

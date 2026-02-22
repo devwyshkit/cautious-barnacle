@@ -1130,6 +1130,7 @@ export type Database = {
           partner_id: string
           personalization_fee: number | null
           personalization_options: Json | null
+          personalization_schema: Json | null
           preview_time_minutes: number | null
           production_hours: number | null
           production_time_minutes: number | null
@@ -1197,6 +1198,7 @@ export type Database = {
           partner_id: string
           personalization_fee?: number | null
           personalization_options?: Json | null
+          personalization_schema?: Json | null
           preview_time_minutes?: number | null
           production_hours?: number | null
           production_time_minutes?: number | null
@@ -1264,6 +1266,7 @@ export type Database = {
           partner_id?: string
           personalization_fee?: number | null
           personalization_options?: Json | null
+          personalization_schema?: Json | null
           preview_time_minutes?: number | null
           production_hours?: number | null
           production_time_minutes?: number | null
@@ -1346,9 +1349,11 @@ export type Database = {
           item_image_url: string | null
           item_name: string
           length_cm: number | null
+          liability_shifted_at: string | null
           order_id: string
           personalization_config: Json | null
           personalization_details: Json | null
+          personalization_schema: Json | null
           quantity: number
           selected_addons: Json | null
           selected_variant_id: string | null
@@ -1370,9 +1375,11 @@ export type Database = {
           item_image_url?: string | null
           item_name: string
           length_cm?: number | null
+          liability_shifted_at?: string | null
           order_id: string
           personalization_config?: Json | null
           personalization_details?: Json | null
+          personalization_schema?: Json | null
           quantity: number
           selected_addons?: Json | null
           selected_variant_id?: string | null
@@ -1394,9 +1401,11 @@ export type Database = {
           item_image_url?: string | null
           item_name?: string
           length_cm?: number | null
+          liability_shifted_at?: string | null
           order_id?: string
           personalization_config?: Json | null
           personalization_details?: Json | null
+          personalization_schema?: Json | null
           quantity?: number
           selected_addons?: Json | null
           selected_variant_id?: string | null
@@ -1589,6 +1598,82 @@ export type Database = {
             foreignKeyName: "order_personalization_order_item_id_fkey"
             columns: ["order_item_id"]
             isOneToOne: true
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_personalization_previews: {
+        Row: {
+          customer_feedback: string | null
+          id: string
+          order_id: string | null
+          order_item_id: string | null
+          partner_notes: string | null
+          preview_url: string
+          submitted_at: string | null
+          version: number
+        }
+        Insert: {
+          customer_feedback?: string | null
+          id?: string
+          order_id?: string | null
+          order_item_id?: string | null
+          partner_notes?: string | null
+          preview_url: string
+          submitted_at?: string | null
+          version: number
+        }
+        Update: {
+          customer_feedback?: string | null
+          id?: string
+          order_id?: string | null
+          order_item_id?: string | null
+          partner_notes?: string | null
+          preview_url?: string
+          submitted_at?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_personalization_previews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_personalization_previews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "v_order_detail"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_personalization_previews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "v_order_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_personalization_previews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "v_order_tracking"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_personalization_previews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "v_orders_detailed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_personalization_previews_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
             referencedRelation: "order_items"
             referencedColumns: ["id"]
           },
@@ -2611,6 +2696,24 @@ export type Database = {
         }
         Update: {
           description?: string | null
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string | null
+          value: Json
+        }
+        Update: {
           key?: string
           updated_at?: string | null
           value?: Json
@@ -4707,71 +4810,54 @@ export type Database = {
         Returns: boolean
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
-      get_available_stock:
-        | {
-            Args: { p_item_id?: string; p_variant_id?: string }
-            Returns: number
-          }
-        | {
-            Args: {
-              p_exclude_user_id?: string
-              p_item_id?: string
-              p_variant_id?: string
-            }
-            Returns: number
-          }
-        | {
-            Args: {
-              p_exclude_session_id?: string
-              p_exclude_user_id?: string
-              p_item_id?: string
-              p_variant_id?: string
-            }
-            Returns: number
-          }
+      get_available_stock: {
+        Args: {
+          p_exclude_session_id?: string
+          p_exclude_user_id?: string
+          p_item_id?: string
+          p_variant_id?: string
+        }
+        Returns: number
+      }
+      get_checkout_context: {
+        Args: {
+          p_applied_coupon?: string
+          p_guest_lat?: number
+          p_guest_lng?: number
+          p_selected_address_id?: string
+          p_session_id?: string
+          p_use_wallet?: boolean
+          p_user_id?: string
+        }
+        Returns: Json
+      }
       get_home_surface: {
         Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
         Returns: Json
       }
-      get_nearby_items:
-        | {
-            Args: { radius_km?: number; user_lat: number; user_lng: number }
-            Returns: {
-              base_price: number
-              distance_km: number
-              has_personalization: boolean
-              images: string[]
-              is_online: boolean
-              item_id: string
-              item_name: string
-              partner_id: string
-              partner_name: string
-              rating: number
-            }[]
-          }
-        | {
-            Args: {
-              include_out_of_stock?: boolean
-              radius_km?: number
-              user_lat: number
-              user_lng: number
-            }
-            Returns: {
-              base_price: number
-              distance_km: number
-              has_personalization: boolean
-              images: string[]
-              is_online: boolean
-              item_id: string
-              item_name: string
-              partner_id: string
-              partner_name: string
-              production_time_minutes: number
-              rating: number
-              stock_quantity: number
-              stock_status: string
-            }[]
-          }
+      get_nearby_items: {
+        Args: {
+          include_out_of_stock?: boolean
+          radius_km?: number
+          user_lat: number
+          user_lng: number
+        }
+        Returns: {
+          base_price: number
+          distance_km: number
+          has_personalization: boolean
+          id: string
+          images: string[]
+          is_online: boolean
+          name: string
+          partner_id: string
+          partner_name: string
+          production_time_minutes: number
+          rating: number
+          stock_quantity: number
+          stock_status: string
+        }[]
+      }
       get_partner_stats: {
         Args: { p_partner_id: string }
         Returns: {
@@ -4889,6 +4975,10 @@ export type Database = {
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
       raw_sql: { Args: { query: string }; Returns: Json }
+      recalculate_order_total: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
       resolve_user_permissions: { Args: { p_user_id: string }; Returns: Json }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { ShoppingBag, Sparkles, Clock, Camera, Package, CheckCircle2, X } from 'lucide-react';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/pricing';
 import { ORDER_STATUS, getItemStatusConfig } from '@/lib/types/order-status';
@@ -95,110 +95,110 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                 </div>
             </section>
 
-            {/* WYSHKIT 2026: Preview Sheet */}
-            <Sheet open={!!selectedPreviewItem} onOpenChange={(open) => !open && setSelectedPreviewItem(null)}>
-                <SheetContent
-                    side="bottom"
-                    className="p-0 h-[85dvh] sm:h-[90dvh] rounded-t-[2.5rem] border-none overflow-hidden outline-none bg-zinc-50"
-                >
-                    {selectedPreviewItem && itemPreviews[selectedPreviewItem.id] && (
-                        <div className="h-full overflow-y-auto overscroll-contain pb-safe scrollbar-hide">
-                            <div className="p-4 sticky top-0 bg-white/80 backdrop-blur-md z-10 border-b border-zinc-100 flex items-center justify-between">
-                                <h3 className="text-lg font-black text-zinc-900 tracking-tight">
-                                    {selectedPreviewItem.status === 'preview_ready' ? 'Review Design' : 'Item Details'}
-                                </h3>
-                                <button
-                                    onClick={() => setSelectedPreviewItem(null)}
-                                    className="p-2 bg-zinc-100 rounded-full hover:bg-zinc-200 transition-colors"
-                                >
-                                    <X className="size-5 text-zinc-500" />
-                                </button>
-                            </div>
-                            <div className="p-4">
-                                {selectedPreviewItem.status === 'preview_ready' ? (
-                                    <PreviewApproval
-                                        preview={itemPreviews[selectedPreviewItem.id]}
-                                        orderItem={selectedPreviewItem}
-                                        onApprove={async () => {
-                                            setIsApproving(true);
-                                            try {
-                                                const result = await approve_preview(itemPreviews[selectedPreviewItem.id].id, order.id);
-                                                if (result.success) {
-                                                    toast.success('Item approved! Production has started.');
-                                                    setSelectedPreviewItem(null);
-                                                } else {
-                                                    toast.error(result.error ?? 'Failed to approve');
-                                                }
-                                                return result;
-                                            } catch {
-                                                toast.error('Something went wrong');
-                                                return { success: false };
-                                            } finally {
-                                                setIsApproving(false);
+            {/* WYSHKIT 2026: Preview Surface */}
+            <ResponsiveSurface
+                open={!!selectedPreviewItem}
+                onOpenChange={(open) => !open && setSelectedPreviewItem(null)}
+                className="p-0 sm:max-w-xl h-[85dvh] sm:h-[90dvh] bg-zinc-50 border-none"
+                showClose={false}
+            >
+                {selectedPreviewItem && itemPreviews[selectedPreviewItem.id] && (
+                    <div className="h-full overflow-y-auto overscroll-contain pb-safe scrollbar-hide">
+                        <div className="p-4 sticky top-0 bg-white/80 backdrop-blur-md z-10 border-b border-zinc-100 flex items-center justify-between">
+                            <h3 className="text-lg font-black text-zinc-900 tracking-tight">
+                                {selectedPreviewItem.status === 'preview_ready' ? 'Review Design' : 'Item Details'}
+                            </h3>
+                            <button
+                                onClick={() => setSelectedPreviewItem(null)}
+                                className="p-2 bg-zinc-100 rounded-full hover:bg-zinc-200 transition-colors"
+                            >
+                                <X className="size-5 text-zinc-500" />
+                            </button>
+                        </div>
+                        <div className="p-4">
+                            {selectedPreviewItem.status === 'preview_ready' ? (
+                                <PreviewApproval
+                                    preview={itemPreviews[selectedPreviewItem.id]}
+                                    orderItem={selectedPreviewItem}
+                                    onApprove={async () => {
+                                        setIsApproving(true);
+                                        try {
+                                            const result = await approve_preview(itemPreviews[selectedPreviewItem.id].id, order.id);
+                                            if (result.success) {
+                                                toast.success('Item approved! Production has started.');
+                                                setSelectedPreviewItem(null);
+                                            } else {
+                                                toast.error(result.error ?? 'Failed to approve');
                                             }
-                                        }}
-                                        onRequestChange={async (feedback: string) => {
-                                            setIsRequestingChange(true);
-                                            try {
-                                                const result = await request_change(itemPreviews[selectedPreviewItem.id].id, order.id, feedback);
-                                                if (result.success) {
-                                                    toast.success('Feedback sent. Partner will upload a new preview.');
-                                                    setSelectedPreviewItem(null);
-                                                } else {
-                                                    toast.error(result.error ?? 'Failed to send feedback');
-                                                }
-                                                return result;
-                                            } catch {
-                                                toast.error('Something went wrong');
-                                                return { success: false };
-                                            } finally {
-                                                setIsRequestingChange(false);
+                                            return result;
+                                        } catch {
+                                            toast.error('Something went wrong');
+                                            return { success: false };
+                                        } finally {
+                                            setIsApproving(false);
+                                        }
+                                    }}
+                                    onRequestChange={async (feedback: string) => {
+                                        setIsRequestingChange(true);
+                                        try {
+                                            const result = await request_change(itemPreviews[selectedPreviewItem.id].id, order.id, feedback);
+                                            if (result.success) {
+                                                toast.success('Feedback sent. Partner will upload a new preview.');
+                                                setSelectedPreviewItem(null);
+                                            } else {
+                                                toast.error(result.error ?? 'Failed to send feedback');
                                             }
-                                        }}
-                                        isApproving={isApproving || isRequestingChange}
-                                        maxChanges={order.max_change_requests ?? 2}
-                                        changeCount={order.change_request_count ?? 0}
-                                    />
-                                ) : (
-                                    <div className="space-y-6">
-                                        <div className="flex flex-col gap-2">
-                                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Tracking Status</span>
-                                            <div className="p-4 bg-white border border-zinc-100 rounded-2xl flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="size-10 rounded-xl bg-zinc-50 flex items-center justify-center border border-zinc-100">
-                                                        <Package className="size-5 text-zinc-400" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-zinc-900 uppercase tracking-tight">{selectedPreviewItem.status || order.status}</p>
-                                                        <p className="text-[10px] text-zinc-500 font-medium">Last updated recently</p>
-                                                    </div>
+                                            return result;
+                                        } catch {
+                                            toast.error('Something went wrong');
+                                            return { success: false };
+                                        } finally {
+                                            setIsRequestingChange(false);
+                                        }
+                                    }}
+                                    isApproving={isApproving || isRequestingChange}
+                                    maxChanges={order.max_change_requests ?? 2}
+                                    changeCount={order.change_request_count ?? 0}
+                                />
+                            ) : (
+                                <div className="space-y-6">
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Tracking Status</span>
+                                        <div className="p-4 bg-white border border-zinc-100 rounded-2xl flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="size-10 rounded-xl bg-zinc-50 flex items-center justify-center border border-zinc-100">
+                                                    <Package className="size-5 text-zinc-400" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs font-bold text-zinc-900 uppercase tracking-tight">{selectedPreviewItem.status || order.status}</p>
+                                                    <p className="text-[10px] text-zinc-500 font-medium">Last updated recently</p>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        {selectedPreviewItem.is_personalized && (
-                                            <div className="space-y-3">
-                                                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Identity Details</span>
-                                                {selectedPreviewItem.personalization_details ? (
-                                                    <SubmittedIdentity
-                                                        details={selectedPreviewItem.personalization_details as any}
-                                                        itemName={selectedPreviewItem.item_name}
-                                                    />
-                                                ) : (
-                                                    <div className="p-8 text-center bg-zinc-50 rounded-3xl border border-zinc-100">
-                                                        <Sparkles className="size-8 text-zinc-200 mx-auto mb-3" />
-                                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Awaiting Identity Brief</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
                                     </div>
-                                )}
-                            </div>
+
+                                    {selectedPreviewItem.is_personalized && (
+                                        <div className="space-y-3">
+                                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Identity Details</span>
+                                            {selectedPreviewItem.personalization_details ? (
+                                                <SubmittedIdentity
+                                                    details={selectedPreviewItem.personalization_details as any}
+                                                    itemName={selectedPreviewItem.item_name}
+                                                />
+                                            ) : (
+                                                <div className="p-8 text-center bg-zinc-50 rounded-3xl border border-zinc-100">
+                                                    <Sparkles className="size-8 text-zinc-200 mx-auto mb-3" />
+                                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Awaiting Identity Brief</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
-                    )}
-                </SheetContent>
-            </Sheet>
+                    </div>
+                )}
+            </ResponsiveSurface>
         </>
     );
 }

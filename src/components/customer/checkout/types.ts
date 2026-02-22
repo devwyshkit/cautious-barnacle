@@ -5,7 +5,7 @@
 
 import type { DraftLineItem } from '@/lib/types/personalization';
 import type { Address } from '@/lib/types/address';
-import type { PricingBreakdown } from '@/lib/constants/pricing';
+import type { PricingBreakdown } from '@/lib/types/pricing';
 
 export type { PricingBreakdown };
 

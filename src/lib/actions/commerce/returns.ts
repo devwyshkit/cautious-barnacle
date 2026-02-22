@@ -77,8 +77,19 @@ export async function initiateReturn({ orderId, reason, description, images }: I
       };
     }
 
-    // Calculate return delivery fee
-    const returnDeliveryFee = isPersonalized ? 0 : 60;
+    // WYSHKIT 2026: PURIFIED LOGIC - NO JS ARITHMETIC
+    // Move all refund calculation to DB to ensure policy consistency
+    const { data: pricingData, error: pricingError } = await (supabase as any).rpc('calculate_return_refund', {
+      p_order_id: orderId,
+      p_reason: reason
+    });
+
+    if (pricingError) {
+      logError(pricingError, 'CalculateReturnRefund');
+      return { error: 'Failed to calculate refund amount' };
+    }
+
+    const { refund_amount, return_delivery_fee } = pricingData as any;
 
     // Create return record
     const { data: returnRecord, error: returnError } = await supabase
@@ -89,11 +100,9 @@ export async function initiateReturn({ orderId, reason, description, images }: I
         reason,
         description,
         images: images || [],
-        return_delivery_fee: returnDeliveryFee,
+        return_delivery_fee: return_delivery_fee,
         status: 'pending',
-        refund_amount: (isPersonalized && !['wrong_item', 'damaged'].includes(reason))
-          ? 0
-          : order.total - returnDeliveryFee,
+        refund_amount: refund_amount,
       })
       .select()
       .maybeSingle();
@@ -149,7 +158,7 @@ export async function initiateReturn({ orderId, reason, description, images }: I
       p_type: 'return_initiated',
       p_title: 'Return Requested',
       p_description: `Return requested: ${reason}. ${isPersonalized ? 'No refund for personalized items.' : `Refund amount: ₹${returnRecord.refund_amount || 0}`}`,
-      p_metadata: { return_id: returnRecord.id, reason, return_delivery_fee: returnDeliveryFee } as unknown as Json
+      p_metadata: { return_id: returnRecord.id, reason, return_delivery_fee: return_delivery_fee } as unknown as Json
     });
 
 
@@ -158,7 +167,7 @@ export async function initiateReturn({ orderId, reason, description, images }: I
       success: true,
       returnId: returnRecord.id,
       refundAmount: returnRecord.refund_amount,
-      returnDeliveryFee
+      returnDeliveryFee: return_delivery_fee
     };
   } catch (error) {
     logError(error, 'InitiateReturn');

@@ -23,6 +23,7 @@ interface OrderItem {
     personalization?: SelectedPersonalization;
     selected_addons?: SelectedAddon[];
     personalization_details?: SelectedPersonalization;
+    personalization_schema?: any[];
 }
 
 interface IdentityFormProps {
@@ -72,7 +73,7 @@ export function IdentityForm({
         return !config.text_required && !config.image_required;
     });
 
-    const handleInputChange = (itemId: string, field: 'text' | 'image_url', value: string) => {
+    const handleInputChange = (itemId: string, field: string, value: string) => {
         setFormData(prev => ({
             ...prev,
             [itemId]: {
@@ -203,6 +204,7 @@ export function IdentityForm({
                             itemIndex={idx}
                             totalItems={personalizedItems.length}
                             config={config}
+                            schema={item.personalization_schema}
                             input={formData[item.id] || {}}
                             uploadingProgress={uploadingItems[item.id]}
                             onInputChange={(field, value) => handleInputChange(item.id, field, value)}

@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import type { Json } from '@/lib/supabase/database.types';
-import { PRICING, type PricingBreakdown } from '@/lib/constants/pricing';
+import type { PricingBreakdown } from '@/lib/types/pricing';
 import { logger } from '@/lib/logging/logger';
 
 /**

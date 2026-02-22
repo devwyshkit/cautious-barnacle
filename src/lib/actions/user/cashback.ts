@@ -12,9 +12,22 @@ export async function credit_cashback_on_delivery(order_id: string, user_id: str
   try {
     const supabase = await createClient();
 
-    // Calculate cashback (2% of order total, minimum ₹10, maximum ₹500)
-    const cashback_percentage = 0.02; // 2%
-    const cashback_amount = Math.max(10, Math.min(500, Math.round(order_total * cashback_percentage)));
+    // WYSHKIT 2026: Fetch configs from platform_settings (Zero Shadow Math)
+    const { data: settings } = await supabase
+      .from('platform_settings')
+      .select('key, value')
+      .in('key', ['cashback_percentage', 'cashback_min_amount', 'cashback_max_amount']);
+
+    const getSetting = (key: string, fallback: number) => {
+      const s = settings?.find(s => s.key === key);
+      return typeof s?.value === 'number' ? s.value : fallback;
+    };
+
+    const cashback_percentage = getSetting('cashback_percentage', 0.02);
+    const min_amount = getSetting('cashback_min_amount', 10);
+    const max_amount = getSetting('cashback_max_amount', 500);
+
+    const cashback_amount = Math.max(min_amount, Math.min(max_amount, Math.round(order_total * cashback_percentage)));
 
     // Check if cashback already credited
     const { data: order } = await supabase
@@ -75,7 +88,14 @@ export async function credit_cashback_on_delivery(order_id: string, user_id: str
 
     if (money_error) throw money_error;
 
-    // 3. Create transaction record
+    // 3. Create transaction record — use human-readable order number
+    const { data: orderData } = await supabase
+      .from('orders')
+      .select('order_number')
+      .eq('id', order_id)
+      .maybeSingle();
+    const order_ref = orderData?.order_number ? `#${orderData.order_number}` : order_id.slice(0, 8);
+
     const { error: transaction_error } = await supabase
       .from('wyshkit_money_transactions')
       .insert({
@@ -83,7 +103,7 @@ export async function credit_cashback_on_delivery(order_id: string, user_id: str
         order_id: order_id,
         amount: cashback_amount,
         type: 'credit',
-        description: `Cashback for order ${order_id}`
+        description: `WyshKit Money cashback for order ${order_ref}`
       });
 
     if (transaction_error) throw transaction_error;

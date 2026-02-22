@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { OrderCard } from './OrderCard';
-import { update_order_status, reject_order } from '@/lib/actions/partner/partner-actions';
+import { executePartnerIntent } from '@/lib/actions/partner/engine';
 import type { PartnerOrder } from '@/lib/actions/partner/partner-actions';
 import { usePartnerRealtime } from '@/hooks/usePartnerRealtime';
 import { toast } from 'sonner';
@@ -64,12 +64,15 @@ export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
   const handleAccept = async (orderId: string) => {
     setUpdating(orderId);
     try {
-      const nextStatus = ORDER_STATUS.CONFIRMED;
-      const result = await update_order_status(orderId, nextStatus);
+      const result = await executePartnerIntent({
+        entity: 'order',
+        action: 'ACCEPT',
+        id: orderId
+      });
 
       if (result.success) {
         setOrders(prev => prev.map(o =>
-          o.id === orderId ? { ...o, status: nextStatus } : o
+          o.id === orderId ? { ...o, status: ORDER_STATUS.CONFIRMED as any } : o
         ));
         toast.success('Order accepted');
       } else {
@@ -85,10 +88,15 @@ export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
   const handleReject = async (orderId: string, reason: string) => {
     setUpdating(orderId);
     try {
-      const result = await reject_order(orderId, reason);
+      const result = await executePartnerIntent({
+        entity: 'order',
+        action: 'REJECT',
+        id: orderId,
+        metadata: { reason }
+      });
       if (result.success) {
         setOrders(prev => prev.map(o =>
-          o.id === orderId ? { ...o, status: ORDER_STATUS.CANCELLED } : o
+          o.id === orderId ? { ...o, status: ORDER_STATUS.CANCELLED as any } : o
         ));
         toast.success('Order rejected');
       } else {
@@ -104,10 +112,15 @@ export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
   const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
     setUpdating(orderId);
     try {
-      const result = await update_order_status(orderId, newStatus);
+      const result = await executePartnerIntent({
+        entity: 'order',
+        action: 'UPDATE_STATUS',
+        id: orderId,
+        target_status: newStatus
+      });
       if (result.success) {
         setOrders(prev => prev.map(o =>
-          o.id === orderId ? { ...o, status: newStatus as PartnerOrder['status'] } : o
+          o.id === orderId ? { ...o, status: newStatus as any } : o
         ));
         toast.success('Order updated');
       } else {

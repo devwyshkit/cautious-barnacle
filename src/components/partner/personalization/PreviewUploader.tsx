@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, X, Camera, Image as ImageIcon, Loader2, SwitchCamera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
 import { upload_preview } from '@/lib/actions/partner/partner-actions';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
@@ -181,15 +181,14 @@ export function PreviewUploader({ orderId, orderItemId, orderNumber, isOpen, onC
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-base font-semibold">
-            Upload preview for #{orderNumber}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-4">
+    <ResponsiveSurface
+      open={isOpen}
+      onOpenChange={handleClose}
+      title={`Upload preview for #${orderNumber}`}
+      className="sm:max-w-md"
+    >
+      <div className="flex flex-col h-full mt-4">
+        <div className="flex-1 space-y-4">
           {/* Mode Selection */}
           {mode === 'select' && (
             <div className="grid grid-cols-2 gap-3">
@@ -292,26 +291,24 @@ export function PreviewUploader({ orderId, orderItemId, orderNumber, isOpen, onC
           <canvas ref={canvasRef} className="hidden" />
         </div>
 
-        <DialogFooter>
-          {(mode === 'upload' || preview) && (
-            <>
-              <Button variant="outline" onClick={handleClose} disabled={uploading}>
-                Cancel
-              </Button>
-              <Button onClick={handleUpload} disabled={!file || uploading}>
-                {uploading ? (
-                  <>
-                    <Loader2 className="size-4 mr-2 animate-spin" />
-                    Uploading...
-                  </>
-                ) : (
-                  'Upload preview'
-                )}
-              </Button>
-            </>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        {(mode === 'upload' || preview) && (
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-6 shrink-0">
+            <Button variant="outline" onClick={handleClose} disabled={uploading}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpload} disabled={!file || uploading}>
+              {uploading ? (
+                <>
+                  <Loader2 className="size-4 mr-2 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                'Upload preview'
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+    </ResponsiveSurface>
   );
 }

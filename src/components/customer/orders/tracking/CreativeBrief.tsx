@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { SubmittedIdentity } from './SubmittedIdentity';
 import { PreviewSubmission } from '@/lib/types/order';
 import Image from 'next/image';
+import { HistoryTrail } from './HistoryTrail';
 
 import { ORDER_STATUS } from '@/lib/types/order-status';
 import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
@@ -16,6 +17,7 @@ import { OrderDetail } from '@/lib/types/order';
 interface CreativeBriefProps {
     order: OrderDetail;
     previews: PreviewSubmission[];
+    timeline: any[];
     onOpenPersonalization?: () => void;
     isOptimisticSubmitted?: boolean;
 }
@@ -28,7 +30,7 @@ interface CreativeBriefProps {
  * - Add "Approval SLA" countdown (15m) when preview is ready.
  * - Momentum UI: Micro-animations for high-intent states.
  */
-export function CreativeBrief({ order, previews, onOpenPersonalization, isOptimisticSubmitted }: CreativeBriefProps) {
+export function CreativeBrief({ order, previews, timeline, onOpenPersonalization, isOptimisticSubmitted }: CreativeBriefProps) {
     const latestPreview = previews[0];
     const personalizedItems = order.order_items?.filter(i => i.is_personalized) || [];
 
@@ -48,8 +50,8 @@ export function CreativeBrief({ order, previews, onOpenPersonalization, isOptimi
     if (personalizedItems.length === 0) return null;
 
     return (
-        <section className="flex flex-col gap-6 animate-in fade-in duration-700">
-            {/* Design Previews Milestone */}
+        <section className="flex flex-col gap-8 animate-in fade-in duration-700">
+            {/* Design Previews Milestone (High Impact) */}
             <div className="space-y-4">
                 {previews.length > 0 ? (
                     <div className="space-y-3">
@@ -59,7 +61,7 @@ export function CreativeBrief({ order, previews, onOpenPersonalization, isOptimi
                                     <Sparkles className="size-3 text-amber-500" />
                                 </div>
                                 <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest">
-                                    {previews.length > 1 ? `Latest Design Iterations (${previews.length})` : 'Design Hub • Preview'}
+                                    Status: {order.status === ORDER_STATUS.PREVIEW_READY ? 'Preview Awaiting Action' : 'Design Hub'}
                                 </span>
                             </div>
                             {approvalDeadline && (
@@ -74,6 +76,7 @@ export function CreativeBrief({ order, previews, onOpenPersonalization, isOptimi
                             )}
                         </div>
 
+                        {/* Quick View Carousel */}
                         <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-2">
                             {previews.map((preview, idx) => (
                                 <div key={preview.id} className="relative aspect-[4/3] w-[85%] shrink-0 snap-center rounded-[2.5rem] overflow-hidden border border-zinc-100 shadow-xl shadow-zinc-200/50 bg-zinc-50 group">
@@ -84,7 +87,8 @@ export function CreativeBrief({ order, previews, onOpenPersonalization, isOptimi
                                         className="object-cover"
                                     />
                                     {/* Iteration Badge */}
-                                    <div className="absolute top-4 left-4 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-white/20">
+                                    <div className="absolute top-4 left-4 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-white/20 flex items-center gap-1.5">
+                                        <div className={cn("size-1.5 rounded-full", idx === 0 ? "bg-amber-400 animate-pulse" : "bg-zinc-400")} />
                                         <p className="text-[9px] font-black text-white uppercase tracking-widest">
                                             {idx === 0 ? 'Latest' : `Ver. ${previews.length - idx}`}
                                         </p>
@@ -146,23 +150,14 @@ export function CreativeBrief({ order, previews, onOpenPersonalization, isOptimi
                 )}
             </div>
 
-            {/* Brief Data Milestone */}
-            <div className="space-y-3">
-                <div className="flex items-center gap-2 px-1">
-                    <FileText className="size-3 text-zinc-400" />
-                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Design Hub • Brief Details</span>
-                </div>
-                <div className="grid gap-2">
-                    {personalizedItems.map(item => (
-                        <SubmittedIdentity
-                            key={item.id}
-                            details={item.personalization_details || {}}
-                            itemName={item.item_name}
-                            isOptimisticSubmitted={isOptimisticSubmitted}
-                        />
-                    ))}
-                </div>
-            </div>
+            {/* The 3-Layer History Trail */}
+            <HistoryTrail
+                orderItems={order.order_items || []}
+                previews={previews}
+                timeline={timeline}
+            />
         </section>
     );
 }
+
+

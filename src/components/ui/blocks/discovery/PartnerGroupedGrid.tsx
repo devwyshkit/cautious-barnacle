@@ -7,9 +7,10 @@ import { EntityCard } from '@/components/ui/EntityCard';
 
 interface PartnerGroupedGridProps {
     data: any[];
+    onQuickLook?: (id: string, type: any) => void;
 }
 
-export function PartnerGroupedGrid({ data }: PartnerGroupedGridProps) {
+export function PartnerGroupedGrid({ data, onQuickLook }: PartnerGroupedGridProps) {
     if (!data || data.length === 0) return null;
 
     const groupedData = data.reduce((acc: any, item: any) => {
@@ -44,7 +45,7 @@ export function PartnerGroupedGrid({ data }: PartnerGroupedGridProps) {
                     </div>
                     <div className={cn("grid gap-3", group.items.length === 1 ? "grid-cols-1" : "grid-cols-2")}>
                         {group.items.slice(0, 4).map((item: any) => (
-                            <EntityCard key={item.id} type="item" data={item} variant="portrait" className="bg-white" />
+                            <EntityCard key={item.id} type="item" data={item} variant="portrait" className="bg-white" onQuickLook={onQuickLook} />
                         ))}
                     </div>
                 </div>

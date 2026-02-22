@@ -3,6 +3,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { cn } from '@/lib/utils';
 import { InfiniteItemsGrid } from '@/components/customer/home/InfiniteItemsGrid';
+import { QuickItemSheet } from '../customer/item/QuickItemSheet';
 
 // Discovery Blocks
 const CircleRail = lazy(() => import('./blocks/discovery/CircleRail').then(m => ({ default: m.CircleRail })));
@@ -46,22 +47,29 @@ function useTimeContext(): string | null {
 
 export function BlocksEngine({ blocks, className }: BlocksEngineProps) {
     const timeContext = useTimeContext();
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
     if (!blocks || blocks.length === 0) return null;
+
+    const handleQuickItem = (id: string, type: string) => {
+        if (type === 'item') {
+            setSelectedItemId(id);
+        }
+    };
 
     const renderBlock = (block: BlockData) => {
         switch (block.type) {
             case 'BANNER_BENTO':
-                return <BannerBento data={block.data} title={block.title} subtitle={block.subtitle} timeContext={timeContext} />;
+                return <BannerBento data={block.data} title={block.title} subtitle={block.subtitle} timeContext={timeContext} onQuickLook={handleQuickItem} />;
             case 'CIRCLE_RAIL':
                 return <CircleRail data={block.data} />;
             case 'CARD_RAIL':
-                return <CardRail data={block.data} />;
+                return <CardRail data={block.data} onQuickLook={handleQuickItem} />;
             case 'GRID':
-                return <Grid data={block.data} />;
+                return <Grid data={block.data} onQuickLook={handleQuickItem} />;
             case 'PARTNER_LIST':
             case 'PARTNER_GROUPED_GRID':
-                return <PartnerGroupedGrid data={block.data} />;
+                return <PartnerGroupedGrid data={block.data} onQuickLook={handleQuickItem} />;
             case 'INFINITE_GRID':
                 return (
                     <InfiniteItemsGrid
@@ -69,6 +77,7 @@ export function BlocksEngine({ blocks, className }: BlocksEngineProps) {
                         category={block.metadata?.category || null}
                         totalCount={block.metadata?.totalCount}
                         startOffset={block.data?.length || 0}
+                        onQuickLook={handleQuickItem}
                     />
                 );
             case 'CHECKOUT_ITEMS':
@@ -113,6 +122,13 @@ export function BlocksEngine({ blocks, className }: BlocksEngineProps) {
                     </section>
                 );
             })}
+
+            {/* Global Discovery Surface */}
+            <QuickItemSheet
+                itemId={selectedItemId}
+                open={!!selectedItemId}
+                onClose={() => setSelectedItemId(null)}
+            />
         </div>
     );
 }

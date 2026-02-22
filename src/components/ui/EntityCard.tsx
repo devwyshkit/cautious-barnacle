@@ -69,6 +69,7 @@ interface EntityCardProps {
     badges?: Array<{ text: string; variant?: 'default' | 'fast' | 'scarcity' | 'elite' }>;
     variant?: EntityVariant;
     priority?: boolean;
+    onQuickLook?: (id: string, type: EntityType) => void;
     className?: string;
     children?: React.ReactNode;
 }
@@ -90,6 +91,7 @@ export function EntityCard({
     badges: explicitBadges,
     variant = 'portrait',
     priority = false,
+    onQuickLook,
     className,
     children
 }: EntityCardProps) {
@@ -254,8 +256,20 @@ export function EntityCard({
     const isRow = variant === 'row';
     const isCompact = variant === 'compact';
 
+    const handleClick = (e: React.MouseEvent) => {
+        if (onQuickLook && type && id) {
+            e.preventDefault();
+            onQuickLook(id, type);
+        }
+    };
+
     return (
-        <Link href={href} className="block w-full" scroll={false}>
+        <Link
+            href={href}
+            className="block w-full"
+            scroll={false}
+            onClick={handleClick}
+        >
             <div className={cn(
                 "group relative w-full transition-all duration-300 ease-out",
                 "hover:scale-[1.01] active:scale-[0.99]",

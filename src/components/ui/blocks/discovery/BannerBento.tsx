@@ -9,9 +9,10 @@ interface BannerBentoProps {
     title?: string;
     subtitle?: string;
     timeContext?: string | null;
+    onQuickLook?: (id: string, type: any) => void;
 }
 
-export function BannerBento({ data, title, subtitle, timeContext }: BannerBentoProps) {
+export function BannerBento({ data, title, subtitle, timeContext, onQuickLook }: BannerBentoProps) {
     if (!data || data.length === 0) return null;
 
     return (
@@ -30,9 +31,9 @@ export function BannerBento({ data, title, subtitle, timeContext }: BannerBentoP
                 </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-                {data[0] && <EntityCard type="bento" data={data[0]} variant="bento_large" priority />}
-                {data[1] && <EntityCard type="bento" data={data[1]} variant="bento_small" />}
-                {data[2] && <EntityCard type="bento" data={data[2]} variant="bento_small" />}
+                {data[0] && <EntityCard type="bento" data={data[0]} variant="bento_large" priority onQuickLook={onQuickLook} />}
+                {data[1] && <EntityCard type="bento" data={data[1]} variant="bento_small" onQuickLook={onQuickLook} />}
+                {data[2] && <EntityCard type="bento" data={data[2]} variant="bento_small" onQuickLook={onQuickLook} />}
             </div>
         </>
     );

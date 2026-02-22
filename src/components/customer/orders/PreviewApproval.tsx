@@ -2,11 +2,16 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { XCircle, FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import { XCircle, FileText, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { ActionSlider } from '@/components/ui/ActionSlider';
 import { PreviewSubmission } from '@/lib/types/order';
 import { SubmittedIdentity } from './tracking/SubmittedIdentity';
+
+interface PreviewOrderItemContext {
+    personalization_details: Record<string, unknown>;
+    item_name: string;
+}
 
 interface PreviewApprovalProps {
     preview: PreviewSubmission;
@@ -14,8 +19,10 @@ interface PreviewApprovalProps {
     maxChanges?: number;
     onApprove: () => void;
     onRequestChange: (feedback: string) => void;
+    onReject?: () => void;
     isApproving: boolean;
-    orderItem?: any; // New: To show context
+    isRejecting?: boolean;
+    orderItem?: PreviewOrderItemContext;
 }
 
 export function PreviewApproval({
@@ -24,28 +31,29 @@ export function PreviewApproval({
     maxChanges = 2,
     onApprove,
     onRequestChange,
+    onReject,
     isApproving,
+    isRejecting = false,
     orderItem
 }: PreviewApprovalProps) {
     const [showFeedback, setShowFeedback] = useState(false);
     const [showContext, setShowContext] = useState(false);
     const [feedback, setFeedback] = useState('');
+    const [confirmReject, setConfirmReject] = useState(false);
     const changesRemaining = Math.max(0, maxChanges - changeCount);
 
     return (
         <section className="bg-white space-y-4">
-            {/* WYSHKIT 2026: Minimal Header */}
+            {/* WYSHKIT 2026: Customer-centric header */}
             <div className="flex items-center justify-between px-1 pb-2">
                 <div>
-                    <h3 className="text-lg font-black text-zinc-900 tracking-tight leading-none">Design Review</h3>
-                    <p className="text-[11px] text-zinc-500 font-medium mt-1">Verify details before production</p>
+                    <h3 className="text-lg font-black text-zinc-900 tracking-tight leading-none">Your Preview</h3>
+                    <p className="text-[11px] text-zinc-500 font-medium mt-1">Does this look exactly right?</p>
                 </div>
-                {changesRemaining > 0 && (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 rounded-full shadow-sm">
-                        <div className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        <span className="text-[10px] text-white font-bold uppercase tracking-wider">Action Req.</span>
-                    </div>
-                )}
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 rounded-full shadow-sm">
+                    <div className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[10px] text-white font-bold uppercase tracking-wider">Review</span>
+                </div>
             </div>
 
             {/* WYSHKIT 2026: Requirement Context (Cross-Verification) */}
@@ -65,7 +73,7 @@ export function PreviewApproval({
                         <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-300">
                             <SubmittedIdentity
                                 details={orderItem.personalization_details as any}
-                                itemName={orderItem.item_name || orderItem.name}
+                                itemName={orderItem.item_name}
                             />
                         </div>
                     )}
@@ -134,22 +142,53 @@ export function PreviewApproval({
                     </div>
                 ) : (
                     <div className="space-y-4">
+                        {/* Pre-approval disclaimer — sets expectation, prevents regret */}
                         <p className="text-[10px] text-zinc-400 text-center px-6 leading-relaxed">
-                            By approving, you agree to the design. <br /> Personalized items cannot be returned.
+                            This is a digital preview. Minor variations in rendering or surface reflection may occur.
+                            Once approved, personalisation starts immediately and <strong>cannot be undone.</strong>
                         </p>
                         <ActionSlider
                             onConfirm={onApprove}
                             isLoading={isApproving}
                             label="Slide to approve preview"
-                            successLabel="Approved"
+                            successLabel="Approved!"
                         />
                         <button
                             onClick={() => setShowFeedback(true)}
-                            disabled={isApproving || changesRemaining <= 0}
+                            disabled={isApproving || isRejecting || changesRemaining <= 0}
                             className="w-full py-3 text-[10px] font-black text-zinc-500 hover:text-zinc-800 underline decoration-zinc-200 uppercase tracking-widest transition-colors disabled:no-underline disabled:opacity-30"
                         >
                             Request a change ({changesRemaining} left)
                         </button>
+                        {onReject && (
+                            // Inline double-confirm — no browser modal (dark pattern)
+                            confirmReject ? (
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setConfirmReject(false)}
+                                        className="flex-1 py-3 text-[10px] font-black text-zinc-500 border border-zinc-200 rounded-xl uppercase tracking-widest"
+                                    >
+                                        Keep preview
+                                    </button>
+                                    <button
+                                        onClick={() => { setConfirmReject(false); onReject(); }}
+                                        disabled={isApproving || isRejecting}
+                                        className="flex-1 py-3 text-[10px] font-black text-white bg-rose-500 hover:bg-rose-600 rounded-xl uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-1.5"
+                                    >
+                                        <AlertTriangle className="size-3" />
+                                        {isRejecting ? 'Processing...' : 'Confirm & Refund'}
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setConfirmReject(true)}
+                                    disabled={isApproving || isRejecting}
+                                    className="w-full py-3 mt-1 text-[10px] font-black text-rose-500 hover:text-rose-700 underline decoration-rose-200 uppercase tracking-widest transition-colors disabled:no-underline disabled:opacity-30"
+                                >
+                                    Reject & get instant refund
+                                </button>
+                            )
+                        )}
                     </div>
                 )}
             </div>

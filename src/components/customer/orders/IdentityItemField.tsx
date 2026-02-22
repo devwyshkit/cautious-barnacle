@@ -12,9 +12,10 @@ interface IdentityItemFieldProps {
     itemIndex: number;
     totalItems: number;
     config: PersonalizationConfig;
-    input: { text?: string; image_url?: string };
+    schema?: any[];
+    input: { text?: string; image_url?: string;[key: string]: any };
     uploadingProgress?: number;
-    onInputChange: (field: 'text' | 'image_url', value: string) => void;
+    onInputChange: (field: string, value: string) => void;
     onFileUpload: (file: File) => void;
 }
 
@@ -23,6 +24,7 @@ export function IdentityItemField({
     itemIndex,
     totalItems,
     config,
+    schema,
     input,
     uploadingProgress,
     onInputChange,
@@ -48,104 +50,134 @@ export function IdentityItemField({
             )}
 
             <div className="bg-white rounded-[2rem] p-6 border border-zinc-100 shadow-sm transition-all group-hover:border-zinc-200 space-y-5">
-                {config.allow_text && (
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between px-1">
-                            <label className="text-[10px] font-black text-zinc-900 uppercase tracking-widest flex items-center gap-1.5">
-                                {config.text_label || 'Identity Theme'}
-                            </label>
-                            {config.char_limit && (
-                                <span className={cn(
-                                    "text-[10px] font-bold tracking-tight tabular-nums",
-                                    (input.text?.length || 0) > config.char_limit ? "text-rose-500" : "text-zinc-400"
-                                )}>
-                                    {input.text?.length || 0}/{config.char_limit}
-                                </span>
-                            )}
-                        </div>
-                        <Textarea
-                            value={input.text || ''}
-                            onChange={(e) => onInputChange('text', e.target.value)}
-                            placeholder={config.placeholder || "What should the design focus on?"}
-                            className="w-full bg-zinc-50/50 border-zinc-100 rounded-2xl p-5 text-sm font-medium focus:bg-white focus:border-zinc-900 focus:ring-4 focus:ring-zinc-900/5 transition-all outline-none min-h-[120px] resize-none placeholder:text-zinc-300 border shadow-none text-zinc-900 leading-relaxed"
-                            maxLength={config.char_limit}
-                        />
-                    </div>
-                )}
-
-                {config.allow_image && (
+                {schema ? (
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 px-1">
-                            <div className="h-px flex-1 bg-zinc-50" />
-                            <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest leading-none">Visual Reference</span>
-                            <div className="h-px flex-1 bg-zinc-50" />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <button
-                                type="button"
-                                disabled={uploadingProgress !== undefined}
-                                onClick={() => {
-                                    const fileInput = document.createElement('input');
-                                    fileInput.type = 'file';
-                                    fileInput.accept = 'image/*';
-                                    fileInput.onchange = (e) => {
-                                        const file = (e.target as HTMLInputElement).files?.[0];
-                                        if (file) onFileUpload(file);
-                                    };
-                                    fileInput.click();
-                                }}
-                                className="flex flex-col items-center justify-center gap-2 py-5 bg-zinc-50 border border-zinc-100 rounded-2xl hover:bg-zinc-100 transition-all active:scale-[0.98] disabled:opacity-50 group/btn"
-                            >
-                                <ImageIcon className="size-5 text-zinc-400 group-hover/btn:text-zinc-600 group-hover/btn:scale-110 transition-all" />
-                                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest group-hover/btn:text-zinc-600 transition-colors">Library</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                disabled={uploadingProgress !== undefined}
-                                onClick={() => {
-                                    const fileInput = document.createElement('input');
-                                    fileInput.type = 'file';
-                                    fileInput.accept = 'image/*';
-                                    fileInput.capture = 'environment';
-                                    fileInput.onchange = (e) => {
-                                        const file = (e.target as HTMLInputElement).files?.[0];
-                                        if (file) onFileUpload(file);
-                                    };
-                                    fileInput.click();
-                                }}
-                                className="flex flex-col items-center justify-center gap-2 py-5 bg-zinc-900 rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 group/btn shadow-lg shadow-zinc-200"
-                            >
-                                <Camera className="size-5 text-white/60 group-hover/btn:text-white group-hover/btn:scale-110 transition-all" />
-                                <span className="text-[10px] font-black text-white/60 uppercase tracking-widest group-hover/btn:text-white transition-colors">Capture</span>
-                            </button>
-                        </div>
-
-                        {uploadingProgress !== undefined && (
-                            <div className="space-y-2 animate-in fade-in duration-300">
-                                <div className="flex items-center justify-between px-1">
-                                    <span className="text-[9px] font-black text-zinc-900 uppercase tracking-widest">Processing Image...</span>
-                                    <span className="text-[10px] font-bold text-zinc-400 tabular-nums">{Math.round(uploadingProgress)}%</span>
-                                </div>
-                                <Progress value={uploadingProgress} className="h-1.5 bg-zinc-100" />
+                        {schema.map((field) => (
+                            <div key={field.id} className="space-y-2">
+                                <label className="text-[10px] font-black text-zinc-900 uppercase tracking-widest block px-1">
+                                    {field.label} {field.required && <span className="text-rose-500">*</span>}
+                                </label>
+                                {field.type === 'text' ? (
+                                    <input
+                                        type="text"
+                                        value={input[field.id] || ''}
+                                        onChange={(e) => onInputChange(field.id, e.target.value)}
+                                        placeholder={field.placeholder}
+                                        className="w-full bg-zinc-50 border-zinc-100 rounded-xl p-3 text-sm focus:bg-white focus:border-zinc-900 transition-all outline-none border"
+                                    />
+                                ) : field.type === 'textarea' ? (
+                                    <Textarea
+                                        value={input[field.id] || ''}
+                                        onChange={(e) => onInputChange(field.id, e.target.value)}
+                                        placeholder={field.placeholder}
+                                        className="w-full bg-zinc-50 border-zinc-100 rounded-xl p-3 text-sm focus:bg-white focus:border-zinc-900 transition-all outline-none border min-h-[80px]"
+                                    />
+                                ) : null}
                             </div>
-                        )}
-
-                        {input.image_url && (
-                            <div className="relative aspect-video rounded-2xl overflow-hidden border border-zinc-100 group shadow-sm bg-zinc-50 animate-in zoom-in-95 duration-500">
-                                <img src={input.image_url} alt="Preview" className="size-full object-cover" />
-                                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
-                                <button
-                                    type="button"
-                                    onClick={() => onInputChange('image_url', '')}
-                                    className="absolute top-3 right-3 size-10 bg-white shadow-xl rounded-full flex items-center justify-center text-zinc-900 hover:scale-110 active:scale-95 transition-all z-10"
-                                >
-                                    <X className="size-5" />
-                                </button>
-                            </div>
-                        )}
+                        ))}
                     </div>
+                ) : (
+                    <>
+                        {config.allow_text && (
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between px-1">
+                                    <label className="text-[10px] font-black text-zinc-900 uppercase tracking-widest flex items-center gap-1.5">
+                                        {config.text_label || 'Identity Theme'}
+                                    </label>
+                                    {config.char_limit && (
+                                        <span className={cn(
+                                            "text-[10px] font-bold tracking-tight tabular-nums",
+                                            (input.text?.length || 0) > config.char_limit ? "text-rose-500" : "text-zinc-400"
+                                        )}>
+                                            {input.text?.length || 0}/{config.char_limit}
+                                        </span>
+                                    )}
+                                </div>
+                                <Textarea
+                                    value={input.text || ''}
+                                    onChange={(e) => onInputChange('text', e.target.value)}
+                                    placeholder={config.placeholder || "What should the design focus on?"}
+                                    className="w-full bg-zinc-50/50 border-zinc-100 rounded-2xl p-5 text-sm font-medium focus:bg-white focus:border-zinc-900 focus:ring-4 focus:ring-zinc-900/5 transition-all outline-none min-h-[120px] resize-none placeholder:text-zinc-300 border shadow-none text-zinc-900 leading-relaxed"
+                                    maxLength={config.char_limit}
+                                />
+                            </div>
+                        )}
+
+                        {config.allow_image && (
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 px-1">
+                                    <div className="h-px flex-1 bg-zinc-50" />
+                                    <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest leading-none">Visual Reference</span>
+                                    <div className="h-px flex-1 bg-zinc-50" />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <button
+                                        type="button"
+                                        disabled={uploadingProgress !== undefined}
+                                        onClick={() => {
+                                            const fileInput = document.createElement('input');
+                                            fileInput.type = 'file';
+                                            fileInput.accept = 'image/*';
+                                            fileInput.onchange = (e) => {
+                                                const file = (e.target as HTMLInputElement).files?.[0];
+                                                if (file) onFileUpload(file);
+                                            };
+                                            fileInput.click();
+                                        }}
+                                        className="flex flex-col items-center justify-center gap-2 py-5 bg-zinc-50 border border-zinc-100 rounded-2xl hover:bg-zinc-100 transition-all active:scale-[0.98] disabled:opacity-50 group/btn"
+                                    >
+                                        <ImageIcon className="size-5 text-zinc-400 group-hover/btn:text-zinc-600 group-hover/btn:scale-110 transition-all" />
+                                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest group-hover/btn:text-zinc-600 transition-colors">Library</span>
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        disabled={uploadingProgress !== undefined}
+                                        onClick={() => {
+                                            const fileInput = document.createElement('input');
+                                            fileInput.type = 'file';
+                                            fileInput.accept = 'image/*';
+                                            fileInput.capture = 'environment';
+                                            fileInput.onchange = (e) => {
+                                                const file = (e.target as HTMLInputElement).files?.[0];
+                                                if (file) onFileUpload(file);
+                                            };
+                                            fileInput.click();
+                                        }}
+                                        className="flex flex-col items-center justify-center gap-2 py-5 bg-zinc-900 rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 group/btn shadow-lg shadow-zinc-200"
+                                    >
+                                        <Camera className="size-5 text-white/60 group-hover/btn:text-white group-hover/btn:scale-110 transition-all" />
+                                        <span className="text-[10px] font-black text-white/60 uppercase tracking-widest group-hover/btn:text-white transition-colors">Capture</span>
+                                    </button>
+                                </div>
+
+                                {uploadingProgress !== undefined && (
+                                    <div className="space-y-2 animate-in fade-in duration-300">
+                                        <div className="flex items-center justify-between px-1">
+                                            <span className="text-[9px] font-black text-zinc-900 uppercase tracking-widest">Processing Image...</span>
+                                            <span className="text-[10px] font-bold text-zinc-400 tabular-nums">{Math.round(uploadingProgress)}%</span>
+                                        </div>
+                                        <Progress value={uploadingProgress} className="h-1.5 bg-zinc-100" />
+                                    </div>
+                                )}
+
+                                {input.image_url && (
+                                    <div className="relative aspect-video rounded-2xl overflow-hidden border border-zinc-100 group shadow-sm bg-zinc-50 animate-in zoom-in-95 duration-500">
+                                        <img src={input.image_url} alt="Preview" className="size-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all" />
+                                        <button
+                                            type="button"
+                                            onClick={() => onInputChange('image_url', '')}
+                                            className="absolute top-3 right-3 size-10 bg-white shadow-xl rounded-full flex items-center justify-center text-zinc-900 hover:scale-110 active:scale-95 transition-all z-10"
+                                        >
+                                            <X className="size-5" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </>
                 )}
 
                 {config.instructions && (

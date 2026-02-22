@@ -19,7 +19,8 @@ import {
   Sparkles,
   FileText,
   RefreshCw,
-  X
+  X,
+  Phone
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import Image from 'next/image';
@@ -208,8 +209,8 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
                         <Sparkles className="size-5 text-amber-500" />
                       </div>
                       <div>
-                        <h3 className="text-base font-black uppercase tracking-tight text-zinc-900">Add Identity</h3>
-                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Share your vision for these items</p>
+                        <h3 className="text-base font-black uppercase tracking-tight text-zinc-900">Add personalisation details</h3>
+                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">We need a few details to personalise your item</p>
                       </div>
                     </div>
                     <button
@@ -245,6 +246,7 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
               <CreativeBrief
                 order={order as OrderDetail}
                 previews={previews || []}
+                timeline={events}
                 isOptimisticSubmitted={isIdentitySubmittedOptimistic}
                 onOpenPersonalization={() => setProactivePersonalizationOpen(true)}
               />
@@ -280,29 +282,32 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
           </SurfaceErrorBoundaryWithRouter>
 
           <div className="mt-4 text-center">
-            <p className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest mb-4">Support</p>
+            <p className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest mb-4">Need help?</p>
             <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  triggerHaptic(HapticPattern.ACTION);
-                  toast.info("Connecting to support...");
-                  window.open('https://wa.me/919999999999', '_blank');
-                }}
-                className="flex-1 h-14 rounded-2xl bg-white border border-zinc-100 flex items-center justify-center gap-2 text-xs font-bold text-zinc-600 active:scale-95 transition-all hover:bg-zinc-50"
-              >
-                <MessageSquare className="size-4" />
-                Chat
-              </button>
-              <button
-                onClick={() => {
-                  triggerHaptic(HapticPattern.ACTION);
-                  window.location.href = 'tel:+919999999999';
-                }}
-                className="flex-1 h-14 rounded-2xl bg-white border border-zinc-100 flex items-center justify-center gap-2 text-xs font-bold text-zinc-600 active:scale-95 transition-all hover:bg-zinc-50"
-              >
-                <MessageSquare className="size-4" />
-                Call
-              </button>
+              {process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP && (
+                <button
+                  onClick={() => {
+                    triggerHaptic(HapticPattern.ACTION);
+                    window.open(`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP}`, '_blank');
+                  }}
+                  className="flex-1 h-14 rounded-2xl bg-white border border-zinc-100 flex items-center justify-center gap-2 text-xs font-bold text-zinc-600 active:scale-95 transition-all hover:bg-zinc-50"
+                >
+                  <MessageSquare className="size-4" />
+                  Chat
+                </button>
+              )}
+              {process.env.NEXT_PUBLIC_SUPPORT_PHONE && (
+                <button
+                  onClick={() => {
+                    triggerHaptic(HapticPattern.ACTION);
+                    window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`;
+                  }}
+                  className="flex-1 h-14 rounded-2xl bg-white border border-zinc-100 flex items-center justify-center gap-2 text-xs font-bold text-zinc-600 active:scale-95 transition-all hover:bg-zinc-50"
+                >
+                  <Phone className="size-4" />
+                  Call
+                </button>
+              )}
             </div>
           </div>
         </div>

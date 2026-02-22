@@ -61,6 +61,7 @@ const PlaceOrderSchema = z.object({
 const CommerceIntentSchema = z.discriminatedUnion('intent', [
     z.object({ intent: z.literal('ADD_TO_CART'), payload: AddToCartSchema }),
     z.object({ intent: z.literal('UPDATE_CART_QUANTITY'), payload: UpdateCartSchema }),
+    z.object({ intent: z.literal('UPDATE_CART_ITEM'), payload: AddToCartSchema }), // Uses same schema
     z.object({ intent: z.literal('APPLY_COUPON'), payload: ApplyCouponSchema }),
     z.object({ intent: z.literal('TOGGLE_WALLET'), payload: ToggleWalletSchema }),
     z.object({ intent: z.literal('SET_ADDRESS'), payload: SetAddressSchema }),
@@ -102,12 +103,10 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
 
             switch (validated.intent) {
                 case 'ADD_TO_CART': {
-                    // WYSHKIT 2026: Idempotency Guard
-                    // In a production environment, we would use an x-idempotency-key header or payload field.
-                    // For now, we ensure the atomic RPC handles row-level locking.
-                    const { data, error } = await supabase.rpc('add_to_cart_atomic', {
+                    const { data, error } = await supabase.rpc('execute_cart_mutation', {
                         p_item_id: validated.payload.item_id,
                         p_quantity: validated.payload.quantity,
+                        p_mode: 'ADD',
                         p_user_id: user?.id,
                         p_session_id: sessionId,
                         p_variant_id: validated.payload.variant_id ?? undefined,
@@ -119,17 +118,18 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                 }
 
                 case 'UPDATE_CART_QUANTITY': {
-                    // We'll reuse add_to_cart_atomic with negative qty or a dedicated update if needed
-                    // For now, let's assume we have a clear path for updates
-                    const { error } = await supabase
-                        .from('cart_items')
-                        .update({ quantity: validated.payload.quantity })
-                        .match({
-                            item_id: validated.payload.item_id,
-                            ...(user ? { user_id: user.id } : { session_id: sessionId }),
-                            ...(validated.payload.variant_id ? { selected_variant_id: validated.payload.variant_id } : {})
-                        });
+                    const { data, error } = await supabase.rpc('execute_cart_mutation', {
+                        p_item_id: validated.payload.item_id,
+                        p_quantity: validated.payload.quantity,
+                        p_mode: 'SET',
+                        p_user_id: user?.id,
+                        p_session_id: sessionId,
+                        p_variant_id: validated.payload.variant_id ?? undefined
+                    });
                     if (error) throw error;
+                    if (data && !(data as any).success) {
+                        throw new Error((data as any).error || 'Failed to update quantity');
+                    }
                     break;
                 }
 
@@ -219,15 +219,35 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     return { success: true, data };
                 }
 
+                case 'UPDATE_CART_ITEM': {
+                    const { data, error } = await supabase.rpc('execute_cart_mutation', {
+                        p_item_id: validated.payload.item_id,
+                        p_quantity: validated.payload.quantity ?? 1,
+                        p_mode: 'SET',
+                        p_user_id: user?.id,
+                        p_session_id: sessionId,
+                        p_variant_id: validated.payload.variant_id ?? undefined,
+                        p_personalization: (validated.payload.personalization as any) || undefined,
+                        p_selected_addons: (validated.payload.selected_addons as any) || undefined
+                    });
+                    if (error) throw error;
+                    if (data && !(data as any).success) {
+                        throw new Error((data as any).error || 'Failed to update item');
+                    }
+                    break;
+                }
+
                 case 'CLEAR_CART': {
-                    await supabase.from('cart_items').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`);
-                    await supabase.from('checkout_sessions').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`);
+                    const match = user ? { user_id: user.id } : { session_id: sessionId };
+                    await Promise.all([
+                        supabase.from('cart_items').delete().match(match),
+                        supabase.from('checkout_sessions').delete().match(match)
+                    ]);
                     break;
                 }
             }
 
             revalidatePath('/checkout');
-            revalidatePath('/cart');
             return { success: true };
         } catch (err: any) {
             logError(err, 'IntentEngineError');

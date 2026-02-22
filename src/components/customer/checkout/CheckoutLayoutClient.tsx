@@ -16,7 +16,7 @@ import { AddressSlot } from "./slots/AddressSlot";
 import { formatCurrency } from "@/lib/utils/pricing";
 import { CouponSlot } from "./slots/CouponSlot";
 import { CheckoutAddressProvider, useCheckoutAddress } from "./CheckoutAddressContext";
-import { PRICING } from "@/lib/constants/pricing";
+
 import { useOptimistic, useTransition, useMemo } from "react";
 import { usePaymentFlow } from "@/hooks/usePaymentFlow";
 import { BlocksEngine, BlockData } from "@/components/ui/BlocksEngine";
@@ -89,16 +89,12 @@ function CheckoutLayoutClientInner({
 
           <div className="mt-10 space-y-4 relative z-10">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-zinc-900 uppercase tracking-tight">Order Confirmed</h2>
-              <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Preparing your tracker...</p>
+              <h2 className="text-2xl font-black text-zinc-900 uppercase tracking-tight">Order Confirmed!</h2>
+              <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Taking you to your order...</p>
             </div>
 
             <div className="flex flex-col items-center gap-3 pt-4">
               <Loader2 className="size-6 text-zinc-300 animate-spin" />
-              <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-full border border-zinc-100">
-                <Sparkles className="size-4 text-amber-500 animate-pulse" />
-                <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest leading-none">Redirecting to Design Hub</span>
-              </div>
             </div>
           </div>
         </div>
@@ -119,7 +115,7 @@ function CheckoutLayoutClientInner({
             onClick={() => router.push('/')}
             className="rounded-2xl px-8 h-12 bg-zinc-900 text-white font-bold uppercase tracking-widest text-xs"
           >
-            Browse Products
+            Browse items
           </Button>
         </div>
       ) : (

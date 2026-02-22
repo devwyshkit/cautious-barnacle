@@ -44,6 +44,8 @@ interface CartContextType {
     updateQuantity: (itemId: string, variantId: string | null, quantity: number) => Promise<void>;
     clearDraftOrder: () => Promise<void>;
     refreshDraftOrder: () => Promise<Cart | null>;
+    isCartOpen: boolean;
+    setCartOpen: (open: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -80,12 +82,13 @@ export function CartProvider({
         (state, update: { type: 'add' | 'remove' | 'update' | 'clear', payload: any }) => {
             switch (update.type) {
                 case 'add':
-                    // Elite optimistic add: calculate count and mock total for instant visual satisfaction
+                    // ELITE: Stop attempting "Shadow Math" on the client. 
+                    // Just add the item metadata and let the Server Revalidation overflow the real totals.
                     return {
                         ...state,
-                        items: [...state.items, { id: 'temp', ...update.payload, quantity: update.payload.quantity || 1 }],
-                        item_count: state.item_count + (update.payload.quantity || 1),
-                        total: state.total + (update.payload.price || 500) // mock price visually until server true source overrides 
+                        items: [...state.items, { id: 'temp-' + Math.random(), ...update.payload, quantity: update.payload.quantity || 1 }],
+                        // We reset totals to signal "Syncing..." or keep old values.
+                        // Arithmetric drift happens when we try to add prices here.
                     };
                 case 'remove':
                     return {
@@ -213,6 +216,8 @@ export function CartProvider({
         );
     };
 
+    const [isCartOpen, setCartOpen] = useState(false);
+
     const value = {
         draftOrder: optimisticCart,
         loading: isPending,
@@ -226,6 +231,8 @@ export function CartProvider({
             const result = await getCart();
             return result.cart || initialCart;
         },
+        isCartOpen,
+        setCartOpen
     };
 
     return (

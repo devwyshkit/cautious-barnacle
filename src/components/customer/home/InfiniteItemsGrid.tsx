@@ -5,6 +5,7 @@ import { EntityCard } from '@/components/ui/EntityCard';
 import { getFilteredItems } from '@/lib/actions/discovery/search';
 import { WyshkitItem } from '@/lib/types/item';
 import { InfiniteFlow } from '@/components/ui/InfiniteFlow';
+import { LayoutGrid } from '@/components/ui/LayoutGrid';
 
 interface InfiniteItemsGridProps {
     initialItems: WyshkitItem[];
@@ -12,6 +13,7 @@ interface InfiniteItemsGridProps {
     categoryName?: string | null;
     startOffset?: number;
     totalCount?: number;
+    onQuickLook?: (id: string, type: any) => void;
 }
 
 /**
@@ -25,6 +27,7 @@ export function InfiniteItemsGrid({
     category,
     startOffset = 0,
     totalCount,
+    onQuickLook
 }: InfiniteItemsGridProps) {
 
     const fetchMore = useCallback(async ({ limit, offset }: { limit: number; offset: number }) => {
@@ -44,12 +47,18 @@ export function InfiniteItemsGrid({
                     key={item.id}
                     type="item"
                     data={item}
+                    onQuickLook={onQuickLook}
                 />
             )}
             startOffset={startOffset}
             totalCount={totalCount}
             limit={12}
-            gridClassName="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+            gridClassName=""
+            renderContainer={({ children }: { children: React.ReactNode }) => (
+                <LayoutGrid cols={3} gap="md">
+                    {children}
+                </LayoutGrid>
+            )}
         />
     );
 }

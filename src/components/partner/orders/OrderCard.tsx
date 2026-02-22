@@ -6,14 +6,7 @@ import { Package, Clock, ChevronRight, X, Check, MapPin, Phone, AlertTriangle, Z
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
 import {
   Select,
   SelectContent,
@@ -422,14 +415,13 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
         </CardContent>
       </Card>
 
-      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Reject order</DialogTitle>
-            <DialogDescription>
-              Select a reason for rejecting this order. The customer will be notified.
-            </DialogDescription>
-          </DialogHeader>
+      <ResponsiveSurface
+        open={showRejectDialog}
+        onOpenChange={setShowRejectDialog}
+        title="Reject order"
+        description="Select a reason for rejecting this order. The customer will be notified."
+      >
+        <div className="space-y-4 pt-4">
           <Select value={rejectReason} onValueChange={setRejectReason}>
             <SelectTrigger>
               <SelectValue placeholder="Select a reason" />
@@ -442,20 +434,21 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
               ))}
             </SelectContent>
           </Select>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowRejectDialog(false)}>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-4">
+            <Button variant="outline" onClick={() => setShowRejectDialog(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleReject}
               disabled={!rejectReason}
+              className="w-full sm:w-auto"
             >
               Reject order
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      </ResponsiveSurface>
       <PreviewUploader
         orderId={order.id}
         orderItemId={selectedOrderItemId || ''}

@@ -134,66 +134,13 @@ export async function get_partner_stats(partner_id: string): Promise<{ data?: Pa
   try {
     const supabase = await createClient();
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const { data, error } = await (supabase.rpc as any)('get_partner_dashboard_stats', {
+      p_partner_id: partner_id
+    });
 
-    // 1. Orders and Revenue for today
-    const { data: today_orders_data, error: orders_error } = await supabase
-      .from('orders')
-      .select('id, total, status')
-      .eq('partner_id', partner_id)
-      .gte('created_at', today.toISOString());
+    if (error) throw error;
 
-    if (orders_error) throw orders_error;
-    const orders = today_orders_data || [];
-    const completed_orders = orders.filter((o) => o.status === 'DELIVERED');
-
-    // 2. Partner Rating
-    const { data: partner, error: partner_error } = await supabase
-      .from('partners')
-      .select('rating')
-      .eq('id', partner_id)
-      .single();
-
-    if (partner_error) throw partner_error;
-
-    // 3. Pending Orders (Not Delivered/Cancelled)
-    const { count: pending_count, error: pending_error } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('partner_id', partner_id)
-      .neq('status', 'DELIVERED')
-      .neq('status', 'CANCELLED')
-      .neq('status', 'REFUNDED');
-
-    if (pending_error) logError(pending_error, 'get_partner_stats:pending_count');
-
-
-    // WYSHKIT 2026: More efficient low stock check
-    const { data: partner_items_data } = await supabase.from('items').select('id').eq('partner_id', partner_id);
-    const partner_item_ids = partner_items_data?.map(i => i.id) || [];
-
-    const { count: actual_low_stock_count } = await supabase
-      .from('variants')
-      .select('id', { count: 'exact', head: true })
-      .in('item_id', partner_item_ids)
-      .lt('stock_quantity', 5);
-
-    // 5. Financials
-    const financials_res = await get_partner_financials(partner_id);
-    const financials = financials_res.data || { total_earnings: 0, pending_settlement: 0 };
-
-    return {
-      data: {
-        today_orders: orders.length,
-        today_revenue: completed_orders.reduce((sum, o) => sum + Number(o.total || 0), 0),
-        pending_orders: pending_count || 0,
-        avg_rating: partner?.rating ? Number(partner.rating) : null,
-        low_stock_count: actual_low_stock_count || 0,
-        total_earnings: financials.total_earnings,
-        pending_settlement: financials.pending_settlement
-      }
-    };
+    return { data: data as unknown as PartnerStats };
   } catch (error) {
     logError(error, 'get_partner_stats');
     return { error: 'Failed to fetch stats' };

@@ -6,6 +6,7 @@ import { TopHeader } from './TopHeader';
 import { BottomNav } from './BottomNav';
 import { LocationData } from '@/lib/actions/discovery/location';
 import { ComplianceFooter } from './ComplianceFooter';
+import { useSurfaceScribe } from '@/providers/SurfaceScribeProvider';
 
 interface NavShellProps {
     initialLocation: LocationData;
@@ -31,16 +32,18 @@ export function NavShell({ initialLocation, children }: NavShellProps) {
         pathname.startsWith('/category/') ||
         pathname.startsWith('/collection/');
 
+    const { setBottomNavHeight } = useSurfaceScribe();
+
     // WYSHKIT 2026: Synchronize layout variables with visibility
     useEffect(() => {
-        const root = document.documentElement;
         if (isImmersive) {
-            root.style.setProperty('--bottom-nav-height', '0px');
+            setBottomNavHeight(0);
         } else {
             // WYSHKIT 2026: Mobile bottom nav is 64px (h-16) + safe-area
-            root.style.setProperty('--bottom-nav-height', window.innerWidth < 768 ? 'calc(64px + env(safe-area-inset-bottom, 0px))' : '0px');
+            const h = window.innerWidth < 768 ? 80 : 0; // 64 (nav) + 16 (margin)
+            setBottomNavHeight(h);
         }
-    }, [isImmersive, pathname]);
+    }, [isImmersive, pathname, setBottomNavHeight]);
 
     return (
         <>

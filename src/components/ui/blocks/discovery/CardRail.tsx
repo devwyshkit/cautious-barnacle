@@ -10,9 +10,10 @@ import { EntityCard } from '@/components/ui/EntityCard';
 
 interface CardRailProps {
     data: any[];
+    onQuickLook?: (id: string, type: any) => void;
 }
 
-export function CardRail({ data }: CardRailProps) {
+export function CardRail({ data, onQuickLook }: CardRailProps) {
     if (!data || data.length === 0) return null;
 
     return (
@@ -25,6 +26,7 @@ export function CardRail({ data }: CardRailProps) {
                             data={item}
                             variant="portrait"
                             priority={index === 0}
+                            onQuickLook={onQuickLook}
                             className="surface-card hover:shadow-xl transition-all duration-500"
                         />
                     </CarouselItem>

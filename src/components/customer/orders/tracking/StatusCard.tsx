@@ -8,7 +8,7 @@ import { generateEstimatePDF, generateTaxInvoicePDF } from '@/lib/services/pdf-s
 import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
 import { toast } from 'sonner';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-import { PRICING } from '@/lib/constants/pricing';
+
 
 import { OrderDetail } from '@/lib/types/order';
 
@@ -108,45 +108,59 @@ export function StatusCard({ order }: StatusCardProps) {
         }
     }
 
+    const isBreached = React.useMemo(() => {
+        if (!deadline || order.status === ORDER_STATUS.DELIVERED || order.status === ORDER_STATUS.CANCELLED) return false;
+        return new Date() > new Date(deadline);
+    }, [deadline, order.status]);
+
     return (
-        <section className="bg-white rounded-3xl border border-zinc-100 p-6 shadow-sm overflow-hidden relative">
+        <section className={cn(
+            "rounded-3xl border p-6 shadow-sm overflow-hidden relative transition-all duration-500",
+            isBreached ? "bg-rose-50/50 border-rose-100 shadow-rose-100/50" : "bg-white border-zinc-100"
+        )}>
             {/* WYSHKIT 2026: Live Pulse Header */}
             {deadline && (
-                <div className="absolute top-0 right-0 px-4 py-2 bg-zinc-950 flex items-center gap-2 rounded-bl-2xl">
+                <div className={cn(
+                    "absolute top-0 right-0 px-4 py-2 flex items-center gap-2 rounded-bl-2xl",
+                    isBreached ? "bg-rose-600" : "bg-zinc-950"
+                )}>
                     <div className="relative flex size-2 items-center justify-center">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="absolute inline-flex h-2 w-2 animate-ping-slow rounded-full bg-emerald-400/30 opacity-40"></span>
-                        <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                        <span className={cn("absolute inline-flex h-full w-full animate-ping rounded-full opacity-75", isBreached ? "bg-white" : "bg-emerald-400")}></span>
+                        <span className={cn("relative inline-flex size-1.5 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]", isBreached ? "bg-white" : "bg-emerald-500")}></span>
                     </div>
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest">Live Pulse</span>
+                    <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                        {isBreached ? 'SLA Breach' : 'Live Pulse'}
+                    </span>
                 </div>
             )}
 
             <div className="flex items-start gap-4">
                 <div className={cn(
                     "size-14 rounded-2xl flex items-center justify-center shrink-0 relative transition-all duration-500",
-                    order.status === ORDER_STATUS.PREVIEW_READY
-                        ? "bg-rose-50 text-[var(--primary)]"
-                        : order.status === ORDER_STATUS.DELIVERED ? "bg-emerald-50 text-emerald-600" : "bg-zinc-100 text-zinc-600",
+                    isBreached ? "bg-rose-100 text-rose-600" : (
+                        order.status === ORDER_STATUS.PREVIEW_READY
+                            ? "bg-rose-50 text-[var(--primary)]"
+                            : order.status === ORDER_STATUS.DELIVERED ? "bg-emerald-50 text-emerald-600" : "bg-zinc-100 text-zinc-600"
+                    ),
                 )}>
-                    {getStatusIcon(order.status || '')}
+                    {isBreached ? <AlertCircle className="size-6 animate-bounce" /> : getStatusIcon(order.status || '')}
                     {deadline && (
                         <div className="absolute -bottom-1 -right-1 size-5 bg-white rounded-full flex items-center justify-center shadow-sm border border-zinc-100">
-                            <Timer className="size-3 text-zinc-950 animate-pulse" />
+                            <Timer className={cn("size-3", isBreached ? "text-rose-600" : "text-zinc-950 animate-pulse")} />
                         </div>
                     )}
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
-                        <h2 className="text-lg font-black text-zinc-900 uppercase tracking-tight leading-tight">
-                            {getStatusText(order.status || '')}
+                        <h2 className={cn(
+                            "text-lg font-black uppercase tracking-tight leading-tight",
+                            isBreached ? "text-rose-700" : "text-zinc-900"
+                        )}>
+                            {isBreached ? 'Partner is Running Late' : getStatusText(order.status || '')}
                         </h2>
                         {(() => {
                             const pendingCount = (order.order_items || []).filter((item: any) => {
                                 if (!item.is_personalized) return false;
-
-                                // WYSHKIT 2026: Include all personalized items regardless of addon complexity
-                                // if they don't have details submitted yet.
                                 const s = (item.status || 'pending').toLowerCase();
                                 const blocked = ['submitted', 'details_received', 'preview_ready', 'approved', 'in_production', 'packed', 'shipped', 'delivered', 'cancelled'];
                                 return !blocked.includes(s) && !item.personalization_details;
@@ -172,18 +186,44 @@ export function StatusCard({ order }: StatusCardProps) {
                         </div>
                     ) : (
                         <div className="space-y-1.5 mt-1">
-                            <p className="text-xs font-bold text-zinc-900 leading-tight">{getNextStep(order.status || '', !!order.has_personalization)}</p>
+                            {isBreached ? (
+                                <p className="text-xs font-bold text-rose-600 leading-tight">
+                                    Our partner missed their deadline. Our support team is intervening.
+                                </p>
+                            ) : (
+                                <p className="text-xs font-bold text-zinc-900 leading-tight">{getNextStep(order.status || '', !!order.has_personalization)}</p>
+                            )}
                             {deadline && (
                                 <HyperlocalTimer
                                     deadline={deadline}
                                     variant="minimal"
-                                    className="text-[11px] font-black"
+                                    className={cn("text-[11px] font-black", isBreached ? "text-rose-500" : "")}
                                 />
                             )}
                         </div>
                     )}
                 </div>
             </div>
+
+            {isBreached && (
+                <div className="mt-4 p-4 bg-white rounded-2xl border border-rose-100 shadow-sm animate-in slide-in-from-bottom-2 duration-500">
+                    <p className="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-3">Escalation Options</p>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`}
+                            className="flex-1 py-3 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                        >
+                            Priority Call
+                        </button>
+                        <button
+                            onClick={() => toast.info("Requesting automated refund status...")}
+                            className="flex-1 py-3 bg-zinc-50 border border-rose-100 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                        >
+                            Instant Refund
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <div className="mt-6 flex gap-1.5">
                 {[0, 1, 2, 3].map((i) => {
@@ -265,7 +305,7 @@ export function StatusCard({ order }: StatusCardProps) {
                                 totals: {
                                     item_total: Number(order.subtotal) || 0,
                                     delivery_fee: Number(order.delivery_fee) || 0,
-                                    platform_fee: Number(order.platform_fee) || PRICING.DEPRECATED_ESTIMATE_PLATFORM_FEE,
+                                    platform_fee: Number(order.platform_fee) || 10,
                                     gst_amount: Number(order.gst) || 0,
                                     grand_total: Number(order.total) || 0
                                 }

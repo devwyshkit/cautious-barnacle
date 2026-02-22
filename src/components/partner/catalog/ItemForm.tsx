@@ -17,11 +17,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+  ResponsiveSurface
+} from '@/components/ui/ResponsiveSurface';
 import {
   Tabs,
   TabsContent,
@@ -330,593 +327,581 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
   const totalStock = getTotalStock();
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto p-0">
-        <SheetHeader className="px-4 py-3 border-b sticky top-0 bg-white z-10">
-          <div className="flex items-center justify-between">
-            <SheetTitle className="text-base font-medium">
-              {isEdit ? 'Edit item' : 'Add item'}
-            </SheetTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-8"
-              onClick={() => onOpenChange(false)}
+    <ResponsiveSurface
+      open={open}
+      onOpenChange={onOpenChange}
+      title={isEdit ? 'Edit item' : 'Add item'}
+      className="p-0 sm:max-w-xl"
+    >
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
+        <div className="px-4 pt-3 border-b bg-zinc-50/50">
+          <TabsList className="w-full h-9 bg-transparent p-0 gap-4">
+            <TabsTrigger
+              value="basic"
+              className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
             >
-              <X className="size-4" />
-            </Button>
-          </div>
-        </SheetHeader>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1">
-          <div className="px-4 pt-3 border-b bg-zinc-50/50">
-            <TabsList className="w-full h-9 bg-transparent p-0 gap-4">
-              <TabsTrigger
-                value="basic"
-                className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
-              >
-                Basic
-              </TabsTrigger>
-              <TabsTrigger
-                value="variants"
-                className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
-              >
-                Variants
-                {variants.length > 0 && (
-                  <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-xs">{variants.length}</Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="personalization"
-                className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
-              >
-                Personalization
-                {personalizationOptions.length > 0 && (
-                  <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-xs">{personalizationOptions.length}</Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="addons"
-                className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
-              >
-                Addons
-                {addons.length > 0 && (
-                  <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-xs">{addons.length}</Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="specs"
-                className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
-              >
-                Specifications
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="basic" className="p-4 space-y-5 mt-0">
-            <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-sm text-zinc-600">Item name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g. Chocolate truffle cake"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="description" className="text-sm text-zinc-600">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description || ''}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Describe your item"
-                rows={3}
-                className="resize-none"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="price" className="text-sm text-zinc-600">Selling price</Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">₹</span>
-                  <Input
-                    id="price"
-                    type="number"
-                    value={formData.base_price || ''}
-                    onChange={(e) => setFormData({ ...formData, base_price: Number(e.target.value) })}
-                    className="pl-7"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="mrp" className="text-sm text-zinc-600">MRP (optional)</Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">₹</span>
-                  <Input
-                    id="mrp"
-                    type="number"
-                    value={formData.mrp || ''}
-                    onChange={(e) => setFormData({ ...formData, mrp: Number(e.target.value) || undefined })}
-                    className="pl-7"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-sm text-zinc-600">Category</Label>
-              <Select
-                value={formData.category || ''}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-sm text-zinc-600">Images</Label>
-              <div className="border-2 border-dashed border-zinc-200 rounded-lg p-6 text-center hover:border-zinc-300 transition-colors cursor-pointer">
-                <div className="flex flex-col items-center gap-2">
-                  <div className="size-10 rounded-full bg-zinc-100 flex items-center justify-center">
-                    <ImageIcon className="size-5 text-zinc-400" />
-                  </div>
-                  <p className="text-sm text-zinc-500">Upload images</p>
-                  <p className="text-xs text-zinc-400">PNG, JPG up to 5MB</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label className="text-sm text-zinc-600">Production time</Label>
-                <Select
-                  value={String(formData.production_time_minutes || 120)}
-                  onValueChange={(value) => setFormData({ ...formData, production_time_minutes: Number(value) })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="60">1 hour</SelectItem>
-                    <SelectItem value="120">2 hours</SelectItem>
-                    <SelectItem value="180">3 hours</SelectItem>
-                    <SelectItem value="240">4 hours</SelectItem>
-                    <SelectItem value="360">6 hours</SelectItem>
-                    <SelectItem value="480">8 hours</SelectItem>
-                    <SelectItem value="1440">1 day</SelectItem>
-                    <SelectItem value="2880">2 days</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-sm text-zinc-600">Preview time</Label>
-                <Select
-                  value={String(formData.preview_time_minutes || 60)}
-                  onValueChange={(value) => setFormData({ ...formData, preview_time_minutes: Number(value) })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="30">30 mins</SelectItem>
-                    <SelectItem value="60">1 hour</SelectItem>
-                    <SelectItem value="120">2 hours</SelectItem>
-                    <SelectItem value="180">3 hours</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="pt-2 space-y-3">
-              <div className="flex items-center justify-between py-2">
-                <div>
-                  <p className="text-sm font-medium text-zinc-900">Active</p>
-                  <p className="text-xs text-zinc-500">Show in store</p>
-                </div>
-                <Switch
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="variants" className="p-4 space-y-4 mt-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-zinc-900">Variants</p>
-                <p className="text-xs text-zinc-500">Size, weight, color options</p>
-              </div>
-              {totalStock !== null && (
-                <div className="text-right">
-                  <p className="text-sm font-medium text-zinc-900">{totalStock} units</p>
-                  <p className="text-xs text-zinc-500">Total stock</p>
-                </div>
+              Basic
+            </TabsTrigger>
+            <TabsTrigger
+              value="variants"
+              className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
+            >
+              Variants
+              {variants.length > 0 && (
+                <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-xs">{variants.length}</Badge>
               )}
-            </div>
-
-            {variants.length > 0 && (
-              <div className="space-y-2">
-                {variants.map((v, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100"
-                  >
-                    <GripVertical className="size-4 text-zinc-300 cursor-grab" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-zinc-900 truncate">{v.name || 'Unnamed Variant'}</p>
-                      <p className="text-xs text-zinc-500">
-                        {(v.price ?? 0) > 0 ? `+₹${Number(v.price).toLocaleString('en-IN')}` : 'Base price'}
-                        {v.sku && <span className="ml-2 text-zinc-400">SKU: {v.sku}</span>}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-20">
-                        <Input
-                          type="number"
-                          value={v.stock_quantity ?? 0}
-                          onChange={(e) => handleUpdateVariantStock(i, Number(e.target.value))}
-                          className="h-8 text-sm text-center"
-                          min={0}
-                        />
-                      </div>
-                      <span className="text-xs text-zinc-400">qty</span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-zinc-400 hover:text-red-500 shrink-0"
-                      onClick={() => handleRemoveVariant(i)}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="p-3 border rounded-lg space-y-3 bg-white">
-              <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Add variant</p>
-              <div className="grid grid-cols-2 gap-2">
-                <Input
-                  placeholder="Name (e.g. 500g)"
-                  value={newVariant.name || ''}
-                  onChange={(e) => setNewVariant({ ...newVariant, name: e.target.value })}
-                />
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">+₹</span>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={newVariant.price || ''}
-                    onChange={(e) => setNewVariant({ ...newVariant, price: Number(e.target.value) })}
-                    className="pl-8"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <Input
-                  type="number"
-                  placeholder="Stock quantity"
-                  value={newVariant.stock_quantity || ''}
-                  onChange={(e) => setNewVariant({ ...newVariant, stock_quantity: Number(e.target.value) })}
-                />
-                <Input
-                  placeholder="SKU (optional)"
-                  value={newVariant.sku || ''}
-                  onChange={(e) => setNewVariant({ ...newVariant, sku: e.target.value })}
-                />
-              </div>
-              <Button size="sm" onClick={handleAddVariant} className="w-full">
-                <Plus className="size-4 mr-1" />
-                Add variant
-              </Button>
-            </div>
-
-            {variants.length === 0 && (
-              <div className="text-center py-6 text-zinc-400">
-                <Package className="size-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No variants added</p>
-                <p className="text-xs mt-1">Add variants if your item has different sizes or options</p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="personalization" className="p-4 space-y-4 mt-0">
-            <div>
-              <p className="text-sm font-medium text-zinc-900">Personalization options</p>
-              <p className="text-xs text-zinc-500">Text engraving, photos, name prints</p>
-            </div>
-
-            {personalizationOptions.length > 0 && (
-              <div className="space-y-2">
-                {personalizationOptions.map((p, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100"
-                  >
-                    <div className="size-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                      <Sparkles className="size-4 text-amber-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-zinc-900">{p.name}</p>
-                      <p className="text-xs text-zinc-500">
-                        {p.input_type === 'text' ? 'Text input' : p.input_type === 'image' ? 'Image upload' : 'Text + image'}
-                        {p.char_limit && ` • Max ${p.char_limit} chars`}
-                        {p.price && p.price > 0 ? ` • +₹${Number(p.price).toLocaleString('en-IN')}` : ' • Free'}
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-zinc-400 hover:text-red-500 shrink-0"
-                      onClick={() => handleRemovePersonalization(i)}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="p-3 border rounded-lg space-y-3 bg-white">
-              <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Add option</p>
-              <Input
-                placeholder="Option name (e.g. Name engraving)"
-                value={newPersonalization.name}
-                onChange={(e) => setNewPersonalization({ ...newPersonalization, name: e.target.value })}
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <Select
-                  value={newPersonalization.input_type}
-                  onValueChange={(value: 'text' | 'image' | 'both') =>
-                    setNewPersonalization({ ...newPersonalization, input_type: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="text">Text input</SelectItem>
-                    <SelectItem value="image">Image upload</SelectItem>
-                    <SelectItem value="both">Text + image</SelectItem>
-                  </SelectContent>
-                </Select>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">+₹</span>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={newPersonalization.price || ''}
-                    onChange={(e) => setNewPersonalization({ ...newPersonalization, price: Number(e.target.value) })}
-                    className="pl-8"
-                  />
-                </div>
-              </div>
-              {newPersonalization.input_type !== 'image' && (
-                <Input
-                  type="number"
-                  placeholder="Character limit (e.g. 50)"
-                  value={newPersonalization.char_limit || ''}
-                  onChange={(e) => setNewPersonalization({ ...newPersonalization, char_limit: Number(e.target.value) })}
-                />
+            </TabsTrigger>
+            <TabsTrigger
+              value="personalization"
+              className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
+            >
+              Personalization
+              {personalizationOptions.length > 0 && (
+                <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-xs">{personalizationOptions.length}</Badge>
               )}
-              <Button size="sm" onClick={handleAddPersonalization} className="w-full">
-                <Plus className="size-4 mr-1" />
-                Add option
-              </Button>
-            </div>
+            </TabsTrigger>
+            <TabsTrigger
+              value="addons"
+              className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
+            >
+              Addons
+              {addons.length > 0 && (
+                <Badge variant="secondary" className="ml-1.5 h-5 px-1.5 text-xs">{addons.length}</Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger
+              value="specs"
+              className="px-0 pb-3 h-auto rounded-none border-b-2 border-transparent data-[state=active]:border-zinc-900 data-[state=active]:bg-transparent data-[state=active]:shadow-none text-sm"
+            >
+              Specifications
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-            {personalizationOptions.length === 0 && (
-              <div className="text-center py-6 text-zinc-400">
-                <Sparkles className="size-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No personalization options</p>
-                <p className="text-xs mt-1">Add options like name engraving or photo printing</p>
-              </div>
-            )}
-          </TabsContent>
+        <TabsContent value="basic" className="p-4 space-y-5 mt-0">
+          <div className="space-y-1.5">
+            <Label htmlFor="name" className="text-sm text-zinc-600">Item name</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="e.g. Chocolate truffle cake"
+            />
+          </div>
 
-          <TabsContent value="addons" className="p-4 space-y-4 mt-0">
-            <div>
-              <p className="text-sm font-medium text-zinc-900">Addons</p>
-              <p className="text-xs text-zinc-500">Premium packaging, express delivery, etc.</p>
-            </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="description" className="text-sm text-zinc-600">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description || ''}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Describe your item"
+              rows={3}
+              className="resize-none"
+            />
+          </div>
 
-            {addons.length > 0 && (
-              <div className="space-y-2">
-                {addons.map((a, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100"
-                  >
-                    <div className="size-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                      <ShoppingBag className="size-4 text-emerald-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-zinc-900">{a.name}</p>
-                      <p className="text-xs text-zinc-500">
-                        +₹{Number(a.price).toLocaleString('en-IN')}
-                      </p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 text-zinc-400 hover:text-red-500 shrink-0"
-                      onClick={() => handleRemoveAddon(i)}
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="p-3 border rounded-lg space-y-3 bg-white">
-              <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Add addon</p>
-              <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="price" className="text-sm text-zinc-600">Selling price</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">₹</span>
                 <Input
-                  placeholder="Name (e.g. Premium wrap)"
-                  value={newAddon.name}
-                  onChange={(e) => setNewAddon({ ...newAddon, name: e.target.value })}
-                />
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">+₹</span>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={newAddon.price || ''}
-                    onChange={(e) => setNewAddon({ ...newAddon, price: Number(e.target.value) })}
-                    className="pl-8"
-                  />
-                </div>
-              </div>
-              <Button size="sm" onClick={handleAddAddon} className="w-full">
-                <Plus className="size-4 mr-1" />
-                Add addon
-              </Button>
-            </div>
-
-            {addons.length === 0 && (
-              <div className="text-center py-6 text-zinc-400">
-                <ShoppingBag className="size-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No addons added</p>
-                <p className="text-xs mt-1">Add extras like premium packaging or express delivery</p>
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="specs" className="p-4 space-y-5 mt-0">
-            <div>
-              <p className="text-sm font-medium text-zinc-900">Physical Specifications</p>
-              <p className="text-xs text-zinc-500">Required for accurate shipping and tax</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="material" className="text-sm text-zinc-600">Material</Label>
-                <Input
-                  id="material"
-                  value={formData.material || ''}
-                  onChange={(e) => setFormData({ ...formData, material: e.target.value })}
-                  placeholder="e.g. Ceramic, Cotton"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="capacity" className="text-sm text-zinc-600">Capacity</Label>
-                <Input
-                  id="capacity"
-                  value={formData.capacity || ''}
-                  onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                  placeholder="e.g. 500ml, 1kg"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="weight" className="text-sm text-zinc-600">Weight (grams)</Label>
-                <Input
-                  id="weight"
+                  id="price"
                   type="number"
-                  value={formData.weight_grams || ''}
-                  onChange={(e) => setFormData({ ...formData, weight_grams: Number(e.target.value) })}
+                  value={formData.base_price || ''}
+                  onChange={(e) => setFormData({ ...formData, base_price: Number(e.target.value) })}
+                  className="pl-7"
                   placeholder="0"
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="hsn" className="text-sm text-zinc-600">HSN Code</Label>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="mrp" className="text-sm text-zinc-600">MRP (optional)</Label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">₹</span>
                 <Input
-                  id="hsn"
-                  value={formData.hsn_code || ''}
-                  onChange={(e) => setFormData({ ...formData, hsn_code: e.target.value })}
-                  placeholder="e.g. 4901"
+                  id="mrp"
+                  type="number"
+                  value={formData.mrp || ''}
+                  onChange={(e) => setFormData({ ...formData, mrp: Number(e.target.value) || undefined })}
+                  className="pl-7"
+                  placeholder="0"
                 />
               </div>
             </div>
+          </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-sm text-zinc-600">Dimensions (cm)</Label>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="space-y-1">
-                  <span className="text-[10px] text-zinc-400 uppercase">Length</span>
-                  <Input
-                    type="number"
-                    value={formData.dimensions_cm?.length || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      dimensions_cm: { ...formData.dimensions_cm!, length: Number(e.target.value) }
-                    })}
-                    placeholder="L"
-                  />
+          <div className="space-y-1.5">
+            <Label className="text-sm text-zinc-600">Category</Label>
+            <Select
+              value={formData.category || ''}
+              onValueChange={(value) => setFormData({ ...formData, category: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((cat) => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm text-zinc-600">Images</Label>
+            <div className="border-2 border-dashed border-zinc-200 rounded-lg p-6 text-center hover:border-zinc-300 transition-colors cursor-pointer">
+              <div className="flex flex-col items-center gap-2">
+                <div className="size-10 rounded-full bg-zinc-100 flex items-center justify-center">
+                  <ImageIcon className="size-5 text-zinc-400" />
                 </div>
-                <div className="space-y-1">
-                  <span className="text-[10px] text-zinc-400 uppercase">Width</span>
-                  <Input
-                    type="number"
-                    value={formData.dimensions_cm?.width || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      dimensions_cm: { ...formData.dimensions_cm!, width: Number(e.target.value) }
-                    })}
-                    placeholder="W"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <span className="text-[10px] text-zinc-400 uppercase">Height</span>
-                  <Input
-                    type="number"
-                    value={formData.dimensions_cm?.height || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      dimensions_cm: { ...formData.dimensions_cm!, height: Number(e.target.value) }
-                    })}
-                    placeholder="H"
-                  />
-                </div>
+                <p className="text-sm text-zinc-500">Upload images</p>
+                <p className="text-xs text-zinc-400">PNG, JPG up to 5MB</p>
               </div>
             </div>
+          </div>
 
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="gst" className="text-sm text-zinc-600">GST Rate (%)</Label>
+              <Label className="text-sm text-zinc-600">Production time</Label>
               <Select
-                value={String(formData.gst_percentage || 18)}
-                onValueChange={(value) => setFormData({ ...formData, gst_percentage: Number(value) })}
+                value={String(formData.production_time_minutes || 120)}
+                onValueChange={(value) => setFormData({ ...formData, production_time_minutes: Number(value) })}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">0% (GST Exempt)</SelectItem>
-                  <SelectItem value="5">5%</SelectItem>
-                  <SelectItem value="12">12%</SelectItem>
-                  <SelectItem value="18">18%</SelectItem>
-                  <SelectItem value="28">28%</SelectItem>
+                  <SelectItem value="60">1 hour</SelectItem>
+                  <SelectItem value="120">2 hours</SelectItem>
+                  <SelectItem value="180">3 hours</SelectItem>
+                  <SelectItem value="240">4 hours</SelectItem>
+                  <SelectItem value="360">6 hours</SelectItem>
+                  <SelectItem value="480">8 hours</SelectItem>
+                  <SelectItem value="1440">1 day</SelectItem>
+                  <SelectItem value="2880">2 days</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </TabsContent>
-        </Tabs>
+            <div className="space-y-1.5">
+              <Label className="text-sm text-zinc-600">Preview time</Label>
+              <Select
+                value={String(formData.preview_time_minutes || 60)}
+                onValueChange={(value) => setFormData({ ...formData, preview_time_minutes: Number(value) })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30">30 mins</SelectItem>
+                  <SelectItem value="60">1 hour</SelectItem>
+                  <SelectItem value="120">2 hours</SelectItem>
+                  <SelectItem value="180">3 hours</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-        <div className="sticky bottom-0 p-4 border-t bg-white">
-          <Button
-            className="w-full"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? 'Saving...' : isEdit ? 'Save changes' : 'Add item'}
-          </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
+          <div className="pt-2 space-y-3">
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <p className="text-sm font-medium text-zinc-900">Active</p>
+                <p className="text-xs text-zinc-500">Show in store</p>
+              </div>
+              <Switch
+                checked={formData.is_active}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+              />
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="variants" className="p-4 space-y-4 mt-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-zinc-900">Variants</p>
+              <p className="text-xs text-zinc-500">Size, weight, color options</p>
+            </div>
+            {totalStock !== null && (
+              <div className="text-right">
+                <p className="text-sm font-medium text-zinc-900">{totalStock} units</p>
+                <p className="text-xs text-zinc-500">Total stock</p>
+              </div>
+            )}
+          </div>
+
+          {variants.length > 0 && (
+            <div className="space-y-2">
+              {variants.map((v, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100"
+                >
+                  <GripVertical className="size-4 text-zinc-300 cursor-grab" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-zinc-900 truncate">{v.name || 'Unnamed Variant'}</p>
+                    <p className="text-xs text-zinc-500">
+                      {(v.price ?? 0) > 0 ? `+₹${Number(v.price).toLocaleString('en-IN')}` : 'Base price'}
+                      {v.sku && <span className="ml-2 text-zinc-400">SKU: {v.sku}</span>}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-20">
+                      <Input
+                        type="number"
+                        value={v.stock_quantity ?? 0}
+                        onChange={(e) => handleUpdateVariantStock(i, Number(e.target.value))}
+                        className="h-8 text-sm text-center"
+                        min={0}
+                      />
+                    </div>
+                    <span className="text-xs text-zinc-400">qty</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-zinc-400 hover:text-red-500 shrink-0"
+                    onClick={() => handleRemoveVariant(i)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="p-3 border rounded-lg space-y-3 bg-white">
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Add variant</p>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                placeholder="Name (e.g. 500g)"
+                value={newVariant.name || ''}
+                onChange={(e) => setNewVariant({ ...newVariant, name: e.target.value })}
+              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">+₹</span>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={newVariant.price || ''}
+                  onChange={(e) => setNewVariant({ ...newVariant, price: Number(e.target.value) })}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                type="number"
+                placeholder="Stock quantity"
+                value={newVariant.stock_quantity || ''}
+                onChange={(e) => setNewVariant({ ...newVariant, stock_quantity: Number(e.target.value) })}
+              />
+              <Input
+                placeholder="SKU (optional)"
+                value={newVariant.sku || ''}
+                onChange={(e) => setNewVariant({ ...newVariant, sku: e.target.value })}
+              />
+            </div>
+            <Button size="sm" onClick={handleAddVariant} className="w-full">
+              <Plus className="size-4 mr-1" />
+              Add variant
+            </Button>
+          </div>
+
+          {variants.length === 0 && (
+            <div className="text-center py-6 text-zinc-400">
+              <Package className="size-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No variants added</p>
+              <p className="text-xs mt-1">Add variants if your item has different sizes or options</p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="personalization" className="p-4 space-y-4 mt-0">
+          <div>
+            <p className="text-sm font-medium text-zinc-900">Personalization options</p>
+            <p className="text-xs text-zinc-500">Text engraving, photos, name prints</p>
+          </div>
+
+          {personalizationOptions.length > 0 && (
+            <div className="space-y-2">
+              {personalizationOptions.map((p, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100"
+                >
+                  <div className="size-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                    <Sparkles className="size-4 text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-zinc-900">{p.name}</p>
+                    <p className="text-xs text-zinc-500">
+                      {p.input_type === 'text' ? 'Text input' : p.input_type === 'image' ? 'Image upload' : 'Text + image'}
+                      {p.char_limit && ` • Max ${p.char_limit} chars`}
+                      {p.price && p.price > 0 ? ` • +₹${Number(p.price).toLocaleString('en-IN')}` : ' • Free'}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-zinc-400 hover:text-red-500 shrink-0"
+                    onClick={() => handleRemovePersonalization(i)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="p-3 border rounded-lg space-y-3 bg-white">
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Add option</p>
+            <Input
+              placeholder="Option name (e.g. Name engraving)"
+              value={newPersonalization.name}
+              onChange={(e) => setNewPersonalization({ ...newPersonalization, name: e.target.value })}
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <Select
+                value={newPersonalization.input_type}
+                onValueChange={(value: 'text' | 'image' | 'both') =>
+                  setNewPersonalization({ ...newPersonalization, input_type: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="text">Text input</SelectItem>
+                  <SelectItem value="image">Image upload</SelectItem>
+                  <SelectItem value="both">Text + image</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">+₹</span>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={newPersonalization.price || ''}
+                  onChange={(e) => setNewPersonalization({ ...newPersonalization, price: Number(e.target.value) })}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+            {newPersonalization.input_type !== 'image' && (
+              <Input
+                type="number"
+                placeholder="Character limit (e.g. 50)"
+                value={newPersonalization.char_limit || ''}
+                onChange={(e) => setNewPersonalization({ ...newPersonalization, char_limit: Number(e.target.value) })}
+              />
+            )}
+            <Button size="sm" onClick={handleAddPersonalization} className="w-full">
+              <Plus className="size-4 mr-1" />
+              Add option
+            </Button>
+          </div>
+
+          {personalizationOptions.length === 0 && (
+            <div className="text-center py-6 text-zinc-400">
+              <Sparkles className="size-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No personalization options</p>
+              <p className="text-xs mt-1">Add options like name engraving or photo printing</p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="addons" className="p-4 space-y-4 mt-0">
+          <div>
+            <p className="text-sm font-medium text-zinc-900">Addons</p>
+            <p className="text-xs text-zinc-500">Premium packaging, express delivery, etc.</p>
+          </div>
+
+          {addons.length > 0 && (
+            <div className="space-y-2">
+              {addons.map((a, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100"
+                >
+                  <div className="size-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                    <ShoppingBag className="size-4 text-emerald-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-zinc-900">{a.name}</p>
+                    <p className="text-xs text-zinc-500">
+                      +₹{Number(a.price).toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-zinc-400 hover:text-red-500 shrink-0"
+                    onClick={() => handleRemoveAddon(i)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="p-3 border rounded-lg space-y-3 bg-white">
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Add addon</p>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                placeholder="Name (e.g. Premium wrap)"
+                value={newAddon.name}
+                onChange={(e) => setNewAddon({ ...newAddon, name: e.target.value })}
+              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">+₹</span>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={newAddon.price || ''}
+                  onChange={(e) => setNewAddon({ ...newAddon, price: Number(e.target.value) })}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+            <Button size="sm" onClick={handleAddAddon} className="w-full">
+              <Plus className="size-4 mr-1" />
+              Add addon
+            </Button>
+          </div>
+
+          {addons.length === 0 && (
+            <div className="text-center py-6 text-zinc-400">
+              <ShoppingBag className="size-8 mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No addons added</p>
+              <p className="text-xs mt-1">Add extras like premium packaging or express delivery</p>
+            </div>
+          )}
+        </TabsContent>
+        <TabsContent value="specs" className="p-4 space-y-5 mt-0">
+          <div>
+            <p className="text-sm font-medium text-zinc-900">Physical Specifications</p>
+            <p className="text-xs text-zinc-500">Required for accurate shipping and tax</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="material" className="text-sm text-zinc-600">Material</Label>
+              <Input
+                id="material"
+                value={formData.material || ''}
+                onChange={(e) => setFormData({ ...formData, material: e.target.value })}
+                placeholder="e.g. Ceramic, Cotton"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="capacity" className="text-sm text-zinc-600">Capacity</Label>
+              <Input
+                id="capacity"
+                value={formData.capacity || ''}
+                onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                placeholder="e.g. 500ml, 1kg"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="weight" className="text-sm text-zinc-600">Weight (grams)</Label>
+              <Input
+                id="weight"
+                type="number"
+                value={formData.weight_grams || ''}
+                onChange={(e) => setFormData({ ...formData, weight_grams: Number(e.target.value) })}
+                placeholder="0"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="hsn" className="text-sm text-zinc-600">HSN Code</Label>
+              <Input
+                id="hsn"
+                value={formData.hsn_code || ''}
+                onChange={(e) => setFormData({ ...formData, hsn_code: e.target.value })}
+                placeholder="e.g. 4901"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-sm text-zinc-600">Dimensions (cm)</Label>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-1">
+                <span className="text-[10px] text-zinc-400 uppercase">Length</span>
+                <Input
+                  type="number"
+                  value={formData.dimensions_cm?.length || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    dimensions_cm: { ...formData.dimensions_cm!, length: Number(e.target.value) }
+                  })}
+                  placeholder="L"
+                />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] text-zinc-400 uppercase">Width</span>
+                <Input
+                  type="number"
+                  value={formData.dimensions_cm?.width || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    dimensions_cm: { ...formData.dimensions_cm!, width: Number(e.target.value) }
+                  })}
+                  placeholder="W"
+                />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] text-zinc-400 uppercase">Height</span>
+                <Input
+                  type="number"
+                  value={formData.dimensions_cm?.height || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    dimensions_cm: { ...formData.dimensions_cm!, height: Number(e.target.value) }
+                  })}
+                  placeholder="H"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="gst" className="text-sm text-zinc-600">GST Rate (%)</Label>
+            <Select
+              value={String(formData.gst_percentage || 18)}
+              onValueChange={(value) => setFormData({ ...formData, gst_percentage: Number(value) })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">0% (GST Exempt)</SelectItem>
+                <SelectItem value="5">5%</SelectItem>
+                <SelectItem value="12">12%</SelectItem>
+                <SelectItem value="18">18%</SelectItem>
+                <SelectItem value="28">28%</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      <div className="sticky bottom-0 p-4 border-t bg-white">
+        <Button
+          className="w-full"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? 'Saving...' : isEdit ? 'Save changes' : 'Add item'}
+        </Button>
+      </div>
+    </ResponsiveSurface>
   );
 }

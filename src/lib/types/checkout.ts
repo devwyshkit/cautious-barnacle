@@ -1,6 +1,6 @@
 import type { DraftLineItem } from './personalization';
 import type { Address } from './address';
-import type { PricingBreakdown } from '@/lib/constants/pricing';
+import type { PricingBreakdown } from './pricing';
 import type { WalletInfo } from '@/lib/actions/user/wallet';
 
 /**

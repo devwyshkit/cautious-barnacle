@@ -7,7 +7,7 @@ import { logger } from '@/lib/logging/logger';
 import { logError, handleActionError } from '@/lib/utils/error-handler';
 import { EMPTY_CART } from '@/lib/constants/cart';
 import { DraftTransaction, DraftLineItem, SelectedPersonalization, SelectedAddon } from '@/lib/types/personalization';
-import { PricingBreakdown } from '@/lib/constants/pricing';
+import type { PricingBreakdown } from '@/lib/types/pricing';
 import type { Tables } from '@/lib/supabase/database.types';
 
 /**
@@ -68,16 +68,19 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
 
         // 3. Mapping with Purified Logic
         const items: DraftLineItem[] = itemRows.map(row => {
-            const item_base_price = Number(row.base_price || 0);
-            const variant_price = row.variant_price != null ? Number(row.variant_price) : null;
-            const unit_price = variant_price !== null ? variant_price : item_base_price;
             const quantity = Number(row.quantity) || 1;
+            const base_price = Number(row.variant_price ?? row.base_price ?? 0);
 
             const selected_addons = (row.selected_addons as unknown as SelectedAddon[]) || [];
             const addons_price = selected_addons.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
 
             const personalization = (row.personalization as unknown as SelectedPersonalization) || { enabled: false };
-            const personalization_price = (personalization?.price || 0);
+            // Note: Personalization fee is handled at the order total level, 
+            // but we can show it here if needed for UI.
+            const personalization_price = personalization.enabled ? 50 : 0; // Legacy fallback, will be mastered by individual items later
+
+            const unit_price = base_price + addons_price;
+            const line_total = (unit_price + personalization_price) * quantity;
 
             return {
                 id: row.id || '',
@@ -86,7 +89,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
                 item_image: row.item_image || '/images/logo.png',
                 quantity: quantity,
                 unit_price: unit_price,
-                total_price: (unit_price + addons_price + personalization_price) * quantity,
+                total_price: line_total,
                 selected_variant_id: row.selected_variant_id,
                 personalization: personalization,
                 selected_addons: selected_addons,
@@ -96,8 +99,8 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
                 partner_longitude: row.partner_longitude,
                 partner_city: row.partner_city || null,
                 partner_prep_hours: Number(row.partner_prep_hours) || null,
-                base_price: item_base_price,
-                variant_price: variant_price,
+                base_price: Number(row.base_price || 0),
+                variant_price: row.variant_price != null ? Number(row.variant_price) : null,
                 variant_name: row.variant_name || undefined,
                 personalization_price: personalization_price,
                 addons_price: addons_price,
