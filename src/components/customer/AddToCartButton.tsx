@@ -104,7 +104,7 @@ export function AddToCartButton({
                 size="sm"
                 disabled={isDisabled}
                 className={cn(
-                    "h-9 px-3 rounded-lg transition-all z-10 font-bold text-[10px] uppercase tracking-wider w-full shadow-none",
+                    "h-9 px-3 rounded-lg transition-all z-10 font-bold text-[11px] w-full shadow-none",
                     justAdded
                         ? "bg-emerald-600 text-white hover:bg-emerald-700 border-none"
                         : isOutOfStock ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border-zinc-100" : "bg-white text-zinc-900 hover:bg-zinc-50 border border-zinc-200",

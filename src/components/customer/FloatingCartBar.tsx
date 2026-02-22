@@ -142,7 +142,7 @@ export function FloatingCartBar() {
                   {hasPersonalization && (
                     <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/10">
                       <Sparkles className="size-2 text-amber-500" />
-                      <span className="text-[7px] font-bold text-amber-500 uppercase tracking-tight">Personalized</span>
+                      <span className="text-[7px] font-bold text-amber-500 tracking-tight">Personalized</span>
                     </div>
                   )}
                 </div>
@@ -175,7 +175,7 @@ export function FloatingCartBar() {
               }}
               className="group flex items-center gap-1.5 py-1"
             >
-              <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider group-hover:text-zinc-300 transition-colors truncate max-w-[180px]">
+              <span className="text-[9px] font-bold text-zinc-500 tracking-wider group-hover:text-zinc-300 transition-colors truncate max-w-[180px]">
                 View {displayCart?.items?.[0]?.partner_name || 'Store'}
               </span>
               <ChevronRight className="size-2.5 text-zinc-800 group-hover:text-zinc-500 transition-colors" />
@@ -183,7 +183,7 @@ export function FloatingCartBar() {
           )}
           <div className="flex items-center gap-1.5">
             <div className="size-1 rounded-full bg-emerald-500/40 animate-pulse" />
-            <span className="text-[8px] font-medium text-zinc-700 uppercase tracking-widest font-mono">Secure</span>
+            <span className="text-[8px] font-medium text-zinc-700 tracking-widest font-mono">Secure</span>
           </div>
         </div>
       </div>

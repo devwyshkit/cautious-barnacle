@@ -35,7 +35,7 @@ export function OrderTrackingBar() {
     useEffect(() => {
         const root = document.documentElement;
         if (isVisible) {
-            root.style.setProperty('--tracking-bar-height', '72px');
+            root.style.setProperty('--tracking-bar-height', '64px');
         } else {
             root.style.setProperty('--tracking-bar-height', '0px');
         }
@@ -64,39 +64,39 @@ export function OrderTrackingBar() {
             <button
                 onClick={handleTrack}
                 className={cn(
-                    "pointer-events-auto min-w-[320px] max-w-sm transition-all duration-500 ease-out",
-                    "rounded-[2.5rem] shadow-2xl overflow-hidden flex items-center p-1.5 gap-4 active:scale-[0.96]",
+                    "pointer-events-auto min-w-[280px] max-w-[340px] transition-all duration-500 ease-out",
+                    "rounded-2xl shadow-xl overflow-hidden flex items-center p-1 gap-3 active:scale-[0.97]",
                     isUrgent
-                        ? "bg-[var(--primary)] ring-4 ring-rose-500/20 shadow-rose-900/40"
-                        : "bg-zinc-950/95 backdrop-blur-2xl shadow-zinc-950/60 border border-white/5"
+                        ? "bg-[var(--primary)] ring-2 ring-rose-500/10 shadow-rose-900/30"
+                        : "bg-zinc-950/98 backdrop-blur-xl shadow-zinc-950/40 border border-white/5"
                 )}
             >
                 {/* Status Icon with Heartbeat */}
                 <div className={cn(
-                    "size-12 rounded-full flex items-center justify-center relative",
+                    "size-10 rounded-xl flex items-center justify-center relative shrink-0",
                     isUrgent ? "bg-white" : config.color
                 )}>
                     {isUrgent && (
-                        <div className="absolute inset-0 rounded-full bg-rose-500/30 animate-ping" />
+                        <div className="absolute inset-0 rounded-xl bg-rose-500/20 animate-ping" />
                     )}
                     <div className={cn(
-                        "relative z-10",
+                        "relative z-10 scale-90",
                         isUrgent ? "text-[var(--primary)]" : ""
                     )}>
-                        {isUrgent ? <AlertCircle className="size-6" /> : config.icon}
+                        {isUrgent ? <AlertCircle className="size-5" /> : config.icon}
                     </div>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 text-left min-w-0 py-2">
+                <div className="flex-1 text-left min-w-0">
                     <h4 className={cn(
-                        "text-[14px] font-black truncate leading-tight tracking-tight",
+                        "text-[13px] font-bold truncate leading-tight",
                         isUrgent ? "text-white" : "text-white"
                     )}>
-                        {isUrgent ? "Add Identity Now" : (orderToShow.partner_name || config.label)}
+                        {isUrgent ? "Add details" : (orderToShow.partner_name || config.label)}
                     </h4>
                     <p className={cn(
-                        "text-[10px] truncate uppercase font-bold tracking-widest mt-0.5 opacity-80",
+                        "text-[9px] truncate font-medium mt-0.5 opacity-80",
                         isUrgent ? "text-rose-100" : "text-zinc-400"
                     )}>
                         {isUrgent ? config.label : config.subLabel}
@@ -105,14 +105,14 @@ export function OrderTrackingBar() {
 
                 {/* Tracking Pill / Action Pill */}
                 <div className={cn(
-                    "mr-3 px-4 py-2 rounded-full flex items-center gap-1.5 backdrop-blur-md transition-colors",
-                    isUrgent ? "bg-white text-[#D91B24]" : "bg-zinc-800/50 text-white border border-white/10"
+                    "mr-2 px-3 py-1.5 rounded-xl flex items-center gap-1 backdrop-blur-md transition-colors",
+                    isUrgent ? "bg-white text-[#D91B24]" : "bg-zinc-900 text-white"
                 )}>
-                    <span className="text-[10px] font-black uppercase tracking-wider">
-                        {isUrgent ? "Go" : "Live"}
+                    <span className="text-[9px] font-bold tracking-tight">
+                        {isUrgent ? "Fix" : "Track"}
                     </span>
-                    {!isUrgent && <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />}
-                    {isUrgent && <ChevronRight className="size-3" />}
+                    {!isUrgent && <div className="size-1 rounded-full bg-emerald-500 animate-pulse" />}
+                    {isUrgent && <ChevronRight className="size-2.5" />}
                 </div>
             </button>
         </div>

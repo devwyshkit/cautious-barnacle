@@ -87,17 +87,17 @@ function CheckoutLayoutClientInner({
             </div>
           </div>
 
-          <div className="mt-10 space-y-4 relative z-10">
+          <div className="mt-8 space-y-4 relative z-10">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-zinc-900 uppercase tracking-tight">Order Confirmed</h2>
-              <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Preparing your tracker...</p>
+              <h2 className="text-xl font-bold text-zinc-900 tracking-tight">Order confirmed</h2>
+              <p className="text-xs font-medium text-zinc-400">Preparing your tracker...</p>
             </div>
 
-            <div className="flex flex-col items-center gap-3 pt-4">
-              <Loader2 className="size-6 text-zinc-300 animate-spin" />
-              <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-full border border-zinc-100">
-                <Sparkles className="size-4 text-amber-500 animate-pulse" />
-                <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest leading-none">Redirecting to Design Hub</span>
+            <div className="flex flex-col items-center gap-3 pt-2">
+              <Loader2 className="size-5 text-zinc-200 animate-spin" />
+              <div className="flex items-center gap-2 bg-zinc-50 px-3 py-1.5 rounded-full border border-zinc-100">
+                <Sparkles className="size-3.5 text-amber-500 animate-pulse" />
+                <span className="text-[9px] font-bold text-zinc-800 tracking-wide leading-none">Redirecting to Design Hub</span>
               </div>
             </div>
           </div>
@@ -117,9 +117,9 @@ function CheckoutLayoutClientInner({
           </div>
           <Button
             onClick={() => router.push('/')}
-            className="rounded-2xl px-8 h-12 bg-zinc-900 text-white font-bold uppercase tracking-widest text-xs"
+            className="rounded-xl px-6 h-10 bg-zinc-950 text-white font-bold text-xs"
           >
-            Browse Products
+            Browse products
           </Button>
         </div>
       ) : (
@@ -182,9 +182,9 @@ function CheckoutLayoutClientInner({
               </div>
 
               {/* Security badge (Unified) */}
-              <div className="px-3 py-6 flex items-center justify-center gap-1.5 opacity-40">
+              <div className="px-3 py-5 flex items-center justify-center gap-1.5 opacity-30">
                 <ShieldCheck className="size-2.5 text-zinc-600" />
-                <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest font-mono">Secured by Razorpay</span>
+                <span className="text-[8px] font-bold text-zinc-600 font-mono">Secured by Razorpay</span>
               </div>
             </div>
           </main>

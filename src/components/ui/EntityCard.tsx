@@ -300,7 +300,7 @@ export function EntityCard({
                     <div className="flex justify-between items-start gap-2 mb-0.5">
                         <div className="flex-1 min-w-0">
                             {subtitle && (
-                                <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 truncate mb-0.5">
+                                <p className="text-[9px] font-bold text-zinc-400 truncate mb-0.5">
                                     {subtitle}
                                 </p>
                             )}
@@ -344,7 +344,7 @@ export function EntityCard({
                                 <span
                                     key={i}
                                     className={cn(
-                                        "text-[8px] font-bold uppercase tracking-tight px-1.5 py-0.5 rounded border shadow-none",
+                                        "text-[8px] font-bold px-1.5 py-0.5 rounded border shadow-none",
                                         badge.variant === 'fast' ? "bg-orange-50 text-orange-600 border-orange-100" :
                                             badge.variant === 'scarcity' ? "bg-red-50 text-red-600 border-red-100" :
                                                 badge.variant === 'elite' ? "bg-indigo-50 text-indigo-600 border-indigo-100" :
