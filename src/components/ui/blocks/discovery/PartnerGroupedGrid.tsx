@@ -13,7 +13,7 @@ export function PartnerGroupedGrid({ data }: PartnerGroupedGridProps) {
     if (!data || data.length === 0) return null;
 
     const groupedData = data.reduce((acc: any, item: any) => {
-        const pId = item.partner_id || 'unknown';
+        const pId = item.partner_id || '';
         if (!acc[pId]) acc[pId] = { partnerName: item.partner_name || 'Local Store', items: [] };
         acc[pId].items.push(item);
         return acc;

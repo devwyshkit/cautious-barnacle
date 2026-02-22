@@ -18,12 +18,13 @@ export function CardRail({ data }: CardRailProps) {
     return (
         <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
             <CarouselContent className="-ml-4">
-                {data.map((item) => (
+                {data.map((item, index) => (
                     <CarouselItem key={item.id} className="pl-4 basis-[200px] sm:basis-[240px]">
                         <EntityCard
                             type={item.partner_id ? 'item' : 'partner'}
                             data={item}
                             variant="portrait"
+                            priority={index === 0}
                             className="surface-card hover:shadow-xl transition-all duration-500"
                         />
                     </CarouselItem>

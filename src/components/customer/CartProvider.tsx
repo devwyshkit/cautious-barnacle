@@ -5,6 +5,7 @@ import { DraftTransaction as Cart, SelectedPersonalization, SelectedAddon, Draft
 import { EMPTY_CART } from "@/lib/constants/cart";
 import { useAuth } from "@/hooks/useAuth";
 import { addToCart, removeCartItem, updateCartItemQuantity, clearDraftOrder } from "@/lib/actions/cart/mutations";
+import { getCart } from "@/lib/actions/cart/get-cart";
 import { logger } from "@/lib/logging/logger";
 import {
     AlertDialog,
@@ -79,10 +80,12 @@ export function CartProvider({
         (state, update: { type: 'add' | 'remove' | 'update' | 'clear', payload: any }) => {
             switch (update.type) {
                 case 'add':
-                    // Basic optimistic add (doesn't need total calculation, just item presence)
+                    // Elite optimistic add: calculate count and mock total for instant visual satisfaction
                     return {
                         ...state,
-                        items: [...state.items, { id: 'temp', ...update.payload, quantity: update.payload.quantity || 1 }]
+                        items: [...state.items, { id: 'temp', ...update.payload, quantity: update.payload.quantity || 1 }],
+                        item_count: state.item_count + (update.payload.quantity || 1),
+                        total: state.total + (update.payload.price || 500) // mock price visually until server true source overrides 
                     };
                 case 'remove':
                     return {
@@ -219,7 +222,10 @@ export function CartProvider({
         removeFromDraftOrder,
         updateQuantity,
         clearDraftOrder: clearCart,
-        refreshDraftOrder: async () => initialCart,
+        refreshDraftOrder: async () => {
+            const result = await getCart();
+            return result.cart || initialCart;
+        },
     };
 
     return (

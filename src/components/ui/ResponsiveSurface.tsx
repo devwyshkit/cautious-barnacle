@@ -62,7 +62,10 @@ export function ResponsiveSurface({
                             {description && <DrawerDescription>{description}</DrawerDescription>}
                         </DrawerHeader>
                     )}
-                    <div className="flex-1 overflow-y-auto px-4 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]">
+                    <div
+                        data-vaul-no-drag
+                        className="flex-1 overflow-y-auto px-4 pb-[calc(2rem+env(safe-area-inset-bottom,0px))] overscroll-contain touch-pan-y"
+                    >
                         {children}
                     </div>
                 </DrawerContent>

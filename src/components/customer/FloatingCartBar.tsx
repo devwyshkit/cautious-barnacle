@@ -84,9 +84,9 @@ export function FloatingCartBar() {
       aria-label="Floating cart summary"
       data-testid="floating-cart-bar"
       className={cn(
-        "fixed z-50 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+        "fixed z-[999] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
         "left-4 right-4 md:left-auto md:w-[420px] md:right-8",
-        isVisible ? "translate-y-0 opacity-100" : "translate-y-32 opacity-0 pointer-events-none"
+        isVisible ? "translate-y-0 opacity-100" : "translate-y-32 opacity-0"
       )}
       style={{
         bottom: `calc(var(--bottom-nav-height, 0px) + var(--tracking-bar-height, 0px) + 16px + env(safe-area-inset-bottom, 0px))`
@@ -102,11 +102,15 @@ export function FloatingCartBar() {
         <div className="relative">
           <Link
             href="/checkout"
-            onClick={handleCheckout}
+            onClick={(e) => {
+              handleCheckout(e);
+              // SWIGGY 2026: Forced navigation
+              router.push('/checkout');
+            }}
             aria-disabled={isLoading}
             className={cn(
               "w-full flex items-center justify-between p-3.5 transition-all active:scale-[0.98]",
-              isLoading && "opacity-70 pointer-events-none"
+              isLoading && "opacity-70"
             )}
           >
 

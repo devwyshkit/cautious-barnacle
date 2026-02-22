@@ -82,7 +82,7 @@ async function AsyncLayoutContent({
         {modal}
       </NavShell>
       <CartErrorBoundary>
-        <FloatingCartBar />
+        <FloatingCartBar key={cartResult.cartIdentity} />
       </CartErrorBoundary>
       <OrderTrackingBar />
     </CartProvider>

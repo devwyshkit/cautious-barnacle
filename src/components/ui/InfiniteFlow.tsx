@@ -93,7 +93,10 @@ export function InfiniteFlow<T extends { id: string | number }>({
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+                const target = entries[0];
+                if (target.isIntersecting && hasMore && !isLoadingMore) {
+                    // WYSHKIT 2026: Strict Unobserve to prevent memory leaks and racing
+                    observer.unobserve(target.target);
                     loadMore();
                 }
             },

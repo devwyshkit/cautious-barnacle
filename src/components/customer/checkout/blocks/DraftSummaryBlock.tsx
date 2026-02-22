@@ -126,7 +126,7 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                   {editable && (
                     <button
                       onClick={() => {
-                        const partnerId = item.partner_id || 'unknown';
+                        const partnerId = item.partner_id || '';
                         const addonIds = (item.selected_addons || []).map((a: any) => a.id).join(',');
                         router.push(`/partner/${partnerId}/item/${item.item_id}?edit=true&cartItemId=${item.id}&variantId=${item.selected_variant_id || ''}&quantity=${item.quantity}&addons=${addonIds}`);
                       }}

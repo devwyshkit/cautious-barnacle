@@ -18,17 +18,17 @@ const CheckoutSummary = lazy(() => import('./blocks/checkout/CheckoutSummary').t
 
 export type BlockType = 'CIRCLE_RAIL' | 'CARD_RAIL' | 'GRID' | 'BANNER_BENTO' | 'PARTNER_LIST' | 'PARTNER_GROUPED_GRID' | 'INFINITE_GRID' | 'CHECKOUT_ITEMS' | 'CHECKOUT_ADDRESS' | 'CHECKOUT_PAYMENT' | 'CHECKOUT_SUMMARY';
 
-export interface BlockData {
+export interface BlockData<T = any> {
     id: string;
     type: BlockType;
     title?: string;
     subtitle?: string;
-    data: any[];
+    data: T[];
     metadata?: Record<string, any>;
 }
 
 interface BlocksEngineProps {
-    blocks: BlockData[];
+    blocks: BlockData<any>[];
     className?: string;
 }
 
@@ -85,7 +85,9 @@ export function BlocksEngine({ blocks, className }: BlocksEngineProps) {
     return (
         <div className={cn("flex flex-col gap-6 md:gap-10", className)}>
             {blocks.map(block => {
-                if (!block.data && block.type !== 'INFINITE_GRID') return null;
+                // We allow critical blocks (like rails) to render even with empty data 
+                // so they can show empty states or skeletons rather than vanishing.
+                if (!block.data && block.type !== 'INFINITE_GRID' && block.type !== 'CIRCLE_RAIL') return null;
 
                 return (
                     <section key={block.id} className={cn("px-4 md:px-8 max-w-[1440px] mx-auto w-full", block.type === 'BANNER_BENTO' ? "pt-2 pb-1" : "py-4")}>

@@ -45,7 +45,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <main className="pb-24">
         <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
         {!category && (
-          <Masthead locationName={location?.name || 'Koramangala'} status={systemStatus} />
+          <Masthead
+            locationName={location?.name || 'Bangalore'}
+            status={systemStatus}
+          />
         )}
 
         {/* WYSHKIT 2026: Discovery Sections (Server Driven) */}

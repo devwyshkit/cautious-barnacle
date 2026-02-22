@@ -54,11 +54,14 @@ export function Masthead({
     const config = getStatusConfig();
 
     return (
-        <div className={cn(
-            "px-4 md:px-8 py-2.5 border-b transition-all duration-500 animate-in slide-in-from-top-4",
-            config.bg,
-            className
-        )}>
+        <div
+            className={cn(
+                "px-4 md:px-8 py-2.5 border-b transition-all duration-500 animate-in slide-in-from-top-4",
+                config.bg,
+                className
+            )}
+            suppressHydrationWarning
+        >
             <div className="flex items-center justify-between gap-4 max-w-[1440px] mx-auto">
                 <div className="flex items-center gap-2.5 overflow-hidden">
                     {config.icon}

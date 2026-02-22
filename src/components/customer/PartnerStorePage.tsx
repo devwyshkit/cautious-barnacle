@@ -18,6 +18,8 @@ import { useEffect, useMemo } from 'react';
 import { InterceptedItemSheet } from '@/components/customer/item/InterceptedItemSheet';
 import { formatPrepTime, formatDeliveryTime } from '@/lib/utils/sla';
 import { useCartValidation } from '@/hooks/useCartValidation';
+import { useRealtime } from '@/providers/RealtimeProvider';
+import { createClient } from '@/lib/supabase/client';
 import { AlertCircle } from 'lucide-react';
 
 const FALLBACK_IMAGE = '/images/logo.png';
@@ -35,15 +37,52 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
 
   // WYSHKIT 2026: Server-First - Data comes entirely from props
   const partner = initialData!;
+
+  // WYSHKIT 2026: Real-time Item Synchronization
+  const [items, setItems] = useState<any[]>(initialItems || []);
+  const supabase = useMemo(() => createClient(), []);
+  const { channel } = useRealtime();
+
+  useEffect(() => {
+    if (!channel) return;
+
+    // Pulse: Subscribe to public item changes for this partner
+    const itemsChannel = supabase
+      .channel(`partner-inventory-${partnerId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'items',
+          filter: `partner_id=eq.${partnerId}`
+        },
+        async (payload) => {
+          if (payload.eventType === 'UPDATE') {
+            setItems(current =>
+              current.map(item => item.id === payload.new.id ? { ...item, ...payload.new } : item)
+            );
+          } else if (payload.eventType === 'INSERT') {
+            setItems(current => [...current, payload.new]);
+          } else if (payload.eventType === 'DELETE') {
+            setItems(current => current.filter(item => item.id !== payload.old.id));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(itemsChannel);
+    };
+  }, [partnerId, channel, supabase]);
+
   // WYSHKIT 2026: Zero Reflection - Filter out-of-stock items
   const allItems = React.useMemo(() => {
-    const rawItems = initialItems || [];
-    // In production, strictly hide out of stock. In dev, we might show them for testing but standard is to hide.
-    return rawItems.filter(item =>
+    return items.filter(item =>
       item.stock_status !== 'out_of_stock' &&
       (typeof item.stock_quantity !== 'number' || item.stock_quantity > 0)
     );
-  }, [initialItems]);
+  }, [items]);
 
   // WYSHKIT 2026: Proactive Cart Validation
   const { isMismatch } = useCartValidation(partnerId);

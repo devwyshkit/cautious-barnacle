@@ -35,7 +35,7 @@ export function Confetti() {
     }, []);
 
     return (
-        <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
             {pieces.map((p) => (
                 <div
                     key={p.id}

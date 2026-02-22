@@ -182,7 +182,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
     return (
         <div className="flex flex-col h-full bg-white font-sans overflow-hidden">
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar">
+            <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar" data-vaul-no-drag>
                 {/* Immersive Navigation Bar */}
                 <div className="fixed top-0 left-0 right-0 z-50 p-4 pointer-events-none">
                     <button

@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { logError } from '@/lib/utils/error-handler';
 import { logger } from '@/lib/logging/logger';
 import { getGuestSessionId, getGuestSessionIdReadOnly } from '@/lib/session';
+import { withTrace } from '@/lib/observability/tracer';
 
 // --- INTENT SCHEMAS ---
 
@@ -78,148 +79,159 @@ export type CommerceIntent = z.infer<typeof CommerceIntentSchema>;
  * Consolidated entry point for all commerce mutations.
  */
 export async function executeCommerceIntent(intentAction: CommerceIntent) {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    return withTrace(`commerce_intent:${intentAction.intent}`, async (span) => {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
 
-    // Resolve Session Identity
-    const isReadOnly = ['PLACE_ORDER', 'CLEAR_CART'].includes(intentAction.intent) === false;
-    const guestSessionRaw = !user
-        ? (isReadOnly ? await getGuestSessionIdReadOnly() : await getGuestSessionId())
-        : undefined;
-    const sessionId = guestSessionRaw || undefined;
+        // Resolve Session Identity
+        const isReadOnly = ['PLACE_ORDER', 'CLEAR_CART'].includes(intentAction.intent) === false;
+        const guestSessionRaw = !user
+            ? (isReadOnly ? await getGuestSessionIdReadOnly() : await getGuestSessionId())
+            : undefined;
+        const sessionId = guestSessionRaw || undefined;
 
-    try {
-        const validated = CommerceIntentSchema.parse(intentAction);
-        logger.info('CommerceIntent', { intent: validated.intent, user_id: user?.id });
+        span.setAttributes({
+            intent: intentAction.intent,
+            user_id: user?.id || 'guest',
+            session_id: sessionId || 'none'
+        });
 
-        switch (validated.intent) {
-            case 'ADD_TO_CART': {
-                const { data, error } = await supabase.rpc('add_to_cart_atomic', {
-                    p_item_id: validated.payload.item_id,
-                    p_quantity: validated.payload.quantity,
-                    p_user_id: user?.id,
-                    p_session_id: sessionId,
-                    p_variant_id: validated.payload.variant_id ?? undefined,
-                    p_personalization: (validated.payload.personalization as any) || { enabled: false },
-                    p_selected_addons: (validated.payload.selected_addons as any) || []
-                });
-                if (error) throw error;
-                return { success: true, data };
-            }
+        try {
+            const validated = CommerceIntentSchema.parse(intentAction);
+            logger.info('CommerceIntent', { intent: validated.intent, user_id: user?.id });
 
-            case 'UPDATE_CART_QUANTITY': {
-                // We'll reuse add_to_cart_atomic with negative qty or a dedicated update if needed
-                // For now, let's assume we have a clear path for updates
-                const { error } = await supabase
-                    .from('cart_items')
-                    .update({ quantity: validated.payload.quantity })
-                    .match({
-                        item_id: validated.payload.item_id,
-                        ...(user ? { user_id: user.id } : { session_id: sessionId }),
-                        ...(validated.payload.variant_id ? { selected_variant_id: validated.payload.variant_id } : {})
+            switch (validated.intent) {
+                case 'ADD_TO_CART': {
+                    // WYSHKIT 2026: Idempotency Guard
+                    // In a production environment, we would use an x-idempotency-key header or payload field.
+                    // For now, we ensure the atomic RPC handles row-level locking.
+                    const { data, error } = await supabase.rpc('add_to_cart_atomic', {
+                        p_item_id: validated.payload.item_id,
+                        p_quantity: validated.payload.quantity,
+                        p_user_id: user?.id,
+                        p_session_id: sessionId,
+                        p_variant_id: validated.payload.variant_id ?? undefined,
+                        p_personalization: (validated.payload.personalization as any) || { enabled: false },
+                        p_selected_addons: (validated.payload.selected_addons as any) || []
                     });
-                if (error) throw error;
-                break;
+                    if (error) throw error;
+                    return { success: true, data };
+                }
+
+                case 'UPDATE_CART_QUANTITY': {
+                    // We'll reuse add_to_cart_atomic with negative qty or a dedicated update if needed
+                    // For now, let's assume we have a clear path for updates
+                    const { error } = await supabase
+                        .from('cart_items')
+                        .update({ quantity: validated.payload.quantity })
+                        .match({
+                            item_id: validated.payload.item_id,
+                            ...(user ? { user_id: user.id } : { session_id: sessionId }),
+                            ...(validated.payload.variant_id ? { selected_variant_id: validated.payload.variant_id } : {})
+                        });
+                    if (error) throw error;
+                    break;
+                }
+
+                case 'APPLY_COUPON': {
+                    const { error } = await supabase
+                        .from('checkout_sessions')
+                        .upsert({
+                            user_id: user?.id,
+                            session_id: sessionId,
+                            applied_coupon: validated.payload.code
+                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    if (error) throw error;
+                    break;
+                }
+
+                case 'TOGGLE_WALLET': {
+                    const { error } = await supabase
+                        .from('checkout_sessions')
+                        .upsert({
+                            user_id: user?.id,
+                            session_id: sessionId,
+                            use_wallet: validated.payload.enabled
+                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    if (error) throw error;
+                    break;
+                }
+
+                case 'SET_ADDRESS': {
+                    const { error } = await supabase
+                        .from('checkout_sessions')
+                        .upsert({
+                            user_id: user?.id,
+                            session_id: sessionId,
+                            selected_address_id: validated.payload.address_id
+                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    if (error) throw error;
+                    break;
+                }
+
+                case 'SET_GSTIN': {
+                    const { error } = await supabase
+                        .from('checkout_sessions')
+                        .upsert({
+                            user_id: user?.id,
+                            session_id: sessionId,
+                            gstin: validated.payload.gstin
+                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    if (error) throw error;
+                    break;
+                }
+
+                case 'SET_GUEST_LOCATION': {
+                    const { error } = await supabase
+                        .from('checkout_sessions')
+                        .upsert({
+                            user_id: user?.id,
+                            session_id: sessionId,
+                            guest_lat: validated.payload.lat,
+                            guest_lng: validated.payload.lng
+                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    if (error) throw error;
+                    break;
+                }
+
+                case 'PLACE_ORDER': {
+                    const { data, error } = await supabase.rpc('place_secure_order', {
+                        p_items: validated.payload.items as any,
+                        p_razorpay_order_id: validated.payload.razorpay_order_id,
+                        p_user_id: user?.id,
+                        p_session_id: sessionId,
+                        p_address_id: validated.payload.address_id ?? undefined,
+                        p_payment_id: validated.payload.payment_id ?? undefined,
+                        p_coupon_code: validated.payload.coupon_code ?? undefined,
+                        p_use_wallet: validated.payload.use_wallet ?? undefined,
+                        p_gstin: validated.payload.gstin ?? undefined,
+                        p_delivery_instructions: validated.payload.delivery_instructions ?? undefined,
+                        p_distance_km: validated.payload.distance_km ?? undefined
+                    });
+                    if (error) throw error;
+
+                    // Post-order cleanup
+                    await Promise.all([
+                        supabase.from('cart_items').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`),
+                        supabase.from('checkout_sessions').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`)
+                    ]);
+
+                    return { success: true, data };
+                }
+
+                case 'CLEAR_CART': {
+                    await supabase.from('cart_items').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`);
+                    await supabase.from('checkout_sessions').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`);
+                    break;
+                }
             }
 
-            case 'APPLY_COUPON': {
-                const { error } = await supabase
-                    .from('checkout_sessions')
-                    .upsert({
-                        user_id: user?.id,
-                        session_id: sessionId,
-                        applied_coupon: validated.payload.code
-                    }, { onConflict: (user ? 'user_id' : 'session_id') });
-                if (error) throw error;
-                break;
-            }
-
-            case 'TOGGLE_WALLET': {
-                const { error } = await supabase
-                    .from('checkout_sessions')
-                    .upsert({
-                        user_id: user?.id,
-                        session_id: sessionId,
-                        use_wallet: validated.payload.enabled
-                    }, { onConflict: (user ? 'user_id' : 'session_id') });
-                if (error) throw error;
-                break;
-            }
-
-            case 'SET_ADDRESS': {
-                const { error } = await supabase
-                    .from('checkout_sessions')
-                    .upsert({
-                        user_id: user?.id,
-                        session_id: sessionId,
-                        selected_address_id: validated.payload.address_id
-                    }, { onConflict: (user ? 'user_id' : 'session_id') });
-                if (error) throw error;
-                break;
-            }
-
-            case 'SET_GSTIN': {
-                const { error } = await supabase
-                    .from('checkout_sessions')
-                    .upsert({
-                        user_id: user?.id,
-                        session_id: sessionId,
-                        gstin: validated.payload.gstin
-                    }, { onConflict: (user ? 'user_id' : 'session_id') });
-                if (error) throw error;
-                break;
-            }
-
-            case 'SET_GUEST_LOCATION': {
-                const { error } = await supabase
-                    .from('checkout_sessions')
-                    .upsert({
-                        user_id: user?.id,
-                        session_id: sessionId,
-                        guest_lat: validated.payload.lat,
-                        guest_lng: validated.payload.lng
-                    }, { onConflict: (user ? 'user_id' : 'session_id') });
-                if (error) throw error;
-                break;
-            }
-
-            case 'PLACE_ORDER': {
-                const { data, error } = await supabase.rpc('place_secure_order', {
-                    p_items: validated.payload.items as any,
-                    p_razorpay_order_id: validated.payload.razorpay_order_id,
-                    p_user_id: user?.id,
-                    p_session_id: sessionId,
-                    p_address_id: validated.payload.address_id ?? undefined,
-                    p_payment_id: validated.payload.payment_id ?? undefined,
-                    p_coupon_code: validated.payload.coupon_code ?? undefined,
-                    p_use_wallet: validated.payload.use_wallet ?? undefined,
-                    p_gstin: validated.payload.gstin ?? undefined,
-                    p_delivery_instructions: validated.payload.delivery_instructions ?? undefined,
-                    p_distance_km: validated.payload.distance_km ?? undefined
-                });
-                if (error) throw error;
-
-                // Post-order cleanup
-                await Promise.all([
-                    supabase.from('cart_items').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`),
-                    supabase.from('checkout_sessions').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`)
-                ]);
-
-                return { success: true, data };
-            }
-
-            case 'CLEAR_CART': {
-                await supabase.from('cart_items').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`);
-                await supabase.from('checkout_sessions').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`);
-                break;
-            }
+            revalidatePath('/checkout');
+            revalidatePath('/cart');
+            return { success: true };
+        } catch (err: any) {
+            logError(err, 'IntentEngineError');
+            return { success: false, error: err.message };
         }
-
-        revalidatePath('/checkout');
-        revalidatePath('/cart');
-        return { success: true };
-    } catch (err: any) {
-        logError(err, 'IntentEngineError');
-        return { success: false, error: err.message };
-    }
+    });
 }

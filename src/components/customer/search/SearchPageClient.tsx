@@ -182,7 +182,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                   <div className="space-y-6">
                     {Object.entries(
                       results.items.reduce((acc: Record<string, { partnerName: string, items: any[] }>, item: any) => {
-                        const pId = item.partner_id || 'unknown';
+                        const pId = item.partner_id || '';
                         if (!acc[pId]) acc[pId] = { partnerName: item.partner_name || 'Partner', items: [] };
                         acc[pId].items.push(item);
                         return acc;

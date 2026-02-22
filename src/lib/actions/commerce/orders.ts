@@ -9,6 +9,7 @@ import type { Order, Tables, OrderDetails, OrderWithRelations, OrderStatusHistor
 import { logError, handleActionError } from '@/lib/utils/error-handler';
 import { logger } from '@/lib/logging/logger';
 import { hasItemPersonalization } from '@/lib/utils/personalization';
+import { withTrace } from '@/lib/observability/tracer';
 
 // WYSHKIT 2026: Strict Payload Validation (Swiggy Standard)
 // [PURGED] placeOrderSchema and PlaceOrderPayload (Superseded by Intent Engine)
@@ -28,80 +29,85 @@ async function log_order_status_history(order_id: string, type: string, title: s
 }
 
 export async function submit_order_personalization(order_id: string, personalization_input: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
-  try {
-    if (!order_id || order_id.trim() === '') {
-      return { success: false, error: 'Invalid Order ID' };
+  return withTrace('submit_order_personalization', async (span) => {
+    try {
+      if (!order_id || order_id.trim() === '') {
+        return { success: false, error: 'Invalid Order ID' };
+      }
+      span.setAttribute('order_id', order_id);
+
+      logger.info(`[submitOrderPersonalization] Starting for order: ${order_id}`, {
+        order_id,
+        personalization_input: Object.keys(personalization_input),
+        has_details: Object.values(personalization_input).some((v: any) => v.text || v.image_url)
+      });
+
+      // 1. Verify Ownership & Fetch Current State
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        return { success: false, error: "Unauthorized" };
+      }
+      span.setAttribute('user_id', user.id);
+
+      const { data: order, error: fetch_error } = await supabase
+        .from('orders')
+        .select('id, user_id, status')
+        .eq('id', order_id)
+        .single();
+
+      if (fetch_error || !order) {
+        return { success: false, error: "Order not found" };
+      }
+
+      // Strict ownership check
+      if (order.user_id !== user.id) {
+        logger.error(`[submitOrderPersonalization] Unauthorized attempt by ${user.id} for order ${order_id}`);
+        return { success: false, error: "Unauthorized" };
+      }
+
+      // 2. Validate Current State
+      // WYSHKIT 2026: "Momentum First" - Allow upload during PLACED, but only move status for CONFIRMED.
+      const can_submit = ([ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED, ORDER_STATUS.DETAILS_RECEIVED, ORDER_STATUS.REVISION_REQUESTED] as string[]).includes(order.status);
+
+      if (!can_submit) {
+        return { success: false, error: `Cannot submit details in ${order.status} state.` };
+      }
+
+      // 3. Determine Next Status
+      // Only move to DETAILS_RECEIVED if we were already CONFIRMED or in the loop.
+      // If PLACED, we stay PLACED until the partner commits (Accepts).
+      const next_status = order.status === ORDER_STATUS.PLACED ? ORDER_STATUS.PLACED : ORDER_STATUS.DETAILS_RECEIVED;
+
+      // 3. WYSHKIT 2026: Atomic Submission
+      const admin_supabase = await createAdminClient();
+      const { data: result, error: rpc_error } = await admin_supabase.rpc('submit_order_personalization_atomic' as any, {
+        p_order_id: order_id,
+        p_personalization_input: personalization_input as unknown as Json
+      });
+
+      if (rpc_error) {
+        logger.error(`[submitOrderPersonalization] RPC failed`, rpc_error);
+        throw rpc_error;
+      }
+
+      const rpcResult = result as any;
+      if (!rpcResult.success) {
+        throw new Error(rpcResult.error || 'Failed to submit personalization');
+      }
+
+      await log_order_status_history(order_id, 'personalization_submitted', 'Details Shared', 'You have shared the personalization details with the partner.', { personalization: personalization_input });
+
+      revalidateTag(`order-${order_id}`);
+      revalidateTag('orders');
+      return { success: true };
+    } catch (error) {
+      logError(error, `SubmitPersonalization:${order_id}`);
+      const { error: errMsg } = handleActionError(error);
+      return { success: false, error: errMsg };
     }
-    logger.info(`[submitOrderPersonalization] Starting for order: ${order_id}`, {
-      order_id,
-      personalization_input: Object.keys(personalization_input),
-      has_details: Object.values(personalization_input).some((v: any) => v.text || v.image_url)
-    });
-
-    // 1. Verify Ownership & Fetch Current State
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    const { data: order, error: fetch_error } = await supabase
-      .from('orders')
-      .select('id, user_id, status')
-      .eq('id', order_id)
-      .single();
-
-    if (fetch_error || !order) {
-      return { success: false, error: "Order not found" };
-    }
-
-    // Strict ownership check
-    if (order.user_id !== user.id) {
-      logger.error(`[submitOrderPersonalization] Unauthorized attempt by ${user.id} for order ${order_id}`);
-      return { success: false, error: "Unauthorized" };
-    }
-
-    // 2. Validate Current State
-    // WYSHKIT 2026: "Momentum First" - Allow upload during PLACED, but only move status for CONFIRMED.
-    const can_submit = ([ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED, ORDER_STATUS.DETAILS_RECEIVED, ORDER_STATUS.REVISION_REQUESTED] as string[]).includes(order.status);
-
-    if (!can_submit) {
-      return { success: false, error: `Cannot submit details in ${order.status} state.` };
-    }
-
-    // 3. Determine Next Status
-    // Only move to DETAILS_RECEIVED if we were already CONFIRMED or in the loop.
-    // If PLACED, we stay PLACED until the partner commits (Accepts).
-    const next_status = order.status === ORDER_STATUS.PLACED ? ORDER_STATUS.PLACED : ORDER_STATUS.DETAILS_RECEIVED;
-
-    // 3. WYSHKIT 2026: Atomic Submission
-    const admin_supabase = await createAdminClient();
-    const { data: result, error: rpc_error } = await admin_supabase.rpc('submit_order_personalization_atomic' as any, {
-      p_order_id: order_id,
-      p_personalization_input: personalization_input as unknown as Json
-    });
-
-    if (rpc_error) {
-      logger.error(`[submitOrderPersonalization] RPC failed`, rpc_error);
-      throw rpc_error;
-    }
-
-    const rpcResult = result as any;
-    if (!rpcResult.success) {
-      throw new Error(rpcResult.error || 'Failed to submit personalization');
-    }
-
-    await log_order_status_history(order_id, 'personalization_submitted', 'Details Shared', 'You have shared the personalization details with the partner.', { personalization: personalization_input });
-
-    revalidateTag(`order-${order_id}`);
-    revalidateTag('orders');
-    return { success: true };
-  } catch (error) {
-    logError(error, `SubmitPersonalization:${order_id}`);
-    const { error: errMsg } = handleActionError(error);
-    return { success: false, error: errMsg };
-  }
+  }, { order_id });
 }
 
 /**

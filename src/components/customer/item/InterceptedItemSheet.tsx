@@ -60,7 +60,7 @@ export function InterceptedItemSheet({ item, onCloseOverride }: InterceptedItemS
             className="md:max-w-[520px]"
             showClose={false}
         >
-            <div className="flex-1 overflow-y-auto relative">
+            <div className="flex-1 relative h-full">
                 <ItemDetailView
                     item={item}
                     onBack={handleClose}
