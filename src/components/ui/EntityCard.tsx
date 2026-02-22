@@ -300,25 +300,24 @@ export function EntityCard({
                     <div className="flex justify-between items-start gap-2 mb-0.5">
                         <div className="flex-1 min-w-0">
                             {subtitle && (
-                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 truncate mb-1">
+                                <p className="text-[9px] font-bold text-zinc-400 truncate mb-0.5">
                                     {subtitle}
                                 </p>
                             )}
                             <h3 className={cn(
-                                "font-black tracking-tight leading-tight uppercase line-clamp-1",
-                                isRow || isCompact ? "text-sm text-zinc-900" : "text-[15px] text-zinc-900",
-                                (isPortrait || isLandscape) && "max-md:text-white max-md:absolute max-md:bottom-3 max-md:left-3"
+                                "font-bold tracking-tight leading-tight line-clamp-1",
+                                isRow || isCompact ? "text-sm text-zinc-900" : "text-[14px] text-zinc-900"
                             )}>
                                 {name}
                             </h3>
                         </div>
                         {price !== undefined && (
                             <div className="flex flex-col items-end shrink-0">
-                                <span className="text-sm font-black text-zinc-900 tabular-nums">
+                                <span className="text-[13px] font-bold text-zinc-950 tabular-nums">
                                     {formatCurrency(price)}
                                 </span>
                                 {mrp && mrp > price && (
-                                    <span className="text-[9px] text-zinc-400 line-through decoration-zinc-300">
+                                    <span className="text-[8px] text-zinc-400 line-through decoration-zinc-300">
                                         {formatCurrency(mrp)}
                                     </span>
                                 )}
@@ -326,26 +325,26 @@ export function EntityCard({
                         )}
                     </div>
 
-                    <div className="flex items-center gap-2 mt-auto">
+                    <div className="flex items-center gap-2 mt-1">
                         {estimate && (
-                            <div className="flex items-center gap-1 text-[10px] font-bold text-zinc-400">
-                                <Clock className="size-3" />
+                            <div className="flex items-center gap-1 text-[9px] font-medium text-zinc-400">
+                                <Clock className="size-2.5" />
                                 <span>{estimate.min}-{estimate.max}m</span>
                             </div>
                         )}
                         {rating && (isRow || isCompact) && (
                             <div className="flex items-center gap-0.5 bg-emerald-50 text-emerald-700 px-1 py-0.5 rounded border border-emerald-100">
-                                <span className="text-[10px] font-black">{rating.toFixed(1)}</span>
+                                <span className="text-[9px] font-bold">{rating.toFixed(1)}</span>
                                 <Star className="size-2 fill-emerald-600 text-emerald-600" />
                             </div>
                         )}
 
-                        <div className="flex gap-1.5 flex-wrap">
+                        <div className="flex gap-1 flex-wrap">
                             {badges.map((badge: { text: string; variant?: 'default' | 'fast' | 'scarcity' | 'elite' }, i: number) => (
                                 <span
                                     key={i}
                                     className={cn(
-                                        "text-[9px] font-black uppercase tracking-tight px-1.5 py-0.5 rounded border shadow-sm",
+                                        "text-[8px] font-bold px-1.5 py-0.5 rounded border shadow-none",
                                         badge.variant === 'fast' ? "bg-orange-50 text-orange-600 border-orange-100" :
                                             badge.variant === 'scarcity' ? "bg-red-50 text-red-600 border-red-100" :
                                                 badge.variant === 'elite' ? "bg-indigo-50 text-indigo-600 border-indigo-100" :
@@ -363,7 +362,7 @@ export function EntityCard({
 
                 {/* Action Rendering (only for items) */}
                 {type === 'item' && resolvedProps && !isCompact && (
-                    <div className="absolute bottom-0 right-0 z-20 p-1" onClick={e => { e.preventDefault(); e.stopPropagation(); }} onMouseDown={e => e.stopPropagation()}>
+                    <div className="mt-3" onClick={e => { e.preventDefault(); e.stopPropagation(); }} onMouseDown={e => e.stopPropagation()}>
                         <AddToCartButton
                             item_id={resolvedProps.id}
                             item_name={resolvedProps.name}
@@ -374,6 +373,7 @@ export function EntityCard({
                             is_identity_available={resolvedProps.isPersonalizable}
                             has_variants={resolvedProps.hasVariants}
                             stock_quantity={resolvedProps.stockQuantity}
+                            className="h-8 rounded-lg"
                         />
                     </div>
                 )}

@@ -220,7 +220,11 @@ async function seed() {
             stock_quantity: 100,
             category: 'Cakes',
             has_personalization: true,
-            personalization_options: [{ id: 'msg', name: 'Message on Cake', type: 'text', maxLength: 25 }],
+            personalization_options: [
+                { id: 'msg', name: 'Message on Cake', type: 'text', maxLength: 25, required: true },
+                { id: 'flavor', name: 'Base Flavor', type: 'select', options: ['Classic Dark', 'Hazelnut Dark', 'Orange Dark'], required: true },
+                { id: 'dietary', name: 'Eggless', type: 'boolean' }
+            ],
             images: ['https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=800'],
             slug: 'intense-70-dark-chocolate-cake'
         },
@@ -322,18 +326,64 @@ async function seed() {
             category: 'Personalized',
             has_personalization: true,
             personalization_options: [
-                { id: 'photo', name: 'Upload Photo', type: 'image', required: true },
-                { id: 'caption', name: 'Caption', type: 'text', maxLength: 50 }
+                { id: 'photo', name: 'Upload Photo', type: 'image', required: true, instructions: 'High resolution JPG/PNG only' },
+                { id: 'caption', name: 'Caption', type: 'text', maxLength: 50 },
+                { id: 'frame_color', name: 'Frame Finish', type: 'select', options: ['Oak', 'Walnut', 'Minimalist Black'], required: true }
             ],
             images: ['https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=800'],
             slug: 'personalized-photo-frame'
+        },
+        // NEW ELITE ITEM
+        {
+            id: randomUUID(),
+            partner_id: partnerIds.magnolia,
+            name: 'Signature Dessert Box (Custom)',
+            description: 'Curate your own Magnolia dessert experience.',
+            base_price: 1250,
+            is_active: true,
+            approval_status: 'approved',
+            stock_status: 'in_stock',
+            category: 'Hampers',
+            has_personalization: true,
+            personalization_options: [
+                { id: 'item1', name: 'First Choice', type: 'select', options: ['Banana Pudding', 'Red Velvet Cupcake', 'Cheesecake Slice'], required: true },
+                { id: 'item2', name: 'Second Choice', type: 'select', options: ['Banana Pudding', 'Red Velvet Cupcake', 'Cheesecake Slice'], required: true },
+                { id: 'note', name: 'Occasion Note', type: 'text', maxLength: 100 }
+            ],
+            images: ['https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&q=80&w=800'],
+            slug: 'signature-dessert-box-custom'
         }
 
     ]
 
     console.log('Injecting items...')
-    const { error: itemError } = await supabase.from('items').upsert(items)
+    const { data: insertedItems, error: itemError } = await supabase.from('items').upsert(items).select()
     if (itemError) console.error('Error seeding items:', itemError)
+
+    // 4. Variants for selected items
+    const variants = []
+    if (insertedItems) {
+        const cake = insertedItems.find(i => i.slug === 'intense-70-dark-chocolate-cake')
+        if (cake) {
+            variants.push(
+                { item_id: cake.id, name: '500g', price: 0, stock_quantity: 50, is_active: true },
+                { item_id: cake.id, name: '1kg', price: 800, stock_quantity: 30, is_active: true }
+            )
+        }
+        const pudding = insertedItems.find(i => i.slug === 'classic-banana-pudding')
+        if (pudding) {
+            variants.push(
+                { item_id: pudding.id, name: 'Small Jar', price: 0, stock_quantity: 100, is_active: true },
+                { item_id: pudding.id, name: 'Large Bowl', price: 600, stock_quantity: 20, is_active: true }
+            )
+        }
+    }
+
+    if (variants.length > 0) {
+        console.log('Injecting variants...')
+        const { error: varError } = await supabase.from('variants').upsert(variants)
+        if (varError) console.error('Error seeding variants:', varError)
+    }
 
     console.log('✅ Rich Data Seeded Successfully!')
     console.log('Tables cleared and replenished with premium content.')

@@ -98,30 +98,30 @@ export function AddToCartButton({
     }
 
     return (
-        <form action={dispatch}>
+        <form action={dispatch} className="w-full">
             <Button
                 type="submit"
-                size="default"
+                size="sm"
                 disabled={isDisabled}
                 className={cn(
-                    "h-11 px-4 rounded-xl transition-all z-10 font-black text-[11px] uppercase tracking-widest w-full",
+                    "h-9 px-3 rounded-lg transition-all z-10 font-bold text-[11px] w-full shadow-none",
                     justAdded
-                        ? "bg-emerald-500 text-white hover:bg-emerald-600 border-none"
-                        : isOutOfStock ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border-zinc-200" : "bg-white text-zinc-900 hover:bg-zinc-100 shadow-sm border border-zinc-100",
-                    "active:scale-95",
+                        ? "bg-emerald-600 text-white hover:bg-emerald-700 border-none"
+                        : isOutOfStock ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border-zinc-100" : "bg-white text-zinc-900 hover:bg-zinc-50 border border-zinc-200",
+                    "active:scale-[0.96]",
                     className
                 )}
             >
                 {isPending ? (
-                    <Loader2 className="size-4 animate-spin" />
+                    <Loader2 className="size-3.5 animate-spin" />
                 ) : justAdded ? (
-                    <div className="flex items-center gap-1.5">
-                        <Check className="size-4" />
+                    <div className="flex items-center gap-1">
+                        <Check className="size-3.5 stroke-[3]" />
                         <span>Added</span>
                     </div>
                 ) : (
-                    <div className="flex items-center gap-1.5">
-                        <Plus className="size-4" />
+                    <div className="flex items-center gap-1">
+                        <Plus className="size-3.5 stroke-[3]" />
                         <span>Add</span>
                     </div>
                 )}

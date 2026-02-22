@@ -114,13 +114,13 @@ async function AsyncDiscoveryGrid({
 
   if (initialItems.length === 0) {
     return (
-      <section className="px-4 py-24 md:px-8">
-        <div className="flex flex-col items-center justify-center py-24 px-8 text-center bg-zinc-50 rounded-[40px] border border-dashed border-zinc-200">
-          <div className="size-20 rounded-full bg-white flex items-center justify-center mb-6 shadow-sm">
-            <span className="text-3xl">🧺</span>
+      <section className="px-4 py-16 md:px-8">
+        <div className="flex flex-col items-center justify-center py-16 px-8 text-center bg-zinc-50/50 rounded-3xl border border-zinc-100">
+          <div className="size-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm">
+            <span className="text-2xl opacity-50">🧺</span>
           </div>
-          <p className="text-lg font-black text-zinc-950 uppercase tracking-tighter">No items found</p>
-          <p className="text-sm text-zinc-500 mt-2 font-medium">Try another category or check back later.</p>
+          <p className="text-base font-bold text-zinc-950 tracking-tight">No items found</p>
+          <p className="text-xs text-zinc-500 mt-1.5 font-medium">Try another category or check back later.</p>
         </div>
       </section>
     );
@@ -157,13 +157,13 @@ async function AsyncDiscoveryGrid({
 function DiscoveryErrorFallback() {
   return (
     <section className="px-4 py-12 md:px-8">
-      <div className="flex flex-col items-center justify-center py-12 px-8 text-center bg-amber-50 rounded-[40px] border border-amber-100">
-        <div className="size-16 rounded-full bg-white flex items-center justify-center mb-6 shadow-sm">
-          <span className="text-2xl text-amber-600">⚠️</span>
+      <div className="flex flex-col items-center justify-center py-10 px-8 text-center bg-amber-50/50 rounded-3xl border border-amber-100">
+        <div className="size-14 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm border border-amber-50">
+          <span className="text-xl text-amber-600">⚠️</span>
         </div>
-        <p className="text-sm font-black text-amber-900 uppercase tracking-tighter">Connection Interrupted</p>
-        <p className="text-[11px] text-amber-800/70 mt-2 font-medium max-w-[200px]">
-          We're having trouble reaching our catalogs. Please refresh or try again later.
+        <p className="text-sm font-bold text-amber-950 tracking-tight">Connection Interrupted</p>
+        <p className="text-[11px] text-amber-800/60 mt-1.5 font-medium max-w-[180px]">
+          We're having trouble reaching our catalogs. Please refresh.
         </p>
       </div>
     </section>

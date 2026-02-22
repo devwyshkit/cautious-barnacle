@@ -87,17 +87,17 @@ function CheckoutLayoutClientInner({
             </div>
           </div>
 
-          <div className="mt-10 space-y-4 relative z-10">
+          <div className="mt-8 space-y-4 relative z-10">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-zinc-900 uppercase tracking-tight">Order Confirmed</h2>
-              <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Preparing your tracker...</p>
+              <h2 className="text-xl font-bold text-zinc-900 tracking-tight">Order confirmed</h2>
+              <p className="text-xs font-medium text-zinc-400">Preparing your tracker...</p>
             </div>
 
-            <div className="flex flex-col items-center gap-3 pt-4">
-              <Loader2 className="size-6 text-zinc-300 animate-spin" />
-              <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-full border border-zinc-100">
-                <Sparkles className="size-4 text-amber-500 animate-pulse" />
-                <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest leading-none">Redirecting to Design Hub</span>
+            <div className="flex flex-col items-center gap-3 pt-2">
+              <Loader2 className="size-5 text-zinc-200 animate-spin" />
+              <div className="flex items-center gap-2 bg-zinc-50 px-3 py-1.5 rounded-full border border-zinc-100">
+                <Sparkles className="size-3.5 text-amber-500 animate-pulse" />
+                <span className="text-[9px] font-bold text-zinc-800 tracking-wide leading-none">Redirecting to Design Hub</span>
               </div>
             </div>
           </div>
@@ -117,25 +117,25 @@ function CheckoutLayoutClientInner({
           </div>
           <Button
             onClick={() => router.push('/')}
-            className="rounded-2xl px-8 h-12 bg-zinc-900 text-white font-bold uppercase tracking-widest text-xs"
+            className="rounded-xl px-6 h-10 bg-zinc-950 text-white font-bold text-xs"
           >
-            Browse Products
+            Browse products
           </Button>
         </div>
       ) : (
         <div className="flex flex-col h-full">
           {/* WYSHKIT 2026: Always show Header and Main Content if items exist */}
-          <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-5 md:px-0 glass-morphism shrink-0">
-            <div className="w-full max-w-2xl mx-auto flex items-center gap-3">
+          <header className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 md:px-0 glass-morphism shrink-0 border-b border-zinc-100">
+            <div className="w-full max-w-2xl mx-auto flex items-center gap-2">
               <button
                 onClick={() => router.back()}
-                className="size-9 flex items-center justify-center text-zinc-900 active:scale-95 transition-all"
+                className="size-8 flex items-center justify-center text-zinc-900 active:scale-95 transition-all"
               >
-                <ChevronLeft className="size-6" />
+                <ChevronLeft className="size-5" />
               </button>
-              <div className="flex flex-col">
-                <h2 className="text-lg font-bold text-zinc-900 leading-tight tracking-tight">{data.partner_name || 'Checkout'}</h2>
-                <p className="text-[11px] font-bold text-zinc-400 leading-tight">{data.partner_city || 'Local Store'}</p>
+              <div className="flex flex-col min-w-0">
+                <h2 className="text-base font-bold text-zinc-900 leading-tight truncate">{data.partner_name || 'Checkout'}</h2>
+                <p className="text-[10px] font-medium text-zinc-400 leading-tight truncate">{data.partner_city || 'Local Store'}</p>
               </div>
             </div>
           </header>
@@ -182,38 +182,38 @@ function CheckoutLayoutClientInner({
               </div>
 
               {/* Security badge (Unified) */}
-              <div className="px-3 py-8 flex items-center justify-center gap-2 opacity-60">
-                <ShieldCheck className="size-3 text-zinc-600" />
-                <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Secured by Razorpay</span>
+              <div className="px-3 py-5 flex items-center justify-center gap-1.5 opacity-30">
+                <ShieldCheck className="size-2.5 text-zinc-600" />
+                <span className="text-[8px] font-bold text-zinc-600 font-mono">Secured by Razorpay</span>
               </div>
             </div>
           </main>
 
           {/* WYSHKIT 2026: Footer - Adjusted for null pricing */}
-          <footer className="sticky bottom-0 glass-morphism z-20 shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
+          <footer className="sticky bottom-0 glass-morphism z-20 border-t border-zinc-100">
             <div className="max-w-2xl mx-auto w-full px-4 md:px-0">
-              <div className="flex items-center justify-between gap-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <div className="flex items-center justify-between gap-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
                 <div className="flex flex-col">
-                  <span className="text-2xl font-black text-zinc-950 tabular-nums leading-none">
+                  <span className="text-xl font-bold text-zinc-950 tabular-nums leading-none">
                     {pricing ? formatCurrency(pricing.total) : '—'}
                   </span>
-                  <span className="text-[10px] text-zinc-400 font-semibold">
-                    {pricing ? 'Bill details above' : 'Waiting for address'}
+                  <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-wider mt-1">
+                    {pricing ? 'View Bill Detail' : 'Waiting for address'}
                   </span>
                 </div>
 
-                <div className="flex-1">
+                <div className="flex-1 max-w-[240px]">
                   {!authUser ? (
                     <button
                       onClick={() => router.push('/auth?returnUrl=/checkout')}
-                      className="w-full h-16 bg-zinc-950 rounded-[24px] flex flex-col items-center justify-center border border-zinc-900 active:scale-95 transition-all shadow-xl shadow-zinc-900/10"
+                      className="w-full h-12 bg-zinc-950 rounded-xl flex flex-col items-center justify-center active:scale-95 transition-all shadow-lg shadow-zinc-900/10"
                     >
-                      <span className="text-sm font-black text-white">Login to continue</span>
-                      <span className="text-[10px] font-bold text-white/70">Securely checkout after login</span>
+                      <span className="text-xs font-bold text-white">Login to continue</span>
+                      <span className="text-[8px] font-medium text-white/50 uppercase tracking-tighter">Secure checkout</span>
                     </button>
                   ) : !isValidAddress ? (
-                    <div className="w-full h-16 bg-zinc-100 rounded-[24px] flex items-center justify-center border border-zinc-200">
-                      <span className="text-xs font-semibold text-zinc-400">Select delivery address</span>
+                    <div className="w-full h-12 bg-zinc-50 rounded-xl flex items-center justify-center border border-zinc-100">
+                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Select address</span>
                     </div>
                   ) : !pricing ? (
                     <button
@@ -221,14 +221,11 @@ function CheckoutLayoutClientInner({
                         triggerHaptic(HapticPattern.WARNING);
                         router.refresh();
                       }}
-                      className="w-full h-16 bg-rose-50 rounded-[24px] flex items-center justify-center border border-rose-100 px-4 text-center hover:bg-rose-100 transition-colors group"
+                      className="w-full h-12 bg-rose-50 rounded-xl flex items-center justify-center border border-rose-100 px-3 hover:bg-rose-100 transition-colors group"
                     >
-                      <div className="flex flex-col items-center">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          <RefreshCw className="size-3 text-rose-600 group-active:animate-spin" />
-                          <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Pricing Engine Offline</span>
-                        </div>
-                        <span className="text-[9px] font-bold text-rose-500/70 uppercase">Tap to retry calculation</span>
+                      <div className="flex items-center gap-2">
+                        <RefreshCw className="size-3 text-rose-600 group-active:animate-spin" />
+                        <span className="text-[10px] font-bold text-rose-600 uppercase">Retry Calculation</span>
                       </div>
                     </button>
                   ) : (
@@ -238,16 +235,16 @@ function CheckoutLayoutClientInner({
                           onClick={handlePayment}
                           disabled={isProcessing || isSuccess}
                           className={cn(
-                            "w-full h-16 rounded-[24px] flex items-center justify-center transition-all active:scale-95 shadow-xl hover:shadow-2xl",
+                            "w-full h-12 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-lg",
                             isProcessing || isSuccess
-                              ? "bg-zinc-100 border border-zinc-200 text-zinc-400"
-                              : "bg-zinc-900 border border-zinc-900 text-white hover:bg-zinc-800"
+                              ? "bg-zinc-100 text-zinc-400"
+                              : "bg-zinc-900 text-white hover:bg-zinc-800"
                           )}
                         >
                           {isProcessing ? (
-                            <Loader2 className="size-5 animate-spin" />
+                            <Loader2 className="size-4 animate-spin" />
                           ) : (
-                            <span className="text-sm font-bold">Place Order • {formatCurrency(pricing.total)}</span>
+                            <span className="text-xs font-bold uppercase tracking-wider">Pay {formatCurrency(pricing.total)}</span>
                           )}
                         </button>
                       </div>
