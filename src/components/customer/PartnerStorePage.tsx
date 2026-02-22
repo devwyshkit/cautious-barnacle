@@ -153,40 +153,40 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
         <div className="bg-white rounded-[28px] p-5 shadow-[0_12px_44px_-8px_rgba(0,0,0,0.12)] border border-zinc-100/80 backdrop-blur-xl">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-black text-zinc-950 leading-tight tracking-tighter line-clamp-2 uppercase">
+              <h1 className="text-xl font-bold text-zinc-950 leading-tight tracking-tight line-clamp-2">
                 {displayName}
               </h1>
-              <div className="flex items-center gap-2 mt-1.5 text-[13px] font-bold text-zinc-500">
+              <div className="flex items-center gap-2 mt-1 text-[11px] font-medium text-zinc-500">
                 <div className="flex items-center gap-1">
-                  <MapPin className="size-3.5 text-zinc-400" />
+                  <MapPin className="size-3 text-zinc-400" />
                   <span className="truncate">{displayCity}</span>
                 </div>
-                <span className="text-zinc-400">|</span>
-                <span className="text-zinc-400 uppercase tracking-widest text-[10px]">Local Store</span>
+                <span className="text-zinc-300">•</span>
+                <span className="text-zinc-400 uppercase tracking-wider text-[9px]">Local Partner</span>
               </div>
             </div>
-            <div className="flex items-start gap-3 shrink-0">
+            <div className="flex items-start gap-2 shrink-0">
               <ShareButton
                 title={displayName}
                 url={`/partner/${partnerId}`}
-                className="bg-zinc-50 size-11 rounded-2xl flex items-center justify-center text-zinc-900 hover:bg-zinc-100 transition-all border border-zinc-100 shadow-sm"
+                className="bg-zinc-50 size-9 rounded-xl flex items-center justify-center text-zinc-900 hover:bg-zinc-100 transition-all border border-zinc-100 shadow-none"
               />
               {displayRating && (
-                <div className="flex flex-col items-center bg-zinc-900 px-3 py-2 rounded-2xl shadow-xl min-w-[56px]">
-                  <div className="flex items-center gap-1">
-                    <span className="text-[15px] font-black text-white leading-none tracking-tighter">{displayRating.toFixed(1)}</span>
-                    <Star className="size-3 fill-white text-white" />
+                <div className="flex flex-col items-center bg-zinc-950 px-2.5 py-1.5 rounded-xl shadow-lg min-w-[48px]">
+                  <div className="flex items-center gap-0.5">
+                    <span className="text-[13px] font-bold text-white leading-none">{displayRating.toFixed(1)}</span>
+                    <Star className="size-2.5 fill-white text-white" />
                   </div>
-                  <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest mt-1">Rating</span>
+                  <span className="text-[7px] font-bold text-zinc-500 uppercase tracking-wider mt-0.5">Rating</span>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-4 mt-5 pt-5 border-t border-dashed border-zinc-100">
-            <div className="flex items-center gap-2 text-[11px] font-black text-zinc-700 uppercase tracking-widest bg-zinc-50 px-3 py-1.5 rounded-xl border border-zinc-100">
-              <Clock className="size-3.5 text-emerald-600" />
-              <span>{prepTimeText} prep</span>
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-zinc-50">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-600 uppercase tracking-wide bg-zinc-50/50 px-2.5 py-1 rounded-lg border border-zinc-100">
+              <Clock className="size-3 text-emerald-600" />
+              <span>{prepTimeText} delivery</span>
             </div>
           </div>
         </div>
@@ -221,46 +221,45 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
       <div className="flex flex-col md:flex-row max-w-[1440px] mx-auto min-h-[70vh] relative pt-8">
         {/* WYSHKIT 2026: Sticky Sidebar Browse Pattern */}
         {/* Mobile: Horizontal Pill Rail (top-sticky), Desktop: Vertical Strip (left-sticky) */}
-        <aside className="md:w-28 md:border-r border-zinc-100 flex md:flex-col gap-4 py-4 px-4 md:px-0 shrink-0 bg-white md:sticky md:top-16 md:h-[calc(100vh-64px)] overflow-x-auto md:overflow-y-auto no-scrollbar md:overscroll-contain z-20 top-0 sticky border-b md:border-b-0">
-          <div className="flex md:flex-col gap-4 md:gap-6 min-w-max md:min-w-0">
+        <aside className="md:w-24 md:border-r border-zinc-100 flex md:flex-col gap-3 py-3 px-4 md:px-0 shrink-0 bg-white md:sticky md:top-14 md:h-[calc(100vh-56px)] overflow-x-auto md:overflow-y-auto no-scrollbar md:overscroll-contain z-20 top-0 sticky border-b md:border-b-0">
+          <div className="flex md:flex-col gap-3 md:gap-5 min-w-max md:min-w-0">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className="flex md:flex-col items-center gap-2 px-1 group outline-none"
+                className="flex md:flex-col items-center gap-1.5 px-0.5 group outline-none"
               >
                 <div className={cn(
-                  "size-12 md:size-16 rounded-[20px] bg-zinc-50 group-hover:bg-zinc-100 transition-all flex items-center justify-center border border-zinc-100 group-active:scale-90",
-                  selectedCategory === cat && "bg-zinc-900 border-zinc-900 ring-4 ring-zinc-900/5"
+                  "size-10 md:size-14 rounded-2xl bg-zinc-50 group-hover:bg-zinc-100 transition-all flex items-center justify-center border border-zinc-100 group-active:scale-90",
+                  selectedCategory === cat && "bg-zinc-950 border-zinc-950 shadow-md"
                 )}>
                   <span className={cn(
-                    "text-[10px] md:text-[11px] font-black uppercase tracking-tighter text-zinc-400",
+                    "text-[9px] md:text-[10px] font-bold uppercase tracking-tight text-zinc-400",
                     selectedCategory === cat && "text-white"
                   )}>
                     {cat.slice(0, 3)}
                   </span>
                 </div>
                 <span className={cn(
-                  "text-[10px] md:text-[11px] font-black uppercase tracking-tight text-center leading-tight transition-colors",
-                  selectedCategory === cat ? "text-zinc-900" : "text-zinc-400 group-hover:text-zinc-600"
+                  "text-[9px] md:text-[10px] font-bold uppercase tracking-wide text-center leading-none transition-colors",
+                  selectedCategory === cat ? "text-zinc-950" : "text-zinc-400 group-hover:text-zinc-600"
                 )}>
                   {cat}
                 </span>
               </button>
             ))}
           </div>
-
         </aside>
 
         {/* Product Grid Area */}
-        <div id="menu-items" className="flex-1 px-4 md:px-10 py-6 md:py-10">
-          <div className="flex items-center justify-between mb-8">
+        <div id="menu-items" className="flex-1 px-4 md:px-8 py-4 md:py-8">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl md:text-2xl font-black text-zinc-950 tracking-tighter uppercase leading-none">
-                {selectedCategory === 'Recommended' ? 'Recommended Items' : selectedCategory}
+              <h2 className="text-lg md:text-xl font-bold text-zinc-950 tracking-tight leading-none">
+                {selectedCategory === 'Recommended' ? 'Recommended' : selectedCategory}
               </h2>
-              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mt-2">
-                {selectedCategory === 'Recommended' ? 'Bestselling items from this store' : `Items in ${selectedCategory}`}
+              <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-1.5">
+                {selectedCategory === 'Recommended' ? 'Curated from this store' : `${displayItems.length} items available`}
               </p>
             </div>
 

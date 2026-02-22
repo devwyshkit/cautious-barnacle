@@ -36,6 +36,16 @@ vi.mock('@/lib/actions/commerce/orders', () => ({
     get_order_with_history: vi.fn().mockResolvedValue({ order: { id: 'test-order-id-123' } })
 }));
 
+vi.mock('@/lib/actions/commerce/intent-engine', () => ({
+    executeCommerceIntent: vi.fn().mockResolvedValue({
+        success: true,
+        data: {
+            order_id: 'test-order-id-123',
+            order_number: 'WSH-260221-XXXX'
+        }
+    }),
+}));
+
 // Mock Supabase Server Client
 vi.mock('@/lib/supabase/server', () => ({
     createClient: vi.fn(),
@@ -53,10 +63,14 @@ describe('Checkout Intent Flow Automation', () => {
             const builder: any = {
                 select: vi.fn().mockImplementation(() => builder),
                 eq: vi.fn().mockImplementation(() => builder),
+                or: vi.fn().mockImplementation(() => builder),
                 insert: vi.fn().mockImplementation(() => builder),
                 delete: vi.fn().mockImplementation(() => builder),
                 single: vi.fn().mockImplementation(() => Promise.resolve({ data: { id: 'draft_123' }, error: null })),
-                maybeSingle: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null }))
+                maybeSingle: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
+                match: vi.fn().mockImplementation(() => builder),
+                update: vi.fn().mockImplementation(() => builder),
+                upsert: vi.fn().mockImplementation(() => builder),
             };
             return builder;
         };
@@ -65,6 +79,8 @@ describe('Checkout Intent Flow Automation', () => {
             draft_orders: createMockBuilder('draft_orders'),
             stock_reservations: createMockBuilder('stock_reservations'),
             orders: createMockBuilder('orders'),
+            cart_items: createMockBuilder('cart_items'),
+            checkout_sessions: createMockBuilder('checkout_sessions'),
         };
 
         mockSupabase = {
@@ -83,11 +99,11 @@ describe('Checkout Intent Flow Automation', () => {
 
     it('creates payment order matching strict DB requirements securely', async () => {
         const payload = {
-            address_id: 'address-123',
+            address_id: '550e8400-e29b-41d4-a716-446655440000',
             draft_items: [
                 {
-                    item_id: 'item-123',
-                    selected_variant_id: 'variant-123',
+                    item_id: '550e8400-e29b-41d4-a716-446655440001',
+                    selected_variant_id: '550e8400-e29b-41d4-a716-446655440002',
                     quantity: 1,
                     personalization: { enabled: true, option_id: 'opt1' },
                     selected_addons: []
@@ -119,9 +135,9 @@ describe('Checkout Intent Flow Automation', () => {
         // Assume Draft gets fetched by single()
         builders.draft_orders.single.mockResolvedValue({
             data: {
-                id: 'draft_123',
-                address_id: 'address-123',
-                items: [{ item_id: 'item-123', quantity: 1, selected_variant_id: 'variant-123' }],
+                id: '550e8400-e29b-41d4-a716-446655440003',
+                address_id: '550e8400-e29b-41d4-a716-446655440000',
+                items: [{ item_id: '550e8400-e29b-41d4-a716-446655440001', quantity: 1, selected_variant_id: '550e8400-e29b-41d4-a716-446655440002' }],
                 metadata: { coupon_code: null, use_wallet: false }
             },
             error: null
@@ -132,7 +148,7 @@ describe('Checkout Intent Flow Automation', () => {
             'order_rzp_123',
             'pay_123',
             'valid_signature',
-            { draft_id: 'draft_123' }
+            { draft_id: '550e8400-e29b-41d4-a716-446655440003' }
         );
 
         expect(response.success).toBe(true);
@@ -143,9 +159,11 @@ describe('Checkout Intent Flow Automation', () => {
         // Ensure create_order was triggered properly passing the baton
         const { executeCommerceIntent } = await import('@/lib/actions/commerce/intent-engine');
         expect(executeCommerceIntent).toHaveBeenCalledWith(expect.objectContaining({
-            razorpay_order_id: 'order_rzp_123',
-            user_id: 'user-123',
-            items: expect.any(Array)
+            intent: 'PLACE_ORDER',
+            payload: expect.objectContaining({
+                razorpay_order_id: 'order_rzp_123',
+                payment_id: 'pay_123',
+            })
         }));
     });
 });

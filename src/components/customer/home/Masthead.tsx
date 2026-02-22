@@ -63,10 +63,10 @@ export function Masthead({
             suppressHydrationWarning
         >
             <div className="flex items-center justify-between gap-4 max-w-[1440px] mx-auto">
-                <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="flex items-center gap-2 overflow-hidden">
                     {config.icon}
                     <span className={cn(
-                        "text-[11px] font-black uppercase tracking-tight truncate",
+                        "text-[10px] font-bold tracking-tight truncate",
                         config.text
                     )}>
                         {config.label}
@@ -76,11 +76,11 @@ export function Masthead({
                 <div className="flex items-center gap-3 shrink-0">
                     <div className="flex items-center gap-1.5">
                         <div className={cn(
-                            "size-1.5 rounded-full animate-pulse",
+                            "size-1 rounded-full animate-pulse",
                             status === 'normal' ? 'bg-emerald-500' : status === 'delayed' ? 'bg-rose-500' : 'bg-amber-500'
                         )} />
                         <span className={cn(
-                            "text-[10px] font-black uppercase tracking-widest",
+                            "text-[9px] font-bold uppercase tracking-wider",
                             status === 'normal' ? 'text-emerald-700' : status === 'delayed' ? 'text-rose-700' : 'text-amber-700'
                         )}>
                             {config.tag}

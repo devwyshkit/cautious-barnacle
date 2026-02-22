@@ -19,6 +19,10 @@ vi.mock('@/lib/actions/commerce/orders', () => ({
     create_order: vi.fn(),
 }));
 
+vi.mock('@/lib/actions/commerce/intent-engine', () => ({
+    executeCommerceIntent: vi.fn(),
+}));
+
 // Fixed Constructor Mock
 vi.mock('razorpay', () => {
     return {
@@ -52,9 +56,9 @@ describe('Razorpay Webhook Contract Test', () => {
             delete: vi.fn().mockReturnThis(),
             single: vi.fn().mockResolvedValue({
                 data: {
-                    id: 'draft_123',
-                    address_id: 'addr_123',
-                    items: [{ item_id: 'item_1', quantity: 1 }],
+                    id: '550e8400-e29b-41d4-a716-446655440003',
+                    address_id: '550e8400-e29b-41d4-a716-446655440000',
+                    items: [{ item_id: '550e8400-e29b-41d4-a716-446655440001', quantity: 1 }],
                     metadata: { coupon_code: 'SAVE10', use_wallet: true }
                 },
                 error: null
@@ -64,7 +68,7 @@ describe('Razorpay Webhook Contract Test', () => {
         (createAdminClient as any).mockResolvedValue(mockSupabase);
 
         // 3. Mock create_order
-        (executeCommerceIntent as any).mockResolvedValue({ success: true, order_id: 'order_123' });
+        (executeCommerceIntent as any).mockResolvedValue({ success: true, data: { order_id: 'order_123' } });
 
         // 4. Construct Request
         const body = JSON.stringify({
@@ -73,7 +77,10 @@ describe('Razorpay Webhook Contract Test', () => {
                 payment: {
                     entity: {
                         order_id: 'rzp_order_123',
-                        id: 'rzp_pay_123'
+                        id: 'rzp_pay_123',
+                        amount: 1000,
+                        currency: 'INR',
+                        status: 'captured'
                     }
                 }
             }
@@ -92,12 +99,14 @@ describe('Razorpay Webhook Contract Test', () => {
         expect(res.status).toBe(200);
         expect(resData.order_id).toBe('order_123');
         expect(executeCommerceIntent).toHaveBeenCalledWith(expect.objectContaining({
-            address_id: 'addr_123',
-            razorpay_order_id: 'rzp_order_123',
-            payment_id: 'rzp_pay_123',
-            coupon_code: 'SAVE10',
-            use_wallet: true,
-            useAdmin: true
+            intent: 'PLACE_ORDER',
+            payload: expect.objectContaining({
+                address_id: '550e8400-e29b-41d4-a716-446655440000',
+                razorpay_order_id: 'rzp_order_123',
+                payment_id: 'rzp_pay_123',
+                coupon_code: 'SAVE10',
+                use_wallet: true
+            })
         }));
     });
 
@@ -116,7 +125,7 @@ describe('Razorpay Webhook Contract Test', () => {
         const body = JSON.stringify({
             event: 'payment.captured',
             payload: {
-                payment: { entity: { order_id: 'rzp_order_123', id: 'rzp_pay_123' } }
+                payment: { entity: { order_id: 'rzp_order_123', id: 'rzp_pay_123', amount: 1000, currency: 'INR', status: 'captured' } }
             }
         });
 

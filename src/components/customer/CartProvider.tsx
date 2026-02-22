@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useOptimistic, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { DraftTransaction as Cart, SelectedPersonalization, SelectedAddon, DraftLineItem } from "@/lib/types/personalization";
 import { EMPTY_CART } from "@/lib/constants/cart";
 import { useAuth } from "@/hooks/useAuth";
@@ -72,6 +73,7 @@ export function CartProvider({
     guestSessionId?: string | null
 }) {
     const { user } = useAuth();
+    const router = useRouter();
     const [isPending, startTransition] = useTransition();
 
     // ELITE: Optimistic state bridges the gap between Action and Revalidation
@@ -144,6 +146,8 @@ export function CartProvider({
                     if (result.error) {
                         resolve({ success: false, error: result.error });
                     } else {
+                        // SWIGGY 2026: Force refresh to ensure initialCart prop updates from RSC
+                        router.refresh();
                         resolve({ success: true });
                     }
                 } catch (error) {
@@ -189,13 +193,17 @@ export function CartProvider({
     };
 
     const clearCart = async () => {
-        startTransition(async () => {
-            setOptimisticCart({ type: 'clear', payload: null });
-            try {
-                await clearDraftOrder();
-            } catch (err) {
-                logger.error('Clear Transition Error', err as Error);
-            }
+        return new Promise<void>((resolve) => {
+            startTransition(async () => {
+                setOptimisticCart({ type: 'clear', payload: null });
+                try {
+                    await clearDraftOrder();
+                    resolve();
+                } catch (err) {
+                    logger.error('Clear Transition Error', err as Error);
+                    resolve();
+                }
+            });
         });
     };
 
@@ -203,6 +211,7 @@ export function CartProvider({
         if (!pendingItem) return;
         setShowReplaceCartDialog(false);
         await clearCart();
+        // Wait a bit for the transition to settle
         await addToDraftOrder(
             pendingItem.item_id,
             pendingItem.variant_id,
