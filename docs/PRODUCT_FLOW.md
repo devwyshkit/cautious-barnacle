@@ -99,7 +99,8 @@ Section order (BlocksEngine):
 4. **CouponSlot** — collapsed ("Have a promo code?" → tap to expand). Never always-visible.
 5. **Wallet toggle** — shown only if balance > 0. One tap. No friction.
 6. **GstinSection** — collapsed ("Business purchase? Add GSTIN" → tap to expand). Optional.
-7. **EstimateButton** — shows only after valid GSTIN entered. "Download pro-forma invoice (PDF)".
+7. **EstimateButton** — shows only after valid GSTIN entered. "Download Estimate" (Proforma invoice used for internal corporate approvals *before* payment. Not a legal tax document).
+8. **Final Invoice** (Tax Invoice) — Generated and downloaded only *after* delivery. Legal document for GST claims.
 
 **Footer (sticky)**:
 - Mobile: `SlideToPay` gesture

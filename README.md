@@ -80,13 +80,20 @@ Users pay a 20–30% premium for peace of mind. Returns collapse to near-zero.
 - We never cancel an entire order because one item failed.
 
 **Delivery Fee**:
-- Shown in cart. Never revealed at checkout for the first time.
+- **Flat distance-based fee only** (e.g., ₹40-60). 
+- **NO surge pricing**. Physical products don't spoil rapidly like food; therefore, delivery is not minute-sensitive enough to warrant demand-based surge parsing. Flat fees equal predictable pricing.
+- Shown upfront in cart. Never hidden until checkout.
 - Non-refundable once a rider is dispatched.
 - If order cancelled before `PACKED`: 100% full refund including delivery fee.
 
 **Post-Approval Policy**:
 - Slide to Approve = liability shifts to customer. Zero refunds for personalised items post-approval.
 - Exception only: item arrives factually wrong or demonstrably broken → WhatsApp support within 2 hours of delivery.
+
+**Cashback Flywheel**:
+- First order earns 5% cashback. Subsequent orders earn 2%.
+- Expiry is 90 days.
+- Credited only *after* successful delivery. Usage unlocked on the *next* order.
 
 ---
 
