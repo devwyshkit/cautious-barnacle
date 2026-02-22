@@ -100,7 +100,7 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
               <p className="text-sm font-semibold text-zinc-900 truncate">{addr.name}</p>
               <Check className="size-3 text-emerald-500 shrink-0" />
             </div>
-            <p className="text-[10px] text-zinc-500 leading-relaxed mt-0.5 line-clamp-2">
+            <p className="text-xs text-zinc-500 leading-relaxed mt-0.5 line-clamp-2">
               {addr.address_line1}{addr.city ? `, ${addr.city}` : ''} {addr.pincode || ''}
             </p>
           </div>
@@ -146,7 +146,7 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
           <div className="size-8 rounded-full bg-zinc-100 flex items-center justify-center mx-auto mb-2">
             <MapPin className="size-3.5 text-zinc-400" />
           </div>
-          <p className="text-[10px] font-semibold text-zinc-500 mb-2">No saved addresses</p>
+          <p className="text-xs font-semibold text-zinc-500 mb-2">No saved addresses</p>
           <Button
             onClick={() => setIsAddingAddress(true)}
             variant="outline"
@@ -195,7 +195,7 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
                           {addr.name}
                         </p>
                       </div>
-                      <p className={cn("text-[10px] leading-relaxed", isSelected ? "text-white/60" : "text-zinc-500")}>
+                      <p className={cn("text-xs leading-relaxed", isSelected ? "text-white/60" : "text-zinc-500")}>
                         {addr.address_line1}{addr.city ? `, ${addr.city}` : ''}
                       </p>
                     </div>

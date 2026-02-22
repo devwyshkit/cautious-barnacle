@@ -217,8 +217,8 @@ export function IdentityForm({
             <div className="pt-4 flex flex-col gap-6">
                 <div className="bg-zinc-50 p-6 rounded-[2.5rem] border border-zinc-100 shadow-inner">
                     <div className="flex justify-center gap-4 mb-6 opacity-30">
-                        <span className="flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest"><ShieldCheck className="size-3" /> Encrypted</span>
-                        <span className="flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest"><CheckCircle2 className="size-3" /> Verified</span>
+                        <span className="flex items-center gap-1.5 text-[8px] font-black tracking-wider"><ShieldCheck className="size-3" /> Encrypted</span>
+                        <span className="flex items-center gap-1.5 text-[8px] font-black tracking-wider"><CheckCircle2 className="size-3" /> Verified</span>
                     </div>
 
                     <ActionSlider
@@ -227,14 +227,14 @@ export function IdentityForm({
                         successLabel="Shared"
                         isLoading={isSubmitting}
                         variant="amber"
-                        className="h-16 flex items-center justify-center px-2 bg-black text-white transition-all hover:bg-zinc-900 hover:shadow-2xl hover:shadow-zinc-200"
+                        className="h-16 flex items-center justify-center px-2 bg-black text-white transition-all hover:bg-zinc-900 hover:shadow-sm hover:shadow-zinc-200"
                     />
                 </div>
 
                 {onSkip && (
                     <button
                         onClick={onSkip}
-                        className="w-full text-center text-[10px] font-black text-zinc-400 uppercase tracking-widest hover:text-zinc-600 transition-colors py-2 active:scale-95"
+                        className="w-full text-center text-xs font-black text-zinc-400 tracking-wider hover:text-zinc-600 transition-colors py-2 active:scale-95"
                     >
                         {allOptional ? "Skip (Optional)" : "I'll add details later"}
                     </button>

@@ -25,7 +25,7 @@ export default function GeneralError({
                 </div>
 
                 <div className="space-y-2">
-                    <h2 className="text-xl font-black text-zinc-950 uppercase tracking-tighter">Something went wrong</h2>
+                    <h2 className="text-xl font-black text-zinc-950 tracking-tighter">Something went wrong</h2>
                     <p className="text-sm text-zinc-500 font-medium px-4">
                         We're having trouble loading this section. Our team has been notified.
                     </p>

@@ -19,7 +19,7 @@ export function CheckoutSummary({ metadata }: CheckoutSummaryProps) {
                 </div>
                 <div className="space-y-2">
                     {['subtotal', 'delivery_fee', 'platform_fee', 'gst'].map(key => (
-                        <div key={key} className="flex justify-between text-xs text-zinc-500 uppercase tracking-widest font-bold">
+                        <div key={key} className="flex justify-between text-xs text-zinc-500 tracking-wider font-bold">
                             <span>{key.replace('_', ' ')}</span>
                             <span className="text-zinc-950">₹{pricing[key] || 0}</span>
                         </div>

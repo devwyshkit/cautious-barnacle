@@ -249,7 +249,7 @@ function VariantStockItem({ variant }: { variant: Variant }) {
           className="h-7 w-14 text-xs px-1 text-center bg-white"
           disabled={updating}
         />
-        <span className="text-[10px] text-zinc-400 uppercase font-bold">QTY</span>
+        <span className="text-xs text-zinc-400 font-bold">QTY</span>
       </div>
     </div>
   );

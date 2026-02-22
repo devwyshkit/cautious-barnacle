@@ -223,7 +223,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
                 </div>
 
                 <div className="flex-1 p-3 flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 mb-1">
+                  <div className="flex items-center gap-1.5 text-xs text-zinc-400 mb-1">
                     <Clock className="size-3" />
                     <span>{formatDate(order.created_at)}</span>
                     <span>•</span>

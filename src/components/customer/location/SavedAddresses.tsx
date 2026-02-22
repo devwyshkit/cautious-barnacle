@@ -34,7 +34,7 @@ export function SavedAddresses({
 }: SavedAddressesProps) {
     return (
         <div className="space-y-4">
-            <p className="text-[11px] font-black text-zinc-600 uppercase tracking-widest px-1">Saved addresses</p>
+            <p className="text-[11px] font-black text-zinc-600 tracking-wider px-1">Saved addresses</p>
             <div className="space-y-2">
                 {addresses.map((addr) => {
                     const isSelected = selectedAddressId === addr.id;
@@ -73,7 +73,7 @@ export function SavedAddresses({
                                             {addr.name}
                                         </span>
                                         {addr.is_default && !isSelected && (
-                                            <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 uppercase">Default</span>
+                                            <span className="text-[11px] font-black px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500">Default</span>
                                         )}
                                     </div>
                                     <span className={cn("text-xs truncate mt-0.5 font-medium", isSelected ? "text-white/60" : "text-zinc-500")}>

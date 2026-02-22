@@ -223,7 +223,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     {item.video_url && (
                         <button
                             onClick={(e) => { e.stopPropagation(); window.open(item.video_url!, '_blank'); }}
-                            className="absolute bottom-6 right-6 z-10 size-12 rounded-full bg-white/90 backdrop-blur-md shadow-2xl flex items-center justify-center hover:bg-white active:scale-95 transition-all text-zinc-900 border border-white"
+                            className="absolute bottom-6 right-6 z-10 size-12 rounded-full bg-white/90 backdrop-blur-md shadow-sm flex items-center justify-center hover:bg-white active:scale-95 transition-all text-zinc-900 border border-white"
                         >
                             <PlayCircle className="size-7" />
                         </button>
@@ -256,12 +256,12 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                         <div className="flex items-start justify-between gap-4">
                             <div className="space-y-1">
                                 {item.brand && (
-                                    <p className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.2em]">{item.brand}</p>
+                                    <p className="text-xs font-black text-[var(--primary)] tracking-[0.2em]">{item.brand}</p>
                                 )}
-                                <h1 className="text-2xl font-black text-zinc-950 leading-tight tracking-tighter uppercase">
+                                <h1 className="text-2xl font-black text-zinc-950 leading-tight tracking-tighter">
                                     {item.name}
                                 </h1>
-                                <p className="text-sm font-black text-zinc-500 uppercase tracking-widest">{item.category}</p>
+                                <p className="text-sm font-black text-zinc-500 tracking-wider">{item.category}</p>
                             </div>
                             <div className="flex flex-col items-end gap-1.5">
                                 <div className="flex items-baseline gap-1.5">
@@ -271,7 +271,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                     )}
                                 </div>
                                 {item.mrp && item.mrp > unitPrice && (
-                                    <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md uppercase tracking-wider border border-emerald-100/50">
+                                    <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md tracking-wider border border-emerald-100/50">
                                         {Math.round(((item.mrp - unitPrice) / item.mrp) * 100)}% OFF
                                     </span>
                                 )}
@@ -290,12 +290,12 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                             {item.preview_time_minutes && (
                                 <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-lg text-amber-600 border border-amber-100/50">
                                     <Sparkles className="size-3" />
-                                    <span className="text-[11px] font-black uppercase tracking-widest">{item.preview_time_minutes} min preview</span>
+                                    <span className="text-[11px] font-black tracking-wider">{item.preview_time_minutes} min preview</span>
                                 </div>
                             )}
                             <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-50 rounded-lg text-zinc-600 border border-zinc-100">
                                 <IndianRupee className="size-3" />
-                                <span className="text-[11px] font-black uppercase tracking-widest">Inc. {item.gst_percentage || 0}% GST</span>
+                                <span className="text-[11px] font-black tracking-wider">Inc. {item.gst_percentage || 0}% GST</span>
                             </div>
                         </div>
                     </div>
@@ -304,8 +304,8 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     {variantsArray.length > 0 && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em]">Select Option</h3>
-                                <span className="text-[11px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 uppercase tracking-widest">REQUIRED</span>
+                                <h3 className="text-[11px] font-black text-zinc-400 tracking-[0.2em]">Select Option</h3>
+                                <span className="text-[11px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 tracking-wider">REQUIRED</span>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 {variantsArray.map((v) => {
@@ -334,7 +334,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                                 <span className={cn("text-xs font-bold", isSelected ? "text-white" : isOutOfStock ? "text-zinc-300" : "text-zinc-900")}>
                                                     {formatCurrency(v.price || 0)}
                                                 </span>
-                                                {isOutOfStock && <span className="text-[11px] font-black text-rose-500 uppercase tracking-tighter ml-1">Sold Out</span>}
+                                                {isOutOfStock && <span className="text-[11px] font-black text-rose-500 tracking-tighter ml-1">Sold Out</span>}
                                             </div>
                                             {isSelected && (
                                                 <div className="absolute top-3 right-3">
@@ -356,11 +356,11 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Sparkles className="size-4 text-amber-500" />
-                                    <h3 className="text-[11px] font-black text-zinc-950 uppercase tracking-[0.2em]">Add Identity</h3>
+                                    <h3 className="text-[11px] font-black text-zinc-950 tracking-[0.2em]">Add Identity</h3>
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-[11px] font-black text-zinc-400 bg-zinc-50 px-2 py-0.5 rounded-md border border-zinc-100 uppercase tracking-widest">Optional</span>
-                                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-900 text-white text-[11px] font-black uppercase tracking-widest">
+                                    <span className="text-[11px] font-black text-zinc-400 bg-zinc-50 px-2 py-0.5 rounded-md border border-zinc-100 tracking-wider">Optional</span>
+                                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-900 text-white text-[11px] font-black tracking-wider">
                                         <Clock className="size-3" />
                                         <span>4hr Preview</span>
                                     </div>
@@ -375,7 +375,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                 <div className="min-h-0">
                                     <div className="flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 rounded-2xl mb-2">
                                         <AlertTriangle className="size-4 text-[var(--primary)] shrink-0" />
-                                        <p className="text-[11px] font-bold text-[var(--primary)] leading-tight uppercase tracking-wider">
+                                        <p className="text-[11px] font-bold text-[var(--primary)] leading-tight tracking-wider">
                                             Important: Identity-linked items are non-returnable and non-refundable.
                                         </p>
                                     </div>
@@ -410,7 +410,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                                 </div>
                                                 <div>
                                                     <span className="text-[15px] font-black block leading-none">{p.name}</span>
-                                                    <span className="text-[11px] font-bold uppercase tracking-widest mt-1.5 opacity-60 block italic">Requires Design Approval</span>
+                                                    <span className="text-[11px] font-bold tracking-wider mt-1.5 opacity-60 block italic">Requires Design Approval</span>
                                                 </div>
                                             </div>
                                             <span className="text-[15px] font-black tabular-nums">+{formatCurrency(p.price || 0)}</span>
@@ -424,7 +424,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     {/* Standard Add-ons Section */}
                     {addonsArray.length > 0 && (
                         <section className="space-y-4">
-                            <h3 className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em]">Complementary Gifts</h3>
+                            <h3 className="text-[11px] font-black text-zinc-400 tracking-[0.2em]">Complementary Gifts</h3>
                             <div className="space-y-3">
                                 {addonsArray.map((addon) => {
                                     const isSelected = selectedAddonIds.has(addon.id);
@@ -472,34 +472,34 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     <section className="space-y-4 pt-6 border-t border-zinc-100">
 
                         <div className="flex items-center gap-2">
-                            <h3 className="text-[11px] font-black text-zinc-950 uppercase tracking-[0.2em]">Product Specifications</h3>
+                            <h3 className="text-[11px] font-black text-zinc-950 tracking-[0.2em]">Product Specifications</h3>
                             <div className="h-px flex-1 bg-zinc-100" />
                         </div>
 
                         <div className="grid grid-cols-1 gap-2 bg-zinc-50/50 rounded-[28px] p-2 border border-zinc-100">
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-4 rounded-2xl bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-black text-zinc-500 uppercase tracking-widest">Dimensions</span>
+                                <span className="text-[11px] font-black text-zinc-500 tracking-wider">Dimensions</span>
                                 <span className="text-[13px] font-bold text-zinc-900 tracking-tight">
                                     {item.length_cm || '–'} × {item.width_cm || '–'} × {item.height_cm || '–'} cm
                                 </span>
                             </div>
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-4 rounded-2xl bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-black text-zinc-500 uppercase tracking-widest">Weight</span>
+                                <span className="text-[11px] font-black text-zinc-500 tracking-wider">Weight</span>
                                 <span className="text-[13px] font-bold text-zinc-900 tracking-tight">
                                     {item.weight_kg ? `${item.weight_kg} kg` : item.weight_grams ? `${item.weight_grams} g` : '–'}
                                 </span>
                             </div>
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-4 rounded-2xl bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-black text-zinc-500 uppercase tracking-widest">Material</span>
+                                <span className="text-[11px] font-black text-zinc-500 tracking-wider">Material</span>
                                 <span className="text-[13px] font-bold text-zinc-900 tracking-tight">{item.material || 'Premium Finish'}</span>
                             </div>
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-4 rounded-2xl bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-black text-zinc-500 uppercase tracking-widest">HSN Code</span>
-                                <span className="text-[13px] font-bold text-emerald-600 tracking-widest">{item.hsn_code || '4901'} ({item.gst_percentage || 0}%)</span>
+                                <span className="text-[11px] font-black text-zinc-500 tracking-wider">HSN Code</span>
+                                <span className="text-[13px] font-bold text-emerald-600 tracking-wider">{item.hsn_code || '4901'} ({item.gst_percentage || 0}%)</span>
                             </div>
                             {item.manufacturer_info && (
                                 <div className="p-4 rounded-2xl bg-white border border-zinc-100/50 flex flex-col gap-2">
-                                    <span className="text-[11px] font-black text-zinc-500 uppercase tracking-widest">Manufacturer Details</span>
+                                    <span className="text-[11px] font-black text-zinc-500 tracking-wider">Manufacturer Details</span>
                                     <span className="text-[12px] font-medium text-zinc-600 leading-snug italic line-clamp-2">
                                         {item.manufacturer_info}
                                     </span>
@@ -509,13 +509,13 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
 
                         <div className="flex gap-2">
                             <div className={cn(
-                                "flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl border-2 font-black uppercase tracking-widest text-[11px]",
+                                "flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl border-2 font-black tracking-wider text-[11px]",
                                 item.return_eligible ? "bg-blue-50 border-blue-100 text-blue-600" : "bg-zinc-50 border-zinc-100 text-zinc-500"
                             )}>
                                 <Info className="size-3" />
                                 {item.return_eligible ? '7-Day Return' : 'Final Sale - No Returns'}
                             </div>
-                            <div className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl border-2 bg-zinc-50 border-zinc-100 text-zinc-500 font-black uppercase tracking-widest text-[11px]">
+                            <div className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl border-2 bg-zinc-50 border-zinc-100 text-zinc-500 font-black tracking-wider text-[11px]">
                                 <ShieldCheck className="size-3" />
                                 Quality Assured
                             </div>
@@ -525,7 +525,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     {/* Description Section */}
                     {item.description && (
                         <section className="space-y-3">
-                            <h3 className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em]">About this product</h3>
+                            <h3 className="text-[11px] font-black text-zinc-400 tracking-[0.2em]">About this product</h3>
                             <p className="text-[15px] text-zinc-600 leading-relaxed font-medium">
                                 {item.description}
                             </p>
@@ -563,7 +563,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     </div>
 
                     <button
-                        className="flex-1 h-12 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-black text-[13px] uppercase tracking-widest rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                        className="flex-1 h-12 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-black text-[13px] tracking-wider rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                         onClick={handleAddToCart}
                         data-testid="add-to-cart-drawer"
                         disabled={continuing || !canAdd}

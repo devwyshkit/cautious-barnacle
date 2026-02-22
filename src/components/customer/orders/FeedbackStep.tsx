@@ -59,7 +59,7 @@ export function FeedbackStep({ orderId, items, onComplete }: FeedbackStepProps) 
                 <div className="size-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="size-8 text-emerald-600" />
                 </div>
-                <h3 className="text-lg font-black text-emerald-900 uppercase tracking-tight mb-2">Feedback Received</h3>
+                <h3 className="text-lg font-black text-emerald-900 tracking-tight mb-2">Feedback Received</h3>
                 <p className="text-sm text-emerald-600 font-medium">Your feedback helps us improve the experience.</p>
             </div>
         );
@@ -72,7 +72,7 @@ export function FeedbackStep({ orderId, items, onComplete }: FeedbackStepProps) 
                     <Star className="size-5 text-amber-500 fill-amber-500" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-black text-zinc-900 uppercase tracking-widest">Rate your experience</h3>
+                    <h3 className="text-sm font-black text-zinc-900 tracking-wider">Rate your experience</h3>
                     <p className="text-xs text-zinc-400 font-medium mt-0.5">How was your order #{orderId.slice(0, 8)}?</p>
                 </div>
             </div>
@@ -100,7 +100,7 @@ export function FeedbackStep({ orderId, items, onComplete }: FeedbackStepProps) 
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 px-1">
                         <MessageSquare className="size-3 text-zinc-400" />
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Comments (Optional)</span>
+                        <span className="text-xs font-bold text-zinc-400 tracking-wider">Comments (Optional)</span>
                     </div>
                     <textarea
                         value={comment}

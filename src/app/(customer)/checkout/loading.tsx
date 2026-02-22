@@ -37,7 +37,7 @@ export default function CheckoutLoading() {
           {/* Location Card Skeleton */}
           <div className="bg-white rounded-[32px] p-6 shadow-sm border border-zinc-100 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 uppercase tracking-tighter font-black">
+              <div className="flex items-center gap-3 tracking-tighter font-black">
                 <Skeleton className="size-5 rounded-full" />
                 <Skeleton className="h-4 w-32" />
               </div>
@@ -71,7 +71,7 @@ export default function CheckoutLoading() {
       </div>
 
       {/* Footer Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-zinc-100 max-w-2xl mx-auto rounded-t-[32px] shadow-2xl">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-zinc-100 max-w-2xl mx-auto rounded-t-[32px] shadow-sm">
         <div className="flex items-center justify-between gap-4">
           <div className="space-y-1">
             <Skeleton className="h-3 w-16" />

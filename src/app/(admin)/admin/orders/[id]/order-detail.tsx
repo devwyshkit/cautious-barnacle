@@ -176,7 +176,7 @@ export function OrderDetail({ order }: OrderDetailProps) {
 
                       {p.preview_url && (
                         <div className="mt-2">
-                          <p className="text-[10px] text-zinc-500 mb-1 font-bold">LATEST PREVIEW</p>
+                          <p className="text-xs text-zinc-500 mb-1 font-bold">LATEST PREVIEW</p>
                           <img src={p.preview_url} alt="Preview" className="max-w-[200px] rounded border shadow-sm" />
                         </div>
                       )}

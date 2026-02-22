@@ -65,17 +65,17 @@ export function QuickItemSheet({ itemId, open, onClose }: QuickItemSheetProps) {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-32 gap-4">
                         <Loader2 className="size-8 animate-spin text-[var(--primary)]" />
-                        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Enriching Details...</p>
+                        <p className="text-xs font-black tracking-wider text-zinc-400">Enriching Details...</p>
                     </div>
                 ) : error ? (
                     <div className="flex flex-col items-center justify-center py-20 px-8 text-center gap-4">
                         <div className="size-16 rounded-full bg-rose-50 flex items-center justify-center mb-2">
                             <span className="text-2xl">⚠️</span>
                         </div>
-                        <p className="text-sm font-black text-zinc-900 uppercase tracking-tight">{error}</p>
+                        <p className="text-sm font-black text-zinc-900 tracking-tight">{error}</p>
                         <button
                             onClick={onClose}
-                            className="text-xs font-black uppercase tracking-widest text-[var(--primary)]"
+                            className="text-xs font-black tracking-wider text-[var(--primary)]"
                         >
                             Close
                         </button>

@@ -34,7 +34,7 @@ export function SubmittedIdentity({ details, itemName, isOptimisticSubmitted }: 
                         <FileText className="size-4 text-zinc-400" />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                        <p className="text-xs font-black text-zinc-400 tracking-wider">
                             {isOptimisticSubmitted && !hasContent ? 'Brief Processing...' : 'Submitted Identity'}
                         </p>
                         <p className="text-xs font-bold text-zinc-900 truncate max-w-[150px]">
@@ -60,7 +60,7 @@ export function SubmittedIdentity({ details, itemName, isOptimisticSubmitted }: 
                 <div className="px-4 pb-4 space-y-4 animate-in slide-in-from-top-2 duration-300">
                     {details.text && (
                         <div className="space-y-1.5">
-                            <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.15em]">Instructions</p>
+                            <p className="text-[11px] font-black text-zinc-400 tracking-[0.15em]">Instructions</p>
                             <div className="bg-white p-3 rounded-xl border border-zinc-100 italic text-sm text-zinc-700 leading-relaxed">
                                 "{details.text}"
                             </div>
@@ -69,14 +69,14 @@ export function SubmittedIdentity({ details, itemName, isOptimisticSubmitted }: 
 
                     {details.image_url && (
                         <div className="space-y-1.5">
-                            <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.15em]">Reference Image</p>
+                            <p className="text-[11px] font-black text-zinc-400 tracking-[0.15em]">Reference Image</p>
                             <div className="relative aspect-video rounded-xl overflow-hidden border border-zinc-200 group bg-zinc-200">
                                 <img src={details.image_url} alt="Submitted reference" className="size-full object-cover" />
                                 <a
                                     href={details.image_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="absolute bottom-2 right-2 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-lg text-[9px] font-black uppercase text-zinc-900 shadow-lg flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="absolute bottom-2 right-2 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-lg text-[11px] font-black text-zinc-900 shadow-lg flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                     <ExternalLink className="size-3" />
                                     View Original
@@ -87,12 +87,12 @@ export function SubmittedIdentity({ details, itemName, isOptimisticSubmitted }: 
 
                     {details.addons && details.addons.length > 0 && (
                         <div className="space-y-1.5">
-                            <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.15em]">Included Add-ons</p>
+                            <p className="text-[11px] font-black text-zinc-400 tracking-[0.15em]">Included Add-ons</p>
                             <div className="flex flex-wrap gap-1.5">
                                 {details.addons.map((addon) => (
                                     <span
                                         key={addon}
-                                        className="px-2 py-0.5 rounded-md bg-white border border-zinc-100 text-[9px] font-bold text-zinc-600 uppercase"
+                                        className="px-2 py-0.5 rounded-md bg-white border border-zinc-100 text-[11px] font-bold text-zinc-600"
                                     >
                                         {addon}
                                     </span>

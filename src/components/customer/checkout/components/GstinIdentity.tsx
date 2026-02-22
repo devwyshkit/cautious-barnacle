@@ -8,8 +8,9 @@ import { toast } from 'sonner';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
 import { getPartnerInfo } from '@/lib/actions/discovery/partners';
 import { DraftLineItem } from '@/lib/types/personalization';
-import type { PricingBreakdown } from '@/lib/constants/pricing';
+import type { PricingBreakdown } from '@/lib/types/pricing';
 import { Address } from '@/lib/types/address';
+import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import type { User } from '@supabase/supabase-js';
 
 interface GstinIdentityProps {
@@ -125,9 +126,9 @@ export function GstinIdentity({
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <ShieldCheck className="size-4 text-zinc-900" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-900">Tax Identity (GSTIN)</span>
+                        <span className="text-xs font-bold tracking-wider text-zinc-900">Tax Identity (GSTIN)</span>
                     </div>
-                    <span className="text-[10px] font-medium text-emerald-600 uppercase tracking-tighter">Save with Tax Credit</span>
+                    <span className="text-xs font-medium text-emerald-600 tracking-tighter">Save with Tax Credit</span>
                 </div>
                 <div className="relative">
                     <input
@@ -156,17 +157,17 @@ export function GstinIdentity({
                 {businessName && (
                     <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-top-1">
                         <Check className="size-3 text-emerald-600" />
-                        <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-tight">{businessName} verified</span>
+                        <span className="text-xs font-bold text-emerald-700 tracking-tight">{businessName} verified</span>
                     </div>
                 )}
-                {error && <p className="text-[10px] text-rose-600 font-bold">{error}</p>}
+                {error && <p className="text-xs text-rose-600 font-bold">{error}</p>}
 
                 <div className="flex items-center justify-between pt-1">
-                    <p className="text-[10px] text-zinc-400">Claims input tax credit</p>
+                    <p className="text-xs text-zinc-400">Claims input tax credit</p>
                     <button
                         type="button"
                         onClick={handleDownloadEstimate}
-                        className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-900 hover:underline transition-all"
+                        className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-zinc-900 hover:underline transition-all"
                     >
                         <FileText className="size-3" />
                         Get Estimate

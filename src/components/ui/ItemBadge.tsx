@@ -31,7 +31,7 @@ export function Badge({ type, value, className }: BadgeProps) {
 
   return (
     <div className={cn(
-      "inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold tracking-tight shadow-sm",
+      "inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold tracking-tight shadow-sm",
       variants[type],
       className
     )}>

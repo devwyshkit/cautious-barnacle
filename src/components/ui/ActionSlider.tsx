@@ -132,7 +132,7 @@ export function ActionSlider({
                 disabled={disabled || isLoading || isSuccess}
                 onClick={handleConfirm}
                 className={cn(
-                    "relative h-14 w-full rounded-2xl font-black uppercase tracking-widest transition-all duration-300",
+                    "relative h-14 w-full rounded-2xl font-black tracking-wider transition-all duration-300",
                     isSuccess ? "bg-emerald-500 text-white" : variant === 'amber' ? "bg-amber-500 text-white" : "bg-zinc-900 text-white",
                     "hover:scale-[1.01] active:scale-[0.98] border-none shadow-sm",
                     (disabled || isLoading) && "opacity-60 cursor-not-allowed",
@@ -181,7 +181,7 @@ export function ActionSlider({
                     style={{ opacity: textOpacity }}
                 >
                     <ChevronRight className="size-4 text-zinc-300 animate-pulse" />
-                    <span className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                    <span className="text-[11px] font-black tracking-[0.2em] text-zinc-400">
                         {label}
                     </span>
                 </div>

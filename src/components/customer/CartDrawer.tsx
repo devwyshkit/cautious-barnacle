@@ -74,7 +74,7 @@ export function CartDrawer() {
                                         <div className="flex items-center gap-1.5 mt-1.5">
                                             <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">
                                                 <Sparkles className="size-2.5 text-amber-600" />
-                                                <span className="text-[8px] font-black text-amber-600 uppercase tracking-tighter">Personalized</span>
+                                                <span className="text-[8px] font-black text-amber-600 tracking-tighter">Personalized</span>
                                             </div>
                                         </div>
                                     )}
@@ -107,7 +107,7 @@ export function CartDrawer() {
             <div className="pt-4 pb-8 bg-white">
                 <div className="w-full space-y-4">
                     <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Subtotal</span>
+                        <span className="text-sm font-bold text-zinc-500 tracking-wider">Subtotal</span>
                         <span className="text-lg font-black text-zinc-900">₹{draftOrder.total}</span>
                     </div>
                     <Button
@@ -118,7 +118,7 @@ export function CartDrawer() {
                         <span>Checkout now</span>
                         <ArrowRight className="ml-2 size-5 transition-transform group-hover:translate-x-1" />
                     </Button>
-                    <p className="text-[10px] text-center font-bold text-zinc-400 uppercase tracking-[0.1em]">
+                    <p className="text-xs text-center font-bold text-zinc-400 tracking-[0.1em]">
                         Taxes and delivery calculated at checkout
                     </p>
                 </div>

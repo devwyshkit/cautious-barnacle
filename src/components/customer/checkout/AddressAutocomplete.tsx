@@ -148,7 +148,7 @@ export function AddressAutocomplete({
         />
       </div>
       {!hasApiKey && (
-        <p className="text-[10px] text-zinc-400 mt-1">Or use &quot;Enter manually&quot; below</p>
+        <p className="text-xs text-zinc-400 mt-1">Or use &quot;Enter manually&quot; below</p>
       )}
     </div>
   );

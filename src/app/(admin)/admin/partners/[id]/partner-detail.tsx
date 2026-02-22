@@ -182,7 +182,7 @@ export function PartnerDetailView({ partner, stats }: PartnerDetailViewProps) {
             {Boolean(partner.bank_details) && (
               <>
                 <div className="border-t pt-3 mt-3">
-                  <span className="text-zinc-500 text-xs uppercase tracking-wide">Bank details</span>
+                  <span className="text-zinc-500 text-xs tracking-wide">Bank details</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-zinc-500">Account</span>

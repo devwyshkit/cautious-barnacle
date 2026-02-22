@@ -214,7 +214,7 @@ export async function cancel_order_item(order_item_id: string, order_id: string,
     // 1. Fetch order item and main order to get Razorpay Payment ID
     const [itemRes, orderRes] = await Promise.all([
       admin_supabase.from('order_items').select('*').eq('id', order_item_id).single(),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       (admin_supabase.from('orders').select('id, razorpay_payment_id, total, status').eq('id', order_id).single() as any)
     ]);
 

@@ -29,16 +29,16 @@ export function PartnerGroupedGrid({ data, onQuickLook }: PartnerGroupedGridProp
                 >
                     <div className="flex items-center justify-between mb-4 px-1">
                         <div>
-                            <h3 className="text-[13px] font-black text-zinc-950 uppercase tracking-tight group-hover:text-[var(--primary)] transition-colors">
+                            <h3 className="text-[13px] font-black text-zinc-950 tracking-tight group-hover:text-[var(--primary)] transition-colors">
                                 {group.partnerName}
                             </h3>
-                            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">
+                            <p className="text-[11px] font-bold text-zinc-400 tracking-wider mt-0.5">
                                 {group.items.length} {group.items.length === 1 ? 'Item' : 'Items'}
                             </p>
                         </div>
                         <Link
                             href={`/partner/${pId}`}
-                            className="text-[9px] font-black text-zinc-400 uppercase tracking-widest hover:text-zinc-950 transition-colors bg-white px-2 py-1 rounded-md border border-zinc-100 shadow-sm"
+                            className="text-[11px] font-black text-zinc-400 tracking-wider hover:text-zinc-950 transition-colors bg-white px-2 py-1 rounded-md border border-zinc-100 shadow-sm"
                         >
                             Visit Store
                         </Link>

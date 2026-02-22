@@ -67,7 +67,7 @@ export function OrderTrackingBar() {
                     onClick={handleOpen}
                     className={cn(
                         "pointer-events-auto min-w-[320px] max-w-sm transition-all duration-500 ease-out",
-                        "rounded-[2.5rem] shadow-2xl overflow-hidden flex items-center p-1.5 gap-4 active:scale-[0.96]",
+                        "rounded-[2.5rem] shadow-sm overflow-hidden flex items-center p-1.5 gap-4 active:scale-[0.96]",
                         isUrgent
                             ? "bg-[var(--primary)] ring-4 ring-rose-500/20 shadow-rose-900/40"
                             : "bg-zinc-950/95 backdrop-blur-2xl shadow-zinc-950/60 border border-white/5"
@@ -98,7 +98,7 @@ export function OrderTrackingBar() {
                             {isUrgent ? "Add Identity Now" : (orderToShow.partner_name || config.label)}
                         </h4>
                         <p className={cn(
-                            "text-[10px] truncate uppercase font-bold tracking-widest mt-0.5 opacity-80",
+                            "text-xs truncate font-bold tracking-wider mt-0.5 opacity-80",
                             isUrgent ? "text-rose-100" : "text-zinc-400"
                         )}>
                             {isUrgent ? config.label : config.subLabel}
@@ -110,7 +110,7 @@ export function OrderTrackingBar() {
                         "mr-3 px-4 py-2 rounded-full flex items-center gap-1.5 backdrop-blur-md transition-colors",
                         isUrgent ? "bg-white text-[#D91B24]" : "bg-zinc-800/50 text-white border border-white/10"
                     )}>
-                        <span className="text-[10px] font-black uppercase tracking-wider">
+                        <span className="text-xs font-black tracking-wider">
                             {isUrgent ? "Go" : "Live"}
                         </span>
                         {!isUrgent && <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />}

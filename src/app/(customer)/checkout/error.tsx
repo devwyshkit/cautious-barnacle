@@ -27,7 +27,7 @@ export default function CheckoutError({
                 </div>
 
                 <div className="space-y-2">
-                    <h2 className="text-xl font-black text-zinc-950 uppercase tracking-tighter">Checkout Interrupted</h2>
+                    <h2 className="text-xl font-black text-zinc-950 tracking-tighter">Checkout Interrupted</h2>
                     <p className="text-sm text-zinc-500 font-medium">
                         We encountered a hitch while preparing your order. Your items are safe in the bag.
                     </p>
@@ -55,7 +55,7 @@ export default function CheckoutError({
                 </div>
 
                 {process.env.NODE_ENV === 'development' && (
-                    <p className="text-[10px] text-zinc-300 font-mono break-all">{error.message}</p>
+                    <p className="text-xs text-zinc-300 font-mono break-all">{error.message}</p>
                 )}
             </div>
         </div>

@@ -25,7 +25,7 @@ export function BannerBento({ data, title, subtitle, timeContext, onQuickLook }:
                     <h2 className="text-sm font-bold text-zinc-900">
                         {title || 'Trending now'} {timeContext ? `· ${timeContext}` : ''}
                     </h2>
-                    <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
+                    <p className="text-xs font-black text-zinc-600 tracking-wider">
                         {subtitle || 'Popular in your area'}
                     </p>
                 </div>

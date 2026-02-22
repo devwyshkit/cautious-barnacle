@@ -124,7 +124,7 @@ export function ItemReviews({ itemId, initialReviews }: ItemReviewsProps) {
       {user && (
         <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
           <div className="space-y-2">
-            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Your Rating</label>
+            <label className="text-xs font-bold text-zinc-500 tracking-wider">Your Rating</label>
             <div className="flex items-center gap-2">
               {[1, 2, 3, 4, 5].map((s) => (
                 <button
@@ -144,7 +144,7 @@ export function ItemReviews({ itemId, initialReviews }: ItemReviewsProps) {
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Your Experience</label>
+            <label className="text-xs font-bold text-zinc-500 tracking-wider">Your Experience</label>
             <Textarea
               placeholder="Tell others what you liked or disliked about this item..."
               value={comment}
@@ -187,7 +187,7 @@ export function ItemReviews({ itemId, initialReviews }: ItemReviewsProps) {
                           />
                         ))}
                       </div>
-                      <span className="text-[10px] font-medium text-zinc-400">
+                      <span className="text-xs font-medium text-zinc-400">
                         {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
                       </span>
                     </div>

@@ -41,7 +41,7 @@ export function CircleRail({ data }: CircleRailProps) {
                     )} />
                 </div>
                 <span className={cn(
-                    "text-[10px] md:text-[11px] font-bold tracking-tight text-center leading-tight transition-colors",
+                    "text-xs md:text-[11px] font-bold tracking-tight text-center leading-tight transition-colors",
                     isAllSelected ? "text-zinc-900" : "text-zinc-600"
                 )}>
                     All
@@ -82,7 +82,7 @@ export function CircleRail({ data }: CircleRailProps) {
                             )}
                         </div>
                         <span className={cn(
-                            "text-[10px] md:text-[11px] font-bold tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
+                            "text-xs md:text-[11px] font-bold tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
                             isSelected ? "text-zinc-900" : "text-zinc-600"
                         )}>
                             {item.name}

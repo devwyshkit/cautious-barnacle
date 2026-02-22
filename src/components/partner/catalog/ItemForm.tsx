@@ -573,7 +573,7 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
           )}
 
           <div className="p-3 border rounded-lg space-y-3 bg-white">
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Add variant</p>
+            <p className="text-xs font-medium text-zinc-500 tracking-wide">Add variant</p>
             <div className="grid grid-cols-2 gap-2">
               <Input
                 placeholder="Name (e.g. 500g)"
@@ -657,7 +657,7 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
           )}
 
           <div className="p-3 border rounded-lg space-y-3 bg-white">
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Add option</p>
+            <p className="text-xs font-medium text-zinc-500 tracking-wide">Add option</p>
             <Input
               placeholder="Option name (e.g. Name engraving)"
               value={newPersonalization.name}
@@ -749,7 +749,7 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
           )}
 
           <div className="p-3 border rounded-lg space-y-3 bg-white">
-            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Add addon</p>
+            <p className="text-xs font-medium text-zinc-500 tracking-wide">Add addon</p>
             <div className="grid grid-cols-2 gap-2">
               <Input
                 placeholder="Name (e.g. Premium wrap)"
@@ -834,7 +834,7 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
             <Label className="text-sm text-zinc-600">Dimensions (cm)</Label>
             <div className="grid grid-cols-3 gap-2">
               <div className="space-y-1">
-                <span className="text-[10px] text-zinc-400 uppercase">Length</span>
+                <span className="text-xs text-zinc-400">Length</span>
                 <Input
                   type="number"
                   value={formData.dimensions_cm?.length || ''}
@@ -846,7 +846,7 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
                 />
               </div>
               <div className="space-y-1">
-                <span className="text-[10px] text-zinc-400 uppercase">Width</span>
+                <span className="text-xs text-zinc-400">Width</span>
                 <Input
                   type="number"
                   value={formData.dimensions_cm?.width || ''}
@@ -858,7 +858,7 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
                 />
               </div>
               <div className="space-y-1">
-                <span className="text-[10px] text-zinc-400 uppercase">Height</span>
+                <span className="text-xs text-zinc-400">Height</span>
                 <Input
                   type="number"
                   value={formData.dimensions_cm?.height || ''}

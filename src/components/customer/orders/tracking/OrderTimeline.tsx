@@ -25,7 +25,7 @@ export function OrderTimeline({ events }: OrderTimelineProps) {
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-full px-5 py-4 flex items-center justify-between hover:bg-zinc-50/50 transition-colors"
             >
-                <span className="text-xs font-bold text-zinc-900 uppercase tracking-widest">Order Updates</span>
+                <span className="text-xs font-bold text-zinc-900 tracking-wider">Order Updates</span>
                 {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
             </button>
             {isExpanded && (
@@ -42,8 +42,8 @@ export function OrderTimeline({ events }: OrderTimelineProps) {
                                     <h4 className={cn("text-xs", i === 0 ? "font-bold text-zinc-900" : "font-medium text-zinc-500")}>
                                         {event.title}
                                     </h4>
-                                    {event.description && <p className="text-[10px] text-zinc-400 mt-0.5">{event.description}</p>}
-                                    <span className="text-[9px] font-medium text-zinc-300 tabular-nums uppercase mt-1 block">
+                                    {event.description && <p className="text-xs text-zinc-400 mt-0.5">{event.description}</p>}
+                                    <span className="text-[11px] font-medium text-zinc-300 tabular-nums mt-1 block">
                                         {new Date(event.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>

@@ -109,7 +109,7 @@ export default async function PartnerDashboard() {
       <div className="grid grid-cols-1 gap-3">
         <Card className="bg-zinc-900 text-white border-zinc-800">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-bold uppercase tracking-widest text-zinc-500">Earnings Summary</CardTitle>
+            <CardTitle className="text-xs font-bold tracking-wider text-zinc-500">Earnings Summary</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-end justify-between">
@@ -119,7 +119,7 @@ export default async function PartnerDashboard() {
               </div>
               <div className="text-right">
                 <p className="text-lg font-semibold text-emerald-400">₹{(stats?.pending_settlement || 0).toLocaleString('en-IN')}</p>
-                <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Pending</p>
+                <p className="text-xs text-zinc-500 font-bold tracking-wider">Pending</p>
               </div>
             </div>
           </CardContent>

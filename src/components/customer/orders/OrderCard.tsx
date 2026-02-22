@@ -47,7 +47,7 @@ export function OrderCard({ order }: OrderCardProps) {
               <h3 className="text-sm font-black text-zinc-900 truncate leading-tight group-hover:text-[var(--primary)] transition-colors">
                 {order.partner_name || "Wyshkit Partner"}
               </h3>
-              <p className="text-[10px] font-bold text-zinc-400 mt-0.5 uppercase tracking-wider">
+              <p className="text-xs font-bold text-zinc-400 mt-0.5 tracking-wider">
                 Order #{orderNumber}
               </p>
             </div>
@@ -56,7 +56,7 @@ export function OrderCard({ order }: OrderCardProps) {
 
           <div className="mt-3 flex flex-wrap gap-2">
             <span className={cn(
-              "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider",
+              "px-2 py-0.5 rounded-md text-[11px] font-black tracking-wider",
               status === 'DELIVERED' ? "bg-emerald-50 text-emerald-600" :
                 isActive ? "bg-amber-50 text-[var(--primary)]" :
                   "bg-zinc-100 text-zinc-600"
@@ -66,7 +66,7 @@ export function OrderCard({ order }: OrderCardProps) {
 
             {order.has_personalization && (
               <span className={cn(
-                "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1",
+                "px-2 py-0.5 rounded-md text-[11px] font-black tracking-wider flex items-center gap-1",
                 order.personalization_status === 'SUBMITTED' ? "bg-amber-50 text-amber-600" :
                   order.personalization_status === 'APPROVED' ? "bg-emerald-50 text-emerald-600" :
                     "bg-zinc-100 text-zinc-500"
@@ -89,11 +89,11 @@ export function OrderCard({ order }: OrderCardProps) {
       </div>
 
       <div className="mt-4 pt-4 border-t border-zinc-50 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold">
+        <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-bold">
           {created_at ? format(new Date(created_at), "MMM d, yyyy") : '—'}
         </div>
         <div className={cn(
-          "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
+          "px-4 py-1.5 rounded-full text-xs font-black tracking-wider transition-all",
           isActive
             ? "bg-[var(--primary)] text-white shadow-lg shadow-amber-900/10 active:scale-95"
             : "bg-zinc-50 text-zinc-500 group-hover:bg-zinc-900 group-hover:text-white"

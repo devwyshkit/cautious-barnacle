@@ -81,7 +81,7 @@ export function PartnerSidebar() {
                   <Icon className="size-5" />
                   <span className="flex-1">{item.label}</span>
                   {item.label === 'Orders' && pendingCount > 0 && (
-                    <Badge className="bg-red-500 text-white border-0 size-5 p-0 flex items-center justify-center text-[10px] font-bold">
+                    <Badge className="bg-red-500 text-white border-0 size-5 p-0 flex items-center justify-center text-xs font-bold">
                       {pendingCount > 9 ? '9+' : pendingCount}
                     </Badge>
                   )}

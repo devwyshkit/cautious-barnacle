@@ -2681,27 +2681,6 @@ export type Database = {
           },
         ]
       }
-      platform_config: {
-        Row: {
-          description: string | null
-          key: string
-          updated_at: string | null
-          value: Json
-        }
-        Insert: {
-          description?: string | null
-          key: string
-          updated_at?: string | null
-          value: Json
-        }
-        Update: {
-          description?: string | null
-          key?: string
-          updated_at?: string | null
-          value?: Json
-        }
-        Relationships: []
-      }
       platform_settings: {
         Row: {
           key: string
@@ -4644,32 +4623,23 @@ export type Database = {
             }
             Returns: string
           }
-      calculate_order_total:
-        | {
-            Args: {
-              p_address_id?: string
-              p_cart_items: Json
-              p_coupon_code?: string
-              p_delivery_fee_override?: number
-              p_distance_km?: number
-              p_use_wallet?: boolean
-              p_user_id?: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_address_id?: string
-              p_cart_items: Json
-              p_coupon_code?: string
-              p_delivery_fee_override?: number
-              p_distance_km?: number
-              p_session_id?: string
-              p_use_wallet?: boolean
-              p_user_id?: string
-            }
-            Returns: Json
-          }
+      calculate_order_total: {
+        Args: {
+          p_address_id?: string
+          p_cart_items: Json
+          p_coupon_code?: string
+          p_delivery_fee_override?: number
+          p_distance_km?: number
+          p_session_id?: string
+          p_use_wallet?: boolean
+          p_user_id?: string
+        }
+        Returns: Json
+      }
+      calculate_return_refund: {
+        Args: { p_order_id: string; p_reason: string }
+        Returns: Json
+      }
       deduct_wallet_balance: {
         Args: {
           p_amount: number
@@ -4712,6 +4682,19 @@ export type Database = {
         | { Args: { table_name: string }; Returns: string }
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      execute_cart_mutation: {
+        Args: {
+          p_item_id: string
+          p_mode?: string
+          p_personalization?: Json
+          p_quantity: number
+          p_selected_addons?: Json
+          p_session_id?: string
+          p_user_id?: string
+          p_variant_id?: string
+        }
+        Returns: Json
+      }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
         Args: { geom1: unknown; geom2: unknown }
@@ -4858,6 +4841,10 @@ export type Database = {
           stock_status: string
         }[]
       }
+      get_partner_dashboard_stats: {
+        Args: { p_partner_id: string }
+        Returns: Json
+      }
       get_partner_stats: {
         Args: { p_partner_id: string }
         Returns: {
@@ -4901,39 +4888,22 @@ export type Database = {
         }
         Returns: Json
       }
-      place_secure_order:
-        | {
-            Args: {
-              p_address_id: string
-              p_applied_coupon?: string
-              p_coupon_code?: string
-              p_delivery_instructions?: string
-              p_distance_km?: number
-              p_gstin?: string
-              p_items: Json
-              p_payment_id?: string
-              p_razorpay_order_id: string
-              p_use_wallet?: boolean
-              p_user_id?: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_address_id?: string
-              p_coupon_code?: string
-              p_delivery_instructions?: string
-              p_distance_km?: number
-              p_gstin?: string
-              p_items: Json
-              p_payment_id?: string
-              p_razorpay_order_id: string
-              p_session_id?: string
-              p_use_wallet?: boolean
-              p_user_id?: string
-            }
-            Returns: Json
-          }
+      place_secure_order: {
+        Args: {
+          p_address_id?: string
+          p_coupon_code?: string
+          p_delivery_instructions?: string
+          p_distance_km?: number
+          p_gstin?: string
+          p_items: Json
+          p_payment_id?: string
+          p_razorpay_order_id: string
+          p_session_id?: string
+          p_use_wallet?: boolean
+          p_user_id?: string
+        }
+        Returns: Json
+      }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }

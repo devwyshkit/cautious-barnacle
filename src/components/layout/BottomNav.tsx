@@ -46,7 +46,7 @@ export function BottomNav() {
                 )}
               />
               <span className={cn(
-                "text-[10px] font-black uppercase tracking-[0.05em] transition-opacity duration-300",
+                "text-xs font-black tracking-[0.05em] transition-opacity duration-300",
                 isActive ? "opacity-100" : "opacity-0"
               )}>
                 {label}

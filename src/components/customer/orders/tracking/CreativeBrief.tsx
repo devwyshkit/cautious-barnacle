@@ -60,7 +60,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                 <div className="size-5 rounded-md bg-zinc-900 flex items-center justify-center">
                                     <Sparkles className="size-3 text-amber-500" />
                                 </div>
-                                <span className="text-[10px] font-black text-zinc-900 uppercase tracking-widest">
+                                <span className="text-xs font-black text-zinc-900 tracking-wider">
                                     Status: {order.status === ORDER_STATUS.PREVIEW_READY ? 'Preview Awaiting Action' : 'Design Hub'}
                                 </span>
                             </div>
@@ -70,7 +70,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                     <HyperlocalTimer
                                         deadline={approvalDeadline}
                                         variant="minimal"
-                                        className="text-[9px] font-black text-rose-600 p-0 shadow-none bg-transparent"
+                                        className="text-[11px] font-black text-rose-600 p-0 shadow-none bg-transparent"
                                     />
                                 </div>
                             )}
@@ -89,7 +89,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                     {/* Iteration Badge */}
                                     <div className="absolute top-4 left-4 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-white/20 flex items-center gap-1.5">
                                         <div className={cn("size-1.5 rounded-full", idx === 0 ? "bg-amber-400 animate-pulse" : "bg-zinc-400")} />
-                                        <p className="text-[9px] font-black text-white uppercase tracking-widest">
+                                        <p className="text-[11px] font-black text-white tracking-wider">
                                             {idx === 0 ? 'Latest' : `Ver. ${previews.length - idx}`}
                                         </p>
                                     </div>
@@ -115,15 +115,15 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                             <div>
                                 {hasSubmittedBrief ? (
                                     <>
-                                        <p className="text-[11px] font-black text-zinc-950 uppercase tracking-widest leading-none">Brief Received</p>
-                                        <p className="text-[10px] font-bold text-zinc-400 mt-2 max-w-[220px] mx-auto leading-relaxed">
+                                        <p className="text-[11px] font-black text-zinc-950 tracking-wider leading-none">Brief Received</p>
+                                        <p className="text-xs font-bold text-zinc-400 mt-2 max-w-[220px] mx-auto leading-relaxed">
                                             Partner is reviewing your vision. First preview expected shortly.
                                         </p>
                                     </>
                                 ) : (
                                     <>
-                                        <p className="text-[11px] font-black text-zinc-950 uppercase tracking-widest leading-none">Creative Process Pending</p>
-                                        <p className="text-[10px] font-bold text-zinc-400 mt-2 max-w-[220px] mx-auto leading-relaxed">
+                                        <p className="text-[11px] font-black text-zinc-950 tracking-wider leading-none">Creative Process Pending</p>
+                                        <p className="text-xs font-bold text-zinc-400 mt-2 max-w-[220px] mx-auto leading-relaxed">
                                             Share your vision to start the bespoke crafting process.
                                         </p>
                                     </>
@@ -140,7 +140,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                             triggerHaptic(HapticPattern.ACTION);
                                             onOpenPersonalization();
                                         }}
-                                        className="px-8 py-3 bg-zinc-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black active:scale-95 transition-all shadow-xl shadow-zinc-950/10"
+                                        className="px-8 py-3 bg-zinc-900 text-white rounded-2xl text-xs font-black tracking-wider hover:bg-black active:scale-95 transition-all shadow-xl shadow-zinc-950/10"
                                     >
                                         Complete Brief
                                     </button>

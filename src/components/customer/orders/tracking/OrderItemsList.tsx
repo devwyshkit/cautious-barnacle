@@ -30,7 +30,7 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
         const Icon = config.icon as any;
 
         return (
-            <div className={cn("flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider", config.color)}>
+            <div className={cn("flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-xs font-bold tracking-wider", config.color)}>
                 <Icon className="size-3" />
                 <span>{config.label}</span>
             </div>
@@ -41,8 +41,8 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
         <>
             <section className="bg-white rounded-3xl border border-zinc-100 overflow-hidden">
                 <div className="px-5 py-4 border-b border-zinc-100 bg-white flex items-center justify-between">
-                    <h3 className="text-[11px] font-black text-zinc-950 uppercase tracking-[0.2em]">Order Contents</h3>
-                    <span className="text-[10px] font-black text-zinc-400 tabular-nums">#{order.order_number}</span>
+                    <h3 className="text-[11px] font-black text-zinc-950 tracking-[0.2em]">Order Contents</h3>
+                    <span className="text-xs font-black text-zinc-400 tabular-nums">#{order.order_number}</span>
                 </div>
                 <div className="divide-y divide-zinc-50">
                     {(order.order_items || []).map((item: any) => (
@@ -82,7 +82,7 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                                     {/* WYSHKIT 2026: Details Peek (When not in full review) */}
                                     {item.is_personalized && item.personalization_details && item.status !== 'preview_ready' && (
                                         <div className="mt-4 pt-4 border-t border-zinc-50/50">
-                                            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Submitted Brief</p>
+                                            <p className="text-xs font-black text-zinc-400 tracking-wider mb-2">Submitted Brief</p>
                                             <div className="line-clamp-2 text-[11px] text-zinc-600 italic">
                                                 {Object.values(item.personalization_details).filter(v => typeof v === 'string').join(', ')}
                                             </div>
@@ -163,15 +163,15 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                             ) : (
                                 <div className="space-y-6">
                                     <div className="flex flex-col gap-2">
-                                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Tracking Status</span>
+                                        <span className="text-xs font-black text-zinc-400 tracking-wider px-1">Tracking Status</span>
                                         <div className="p-4 bg-white border border-zinc-100 rounded-2xl flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <div className="size-10 rounded-xl bg-zinc-50 flex items-center justify-center border border-zinc-100">
                                                     <Package className="size-5 text-zinc-400" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs font-bold text-zinc-900 uppercase tracking-tight">{selectedPreviewItem.status || order.status}</p>
-                                                    <p className="text-[10px] text-zinc-500 font-medium">Last updated recently</p>
+                                                    <p className="text-xs font-bold text-zinc-900 tracking-tight">{selectedPreviewItem.status || order.status}</p>
+                                                    <p className="text-xs text-zinc-500 font-medium">Last updated recently</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -179,7 +179,7 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
 
                                     {selectedPreviewItem.is_personalized && (
                                         <div className="space-y-3">
-                                            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">Identity Details</span>
+                                            <span className="text-xs font-black text-zinc-400 tracking-wider px-1">Identity Details</span>
                                             {selectedPreviewItem.personalization_details ? (
                                                 <SubmittedIdentity
                                                     details={selectedPreviewItem.personalization_details as any}
@@ -188,7 +188,7 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                                             ) : (
                                                 <div className="p-8 text-center bg-zinc-50 rounded-3xl border border-zinc-100">
                                                     <Sparkles className="size-8 text-zinc-200 mx-auto mb-3" />
-                                                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Awaiting Identity Brief</p>
+                                                    <p className="text-xs font-bold text-zinc-400 tracking-wider">Awaiting Identity Brief</p>
                                                 </div>
                                             )}
                                         </div>

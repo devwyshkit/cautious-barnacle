@@ -91,7 +91,7 @@ export function PartnerTopBar({ partner }: PartnerTopBarProps) {
               <Bell className="size-5 text-zinc-600" />
               {pendingCount > 0 && (
                 <Badge
-                  className="absolute -top-1 -right-1 size-5 p-0 flex items-center justify-center bg-red-500 text-white text-[10px] font-medium"
+                  className="absolute -top-1 -right-1 size-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs font-medium"
                 >
                   {pendingCount > 9 ? '9+' : pendingCount}
                 </Badge>

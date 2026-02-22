@@ -14,7 +14,7 @@ export function CheckoutAddress({ data, metadata }: CheckoutAddressProps) {
     return (
         <div className="surface-card p-6">
             <div className="flex flex-col gap-4">
-                <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-tight">Delivery Address</h3>
+                <h3 className="text-sm font-bold text-zinc-900 tracking-tight">Delivery Address</h3>
                 {data.map((addr: any) => (
                     <div
                         key={addr.id}
@@ -24,7 +24,7 @@ export function CheckoutAddress({ data, metadata }: CheckoutAddressProps) {
                         )}
                     >
                         <p className="text-xs font-bold text-zinc-900">{addr.type || 'Home'}</p>
-                        <p className="text-[10px] text-zinc-500 line-clamp-1">{addr.address_line1}, {addr.city}</p>
+                        <p className="text-xs text-zinc-500 line-clamp-1">{addr.address_line1}, {addr.city}</p>
                     </div>
                 ))}
             </div>

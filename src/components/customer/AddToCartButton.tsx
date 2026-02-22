@@ -92,7 +92,7 @@ export function AddToCartButton({
                 "h-11 px-4 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center",
                 className
             )}>
-                <span className="text-[11px] font-black text-zinc-400 uppercase tracking-widest">Sold Out</span>
+                <span className="text-[11px] font-black text-zinc-400 tracking-wider">Sold Out</span>
             </div>
         );
     }
@@ -104,7 +104,7 @@ export function AddToCartButton({
                 size="default"
                 disabled={isDisabled}
                 className={cn(
-                    "h-11 px-4 rounded-xl transition-all z-10 font-black text-[11px] uppercase tracking-widest w-full",
+                    "h-11 px-4 rounded-xl transition-all z-10 font-black text-[11px] tracking-wider w-full",
                     justAdded
                         ? "bg-emerald-500 text-white hover:bg-emerald-600 border-none"
                         : isOutOfStock ? "bg-zinc-100 text-zinc-400 cursor-not-allowed border-zinc-200" : "bg-white text-zinc-900 hover:bg-zinc-100 shadow-sm border border-zinc-100",

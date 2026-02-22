@@ -169,7 +169,7 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
         isSheet ? "w-full h-full max-h-[90dvh]" : "max-w-md min-h-screen"
       )}>
         {!isConnected && (
-          <div className="glass-morphism bg-[var(--primary)] text-white text-[10px] font-bold uppercase tracking-widest py-3 px-4 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-300 z-50 sticky top-0">
+          <div className="glass-morphism bg-[var(--primary)] text-white text-xs font-bold tracking-wider py-3 px-4 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-300 z-50 sticky top-0">
             <RefreshCw className="size-3 animate-spin" />
             Reconnecting to order pulse...
           </div>
@@ -180,7 +180,7 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
         )}>
           <SurfaceErrorBoundaryWithRouter surfaceName="Success & Identity Overlay">
             {(showSuccess || showIdentityForm) && (
-              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-white rounded-[32px] p-1 border border-zinc-100 shadow-2xl shadow-zinc-200/50 overflow-hidden relative">
+              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-white rounded-[32px] p-1 border border-zinc-100 shadow-sm shadow-zinc-200/50 overflow-hidden relative">
                 {showSuccess && !showIdentityForm && (
                   <div className="gradient-vibrant p-7 text-white rounded-[30px] mb-1 relative overflow-hidden">
                     {showCelebration && <Confetti />}
@@ -192,11 +192,11 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
                         <div className="size-9 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                           <CheckCircle2 className="size-5 text-white" />
                         </div>
-                        <h3 className="text-lg font-black uppercase tracking-tight">Payment Successful</h3>
+                        <h3 className="text-lg font-black tracking-tight">Payment Successful</h3>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="size-1.5 rounded-full bg-emerald-500" />
-                        <p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">Order Confirmed • Preparing now</p>
+                        <p className="text-xs text-zinc-400 font-black tracking-wider">Order Confirmed • Preparing now</p>
                       </div>
                     </div>
                   </div>
@@ -209,8 +209,8 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
                         <Sparkles className="size-5 text-amber-500" />
                       </div>
                       <div>
-                        <h3 className="text-base font-black uppercase tracking-tight text-zinc-900">Add personalisation details</h3>
-                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">We need a few details to personalise your item</p>
+                        <h3 className="text-base font-black tracking-tight text-zinc-900">Add personalisation details</h3>
+                        <p className="text-xs font-bold text-zinc-400 tracking-wider">We need a few details to personalise your item</p>
                       </div>
                     </div>
                     <button
@@ -282,7 +282,7 @@ export function OrderTracker({ orderId, isSheet }: OrderTrackerProps) {
           </SurfaceErrorBoundaryWithRouter>
 
           <div className="mt-4 text-center">
-            <p className="text-[10px] font-bold text-zinc-300 uppercase tracking-widest mb-4">Need help?</p>
+            <p className="text-xs font-bold text-zinc-300 tracking-wider mb-4">Need help?</p>
             <div className="flex gap-2">
               {process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP && (
                 <button

@@ -62,7 +62,7 @@ export function CouponSlot({ appliedCoupon }: CouponSlotProps) {
                             <p className="text-[13px] font-black text-emerald-900 tracking-tight">
                                 {appliedCoupon.code} Applied
                             </p>
-                            <p className="text-[10px] font-bold text-emerald-600/70 uppercase tracking-wider mt-0.5">
+                            <p className="text-xs font-bold text-emerald-600/70 tracking-wider mt-0.5">
                                 Saved {formatCurrency(appliedCoupon.discount)}
                             </p>
                         </div>
@@ -101,7 +101,7 @@ export function CouponSlot({ appliedCoupon }: CouponSlotProps) {
                                     value={code}
                                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                                     autoFocus
-                                    className="h-10 flex-1 rounded-xl border-zinc-200 focus:border-zinc-900 focus:ring-0 px-3 text-[13px] font-bold uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal"
+                                    className="h-10 flex-1 rounded-xl border-zinc-200 focus:border-zinc-900 focus:ring-0 px-3 text-[13px] font-bold tracking-wider placeholder:normal-case placeholder:tracking-normal"
                                 />
                                 <Button
                                     type="submit"

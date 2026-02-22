@@ -70,8 +70,8 @@ export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameC
                         <ShieldCheck className={cn("size-5", validation === 'valid' && "text-emerald-500")} />
                     </div>
                     <div className="text-left">
-                        <p className="text-[13px] font-black uppercase tracking-tight text-zinc-900">Business purchase?</p>
-                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">
+                        <p className="text-[13px] font-black tracking-tight text-zinc-900">Business purchase?</p>
+                        <p className="text-xs font-bold text-zinc-400 tracking-wider mt-0.5">
                             {validation === 'valid' ? businessName : 'Add GSTIN for tax invoice (Optional)'}
                         </p>
                     </div>
@@ -103,9 +103,9 @@ export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameC
                         </div>
                     </div>
                     {error && (
-                        <p className="mt-2 ml-1 text-[10px] font-bold text-rose-500 uppercase tracking-widest">{error}</p>
+                        <p className="mt-2 ml-1 text-xs font-bold text-rose-500 tracking-wider">{error}</p>
                     )}
-                    <p className="mt-3 px-1 text-[9px] font-medium text-zinc-400 leading-relaxed">
+                    <p className="mt-3 px-1 text-[11px] font-medium text-zinc-400 leading-relaxed">
                         Enter your GSTIN to claim input tax credit on business purchases. Verified in real time.
                     </p>
                 </div>

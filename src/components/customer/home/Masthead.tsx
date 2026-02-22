@@ -66,7 +66,7 @@ export function Masthead({
                 <div className="flex items-center gap-2.5 overflow-hidden">
                     {config.icon}
                     <span className={cn(
-                        "text-[11px] font-black uppercase tracking-tight truncate",
+                        "text-[11px] font-black tracking-tight truncate",
                         config.text
                     )}>
                         {config.label}
@@ -80,7 +80,7 @@ export function Masthead({
                             status === 'normal' ? 'bg-emerald-500' : status === 'delayed' ? 'bg-rose-500' : 'bg-amber-500'
                         )} />
                         <span className={cn(
-                            "text-[10px] font-black uppercase tracking-widest",
+                            "text-xs font-black tracking-wider",
                             status === 'normal' ? 'text-emerald-700' : status === 'delayed' ? 'text-rose-700' : 'text-amber-700'
                         )}>
                             {config.tag}

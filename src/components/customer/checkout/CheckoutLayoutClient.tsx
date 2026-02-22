@@ -82,15 +82,15 @@ function CheckoutLayoutClientInner({
           <div className="relative">
             {/* Swiggy 2026: Success Ripple Effect */}
             <div className="absolute inset-0 size-24 bg-emerald-500/10 rounded-full animate-ping duration-1000" />
-            <div className="size-24 bg-emerald-500 rounded-full flex items-center justify-center shadow-2xl shadow-emerald-500/20 relative z-10 border-4 border-white">
+            <div className="size-24 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm shadow-emerald-500/20 relative z-10 border-4 border-white">
               <Check className="size-12 text-white" strokeWidth={3} />
             </div>
           </div>
 
           <div className="mt-10 space-y-4 relative z-10">
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-zinc-900 uppercase tracking-tight">Order Confirmed!</h2>
-              <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Taking you to your order...</p>
+              <h2 className="text-2xl font-black text-zinc-900 tracking-tight">Order Confirmed!</h2>
+              <p className="text-sm font-bold text-zinc-400 tracking-wider">Taking you to your order...</p>
             </div>
 
             <div className="flex flex-col items-center gap-3 pt-4">
@@ -113,7 +113,7 @@ function CheckoutLayoutClientInner({
           </div>
           <Button
             onClick={() => router.push('/')}
-            className="rounded-2xl px-8 h-12 bg-zinc-900 text-white font-bold uppercase tracking-widest text-xs"
+            className="rounded-2xl px-8 h-12 bg-zinc-900 text-white font-bold tracking-wider text-xs"
           >
             Browse items
           </Button>
@@ -180,7 +180,7 @@ function CheckoutLayoutClientInner({
               {/* Security badge (Unified) */}
               <div className="px-3 py-8 flex items-center justify-center gap-2 opacity-60">
                 <ShieldCheck className="size-3 text-zinc-600" />
-                <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Secured by Razorpay</span>
+                <span className="text-[11px] font-bold text-zinc-600 tracking-wider">Secured by Razorpay</span>
               </div>
             </div>
           </main>
@@ -193,7 +193,7 @@ function CheckoutLayoutClientInner({
                   <span className="text-2xl font-black text-zinc-950 tabular-nums leading-none">
                     {pricing ? formatCurrency(pricing.total) : '—'}
                   </span>
-                  <span className="text-[10px] text-zinc-400 font-semibold">
+                  <span className="text-xs text-zinc-400 font-semibold">
                     {pricing ? 'Bill details above' : 'Waiting for address'}
                   </span>
                 </div>
@@ -205,7 +205,7 @@ function CheckoutLayoutClientInner({
                       className="w-full h-16 bg-zinc-950 rounded-[24px] flex flex-col items-center justify-center border border-zinc-900 active:scale-95 transition-all shadow-xl shadow-zinc-900/10"
                     >
                       <span className="text-sm font-black text-white">Login to continue</span>
-                      <span className="text-[10px] font-bold text-white/70">Securely checkout after login</span>
+                      <span className="text-xs font-bold text-white/70">Securely checkout after login</span>
                     </button>
                   ) : !isValidAddress ? (
                     <div className="w-full h-16 bg-zinc-100 rounded-[24px] flex items-center justify-center border border-zinc-200">
@@ -222,9 +222,9 @@ function CheckoutLayoutClientInner({
                       <div className="flex flex-col items-center">
                         <div className="flex items-center gap-1.5 mb-0.5">
                           <RefreshCw className="size-3 text-rose-600 group-active:animate-spin" />
-                          <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Pricing Engine Offline</span>
+                          <span className="text-xs font-black text-rose-600 tracking-wider">Pricing Engine Offline</span>
                         </div>
-                        <span className="text-[9px] font-bold text-rose-500/70 uppercase">Tap to retry calculation</span>
+                        <span className="text-[11px] font-bold text-rose-500/70">Tap to retry calculation</span>
                       </div>
                     </button>
                   ) : (
@@ -234,7 +234,7 @@ function CheckoutLayoutClientInner({
                           onClick={handlePayment}
                           disabled={isProcessing || isSuccess}
                           className={cn(
-                            "w-full h-16 rounded-[24px] flex items-center justify-center transition-all active:scale-95 shadow-xl hover:shadow-2xl",
+                            "w-full h-16 rounded-[24px] flex items-center justify-center transition-all active:scale-95 shadow-xl hover:shadow-sm",
                             isProcessing || isSuccess
                               ? "bg-zinc-100 border border-zinc-200 text-zinc-400"
                               : "bg-zinc-900 border border-zinc-900 text-white hover:bg-zinc-800"

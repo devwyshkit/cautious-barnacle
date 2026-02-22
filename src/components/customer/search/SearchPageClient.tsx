@@ -151,7 +151,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             <div className="size-20 bg-zinc-50 rounded-full flex items-center justify-center mb-6">
               <Search className="size-8 text-zinc-200" />
             </div>
-            <p className="text-sm font-black text-zinc-900 uppercase tracking-tight mb-2">No Results</p>
+            <p className="text-sm font-black text-zinc-900 tracking-tight mb-2">No Results</p>
             <p className="text-xs font-medium text-zinc-500 max-w-[200px] mb-8 leading-relaxed">
               We couldn't find {currentQ ? `"${currentQ}"` : 'what you were looking for'}
               {currentCategory && ` in ${currentCategory}`}.
@@ -159,7 +159,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             <Button
               onClick={() => router.push('/')}
               variant="outline"
-              className="rounded-xl border-zinc-200 text-xs font-black uppercase tracking-widest px-8"
+              className="rounded-xl border-zinc-200 text-xs font-black tracking-wider px-8"
             >
               Back to Home
             </Button>
@@ -169,7 +169,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             <div className="space-y-8">
               {results.partners.length > 0 && (
                 <div>
-                  <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4 px-1">Top Stores</h3>
+                  <h3 className="text-xs font-black text-zinc-400 tracking-[0.2em] mb-4 px-1">Top Stores</h3>
                   <div className="space-y-4">
                     {results.partners.map((partner) => (
                       <EntityCard
@@ -186,7 +186,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
 
               {results.items.length > 0 && (
                 <div className="pb-safe">
-                  <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4 px-1">Items from Stores</h3>
+                  <h3 className="text-xs font-black text-zinc-400 tracking-[0.2em] mb-4 px-1">Items from Stores</h3>
                   <div className="space-y-6">
                     {Object.entries(
                       results.items.reduce((acc: Record<string, { partnerName: string, items: any[] }>, item: any) => {
@@ -198,10 +198,10 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                     ).map(([pId, group]) => (
                       <div key={pId} className="space-y-3">
                         <div className="flex items-center justify-between px-1">
-                          <Link href={`/partner/${pId}`} className="text-xs font-black text-zinc-900 uppercase tracking-tight hover:text-[var(--primary)] transition-colors">
+                          <Link href={`/partner/${pId}`} className="text-xs font-black text-zinc-900 tracking-tight hover:text-[var(--primary)] transition-colors">
                             {group.partnerName}
                           </Link>
-                          <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{group.items.length} Match{group.items.length > 1 ? 'es' : ''}</span>
+                          <span className="text-[11px] font-bold text-zinc-400 tracking-wider">{group.items.length} Match{group.items.length > 1 ? 'es' : ''}</span>
                         </div>
 
                         <div className="grid grid-cols-1 gap-4">

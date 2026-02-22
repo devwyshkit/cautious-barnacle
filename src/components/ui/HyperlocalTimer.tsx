@@ -60,7 +60,7 @@ export function HyperlocalTimer({
 
     if (variant === 'minimal') {
         return (
-            <div className={cn("flex items-center gap-1.5 tabular-nums text-[10px] font-black uppercase tracking-widest", isUrgent ? "text-rose-500" : "text-amber-500", className)}>
+            <div className={cn("flex items-center gap-1.5 tabular-nums text-xs font-black tracking-wider", isUrgent ? "text-rose-500" : "text-amber-500", className)}>
                 <div className={cn("size-1 rounded-full", isUrgent ? "bg-rose-500 animate-ping" : "bg-amber-500")} />
                 {timeLeft}
             </div>
@@ -95,7 +95,7 @@ export function HyperlocalTimer({
             </div>
             <div>
                 <p className={cn(
-                    "text-[9px] font-black uppercase tracking-[0.15em] mb-0.5",
+                    "text-[11px] font-black tracking-[0.15em] mb-0.5",
                     isUrgent ? "text-rose-500" : (isDark ? "text-white/40" : "text-zinc-400")
                 )}>
                     {isUrgent ? 'Expiring Soon' : 'Preparation Deadline'}
@@ -108,7 +108,7 @@ export function HyperlocalTimer({
                         {timeLeft}
                     </span>
                     {isUrgent && (
-                        <span className="text-[10px] font-bold text-rose-500 animate-pulse uppercase tracking-tighter">Urgent</span>
+                        <span className="text-xs font-bold text-rose-500 animate-pulse tracking-tighter">Urgent</span>
                     )}
                 </div>
             </div>

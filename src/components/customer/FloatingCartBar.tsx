@@ -119,11 +119,11 @@ export function FloatingCartBar() {
                   {hasPersonalization && (
                     <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/20">
                       <Sparkles className="size-2.5 text-amber-400" />
-                      <span className="text-[8px] font-black text-amber-400 uppercase tracking-tighter">Personalized</span>
+                      <span className="text-[8px] font-black text-amber-400 tracking-tighter">Personalized</span>
                     </div>
                   )}
                 </div>
-                <span className="text-[11px] font-bold text-zinc-500 truncate max-w-[140px] uppercase tracking-wider mt-1">
+                <span className="text-[11px] font-bold text-zinc-500 truncate max-w-[140px] tracking-wider mt-1">
                   {displayCart?.items?.[0]?.partner_name || 'Local store'}
                 </span>
               </div>
@@ -152,7 +152,7 @@ export function FloatingCartBar() {
               }}
               className="group flex items-center gap-2 py-2"
             >
-              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.15em] group-hover:text-zinc-300 transition-colors truncate max-w-[200px]">
+              <span className="text-xs font-black text-zinc-500 tracking-[0.15em] group-hover:text-zinc-300 transition-colors truncate max-w-[200px]">
                 View {displayCart?.items?.[0]?.partner_name || 'Store'}
               </span>
               <ChevronRight className="size-3 text-zinc-700 group-hover:text-zinc-400 transition-colors" />
@@ -160,7 +160,7 @@ export function FloatingCartBar() {
           )}
           <div className="flex items-center gap-2">
             <div className="size-1.5 rounded-full bg-emerald-500/50 animate-pulse" />
-            <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Wyshkit Secure</span>
+            <span className="text-[11px] font-black text-zinc-600 tracking-wider">Wyshkit Secure</span>
           </div>
         </div>
       </div>

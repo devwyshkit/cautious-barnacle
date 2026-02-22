@@ -42,7 +42,7 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-900 border-l-2 border-[var(--primary)] pl-2">Your order</label>
+        <label className="text-xs font-black tracking-wider text-zinc-900 border-l-2 border-[var(--primary)] pl-2">Your order</label>
         <span className="text-[11px] font-bold text-zinc-500 tabular-nums">{items.length} item{items.length > 1 ? 's' : ''}</span>
       </div>
 
@@ -69,7 +69,7 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                       {item.item_name}
                     </h4>
                     {item.variant_name && (
-                      <p className="text-[10px] text-zinc-500 font-medium mt-0.5">{item.variant_name}</p>
+                      <p className="text-xs text-zinc-500 font-medium mt-0.5">{item.variant_name}</p>
                     )}
                   </div>
                   <span className="text-[13px] font-semibold text-zinc-900 tabular-nums shrink-0">
@@ -104,7 +104,7 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[11px] font-bold text-zinc-950 uppercase tracking-tighter">
+                    <span className="text-[11px] font-bold text-zinc-950 tracking-tighter">
                       Qty: {item.quantity}
                     </span>
                   )}
@@ -113,12 +113,12 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                 <div className="mt-1 flex items-center justify-between">
                   <div className="flex items-center gap-1">
                     {item.personalization?.enabled ? (
-                      <div className="flex items-center gap-1 text-[9px] font-medium text-amber-600">
+                      <div className="flex items-center gap-1 text-[11px] font-medium text-amber-600">
                         <ShieldAlert className="size-2.5" />
                         <span>Personalized</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1 text-[9px] font-black text-zinc-400 uppercase tracking-tighter">
+                      <div className="flex items-center gap-1 text-[11px] font-black text-zinc-400 tracking-tighter">
                         <span>Standard Item</span>
                       </div>
                     )}
@@ -130,7 +130,7 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                         const addonIds = (item.selected_addons || []).map((a: any) => a.id).join(',');
                         router.push(`/partner/${partnerId}/item/${item.item_id}?edit=true&cartItemId=${item.id}&variantId=${item.selected_variant_id || ''}&quantity=${item.quantity}&addons=${addonIds}`);
                       }}
-                      className="text-[9px] font-bold text-[var(--primary)] flex items-center gap-0.5 hover:underline"
+                      className="text-[11px] font-bold text-[var(--primary)] flex items-center gap-0.5 hover:underline"
                     >
                       <Edit3 className="size-2.5" />
                       Edit Item
@@ -146,7 +146,7 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
       {hasPersonalized && (
         <div className="p-2 rounded-lg bg-amber-50/50 border border-amber-100/50 flex items-start gap-2">
           <ShieldAlert className="size-3.5 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-[10px] font-medium text-amber-800 leading-normal">
+          <p className="text-xs font-medium text-amber-800 leading-normal">
             Personalized items are non-returnable. Refunds only for damaged goods.
           </p>
         </div>

@@ -35,7 +35,7 @@ export function IdentityBlock({ identity, onComplete }: IdentityBlockProps) {
               <p className="text-[13px] font-semibold text-zinc-900">
                 {user.user_metadata?.full_name || 'Verified user'}
               </p>
-              <p className="text-[10px] font-medium text-zinc-500">
+              <p className="text-xs font-medium text-zinc-500">
                 {user.phone || user.email}
               </p>
             </div>
@@ -155,7 +155,7 @@ export function IdentityBlock({ identity, onComplete }: IdentityBlockProps) {
           />
           <button
             onClick={() => setStep('phone')}
-            className="text-[10px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors px-1"
+            className="text-xs font-bold text-zinc-400 hover:text-zinc-900 transition-colors px-1"
           >
             Change mobile number
           </button>

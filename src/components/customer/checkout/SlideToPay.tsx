@@ -138,7 +138,7 @@ export function SlideToPay({
                     triggerHaptic(HapticPattern.SUCCESS);
                     onPay();
                 }}
-                className="w-full h-16 rounded-[24px] text-[13px] font-black uppercase tracking-[0.2em] shadow-xl shadow-red-500/10 gap-3 group overflow-hidden relative"
+                className="w-full h-16 rounded-[24px] text-[13px] font-black tracking-[0.2em] shadow-xl shadow-red-500/10 gap-3 group overflow-hidden relative"
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <ShieldCheck className="size-5" />
@@ -168,7 +168,7 @@ export function SlideToPay({
                     style={{ opacity: textOpacity }}
                 >
                     <ChevronRight className="size-4 text-zinc-400 animate-pulse" />
-                    <span className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 select-none">
+                    <span className="text-[11px] font-black tracking-[0.2em] text-zinc-500 select-none">
                         Slide to pay {formatCurrency(amount)}
                     </span>
                 </div>

@@ -163,7 +163,7 @@ export default async function AdminDashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium">{formatCurrency(order.total)}</p>
-                      <Badge variant="secondary" className="text-[10px]">{order.status}</Badge>
+                      <Badge variant="secondary" className="text-xs">{order.status}</Badge>
                     </div>
                   </div>
                 ))}

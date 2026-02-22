@@ -66,7 +66,7 @@ export function HeaderCart() {
                     <ShoppingBag className={cn("size-5", shouldBounce ? "text-emerald-600" : "text-zinc-900")} />
                     {visualCount > 0 && (
                         <span className={cn(
-                            "absolute -top-2 -right-2 size-4 rounded-full flex items-center justify-center text-[10px] text-white font-bold transition-colors",
+                            "absolute -top-2 -right-2 size-4 rounded-full flex items-center justify-center text-xs text-white font-bold transition-colors",
                             shouldBounce ? "bg-emerald-600" : "bg-red-500"
                         )}>
                             {visualCount}
@@ -74,7 +74,7 @@ export function HeaderCart() {
                     )}
                 </div>
                 <div className="flex flex-col items-start leading-none">
-                    <span className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider">Cart</span>
+                    <span className="text-xs text-zinc-500 font-medium tracking-wider">Cart</span>
                     <span className="tabular-nums">{formatCurrency(displayTotal)}</span>
                 </div>
             </Button>

@@ -128,7 +128,7 @@ export function StatusCard({ order }: StatusCardProps) {
                         <span className={cn("absolute inline-flex h-full w-full animate-ping rounded-full opacity-75", isBreached ? "bg-white" : "bg-emerald-400")}></span>
                         <span className={cn("relative inline-flex size-1.5 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]", isBreached ? "bg-white" : "bg-emerald-500")}></span>
                     </div>
-                    <span className="text-[10px] font-black text-white uppercase tracking-widest">
+                    <span className="text-xs font-black text-white tracking-wider">
                         {isBreached ? 'SLA Breach' : 'Live Pulse'}
                     </span>
                 </div>
@@ -153,7 +153,7 @@ export function StatusCard({ order }: StatusCardProps) {
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
                         <h2 className={cn(
-                            "text-lg font-black uppercase tracking-tight leading-tight",
+                            "text-lg font-black tracking-tight leading-tight",
                             isBreached ? "text-rose-700" : "text-zinc-900"
                         )}>
                             {isBreached ? 'Partner is Running Late' : getStatusText(order.status || '')}
@@ -168,7 +168,7 @@ export function StatusCard({ order }: StatusCardProps) {
 
                             if (order.status === ORDER_STATUS.PLACED && pendingCount > 0) {
                                 return (
-                                    <span className="text-[9px] font-black bg-[var(--primary)] text-white px-2 py-0.5 rounded-full animate-pulse uppercase tracking-widest whitespace-nowrap">
+                                    <span className="text-[11px] font-black bg-[var(--primary)] text-white px-2 py-0.5 rounded-full animate-pulse tracking-wider whitespace-nowrap">
                                         Action Req: {pendingCount} {pendingCount === 1 ? 'Item' : 'Items'}
                                     </span>
                                 );
@@ -207,17 +207,17 @@ export function StatusCard({ order }: StatusCardProps) {
 
             {isBreached && (
                 <div className="mt-4 p-4 bg-white rounded-2xl border border-rose-100 shadow-sm animate-in slide-in-from-bottom-2 duration-500">
-                    <p className="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-3">Escalation Options</p>
+                    <p className="text-xs font-black text-rose-600 tracking-wider mb-3">Escalation Options</p>
                     <div className="flex gap-2">
                         <button
                             onClick={() => window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`}
-                            className="flex-1 py-3 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                            className="flex-1 py-3 bg-rose-600 text-white rounded-xl text-xs font-black tracking-wider active:scale-95 transition-all"
                         >
                             Priority Call
                         </button>
                         <button
                             onClick={() => toast.info("Requesting automated refund status...")}
-                            className="flex-1 py-3 bg-zinc-50 border border-rose-100 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all"
+                            className="flex-1 py-3 bg-zinc-50 border border-rose-100 text-rose-600 rounded-xl text-xs font-black tracking-wider active:scale-95 transition-all"
                         >
                             Instant Refund
                         </button>
@@ -319,7 +319,7 @@ export function StatusCard({ order }: StatusCardProps) {
                 )}
                 <button
                     onClick={handleShare}
-                    className="flex-1 h-11 bg-zinc-900 text-white rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-zinc-200"
+                    className="flex-1 h-11 bg-zinc-900 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-black tracking-wider hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-zinc-200"
                 >
                     <Share2 className="size-3.5" />
                     Share Track

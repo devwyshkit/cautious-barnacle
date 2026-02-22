@@ -150,7 +150,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 text-[10px] font-bold uppercase tracking-wider text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        className="h-8 text-xs font-bold tracking-wider text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                         onClick={() => handleUploadClick(order.id, item.id, order.order_number || '')}
                       >
                         <Upload className="size-3.5 mr-1" />
@@ -158,7 +158,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                       </Button>
                     )}
                     {item.status === 'preview_ready' && (
-                      <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-100 text-[10px]">
+                      <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-100 text-xs">
                         Preview Sent
                       </Badge>
                     )}
@@ -178,7 +178,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                           className="object-cover"
                         />
                       </div>
-                      <span className="text-[10px] text-zinc-500 italic">Waiting for approval</span>
+                      <span className="text-xs text-zinc-500 italic">Waiting for approval</span>
                     </div>
                   )}
                 </div>
@@ -189,7 +189,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                 <div className="mt-4 pt-4 border-t border-zinc-100">
                   <button
                     onClick={() => setShowHistory(!showHistory)}
-                    className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-600 transition-colors"
+                    className="flex items-center gap-2 text-xs font-black tracking-wider text-zinc-400 hover:text-zinc-600 transition-colors"
                   >
                     <RotateCcw className={cn("size-3 transition-transform", showHistory && "rotate-180")} />
                     Design History ({designHistory.length})
@@ -206,7 +206,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                             className="object-cover opacity-60 hover:opacity-100 transition-opacity"
                           />
                           <div className="absolute inset-x-0 bottom-0 bg-white/90 backdrop-blur-md px-1.5 py-1 translate-y-full group-hover/thumb:translate-y-0 transition-transform">
-                            <span className="text-[7px] font-black uppercase text-zinc-900 block truncate leading-none">
+                            <span className="text-[7px] font-black text-zinc-900 block truncate leading-none">
                               {p.submitted_at ? new Date(p.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Iter ' + i}
                             </span>
                           </div>

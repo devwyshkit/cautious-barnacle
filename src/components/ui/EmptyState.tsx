@@ -1,11 +1,12 @@
 "use client";
 
-import { LucideIcon, Sparkles, ShoppingBag } from "lucide-react";
+import React from 'react';
+import { Sparkles, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
-  icon?: LucideIcon | string;
+  icon?: React.ComponentType<{ className?: string }> | string;
   title: string;
   description: string;
   actionLabel?: string;
@@ -41,7 +42,7 @@ export function EmptyState({
         )} />
 
         <div className={cn(
-          "relative size-24 rounded-[32px] flex items-center justify-center shadow-2xl transition-transform duration-700 group-hover:scale-110 group-hover:rotate-3",
+          "relative size-24 rounded-[32px] flex items-center justify-center shadow-sm transition-transform duration-700 group-hover:scale-110 group-hover:rotate-3",
           variant === 'premium'
             ? "bg-gradient-to-br from-rose-500 to-orange-500 shadow-rose-500/20"
             : "bg-white border border-zinc-100 shadow-zinc-200/50"
@@ -73,7 +74,7 @@ export function EmptyState({
 
       <div className="max-w-[280px] space-y-3">
         <h3 className={cn(
-          "text-2xl font-black italic tracking-tighter uppercase leading-none",
+          "text-2xl font-black italic tracking-tighter leading-none",
           variant === 'premium' ? "text-zinc-950" : "text-zinc-900"
         )}>
           {title}
@@ -89,7 +90,7 @@ export function EmptyState({
         <Button
           onClick={onAction}
           className={cn(
-            "mt-10 rounded-2xl px-10 font-black uppercase tracking-widest h-14 shadow-xl active:scale-95 transition-all duration-300",
+            "mt-10 rounded-2xl px-10 font-black tracking-wider h-14 shadow-xl active:scale-95 transition-all duration-300",
             variant === 'premium'
               ? "bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white shadow-rose-500/20"
               : "bg-zinc-950 hover:bg-zinc-800 text-white"

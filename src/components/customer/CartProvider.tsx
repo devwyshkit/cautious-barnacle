@@ -239,7 +239,7 @@ export function CartProvider({
         <CartContext.Provider value={value}>
             {children}
             <AlertDialog open={showReplaceCartDialog} onOpenChange={setShowReplaceCartDialog}>
-                <AlertDialogContent className="rounded-[32px] border-none shadow-2xl bg-white/95 backdrop-blur-xl">
+                <AlertDialogContent className="rounded-[32px] border-none shadow-sm bg-white/95 backdrop-blur-xl">
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-xl font-black text-zinc-950 tracking-tight">Replace cart?</AlertDialogTitle>
                         <AlertDialogDescription className="text-sm font-medium text-zinc-600 leading-relaxed">

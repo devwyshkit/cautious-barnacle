@@ -104,11 +104,11 @@ export function BlocksEngine({ blocks, className }: BlocksEngineProps) {
                         {block.title && block.type !== 'BANNER_BENTO' && (
                             <div className="flex items-center justify-between mb-6">
                                 <div>
-                                    <h2 className="text-xl md:text-2xl font-black text-zinc-950 uppercase tracking-tighter leading-none">
+                                    <h2 className="text-xl md:text-2xl font-black text-zinc-950 tracking-tighter leading-none">
                                         {block.title}
                                     </h2>
                                     {block.subtitle && (
-                                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mt-2 px-1 border-l-2 border-[var(--primary)]">
+                                        <p className="text-xs font-black text-zinc-500 tracking-wider mt-2 px-1 border-l-2 border-[var(--primary)]">
                                             {block.subtitle}
                                         </p>
                                     )}

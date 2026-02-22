@@ -228,7 +228,7 @@ export function EntityCard({
                     <div className="space-y-1">
                         {subtitle && (
                             <div className="flex items-center gap-1.5 overflow-hidden">
-                                <span className="text-[10px] font-bold text-white/80 uppercase tracking-wider truncate">
+                                <span className="text-xs font-bold text-white/80 tracking-wider truncate">
                                     {subtitle}
                                 </span>
                             </div>
@@ -244,7 +244,7 @@ export function EntityCard({
                 </div>
                 <div className="absolute top-3 left-3 px-2 py-1 bg-white/90 backdrop-blur rounded-lg flex items-center gap-1.5 shadow-sm">
                     <TrendingUp className="size-3 text-[var(--primary)]" />
-                    <span className="text-[10px] font-bold text-zinc-900">Trending</span>
+                    <span className="text-xs font-bold text-zinc-900">Trending</span>
                 </div>
             </Link>
         );
@@ -296,7 +296,7 @@ export function EntityCard({
 
                     {rating && !isRow && !isCompact && (
                         <div className="absolute top-2 left-2 flex items-center gap-0.5 bg-emerald-600 px-1.5 py-0.5 rounded-md shadow-sm z-10">
-                            <span className="text-[10px] font-black text-white">{rating.toFixed(1)}</span>
+                            <span className="text-xs font-black text-white">{rating.toFixed(1)}</span>
                             <Star className="size-2.5 fill-white text-white" />
                         </div>
                     )}
@@ -314,12 +314,12 @@ export function EntityCard({
                     <div className="flex justify-between items-start gap-2 mb-0.5">
                         <div className="flex-1 min-w-0">
                             {subtitle && (
-                                <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 truncate mb-1">
+                                <p className="text-xs font-black tracking-wider text-zinc-400 truncate mb-1">
                                     {subtitle}
                                 </p>
                             )}
                             <h3 className={cn(
-                                "font-black tracking-tight leading-tight uppercase line-clamp-1",
+                                "font-black tracking-tight leading-tight line-clamp-1",
                                 isRow || isCompact ? "text-sm text-zinc-900" : "text-[15px] text-zinc-900",
                                 (isPortrait || isLandscape) && "max-md:text-white max-md:absolute max-md:bottom-3 max-md:left-3"
                             )}>
@@ -332,7 +332,7 @@ export function EntityCard({
                                     {formatCurrency(price)}
                                 </span>
                                 {mrp && mrp > price && (
-                                    <span className="text-[9px] text-zinc-400 line-through decoration-zinc-300">
+                                    <span className="text-[11px] text-zinc-400 line-through decoration-zinc-300">
                                         {formatCurrency(mrp)}
                                     </span>
                                 )}
@@ -342,14 +342,14 @@ export function EntityCard({
 
                     <div className="flex items-center gap-2 mt-auto">
                         {estimate && (
-                            <div className="flex items-center gap-1 text-[10px] font-bold text-zinc-400">
+                            <div className="flex items-center gap-1 text-xs font-bold text-zinc-400">
                                 <Clock className="size-3" />
                                 <span>{estimate.min}-{estimate.max}m</span>
                             </div>
                         )}
                         {rating && (isRow || isCompact) && (
                             <div className="flex items-center gap-0.5 bg-emerald-50 text-emerald-700 px-1 py-0.5 rounded border border-emerald-100">
-                                <span className="text-[10px] font-black">{rating.toFixed(1)}</span>
+                                <span className="text-xs font-black">{rating.toFixed(1)}</span>
                                 <Star className="size-2 fill-emerald-600 text-emerald-600" />
                             </div>
                         )}
@@ -359,7 +359,7 @@ export function EntityCard({
                                 <span
                                     key={i}
                                     className={cn(
-                                        "text-[9px] font-black uppercase tracking-tight px-1.5 py-0.5 rounded border shadow-sm",
+                                        "text-[11px] font-black tracking-tight px-1.5 py-0.5 rounded border shadow-sm",
                                         badge.variant === 'fast' ? "bg-orange-50 text-orange-600 border-orange-100" :
                                             badge.variant === 'scarcity' ? "bg-red-50 text-red-600 border-red-100" :
                                                 badge.variant === 'elite' ? "bg-indigo-50 text-indigo-600 border-indigo-100" :

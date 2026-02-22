@@ -40,12 +40,12 @@ export function AddressSlot({ initialAddresses, currentAddress }: AddressSlotPro
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+        <label className="text-xs font-bold tracking-wider text-zinc-400">
           Delivery Address
         </label>
         <button
           onClick={() => setIsSheetOpen(true)}
-          className="text-[11px] font-black text-zinc-900 uppercase tracking-widest active:opacity-50 flex items-center gap-1"
+          className="text-[11px] font-black text-zinc-900 tracking-wider active:opacity-50 flex items-center gap-1"
         >
           {currentAddress ? 'Change' : 'Select'}
           <ChevronRight className="size-3" />

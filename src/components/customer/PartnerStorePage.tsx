@@ -153,7 +153,7 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
         <div className="bg-white rounded-[28px] p-5 shadow-[0_12px_44px_-8px_rgba(0,0,0,0.12)] border border-zinc-100/80 backdrop-blur-xl">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-black text-zinc-950 leading-tight tracking-tighter line-clamp-2 uppercase">
+              <h1 className="text-2xl font-black text-zinc-950 leading-tight tracking-tighter line-clamp-2">
                 {displayName}
               </h1>
               <div className="flex items-center gap-2 mt-1.5 text-[13px] font-bold text-zinc-500">
@@ -162,7 +162,7 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
                   <span className="truncate">{displayCity}</span>
                 </div>
                 <span className="text-zinc-400">|</span>
-                <span className="text-zinc-400 uppercase tracking-widest text-[10px]">Local Store</span>
+                <span className="text-zinc-400 tracking-wider text-xs">Local Store</span>
               </div>
             </div>
             <div className="flex items-start gap-3 shrink-0">
@@ -177,14 +177,14 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
                     <span className="text-[15px] font-black text-white leading-none tracking-tighter">{displayRating.toFixed(1)}</span>
                     <Star className="size-3 fill-white text-white" />
                   </div>
-                  <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest mt-1">Rating</span>
+                  <span className="text-[8px] font-black text-zinc-400 tracking-wider mt-1">Rating</span>
                 </div>
               )}
             </div>
           </div>
 
           <div className="flex items-center gap-4 mt-5 pt-5 border-t border-dashed border-zinc-100">
-            <div className="flex items-center gap-2 text-[11px] font-black text-zinc-700 uppercase tracking-widest bg-zinc-50 px-3 py-1.5 rounded-xl border border-zinc-100">
+            <div className="flex items-center gap-2 text-[11px] font-black text-zinc-700 tracking-wider bg-zinc-50 px-3 py-1.5 rounded-xl border border-zinc-100">
               <Clock className="size-3.5 text-emerald-600" />
               <span>{prepTimeText} prep</span>
             </div>
@@ -201,15 +201,15 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
                 <AlertCircle className="size-4 text-amber-600" />
               </div>
               <div>
-                <p className="text-[12px] font-black text-amber-900 uppercase tracking-tight">Active cart at another store</p>
-                <p className="text-[10px] font-medium text-amber-700/80 leading-tight mt-0.5">Adding items from {displayName} will replace your current cart.</p>
+                <p className="text-[12px] font-black text-amber-900 tracking-tight">Active cart at another store</p>
+                <p className="text-xs font-medium text-amber-700/80 leading-tight mt-0.5">Adding items from {displayName} will replace your current cart.</p>
               </div>
             </div>
             <Button
               variant="outline"
               size="sm"
               onClick={() => router.push('/checkout')}
-              className="rounded-xl h-9 text-[10px] font-black uppercase tracking-widest border-amber-200 bg-white text-amber-900 hover:bg-amber-100"
+              className="rounded-xl h-9 text-xs font-black tracking-wider border-amber-200 bg-white text-amber-900 hover:bg-amber-100"
             >
               View Cart
             </Button>
@@ -234,14 +234,14 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
                   selectedCategory === cat && "bg-zinc-900 border-zinc-900 ring-4 ring-zinc-900/5"
                 )}>
                   <span className={cn(
-                    "text-[10px] md:text-[11px] font-black uppercase tracking-tighter text-zinc-400",
+                    "text-xs md:text-[11px] font-black tracking-tighter text-zinc-400",
                     selectedCategory === cat && "text-white"
                   )}>
                     {cat.slice(0, 3)}
                   </span>
                 </div>
                 <span className={cn(
-                  "text-[10px] md:text-[11px] font-black uppercase tracking-tight text-center leading-tight transition-colors",
+                  "text-xs md:text-[11px] font-black tracking-tight text-center leading-tight transition-colors",
                   selectedCategory === cat ? "text-zinc-900" : "text-zinc-400 group-hover:text-zinc-600"
                 )}>
                   {cat}
@@ -256,10 +256,10 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
         <div id="menu-items" className="flex-1 px-4 md:px-10 py-6 md:py-10">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-xl md:text-2xl font-black text-zinc-950 tracking-tighter uppercase leading-none">
+              <h2 className="text-xl md:text-2xl font-black text-zinc-950 tracking-tighter leading-none">
                 {selectedCategory === 'Recommended' ? 'Recommended Items' : selectedCategory}
               </h2>
-              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mt-2">
+              <p className="text-xs font-black text-zinc-400 tracking-[0.2em] mt-2">
                 {selectedCategory === 'Recommended' ? 'Bestselling items from this store' : `Items in ${selectedCategory}`}
               </p>
             </div>
@@ -291,7 +291,7 @@ export function PartnerStorePage({ partnerId, initialData, initialItems }: Partn
               <div className="size-20 rounded-full bg-zinc-100 flex items-center justify-center mb-6">
                 <span className="text-3xl grayscale opacity-50">🚚</span>
               </div>
-              <p className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.25em]">No products currently available</p>
+              <p className="text-[11px] font-black text-zinc-400 tracking-[0.25em]">No products currently available</p>
               <Button onClick={() => router.back()} variant="link" className="mt-4 text-xs font-bold text-zinc-900">Check other stores</Button>
             </div>
           )}

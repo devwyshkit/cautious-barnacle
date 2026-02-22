@@ -195,7 +195,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-6 md:max-w-md">
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Contact</Label>
+                    <Label className="text-xs font-bold tracking-wider text-zinc-500">Contact</Label>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="relative">
                             <User className="absolute left-3 top-3 size-4 text-zinc-400" />
@@ -207,14 +207,14 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                         </div>
                     </div>
                     {(form.formState.errors.name || form.formState.errors.phone) && (
-                        <p className="text-[10px] font-bold text-rose-500 ml-1">
+                        <p className="text-xs font-bold text-rose-500 ml-1">
                             {form.formState.errors.name?.message || form.formState.errors.phone?.message}
                         </p>
                     )}
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Address Type</Label>
+                    <Label className="text-xs font-bold tracking-wider text-zinc-500">Address Type</Label>
                     <RadioGroup
                         value={form.watch('type')}
                         onValueChange={(val) => form.setValue('type', val as any)}
@@ -232,7 +232,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                                     className="flex flex-col items-center justify-between rounded-xl border-2 border-zinc-100 bg-white p-3 hover:bg-zinc-50 cursor-pointer transition-all peer-data-[state=checked]:border-zinc-900 peer-data-[state=checked]:[&_svg]:text-zinc-900"
                                 >
                                     <type.icon className="mb-2 size-5 text-zinc-400" />
-                                    <span className="text-[10px] font-bold uppercase tracking-wider">{type.label}</span>
+                                    <span className="text-xs font-bold tracking-wider">{type.label}</span>
                                 </Label>
                             </div>
                         ))}
@@ -240,7 +240,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold uppercase tracking-wider text-zinc-500">Location</Label>
+                    <Label className="text-xs font-bold tracking-wider text-zinc-500">Location</Label>
                     {entryMode === 'search' ? (
                         <>
                             <div className="flex gap-2">
@@ -263,14 +263,14 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                                 </Button>
                             </div>
                             {placeData && (
-                                <p className="text-[10px] text-emerald-600 font-medium">
+                                <p className="text-xs text-emerald-600 font-medium">
                                     {placeData.city} {placeData.pincode}
                                 </p>
                             )}
                             <button
                                 type="button"
                                 onClick={() => setEntryMode('manual')}
-                                className="text-[10px] font-semibold text-zinc-500 hover:text-zinc-700 underline decoration-zinc-200"
+                                className="text-xs font-semibold text-zinc-500 hover:text-zinc-700 underline decoration-zinc-200"
                             >
                                 Can&apos;t find your address? Enter manually
                             </button>
@@ -306,7 +306,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                             <button
                                 type="button"
                                 onClick={() => setEntryMode('search')}
-                                className="text-[10px] font-semibold text-zinc-500 hover:text-zinc-700 underline decoration-zinc-200 flex items-center gap-1"
+                                className="text-xs font-semibold text-zinc-500 hover:text-zinc-700 underline decoration-zinc-200 flex items-center gap-1"
                             >
                                 <Edit3 className="size-3" />
                                 Use search or current location instead
@@ -322,7 +322,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                         className="bg-zinc-50/50 border-zinc-200 focus:bg-white transition-all"
                     />
                     {form.formState.errors.flatBuilding && (
-                        <p className="text-[10px] font-bold text-rose-500 ml-1">{form.formState.errors.flatBuilding.message}</p>
+                        <p className="text-xs font-bold text-rose-500 ml-1">{form.formState.errors.flatBuilding.message}</p>
                     )}
                 </div>
 

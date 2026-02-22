@@ -38,13 +38,13 @@ export function IdentityItemField({
                         <ShoppingBag className="size-4 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h4 className="text-[12px] font-black text-zinc-950 uppercase tracking-tight truncate leading-none">
+                        <h4 className="text-[12px] font-black text-zinc-950 tracking-tight truncate leading-none">
                             {item.item_name}
                         </h4>
-                        <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Item {itemIndex + 1}</p>
+                        <p className="text-[11px] font-bold text-zinc-400 tracking-wider mt-1">Item {itemIndex + 1}</p>
                     </div>
                     {!config.text_required && !config.image_required && (
-                        <span className="text-[9px] font-black bg-zinc-100 text-zinc-400 px-2 py-1 rounded-lg uppercase tracking-widest border border-zinc-200/50">Optional</span>
+                        <span className="text-[11px] font-black bg-zinc-100 text-zinc-400 px-2 py-1 rounded-lg tracking-wider border border-zinc-200/50">Optional</span>
                     )}
                 </div>
             )}
@@ -54,7 +54,7 @@ export function IdentityItemField({
                     <div className="space-y-4">
                         {schema.map((field) => (
                             <div key={field.id} className="space-y-2">
-                                <label className="text-[10px] font-black text-zinc-900 uppercase tracking-widest block px-1">
+                                <label className="text-xs font-black text-zinc-900 tracking-wider block px-1">
                                     {field.label} {field.required && <span className="text-rose-500">*</span>}
                                 </label>
                                 {field.type === 'text' ? (
@@ -81,12 +81,12 @@ export function IdentityItemField({
                         {config.allow_text && (
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between px-1">
-                                    <label className="text-[10px] font-black text-zinc-900 uppercase tracking-widest flex items-center gap-1.5">
+                                    <label className="text-xs font-black text-zinc-900 tracking-wider flex items-center gap-1.5">
                                         {config.text_label || 'Identity Theme'}
                                     </label>
                                     {config.char_limit && (
                                         <span className={cn(
-                                            "text-[10px] font-bold tracking-tight tabular-nums",
+                                            "text-xs font-bold tracking-tight tabular-nums",
                                             (input.text?.length || 0) > config.char_limit ? "text-rose-500" : "text-zinc-400"
                                         )}>
                                             {input.text?.length || 0}/{config.char_limit}
@@ -107,7 +107,7 @@ export function IdentityItemField({
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <div className="h-px flex-1 bg-zinc-50" />
-                                    <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest leading-none">Visual Reference</span>
+                                    <span className="text-[11px] font-black text-zinc-300 tracking-wider leading-none">Visual Reference</span>
                                     <div className="h-px flex-1 bg-zinc-50" />
                                 </div>
 
@@ -128,7 +128,7 @@ export function IdentityItemField({
                                         className="flex flex-col items-center justify-center gap-2 py-5 bg-zinc-50 border border-zinc-100 rounded-2xl hover:bg-zinc-100 transition-all active:scale-[0.98] disabled:opacity-50 group/btn"
                                     >
                                         <ImageIcon className="size-5 text-zinc-400 group-hover/btn:text-zinc-600 group-hover/btn:scale-110 transition-all" />
-                                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest group-hover/btn:text-zinc-600 transition-colors">Library</span>
+                                        <span className="text-xs font-black text-zinc-400 tracking-wider group-hover/btn:text-zinc-600 transition-colors">Library</span>
                                     </button>
 
                                     <button
@@ -148,15 +148,15 @@ export function IdentityItemField({
                                         className="flex flex-col items-center justify-center gap-2 py-5 bg-zinc-900 rounded-2xl hover:bg-black transition-all active:scale-[0.98] disabled:opacity-50 group/btn shadow-lg shadow-zinc-200"
                                     >
                                         <Camera className="size-5 text-white/60 group-hover/btn:text-white group-hover/btn:scale-110 transition-all" />
-                                        <span className="text-[10px] font-black text-white/60 uppercase tracking-widest group-hover/btn:text-white transition-colors">Capture</span>
+                                        <span className="text-xs font-black text-white/60 tracking-wider group-hover/btn:text-white transition-colors">Capture</span>
                                     </button>
                                 </div>
 
                                 {uploadingProgress !== undefined && (
                                     <div className="space-y-2 animate-in fade-in duration-300">
                                         <div className="flex items-center justify-between px-1">
-                                            <span className="text-[9px] font-black text-zinc-900 uppercase tracking-widest">Processing Image...</span>
-                                            <span className="text-[10px] font-bold text-zinc-400 tabular-nums">{Math.round(uploadingProgress)}%</span>
+                                            <span className="text-[11px] font-black text-zinc-900 tracking-wider">Processing Image...</span>
+                                            <span className="text-xs font-bold text-zinc-400 tabular-nums">{Math.round(uploadingProgress)}%</span>
                                         </div>
                                         <Progress value={uploadingProgress} className="h-1.5 bg-zinc-100" />
                                     </div>
@@ -183,7 +183,7 @@ export function IdentityItemField({
                 {config.instructions && (
                     <div className="flex gap-2.5 p-4 bg-zinc-50/50 rounded-2xl border border-zinc-100/50">
                         <Info className="size-3.5 text-zinc-400 shrink-0 mt-0.5" />
-                        <p className="text-[10px] text-zinc-500 font-medium leading-relaxed">
+                        <p className="text-xs text-zinc-500 font-medium leading-relaxed">
                             {config.instructions}
                         </p>
                     </div>

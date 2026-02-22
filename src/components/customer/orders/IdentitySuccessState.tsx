@@ -18,7 +18,7 @@ export function IdentitySuccessState({ onClose }: IdentitySuccessStateProps) {
                 <Sparkles className="absolute -top-1 -right-1 size-6 text-amber-500 animate-pulse" />
             </div>
             <div className="space-y-2">
-                <h2 className="text-2xl font-black text-zinc-900 uppercase tracking-tight">Mission Started!</h2>
+                <h2 className="text-2xl font-black text-zinc-900 tracking-tight">Mission Started!</h2>
                 <p className="text-zinc-500 text-sm max-w-[280px] font-medium leading-relaxed">
                     Your vision is being transmitted to our partner. We'll alert you as soon as the preview is ready.
                 </p>
@@ -26,7 +26,7 @@ export function IdentitySuccessState({ onClose }: IdentitySuccessStateProps) {
             <div className="pt-8">
                 <button
                     onClick={onClose}
-                    className="h-14 px-8 bg-zinc-900 text-white rounded-2xl font-black uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-zinc-950/20"
+                    className="h-14 px-8 bg-zinc-900 text-white rounded-2xl font-black tracking-wider hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-zinc-950/20"
                 >
                     Great, thanks
                 </button>

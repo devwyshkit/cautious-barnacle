@@ -51,7 +51,7 @@ export function AddressManager({ initialAddresses, isAdding, onToggleAdding }: A
                     className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors"
                 >
                     <ChevronLeft className="size-4" />
-                    <span className="text-[10px] font-bold uppercase tracking-wider">Back to addresses</span>
+                    <span className="text-xs font-bold tracking-wider">Back to addresses</span>
                 </button>
 
                 <div>
@@ -75,7 +75,7 @@ export function AddressManager({ initialAddresses, isAdding, onToggleAdding }: A
 
     return (
         <>
-            <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.2em] mb-4">Saved Addresses</h3>
+            <h3 className="text-[11px] font-bold text-zinc-400 tracking-[0.2em] mb-4">Saved Addresses</h3>
 
             {loading ? (
                 <div className="flex items-center justify-center py-12">
@@ -106,7 +106,7 @@ export function AddressManager({ initialAddresses, isAdding, onToggleAdding }: A
                                         <div className="flex items-center gap-2">
                                             <h4 className="font-bold text-zinc-900">{addr.name}</h4>
                                             {addr.is_default && (
-                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-900 text-white">Default</span>
+                                                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-zinc-900 text-white">Default</span>
                                             )}
                                         </div>
                                         <p className="text-sm text-zinc-500 mt-1 line-clamp-2">

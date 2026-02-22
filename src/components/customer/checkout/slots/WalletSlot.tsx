@@ -50,7 +50,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing }: WalletSlot
                             Wyshkit Money
                         </p>
                         <p className={cn(
-                            "text-[10px] font-bold uppercase tracking-wider mt-0.5",
+                            "text-xs font-bold tracking-wider mt-0.5",
                             useWalletBalance ? "text-white/60" : "text-zinc-400"
                         )}>
                             Balance: {formatCurrency(walletInfo.balance)}

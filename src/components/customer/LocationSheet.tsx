@@ -165,7 +165,7 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold text-zinc-900">{usingGeolocation ? 'Pinpointing location…' : 'Use current location'}</span>
-              <span className="text-[10px] font-black text-[#D91B24] uppercase tracking-widest mt-0.5 leading-none">Using GPS</span>
+              <span className="text-xs font-black text-[#D91B24] tracking-wider mt-0.5 leading-none">Using GPS</span>
             </div>
           </button>
 

@@ -119,7 +119,7 @@ async function AsyncDiscoveryGrid({
           <div className="size-20 rounded-full bg-white flex items-center justify-center mb-6 shadow-sm">
             <span className="text-3xl">🧺</span>
           </div>
-          <p className="text-lg font-black text-zinc-950 uppercase tracking-tighter">No items found</p>
+          <p className="text-lg font-black text-zinc-950 tracking-tighter">No items found</p>
           <p className="text-sm text-zinc-500 mt-2 font-medium">Try another category or check back later.</p>
         </div>
       </section>
@@ -161,7 +161,7 @@ function DiscoveryErrorFallback() {
         <div className="size-16 rounded-full bg-white flex items-center justify-center mb-6 shadow-sm">
           <span className="text-2xl text-amber-600">⚠️</span>
         </div>
-        <p className="text-sm font-black text-amber-900 uppercase tracking-tighter">Connection Interrupted</p>
+        <p className="text-sm font-black text-amber-900 tracking-tighter">Connection Interrupted</p>
         <p className="text-[11px] text-amber-800/70 mt-2 font-medium max-w-[200px]">
           We're having trouble reaching our catalogs. Please refresh or try again later.
         </p>

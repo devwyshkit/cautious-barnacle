@@ -44,11 +44,11 @@ export default async function OrdersPage() {
                         <h1 className="text-2xl font-black text-zinc-900 tracking-tight flex items-center gap-2">
                             My Orders
                         </h1>
-                        <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest mt-0.5">
+                        <p className="text-[11px] font-bold text-zinc-400 tracking-wider mt-0.5">
                             Track and manage your orders
                         </p>
                     </div>
-                    <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest bg-white px-3 py-1.5 rounded-full border border-zinc-100 shadow-sm">
+                    <span className="text-xs font-black text-zinc-500 tracking-wider bg-white px-3 py-1.5 rounded-full border border-zinc-100 shadow-sm">
                         {orders?.length || 0} Total
                     </span>
                 </div>

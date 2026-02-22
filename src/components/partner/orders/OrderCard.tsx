@@ -182,11 +182,11 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                   <AlertTriangle className="size-4 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-orange-900 uppercase tracking-widest leading-none mb-1">Action Required: Correction Requested</p>
+                  <p className="text-xs font-black text-orange-900 tracking-wider leading-none mb-1">Action Required: Correction Requested</p>
                   <p className="text-sm font-bold text-orange-800 leading-tight">
                     "{order.latest_preview.customer_feedback}"
                   </p>
-                  <p className="text-[10px] text-orange-600 mt-2 font-medium italic">
+                  <p className="text-xs text-orange-600 mt-2 font-medium italic">
                     Upload a corrected preview to proceed.
                   </p>
                 </div>
@@ -253,8 +253,8 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
               {isExpress && order.status === ORDER_STATUS.PLACED && (
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 mb-2 animate-in slide-in-from-top-1 duration-300">
                   <Zap className="size-3 fill-emerald-600" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Express Fulfill</span>
-                  <span className="text-[9px] font-medium opacity-70 ml-auto">No personalization needed</span>
+                  <span className="text-xs font-black tracking-wider">Express Fulfill</span>
+                  <span className="text-[11px] font-medium opacity-70 ml-auto">No personalization needed</span>
                 </div>
               )}
               {order.order_items?.map((item, idx) => (
@@ -298,7 +298,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
           {/* WYSHKIT 2026: Personalization Details Section */}
           {(order.personalization_input as any) && (
             <div className="mx-4 mb-4 p-4 rounded-2xl bg-amber-50 border border-amber-100 space-y-3">
-              <p className="text-[10px] font-black text-amber-900 uppercase tracking-widest">Customer Design Details</p>
+              <p className="text-xs font-black text-amber-900 tracking-wider">Customer Design Details</p>
               <div className="space-y-4">
                 {Object.entries(order.personalization_input as Record<string, any>).map(([itemId, data]: [string, any]) => {
                   const item = order.order_items.find(oi => oi.id === itemId || oi.item_id === itemId);
@@ -316,14 +316,14 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                               href={data.image_url}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-white text-[10px] font-bold underline"
+                              className="text-white text-xs font-bold underline"
                             >
                               VIEW FULL
                             </a>
                             {item?.status === 'details_shared' && (
                               <Button
                                 size="sm"
-                                className="h-6 px-2 text-[9px] bg-white text-zinc-900 border-none hover:bg-zinc-100"
+                                className="h-6 px-2 text-[11px] bg-white text-zinc-900 border-none hover:bg-zinc-100"
                                 onClick={() => {
                                   setSelectedOrderItemId(item.id);
                                   setShowPreviewModal(true);
@@ -338,7 +338,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                       {data.addons && Array.isArray(data.addons) && (
                         <div className="flex flex-wrap gap-1">
                           {data.addons.map((a: string) => (
-                            <Badge key={a} variant="secondary" className="text-[9px] bg-amber-100 text-amber-700 border-none">{a}</Badge>
+                            <Badge key={a} variant="secondary" className="text-[11px] bg-amber-100 text-amber-700 border-none">{a}</Badge>
                           ))}
                         </div>
                       )}
@@ -407,7 +407,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                 <Clock className="size-4 mr-2 animate-pulse" />
                 Waiting for Customer Details...
               </Button>
-              <p className="text-[10px] text-center text-amber-600/70 mt-2 font-medium">
+              <p className="text-xs text-center text-amber-600/70 mt-2 font-medium">
                 Customer has 24 hours to submit design details.
               </p>
             </div>
