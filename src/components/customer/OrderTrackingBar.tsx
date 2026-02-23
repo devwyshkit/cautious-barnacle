@@ -60,46 +60,54 @@ export function OrderTrackingBar() {
     return (
         <>
             <div
-                className="fixed left-0 right-0 z-40 flex justify-center pointer-events-none px-4 animate-in slide-in-from-bottom-8 fade-in duration-500 ease-out transition-all"
-                style={{ bottom: `calc(var(--bottom-nav-height, 0px) + ${isCartVisible ? '136px' : '12px'})` }}
+                className={cn(
+                    "fixed left-4 right-4 md:left-auto md:w-[420px] md:right-8 z-[45] transition-all duration-300 ease-out",
+                    isVisible ? "translate-y-0 opacity-100" : "translate-y-32 opacity-0 pointer-events-none"
+                )}
+                style={{
+                    bottom: `calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + ${isCartVisible ? '80px' : '16px'})`
+                }}
             >
-                <button
+                <div
                     onClick={handleOpen}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handleOpen()}
                     className={cn(
-                        "pointer-events-auto min-w-[320px] max-w-sm transition-all duration-500 ease-out",
-                        "rounded-[2.5rem] shadow-sm overflow-hidden flex items-center p-1.5 gap-4 active:scale-[0.96]",
+                        "w-full transition-all duration-300 ease-out cursor-pointer active:scale-[0.98]",
+                        "rounded-2xl shadow-sm border overflow-hidden flex items-center p-3 gap-3 min-h-[56px]",
                         isUrgent
-                            ? "bg-[var(--primary)] ring-4 ring-rose-500/20 shadow-rose-900/40"
-                            : "bg-zinc-950/95 backdrop-blur-2xl shadow-zinc-950/60 border border-white/5"
+                            ? "bg-rose-50 border-rose-200"
+                            : "bg-zinc-950/95 backdrop-blur-3xl border-white/10"
                     )}
                 >
                     {/* Status Icon with Heartbeat */}
                     <div className={cn(
-                        "size-12 rounded-full flex items-center justify-center relative",
-                        isUrgent ? "bg-white" : config.color
+                        "size-8 rounded-full flex items-center justify-center relative shrink-0",
+                        isUrgent ? "bg-rose-100" : "bg-white/10"
                     )}>
                         {isUrgent && (
-                            <div className="absolute inset-0 rounded-full bg-rose-500/30 animate-ping" />
+                            <div className="absolute inset-0 rounded-full bg-rose-500/20 animate-ping" />
                         )}
                         <div className={cn(
-                            "relative z-10",
-                            isUrgent ? "text-[var(--primary)]" : ""
+                            "relative z-10 scale-75 origin-center",
+                            isUrgent ? "text-rose-600" : "text-white"
                         )}>
                             {isUrgent ? <AlertCircle className="size-6" /> : config.icon}
                         </div>
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 text-left min-w-0 py-2">
+                    <div className="flex-1 text-left min-w-0 pr-2">
                         <h4 className={cn(
-                            "text-[14px] font-black truncate leading-tight tracking-tight",
-                            isUrgent ? "text-white" : "text-white"
+                            "text-sm font-black truncate leading-none",
+                            isUrgent ? "text-rose-950" : "text-white"
                         )}>
                             {isUrgent ? "Add Identity Now" : (orderToShow.partner_name || config.label)}
                         </h4>
                         <p className={cn(
-                            "text-xs truncate font-bold tracking-wider mt-0.5 opacity-80",
-                            isUrgent ? "text-rose-100" : "text-zinc-400"
+                            "text-xs truncate font-medium mt-1 leading-none",
+                            isUrgent ? "text-rose-700" : "text-zinc-400"
                         )}>
                             {isUrgent ? config.label : config.subLabel}
                         </p>
@@ -107,16 +115,16 @@ export function OrderTrackingBar() {
 
                     {/* Tracking Pill / Action Pill */}
                     <div className={cn(
-                        "mr-3 px-4 py-2 rounded-full flex items-center gap-1.5 backdrop-blur-md transition-colors",
-                        isUrgent ? "bg-white text-[#D91B24]" : "bg-zinc-800/50 text-white border border-white/10"
+                        "shrink-0 px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-md transition-colors",
+                        isUrgent ? "bg-rose-600 text-white" : "bg-white/10 text-white"
                     )}>
-                        <span className="text-xs font-black tracking-wider">
-                            {isUrgent ? "Go" : "Live"}
+                        <span className="text-xs font-bold leading-none">
+                            {isUrgent ? "Action required" : "Live"}
                         </span>
-                        {!isUrgent && <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                        {!isUrgent && <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse ml-0.5" />}
                         {isUrgent && <ChevronRight className="size-3" />}
                     </div>
-                </button>
+                </div>
             </div>
 
             <ResponsiveSurface

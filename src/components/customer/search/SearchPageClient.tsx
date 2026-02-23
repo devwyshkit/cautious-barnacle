@@ -206,12 +206,12 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
 
                         <div className="grid grid-cols-1 gap-4">
                           {group.items.map((item) => (
-                            <div key={item.id} onClick={(e) => handleItemClick(e, item)}>
-                              <EntityCard
-                                type="item"
-                                data={item}
-                              />
-                            </div>
+                            <EntityCard
+                              key={item.id}
+                              type="item"
+                              data={item}
+                              onQuickLook={(id) => setSelectedItemId(id)}
+                            />
                           ))}
                         </div>
                       </div>

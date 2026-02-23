@@ -11,7 +11,6 @@ const REQUIRED_ENV_VARS = [
     'SUPABASE_SERVICE_ROLE_KEY',
     'RAZORPAY_KEY_ID',
     'RAZORPAY_KEY_SECRET',
-    'GOOGLE_MAPS_API_KEY',
 ] as const;
 
 export function validateEnv() {

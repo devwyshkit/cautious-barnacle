@@ -100,7 +100,6 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                 open={!!selectedPreviewItem}
                 onOpenChange={(open) => !open && setSelectedPreviewItem(null)}
                 className="p-0 sm:max-w-xl h-[85dvh] sm:h-[90dvh] bg-zinc-50 border-none"
-                showClose={false}
             >
                 {selectedPreviewItem && itemPreviews[selectedPreviewItem.id] && (
                     <div className="h-full overflow-y-auto overscroll-contain pb-safe scrollbar-hide">
@@ -108,12 +107,6 @@ export function OrderItemsList({ order, itemPreviews, onPersonalizationSubmitted
                             <h3 className="text-lg font-black text-zinc-900 tracking-tight">
                                 {selectedPreviewItem.status === 'preview_ready' ? 'Review Design' : 'Item Details'}
                             </h3>
-                            <button
-                                onClick={() => setSelectedPreviewItem(null)}
-                                className="p-2 bg-zinc-100 rounded-full hover:bg-zinc-200 transition-colors"
-                            >
-                                <X className="size-5 text-zinc-500" />
-                            </button>
                         </div>
                         <div className="p-4">
                             {selectedPreviewItem.status === 'preview_ready' ? (

@@ -264,10 +264,8 @@ export function EntityCard({
     };
 
     return (
-        <Link
-            href={href}
+        <div
             className="block w-full"
-            scroll={false}
             onClick={handleClick}
         >
             <div className={cn(
@@ -319,11 +317,13 @@ export function EntityCard({
                                 </p>
                             )}
                             <h3 className={cn(
-                                "font-black tracking-tight leading-tight line-clamp-1",
+                                "font-black tracking-tight leading-tight line-clamp-1 relative pointer-events-auto",
                                 isRow || isCompact ? "text-sm text-zinc-900" : "text-[15px] text-zinc-900",
                                 (isPortrait || isLandscape) && "max-md:text-white max-md:absolute max-md:bottom-3 max-md:left-3"
                             )}>
-                                {name}
+                                <Link href={href} scroll={false} className="before:absolute before:-inset-8 before:z-0 before:content-[''] hover:text-rose-600 transition-colors">
+                                    {name}
+                                </Link>
                             </h3>
                         </div>
                         {price !== undefined && (
@@ -392,7 +392,7 @@ export function EntityCard({
                     </div>
                 )}
             </div>
-        </Link>
+        </div>
     );
 }
 

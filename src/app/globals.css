@@ -159,7 +159,7 @@
   }
 
   .label-overline {
-    @apply text-[10px] font-black uppercase tracking-[0.12em] text-[#686B78]/80 mb-1.5 block;
+    @apply text-[11px] font-black tracking-[0.06em] text-[#686B78]/90 mb-1.5 block;
   }
 
   .label-caption {
