@@ -23,34 +23,34 @@ export interface StatusConfig {
 
 // ✅ STRICT: Type derived directly from database enum
 // We explicitly EXCLUDE deprecated values that might technically exist in DB but should never be used in code.
-export type OrderStatus = Exclude<Database['public']['Enums']['order_status'],
-  'INPUT_RECEIVED' | 'CHANGE_REQUESTED' | 'DETAILS_RECEIVED' | 'PREVIEW_READY' | 'REVISION_REQUESTED' | 'APPROVED'
->;
+export type OrderStatus = Database['public']['Enums']['order_status'];
 
-// ✅ STRICT: Const object with values matching DB enum (UPPERCASE)
 export const ORDER_STATUS = {
   PLACED: 'PLACED',
   CONFIRMED: 'CONFIRMED',
+  DETAILS_RECEIVED: 'DETAILS_RECEIVED',
+  PREVIEW_READY: 'PREVIEW_READY',
+  CHANGE_REQUESTED: 'CHANGE_REQUESTED',
+  APPROVED: 'APPROVED',
   IN_PRODUCTION: 'IN_PRODUCTION',
   PACKED: 'PACKED',
   DISPATCHED: 'DISPATCHED',
   DELIVERED: 'DELIVERED',
   CANCELLED: 'CANCELLED',
   REFUNDED: 'REFUNDED',
+  INPUT_RECEIVED: 'INPUT_RECEIVED',
+  REVISION_REQUESTED: 'REVISION_REQUESTED',
   OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
   // Swiggy 2026 Aliases
   PREPARING: 'IN_PRODUCTION',
   READY: 'PACKED',
 } as const satisfies Record<string, OrderStatus>;
 
-export type PersonalizationStatus = Database['public']['Enums']['personalization_status'];
-
 export const PERSONALIZATION_STATUS = {
   PENDING: 'pending',
-  SUBMITTED: 'submitted',
   PREVIEW_READY: 'preview_ready',
-  REVISION_REQUESTED: 'revision_requested',
-  APPROVED: 'approved',
+  REVISION_REQUESTED: 'change_requested',
+  APPROVED: 'approved'
 } as const;
 
 // WYSHKIT 2026: Centralized Status Configuration
@@ -60,19 +60,33 @@ export function getStatusConfig(order: {
   has_personalization: boolean;
   order_number?: string;
   id?: string;
-  personalization_status?: string;
+  metadata?: any;
 }): StatusConfig {
-  // 1. Action Needed: Personalization (STRICT: Only if has_personalization is true and order is CONFIRMED or PLACED)
-  // Swiggy 2026: Allow immediate input after payment (PLACED) to maintain momentum.
-  const hasInputReady = order.has_personalization &&
-    (!order.personalization_status || order.personalization_status === PERSONALIZATION_STATUS.PENDING);
+  const metadata = order.metadata || {};
+  const personalizationData = metadata.personalization || {};
 
-  if ((order.status === ORDER_STATUS.CONFIRMED || order.status === ORDER_STATUS.PLACED) && hasInputReady) {
+  // 1. Action Needed: Personalization (STRICT: Only if has_personalization is true)
+  // Swiggy 2026: Check metadata flags instead of separate column
+  const needsInput = order.has_personalization && !personalizationData.input_received;
+  const previewReady = order.has_personalization && personalizationData.preview_ready && !personalizationData.approved;
+
+  if (needsInput && (order.status === ORDER_STATUS.PLACED || order.status === ORDER_STATUS.CONFIRMED)) {
     return {
       label: "Design Input Needed",
       subLabel: "Upload your design details now",
       icon: React.createElement(Sparkles, { className: "size-4 text-amber-500" }),
       color: "bg-amber-50",
+      pulse: true
+    };
+  }
+
+  // 2. Action Needed: Preview Approval
+  if (previewReady) {
+    return {
+      label: "Preview Ready",
+      subLabel: "Tap to approve and ship",
+      icon: React.createElement(Package, { className: "size-4 text-emerald-500" }),
+      color: "bg-emerald-50",
       pulse: true
     };
   }
@@ -84,17 +98,6 @@ export function getStatusConfig(order: {
       subLabel: "Waiting for partner to accept",
       icon: React.createElement(Clock, { className: "size-4 text-zinc-400" }),
       color: "bg-zinc-50",
-      pulse: true
-    };
-  }
-
-  // 2. Action Needed: Preview Approval
-  if (order.personalization_status === PERSONALIZATION_STATUS.PREVIEW_READY) {
-    return {
-      label: "Preview Ready",
-      subLabel: "Tap to approve and ship",
-      icon: React.createElement(Package, { className: "size-4 text-emerald-500" }),
-      color: "bg-emerald-50",
       pulse: true
     };
   }
@@ -117,8 +120,9 @@ export function isValidOrderStatus(status: string): status is OrderStatus {
 // Helper to get all valid statuses
 export function getAllOrderStatuses(): OrderStatus[] {
   return [
-    'PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED', 'DISPATCHED', 'DELIVERED',
-    'CANCELLED', 'REFUNDED', 'OUT_FOR_DELIVERY'
+    'PLACED', 'CONFIRMED', 'DETAILS_RECEIVED', 'PREVIEW_READY', 'CHANGE_REQUESTED', 'APPROVED',
+    'IN_PRODUCTION', 'PACKED', 'DISPATCHED', 'DELIVERED',
+    'CANCELLED', 'REFUNDED', 'INPUT_RECEIVED', 'REVISION_REQUESTED', 'OUT_FOR_DELIVERY'
   ];
 }
 
@@ -126,6 +130,10 @@ export function getAllOrderStatuses(): OrderStatus[] {
 const STATUS_DISPLAY: Record<string, string> = {
   PLACED: 'Order Placed',
   CONFIRMED: 'Accepted',
+  DETAILS_RECEIVED: 'Details Received',
+  PREVIEW_READY: 'Preview Ready',
+  CHANGE_REQUESTED: 'Change Requested',
+  APPROVED: 'Approved',
   IN_PRODUCTION: 'Preparing Order',
   PACKED: 'Ready',
   DISPATCHED: 'Dispatched',
@@ -133,6 +141,8 @@ const STATUS_DISPLAY: Record<string, string> = {
   DELIVERED: 'Delivered',
   CANCELLED: 'Cancelled',
   REFUNDED: 'Refunded',
+  INPUT_RECEIVED: 'Input Received',
+  REVISION_REQUESTED: 'Revision Requested'
 };
 
 // Color classes for statuses - Wyshkit 2026 Design Language
@@ -140,6 +150,10 @@ const STATUS_DISPLAY: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   PLACED: 'bg-rose-50 text-[var(--primary)] border-rose-100',
   CONFIRMED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
+  DETAILS_RECEIVED: 'bg-zinc-100 text-zinc-600 border-zinc-200',
+  PREVIEW_READY: 'bg-blue-50 text-blue-600 border-blue-100',
+  CHANGE_REQUESTED: 'bg-amber-50 text-amber-600 border-amber-100',
+  APPROVED: 'bg-emerald-50 text-emerald-600 border-emerald-100',
   IN_PRODUCTION: 'bg-amber-50 text-amber-600 border-amber-100',
   PACKED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
   DISPATCHED: 'bg-amber-50 text-amber-600 border-amber-100',
@@ -147,6 +161,8 @@ const STATUS_COLORS: Record<string, string> = {
   DELIVERED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
   CANCELLED: 'bg-zinc-100 text-zinc-500 border-zinc-200',
   REFUNDED: 'bg-zinc-100 text-zinc-500 border-zinc-200',
+  INPUT_RECEIVED: 'bg-blue-50 text-blue-600 border-blue-100',
+  REVISION_REQUESTED: 'bg-amber-50 text-amber-600 border-amber-100'
 };
 
 export function getOrderStatusDisplay(status: string): string {

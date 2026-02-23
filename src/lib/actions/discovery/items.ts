@@ -35,7 +35,7 @@ export async function getItemWithFullSpec(itemId: string) {
         }
         const supabase = await createClient();
 
-        const [itemRes, variantsRes, addonsRes, personalizationRes] = await Promise.all([
+        const [itemRes, variantsRes] = await Promise.all([
             supabase
                 .from('items')
                 .select('*, partners:partners(id, name, slug, city, rating, image_url, fssai_license, gstin)')
@@ -48,18 +48,7 @@ export async function getItemWithFullSpec(itemId: string) {
                 .select('*')
                 .eq('item_id', itemId)
                 .eq('is_active', true)
-                .order('price', { ascending: true }),
-            supabase
-                .from('item_addons')
-                .select('*')
-                .eq('item_id', itemId)
-                .eq('is_active', true),
-            supabase
-                .from('personalization_options')
-                .select('*')
-                .eq('item_id', itemId)
-                .eq('is_active', true)
-                .order('prep_time_mins', { ascending: true })
+                .order('price', { ascending: true })
         ]);
 
         if (itemRes.error) throw itemRes.error;
@@ -69,8 +58,6 @@ export async function getItemWithFullSpec(itemId: string) {
             ...(itemRes.data),
             partners: (itemRes.data.partners as unknown) as MappedPartner,
             variants: variantsRes.data || [],
-            item_addons: addonsRes.data || [],
-            personalization_options: personalizationRes.data || []
         };
 
         const validated = WyshkitItemSchema.safeParse(rawItem);
@@ -83,34 +70,6 @@ export async function getItemWithFullSpec(itemId: string) {
     } catch (error) {
         logger.error('Failed to get item with full spec', error, { itemId });
         return { data: null, error: 'Internal server error' };
-    }
-}
-
-/**
- * Get item reviews (Server Action)
- */
-export async function getItemReviews(itemId: string) {
-    try {
-        if (!itemId || itemId.trim() === '') {
-            return { data: null, error: 'Invalid Item ID' };
-        }
-        const supabase = await createClient();
-
-        const { data, error } = await supabase
-            .from('item_reviews')
-            .select(`
-        *,
-        user:users(full_name, email)
-      `)
-            .eq('item_id', itemId)
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        return { data: data || [], error: null };
-    } catch (error) {
-        logger.error('Failed to get item reviews', error, { itemId });
-        return { data: null, error: 'Failed to fetch reviews' };
     }
 }
 

@@ -172,8 +172,8 @@ export default async function PartnerFinancialsPage() {
             <div className="flex items-center justify-between py-2">
               <span className="text-sm text-zinc-600">Bank account</span>
               <span className="text-sm font-medium text-zinc-900">
-                {partner.payout_account_number
-                  ? `**** ${partner.payout_account_number.slice(-4)} `
+                {(partner as any).payout_account_number
+                  ? `**** ${(partner as any).payout_account_number.slice(-4)} `
                   : 'Not set'
                 }
               </span>
@@ -181,13 +181,13 @@ export default async function PartnerFinancialsPage() {
             <div className="flex items-center justify-between py-2">
               <span className="text-sm text-zinc-600">IFSC</span>
               <span className="text-sm font-medium text-zinc-900">
-                {partner.payout_ifsc || 'Not set'}
+                {(partner as any).payout_ifsc || 'Not set'}
               </span>
             </div>
             <div className="flex items-center justify-between py-2">
               <span className="text-sm text-zinc-600">Settlement cycle</span>
               <span className="text-sm font-medium text-zinc-900">
-                {partner.settlement_days || 7} days
+                {(partner as any).settlement_days || 7} days
               </span>
             </div>
           </div>

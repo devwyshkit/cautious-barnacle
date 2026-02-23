@@ -5,7 +5,7 @@ import { ORDER_STATUS } from '@/lib/types/order-status';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 import { Database, Json } from '@/lib/supabase/database.types';
-import type { Order, Tables, OrderDetails, OrderWithRelations, OrderStatusHistory, Address, Partner, OrderItem, PreviewSubmission } from '@/lib/supabase/types';
+import type { Order, Tables, OrderDetails, Address, Partner, OrderItem } from '@/lib/supabase/types';
 import { logError, handleActionError } from '@/lib/utils/error-handler';
 import { logger } from '@/lib/logging/logger';
 import { hasItemPersonalization } from '@/lib/utils/personalization';
@@ -53,7 +53,7 @@ export type PartnerOrder = Omit<Order, 'delivery_address' | 'partner'> & {
     personalization_entry?: Tables<'order_personalization'> | null;
   })[];
   order_personalization?: Tables<'order_personalization'>[];
-  latest_preview?: PreviewSubmission | null;
+  latest_preview?: Tables<'order_personalization'> | null;
   delivery_address?: Address | Address[] | null;
   partner?: Partner | Partner[] | null;
 };
@@ -306,7 +306,7 @@ export async function approve_preview(preview_submission_id: string, order_id: s
 
     // 1. Get the preview and its linked item
     const { data: preview, error: fetch_error } = await admin_supabase
-      .from('preview_submissions')
+      .from('order_personalization')
       .select('order_item_id')
       .eq('id', preview_submission_id)
       .single();
@@ -327,7 +327,7 @@ export async function approve_preview(preview_submission_id: string, order_id: s
     if (intentError) throw intentError;
 
     // Approve the preview submission record
-    await admin_supabase.from('preview_submissions').update({ status: 'approved' }).eq('id', preview_submission_id);
+    await admin_supabase.from('order_personalization').update({ status: 'approved' }).eq('id', preview_submission_id);
 
     // Update specific item status
     if (preview.order_item_id) {
@@ -458,7 +458,7 @@ export async function request_change(preview_submission_id: string, order_id: st
 
     // 1. Get the preview and its linked item
     const { data: preview, error: fetch_preview_error } = await admin_supabase
-      .from('preview_submissions')
+      .from('order_personalization')
       .select('order_item_id')
       .eq('id', preview_submission_id)
       .single();
@@ -467,7 +467,7 @@ export async function request_change(preview_submission_id: string, order_id: st
 
     // 2. Update preview status
     const { error: preview_error } = await admin_supabase
-      .from('preview_submissions')
+      .from('order_personalization')
       .update({
         status: 'change_requested',
         customer_feedback: feedback
@@ -526,10 +526,10 @@ export async function get_order_with_history(order_id: string): Promise<{ order:
     }
 
     // Cast to the robust join type we defined
-    const raw_order = data as unknown as OrderWithRelations;
+    const raw_order = data as unknown as OrderDetails;
 
     // Sort history by latest first
-    const order_status_history = (raw_order.order_status_history || []).sort((a, b) => {
+    const order_status_history_arr = ((raw_order as any).order_status_history || []).sort((a: any, b: any) => {
       const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
       const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
       return bTime - aTime;
@@ -540,9 +540,9 @@ export async function get_order_with_history(order_id: string): Promise<{ order:
       ...raw_order,
       partner_name: raw_order.partners?.name || 'Partner',
       partner_image: raw_order.partners?.image_url || null,
-      order_status_history: order_status_history,
+      order_status_history: order_status_history_arr as any,
       order_items: raw_order.order_items || []
-    };
+    } as any;
 
     return { order: mapped_order };
   } catch (error) {
@@ -560,8 +560,8 @@ export async function get_my_orders(): Promise<{ data?: any[]; error?: string }>
     if (!user) throw new Error('Not authenticated');
 
     const { data, error } = await supabase
-      .from('v_orders_detailed')
-      .select('id, order_number, status, total, created_at, partner_name, partner_image, items, has_personalization, personalization_status')
+      .from('v_order_tracking')
+      .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 

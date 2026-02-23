@@ -11,17 +11,26 @@ import type { Tables, Views } from '@/lib/supabase/types';
 import type { PersonalizationConfig, SelectedPersonalization, SelectedAddon } from './personalization';
 
 // View type from Supabase
-export type ViewOrderDetailed = Views<'v_orders_detailed'>;
+export type ViewOrderDetailed = Views<'v_order_tracking'>;
 
 import type { Order, OrderItem, OrderPersonalization } from '@/lib/supabase/types';
 export type { OrderItem, OrderPersonalization };
 
 /**
  * OrderListItem: Unified shape for order lists.
- * Derives directly from v_orders_detailed view.
+ * Derives directly from v_order_tracking view.
  */
-export interface OrderListItem extends ViewOrderDetailed {
-  // Computed/UI-only fields that might not be in the view but are needed for legacy UI
+export interface OrderListItem {
+  id: string;
+  order_number: string;
+  status: string;
+  total: number;
+  created_at: string;
+  has_personalization?: boolean | null;
+  personalization_status?: string | null;
+  partner_name: string | null;
+  partner_image: string | null;
+  items: any[];
   item_count?: number;
   first_item_image?: string | null;
   first_item_name?: string | null;
@@ -95,10 +104,10 @@ export interface OrderStatusHistory {
 }
 
 export interface OrderDetail extends Order {
-  preview_submissions?: PreviewSubmission[];
+  order_personalization?: PreviewSubmission[];
   personalizations?: OrderPersonalization[];
   order_items?: OrderItemDetail[];
-  order_status_history?: OrderStatusHistory[];
+  status_history?: Record<string, any>[] | null;
 
   // Composite/Joins
   partners?: Pick<Tables<'partners'>, 'name' | 'image_url'> | null;

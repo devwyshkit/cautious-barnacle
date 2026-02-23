@@ -53,18 +53,33 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
     const fetchRecentOrders = async () => {
       const supabase = createClient();
       const { data, error } = await supabase
-        .from('v_orders_detailed')
-        .select('id, order_number, items, total, created_at, partner_name')
+        .from('orders')
+        .select(`
+          id, order_number, total, created_at,
+          partners(name),
+          order_items(item_id, item_name, quantity, variant_id, items(images))
+        `)
         .eq('user_id', user.id)
         .in('status', ['DELIVERED', 'DISPATCHED', 'PACKED', 'APPROVED', 'IN_PRODUCTION'])
         .order('created_at', { ascending: false })
         .limit(3);
 
       if (!error && data) {
-        setRecentOrders(data as RecentOrder[]);
+        const mappedData: RecentOrder[] = data.map((row: any) => ({
+          ...row,
+          partner_name: row.partners?.name,
+          items: (row.order_items || []).map((oi: any) => ({
+            item_id: oi.item_id,
+            item_name: oi.item_name,
+            quantity: oi.quantity,
+            images: oi.items?.images || [],
+            variant_id: oi.variant_id
+          }))
+        }));
+        setRecentOrders(mappedData);
 
         // Fetch current stock for these items
-        const itemIds = Array.from(new Set((data as any[]).flatMap(order => order.items.map((i: any) => i.item_id))));
+        const itemIds = Array.from(new Set(mappedData.flatMap(order => order.items.map((i: any) => i.item_id))));
         if (itemIds.length > 0) {
           const { data: stockData } = await supabase
             .from('items')
@@ -192,8 +207,8 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
               onClick={() => handleReorder(order)}
               disabled={isPending || isReordering || !isOrderAvailable}
               className={cn(
-                "shrink-0 w-[260px] bg-white rounded-xl border border-zinc-100 overflow-hidden",
-                "hover:border-zinc-200 hover:shadow-lg transition-all duration-300",
+                "shrink-0 w-[260px] bg-zinc-50/50 rounded-xl border border-zinc-100/50 overflow-hidden",
+                "hover:bg-white hover:border-zinc-200 hover:shadow-sm transition-all duration-300",
                 "active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed",
                 !isOrderAvailable && "grayscale",
                 "group slide-in-from-bottom-2",

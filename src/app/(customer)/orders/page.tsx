@@ -14,23 +14,23 @@ export default async function OrdersPage() {
         redirect("/auth?intent=signin&returnUrl=/orders");
     }
 
-    // WYSHKIT 2026: Use v_orders_detailed for rich context (items, partner_image)
-    const { data: orders, error } = await supabase
-        .from('v_orders_detailed')
-        .select('id, order_number, status, total, created_at, delivery_address, partner_name, partner_image, items, has_personalization, personalization_status')
+    // WYSHKIT 2026: Direct lookup on orders table
+    const { data: dbOrders, error } = await supabase
+        .from('orders')
+        .select('id, order_number, status, total, created_at, delivery_address, has_personalization, personalization_status, partners(name, image_url), order_items(item_name)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
 
     // Map DB orders to OrderListItem for the component
-    const mappedOrders = ((orders as any[]) || []).map((row) => ({
+    const mappedOrders = ((dbOrders as any[]) || []).map((row) => ({
         ...row,
         order_number: row.order_number ?? null,
         created_at: row.created_at ?? null,
-        partner_name: row.partner_name ?? null,
-        item_count: row.items?.length || 1,
-        first_item_image: row.partner_image ?? null,
-        first_item_name: row.items?.map((it: any) => it.item_name).join(', ') || null,
+        partner_name: row.partners?.name ?? null,
+        item_count: row.order_items?.length || 1,
+        first_item_image: row.partners?.image_url ?? null,
+        first_item_name: row.order_items?.[0]?.item_name || null,
         has_personalization: row.has_personalization || false,
         personalization_status: row.personalization_status || null,
     }));
@@ -49,7 +49,7 @@ export default async function OrdersPage() {
                         </p>
                     </div>
                     <span className="text-xs font-black text-zinc-500 tracking-tight bg-white px-3 py-1.5 rounded-full border border-zinc-100 shadow-sm">
-                        {orders?.length || 0} Total
+                        {dbOrders?.length || 0} Total
                     </span>
                 </div>
 
@@ -57,7 +57,7 @@ export default async function OrdersPage() {
                     <div className="p-8 text-center bg-white rounded-xl border border-zinc-100 shadow-sm">
                         <p className="text-sm font-medium text-zinc-500">Failed to load orders. Please try again.</p>
                     </div>
-                ) : !orders || orders.length === 0 ? (
+                ) : !dbOrders || dbOrders.length === 0 ? (
                     <div className="p-12 text-center bg-white rounded-xl border border-zinc-100 shadow-sm">
                         <div className="size-16 rounded-full bg-zinc-50 flex items-center justify-center mx-auto mb-4 border border-zinc-100">
                             <Package className="size-8 text-zinc-300" />

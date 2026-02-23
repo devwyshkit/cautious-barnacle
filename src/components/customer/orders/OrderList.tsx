@@ -28,10 +28,10 @@ export function OrderList({ initialOrders }: OrderListProps) {
       if (!session) return;
 
       const query = supabase
-        .from("v_orders_detailed")
-        .select("id, order_number, status, total, created_at, partner_name, partner_image, items")
-        .eq("user_id", session.user.id) // Changed from userId to user_id, and user.id to session.user.id
-        .order("created_at", { ascending: false }); // Changed from createdAt to created_at
+        .from("orders")
+        .select("id, order_number, status, total, created_at, has_personalization, personalization_status, partners(name, image_url), order_items(item_name)")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: false });
 
       const { data, error } = await query;
 
@@ -45,11 +45,12 @@ export function OrderList({ initialOrders }: OrderListProps) {
         ...row,
         order_number: row.order_number,
         created_at: row.created_at,
-        partner_name: row.partner_name,
+        partner_name: row.partners?.name || null,
         // UI-only computed fields
-        item_count: row.items?.length || 1,
-        first_item_image: row.partner_image || null,
-        first_item_name: row.items?.map((it: any) => it.item_name).join(', ') || null,
+        item_count: row.order_items?.length || 1,
+        first_item_image: row.partners?.image_url || null,
+        first_item_name: row.order_items?.[0]?.item_name || null,
+        items: row.order_items || [],
       }));
       setOrders(mapped);
     } catch (err: unknown) {

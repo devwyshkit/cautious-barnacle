@@ -9,7 +9,7 @@
  */
 
 import type { Tables } from '@/lib/supabase/database.types';
-import type { ItemWithFullSpec, PersonalizationOption as DBPersonalizationOption, Variant, ItemAddon } from '@/lib/supabase/types';
+import type { ItemWithFullSpec, Variant } from '@/lib/supabase/types';
 import { ValidatedWyshkitItem } from '../validations/discovery';
 
 export type { Item } from '@/lib/supabase/types';
@@ -29,7 +29,7 @@ export type ItemListItem = Tables<'items'> & {
  * WyshkitItem: The standard item shape for all discovery components.
  * Derives directly from Supabase 'items' table plus joins.
  */
-export interface WyshkitItem extends Omit<Tables<'items'>, 'personalization_options' | 'variants'> {
+export interface WyshkitItem extends Omit<Tables<'items'>, 'variants'> {
   // UI Computed & Joined fields
   price?: number; // Normalized price (base_price or variant price)
   image_url?: string | null;
@@ -47,11 +47,6 @@ export interface WyshkitItem extends Omit<Tables<'items'>, 'personalization_opti
     image_url?: string;
   } | null;
   variants?: Array<Tables<'variants'> & { price: number | null; stock_quantity: number | null }>;
-  item_addons?: Tables<'item_addons'>[];
-  personalization_options?: Tables<'personalization_options'>[];
   elite_signals?: ValidatedWyshkitItem['elite_signals'];
 }
-
-// Re-export from Supabase Types for consistency
-export type { PersonalizationOption } from '@/lib/supabase/types';
 

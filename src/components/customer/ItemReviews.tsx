@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
-import { getItemReviews } from "@/lib/actions/discovery/items";
+import { createClient } from "@/lib/supabase/client";
 import { submitItemReview } from "@/lib/actions/partner/catalog";
 import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
 
@@ -41,9 +41,14 @@ export function ItemReviews({ itemId, initialReviews }: ItemReviewsProps) {
   useEffect(() => {
     if (!initialReviews) {
       startTransition(async () => {
-        const result = await getItemReviews(itemId);
-        if (result.data) {
-          setReviews(result.data);
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('item_reviews' as any)
+          .select('id, rating, comment, created_at, users(full_name, email)')
+          .eq('item_id', itemId)
+          .order('created_at', { ascending: false });
+        if (data) {
+          setReviews(data);
         }
         setLoading(false);
       });
@@ -70,10 +75,13 @@ export function ItemReviews({ itemId, initialReviews }: ItemReviewsProps) {
         setComment("");
         setRating(5);
         // Refresh reviews
-        const refreshed = await getItemReviews(itemId);
-        if (refreshed.data) {
-          setReviews(refreshed.data);
-        }
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('item_reviews' as any)
+          .select('id, rating, comment, created_at, users(full_name, email)')
+          .eq('item_id', itemId)
+          .order('created_at', { ascending: false });
+        if (data) setReviews(data);
       } else {
         triggerHaptic(HapticPattern.ERROR);
         toast.error(result.error || "Failed to submit review");

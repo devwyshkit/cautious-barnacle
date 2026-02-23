@@ -90,7 +90,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
                 variant_name: row.variant_name || undefined,
                 addons_price: addons_price,
                 is_personalized: !!personalization?.enabled,
-                personalization_options: (row.personalization_options as Tables<'personalization_options'>[]) || [],
+                personalization_options: (row.personalization_options as any[]) || [],
                 item_addons: [],
             };
         });

@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createAdminClient();
 
     // 1. Log Webhook for Audit (Elite Pattern)
-    const { data: log, error: logError } = await supabase.from('webhook_logs').insert({
+    const { data: log, error: logError } = await supabase.from('webhook_logs' as any).insert({
       source: 'shadowfax',
       external_id: awb_number || client_order_id,
       payload: body
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
     const { data: transitioned, error: transitionError } = await supabase.rpc('transition_order_status', {
       p_order_id: client_order_id,
       p_new_status: targetStatus,
-      p_metadata: { webhook_log_id: log?.id }
+      p_metadata: { webhook_log_id: (log as any)?.id }
     });
 
     if (transitionError) {
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     if (transitioned) {
       // 4. Mark log as processed
       if (log) {
-        await supabase.from('webhook_logs').update({ processed_at: new Date().toISOString() }).eq('id', log.id);
+        await supabase.from('webhook_logs' as any).update({ processed_at: new Date().toISOString() }).eq('id', (log as any).id);
       }
 
       // 5. Trigger Post-Delivery Events

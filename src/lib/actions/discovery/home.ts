@@ -58,7 +58,13 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
 
         if (error) {
             logError(error, 'GetHomeSurfaceContext');
-            return { sections: [], categories: [], activeOrders: [] };
+            return {
+                sections: [],
+                categories: [],
+                trendingItems: [],
+                featuredPartners: [],
+                activeOrders: []
+            };
         }
 
         const raw = data as any;
@@ -86,6 +92,8 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
         return {
             sections,
             categories: resolvedCategories,
+            trendingItems: raw.trendingItems || [],
+            featuredPartners: raw.featuredPartners || [],
             activeOrders: raw.activeOrders || [],
             metadata: {
                 system_status,
@@ -94,7 +102,13 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
         };
     } catch (error) {
         logError(error, 'GetHomeSurfaceContextCatch');
-        return { sections: [], categories: [], activeOrders: [] };
+        return {
+            sections: [],
+            categories: [],
+            trendingItems: [],
+            featuredPartners: [],
+            activeOrders: []
+        };
     }
 });
 

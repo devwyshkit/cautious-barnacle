@@ -9,8 +9,6 @@ import {
   Item,
   OrderItem,
   OrderWithItems,
-  OrderWithRelations,
-  PreviewSubmission,
   Tables
 } from '@/lib/supabase/types';
 import { ShadowfaxService } from '@/lib/services/shadowfax';
@@ -46,7 +44,7 @@ export async function get_partner_orders(
         id, status, total, subtotal, order_number, created_at, has_personalization, personalization_input, payment_id, delivery_fee, platform_fee, gst, discount, partner_id,
         order_items (*),
         order_personalization (*),
-        preview_submissions (*),
+        order_personalization (*),
         delivery_address:addresses(*),
         partner:partners(*)
       `)
@@ -62,7 +60,7 @@ export async function get_partner_orders(
 
     const mapped_data = (data || []).map(order => ({
       ...order,
-      latest_preview: order.preview_submissions?.[0] || null
+      latest_preview: order.order_personalization?.[0] || null
     })) as unknown as PartnerOrder[];
 
     return { data: mapped_data };
@@ -110,7 +108,7 @@ export type ItemWithCounts = Item & {
   total_stock?: number;
   personalization_count?: number;
   variants: Partial<Tables<'variants'>>[];
-  personalization_options: Partial<Tables<'personalization_options'>>[];
+  personalization_options: any;
 };
 
 export async function get_partner_items(partner_id: string): Promise<{ data?: ItemWithCounts[]; error?: string }> {
@@ -265,7 +263,7 @@ export async function get_personalization_queue(partner_id: string): Promise<{
 
     const order_ids = orders.map(o => o.id);
     const { data: previews } = await supabase
-      .from('preview_submissions')
+      .from('order_personalization')
       .select('order_id, preview_url, status, submitted_at, customer_feedback, partner_notes')
       .in('order_id', order_ids)
       .order('submitted_at', { ascending: false });
@@ -277,7 +275,7 @@ export async function get_personalization_queue(partner_id: string): Promise<{
       }));
 
       // For latest_preview at order level, we'll take the most recent one overall
-      const latest_preview = ((previews as unknown as PreviewSubmission[]) || [])
+      const latest_preview = ((previews as unknown as Tables<'order_personalization'>[]) || [])
         .filter(p => p.order_id === order.id)
         .sort((a, b) => {
           const aTime = a.submitted_at ? new Date(a.submitted_at).getTime() : 0;
@@ -336,7 +334,7 @@ export async function upload_preview(
     // WYSHKIT 2026: Combined Update (Stateless/Atomic)
     // We insert the preview linked to the specific item
     const { error: preview_error } = await supabase
-      .from('preview_submissions')
+      .from('order_personalization')
       .insert({
         order_id: order_id,
         order_item_id: order_item_id, // Relational Mapping

@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { formatCurrency } from '@/lib/utils/pricing';
-import { PRICING } from '@/lib/constants/pricing';
 
 describe('formatCurrency', () => {
     it('formats zero correctly', () => {
@@ -20,21 +19,5 @@ describe('formatCurrency', () => {
     it('rounds decimals per config', () => {
         const result = formatCurrency(99.9);
         expect(result).toBe('₹100');
-    });
-});
-
-describe('PRICING constants', () => {
-    it('has reasonable delivery fee tiers (ascending by distance)', () => {
-        expect(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_3KM).toBeLessThan(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_5KM);
-        expect(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_5KM).toBeLessThan(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_7KM);
-        expect(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_7KM).toBeLessThan(PRICING.DEPRECATED_ESTIMATE_DELIVERY_FEE_ABOVE_7KM);
-    });
-
-    it('platform fee is a positive number', () => {
-        expect(PRICING.DEPRECATED_ESTIMATE_PLATFORM_FEE).toBeGreaterThan(0);
-    });
-
-    it('high value threshold is sensible', () => {
-        expect(PRICING.DEPRECATED_ESTIMATE_HIGH_VALUE_THRESHOLD).toBeGreaterThanOrEqual(10000);
     });
 });

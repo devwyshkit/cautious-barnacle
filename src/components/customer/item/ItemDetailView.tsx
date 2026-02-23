@@ -56,8 +56,8 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
 
 
     const variantsArray = Array.isArray(item?.variants) ? item.variants : [];
-    const addonsArray = Array.isArray(item?.item_addons) ? item.item_addons : [];
-    const personalizationArray = Array.isArray(item?.personalization_options) ? item.personalization_options : [];
+    const addonsArray: any[] = []; // Deprecated table
+    const personalizationArray: any[] = Array.isArray(item?.personalization_options) ? item.personalization_options as any[] : [];
 
     const selectedVariant = useMemo(() => {
         return variantsArray.find(v => String(v.id) === selectedVariantId) || null;
@@ -463,13 +463,13 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
                                 <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Dimensions</span>
                                 <span className="text-xs font-semibold text-zinc-900">
-                                    {item.length_cm || '–'} × {item.width_cm || '–'} × {item.height_cm || '–'} cm
+                                    {item.dimensions ? (typeof item.dimensions === 'string' ? item.dimensions : JSON.stringify(item.dimensions).replace(/["{}]/g, '').replace(/:/g, ': ')) : '–'}
                                 </span>
                             </div>
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
                                 <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Weight</span>
                                 <span className="text-xs font-semibold text-zinc-900">
-                                    {item.weight_kg ? `${item.weight_kg} kg` : item.weight_grams ? `${item.weight_grams} g` : '–'}
+                                    {item.net_weight || '–'}
                                 </span>
                             </div>
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">

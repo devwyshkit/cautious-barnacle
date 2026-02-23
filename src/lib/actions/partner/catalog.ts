@@ -163,9 +163,8 @@ export async function deleteItem(itemId: string) {
             .eq('id', itemId)
             .single();
 
-        // Cascade deletions (variants, reviews)
+        // Cascade deletions (variants)
         await supabase.from('variants').delete().eq('item_id', itemId);
-        await supabase.from('item_reviews').delete().eq('item_id', itemId);
 
         const { error } = await supabase
             .from('items')

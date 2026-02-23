@@ -175,7 +175,7 @@ export function useOrderRealtime({
     // 3. Previews — optimistic insert/update
     orderChannel.on(
       'postgres_changes',
-      { event: '*', schema: 'public', table: 'preview_submissions', filter: `order_id=eq.${orderId}` },
+      { event: '*', schema: 'public', table: 'order_personalization', filter: `order_id=eq.${orderId}` },
       (payload) => {
         if (payload.eventType === 'INSERT') {
           const newPreview = payload.new as PreviewSubmission;

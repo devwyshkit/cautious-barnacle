@@ -3,27 +3,30 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MappedPartner } from '@/lib/types/partner';
-import { BlocksEngine } from '@/components/ui/BlocksEngine';
 import { useRouter } from 'next/navigation';
 import { useCartValidation } from '@/hooks/useCartValidation';
 import { AlertCircle } from 'lucide-react';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-
-const FALLBACK_IMAGE = '/images/logo.png';
+import { StoreHeader } from '@/components/ui/blocks/store/StoreHeader';
+import { CircleRail } from '@/components/ui/blocks/discovery/CircleRail';
+import { WyshkitItem } from '@/lib/types/item';
+import { ItemCard } from '@/components/ui/ItemCard';
 
 interface PartnerStorePageProps {
   partnerId: string;
   initialData?: MappedPartner;
-  blocks: any[];
+  items: WyshkitItem[];
+  itemsGroupedByCategory: Record<string, WyshkitItem[]>;
+  categories: any[];
 }
 
-export function PartnerStorePage({ partnerId, initialData, blocks }: PartnerStorePageProps) {
+export function PartnerStorePage({ partnerId, initialData, items, itemsGroupedByCategory, categories }: PartnerStorePageProps) {
   const router = useRouter();
 
   // WYSHKIT 2026: Proactive Cart Validation
   const { isMismatch } = useCartValidation(partnerId);
 
-  if (!initialData || !blocks) {
+  if (!initialData || !items) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] p-6 text-center bg-background">
         <p className="text-sm font-medium text-zinc-900">Partner data not available</p>
@@ -56,13 +59,39 @@ export function PartnerStorePage({ partnerId, initialData, blocks }: PartnerStor
         </div>
       )}
 
-      {/* SDUI ENGINE RENDERING */}
-      <BlocksEngine
-        blocks={blocks}
-        context={{
-          partner_id: partnerId
-        }}
-      />
+      {/* CORE STORE UI - ZERO SDUI LEAKS */}
+      <div className="flex flex-col gap-6">
+        <StoreHeader data={{
+          id: initialData.id,
+          name: initialData.name,
+          image_url: initialData.image_url ?? undefined,
+          rating: initialData.rating ?? undefined,
+          city: initialData.city ?? undefined,
+          prep_hours: initialData.prep_hours ?? undefined
+        }} />
+
+        <section className="px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+          <CircleRail data={categories} />
+        </section>
+
+        <div className="flex flex-col gap-10 px-4 md:px-8 max-w-[1440px] mx-auto w-full pb-12">
+          {Object.entries(itemsGroupedByCategory).map(([category, categoryItems]) => (
+            <section key={category} id={category.toLowerCase()} className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-black text-zinc-950 tracking-tighter capitalize">{category}</h2>
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-50 px-2 py-0.5 rounded-full border border-zinc-100">
+                  {categoryItems.length} {categoryItems.length === 1 ? 'Item' : 'Items'}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                {categoryItems.map((item) => (
+                  <ItemCard key={item.id} data={item} variant="portrait" />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

@@ -13,12 +13,16 @@ import { cn } from "@/lib/utils";
 import { SurfaceErrorBoundaryWithRouter } from "@/components/error/SurfaceErrorBoundary";
 
 
+import { CircleRail } from "@/components/ui/blocks/discovery/CircleRail";
+import { CardRail } from "@/components/ui/blocks/discovery/CardRail";
+import { Grid } from "@/components/ui/blocks/discovery/Grid";
+import { BannerBento } from "@/components/ui/blocks/discovery/BannerBento";
+
 interface HomePageProps {
   searchParams: Promise<{ category?: string }>;
 }
 
-// export const experimental_ppr = true; // Enable when confirmed on Next.js 15 with PPR flag
-export const dynamic = 'force-dynamic'; // Ensure location-based content is always fresh
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { category = null } = await searchParams;
@@ -26,41 +30,52 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // WYSHKIT 2026: Elite Surface Aggregator (One Trip)
-  // Consolidates Categories, Trending Items, Featured Partners, and Active Orders.
   const discovery = await getHomeSurfaceContext(
     location.lat || undefined,
     location.lng || undefined,
     user?.id
   );
 
-  const bannerItems = (discovery.sections?.find((s: any) => s.id === 'trending')?.data || []).slice(0, 3);
-  const discoveryItems = (discovery.sections?.find((s: any) => s.id === 'trending')?.data || []).slice(0, 12);
-
   return (
     <div className="min-h-screen max-w-[1440px] mx-auto animate-in font-sans selection:bg-[#D91B24]/10 bg-white">
       <main className="pb-24">
         <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
 
-        {/* WYSHKIT 2026: Real-time Contextual Masthead */}
         <Masthead
           status={discovery.metadata?.system_status as 'normal' | 'delayed' | 'capacity'}
           locationName={location.name || 'Your Area'}
         />
 
-        {/* WYSHKIT 2026: Intent-based Reorder Widget */}
         {!category && discovery.activeOrders?.length > 0 && (
           <ReorderWidget initialOrders={discovery.metadata?.orders} />
         )}
 
-        {discovery.sections && (
-          <div className="mt-2">
-            <BlocksEngine
-              blocks={discovery.sections}
-              context={{ ...discovery.metadata, selected_category: category }}
-            />
-          </div>
-        )}
+        <div className="mt-2 flex flex-col gap-8">
+          {/* Categories */}
+          <section className="px-4 md:px-8">
+            <CircleRail data={discovery.categories} context={{ selected_category: category }} />
+          </section>
+
+          {/* Trending Items */}
+          {discovery.trendingItems?.length > 0 && (
+            <section className="px-4 md:px-8">
+              <div className="flex flex-col gap-4">
+                <h2 className="text-xl font-black text-zinc-950 tracking-tighter">Trending Around You</h2>
+                <CardRail data={discovery.trendingItems} />
+              </div>
+            </section>
+          )}
+
+          {/* Featured Stores */}
+          {discovery.featuredPartners?.length > 0 && (
+            <section className="px-4 md:px-8">
+              <div className="flex flex-col gap-4">
+                <h2 className="text-xl font-black text-zinc-950 tracking-tighter">Top Stores Near You</h2>
+                <Grid data={discovery.featuredPartners} />
+              </div>
+            </section>
+          )}
+        </div>
       </main>
     </div>
   );

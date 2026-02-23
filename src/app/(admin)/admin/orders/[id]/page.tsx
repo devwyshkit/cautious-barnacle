@@ -14,7 +14,7 @@ async function getOrder(id: string) {
       order_status_history(id, title, description, type, created_at),
       deliveries(*, delivery_updates(*)),
       order_personalization(*),
-      preview_submissions(*)
+      order_personalization(*)
     `)
     .eq('id', id)
     .single()

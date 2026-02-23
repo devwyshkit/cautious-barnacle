@@ -19,7 +19,6 @@ type OrderWithRelations = Tables<'orders'> & {
   order_status_history: Pick<Tables<'order_status_history'>, 'id' | 'title' | 'description' | 'type' | 'created_at'>[]
   deliveries: (Tables<'deliveries'> & { delivery_updates: Tables<'delivery_updates'>[] })[]
   order_personalization: Tables<'order_personalization'>[]
-  preview_submissions: Tables<'preview_submissions'>[]
 }
 
 interface OrderDetailProps {

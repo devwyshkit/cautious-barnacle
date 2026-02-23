@@ -44,7 +44,7 @@ export function usePartnerRealtime({
                 id, status, total, subtotal, order_number, created_at, has_personalization, personalization_input, payment_id, delivery_fee, platform_fee, gst, discount, partner_id,
                 order_items (*),
                 order_personalization (*),
-                preview_submissions (*),
+                order_personalization (*),
                 delivery_address:addresses(*),
                 partner:partners(*)
             `)
@@ -58,7 +58,7 @@ export function usePartnerRealtime({
 
         const enrichedOrder = {
             ...data,
-            latest_preview: (data as any).preview_submissions?.[0] || null
+            latest_preview: (data as any).order_personalization?.[0] || null
         } as unknown as PartnerOrder;
 
         return enrichedOrder;

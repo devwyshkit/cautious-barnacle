@@ -71,9 +71,9 @@ interface ItemFormProps {
   partnerId: string;
   item?: Item & {
     variants?: Variant[];
-    personalization_options?: PersonalizationOption[];
-    addons?: Addon[];
-    item_addons?: Addon[];
+    personalization_options?: any;
+    addons?: any;
+    item_addons?: any;
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -113,8 +113,8 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
     preview_time_minutes: item?.preview_time_minutes || 60,
     material: item?.material || '',
     capacity: item?.capacity || '',
-    weight_grams: item?.weight_grams || 0,
-    dimensions_cm: (item?.dimensions_cm as any) || { length: 0, width: 0, height: 0 },
+    weight_grams: item?.net_weight ? parseInt((item.net_weight as string).replace(/\D/g, ''), 10) || 0 : 0,
+    dimensions_cm: typeof item?.dimensions === 'object' && item?.dimensions !== null ? (item.dimensions as any) : { length: 0, width: 0, height: 0 },
     hsn_code: item?.hsn_code || '',
     gst_percentage: item?.gst_percentage ? Number(item.gst_percentage) : 18.00,
   });

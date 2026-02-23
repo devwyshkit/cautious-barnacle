@@ -14,7 +14,7 @@ export default async function ItemPage({
 
   // WYSHKIT 2026: Immersive Store Context
   // Tapping a shared link to an item should show the store in the background, not a standalone page.
-  const { partner, items, blocks, error } = await getPartnerStoreData(id);
+  const { partner, items, itemsGroupedByCategory, categories, error } = await getPartnerStoreData(id);
 
   const item = items?.find(i => String(i.id) === itemId);
 
@@ -27,7 +27,9 @@ export default async function ItemPage({
       <PartnerStorePage
         partnerId={id}
         initialData={(partner as unknown) as MappedPartner}
-        blocks={blocks}
+        items={items}
+        itemsGroupedByCategory={itemsGroupedByCategory}
+        categories={categories}
       />
 
       <InterceptedItemSheet

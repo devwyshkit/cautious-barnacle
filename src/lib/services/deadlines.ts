@@ -83,16 +83,14 @@ export async function enforce_design_deadlines() {
         if (preview_timeouts && preview_timeouts.length > 0) {
             for (const order of preview_timeouts) {
                 const { data: preview } = await supabase
-                    .from('preview_submissions')
-                    .select('id')
+                    .from('order_personalization')
+                    .select('order_id')
                     .eq('order_id', order.id)
-                    .eq('status', 'pending')
-                    .order('submitted_at', { ascending: false })
                     .limit(1)
                     .maybeSingle();
 
                 if (preview) {
-                    await supabase.from('preview_submissions').update({ status: 'approved' }).eq('id', preview.id);
+                    await supabase.from('order_personalization').update({ status: 'approved', approved_at: now_iso }).eq('order_id', order.id);
                     await supabase.from('orders').update({
                         personalization_status: 'approved',
                         approved_at: now_iso,

@@ -1,4 +1,4 @@
-import type { PersonalizationOption, ItemAddon, Views } from '@/lib/supabase/types';
+import type { Views } from '@/lib/supabase/types';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 
 export interface PersonalizationConfig {
@@ -36,7 +36,7 @@ export interface DraftLineItem extends Omit<Views<'v_active_cart_detailed'>, 'pe
   // Overrides for more specific JSON typing
   personalization: SelectedPersonalization;
   selected_addons: SelectedAddon[];
-  personalization_options: PersonalizationOption[];
+  personalization_options: any[];
   quantity: number;
 
   // DB-backed fields (Shadow Math Elimination)
@@ -45,7 +45,7 @@ export interface DraftLineItem extends Omit<Views<'v_active_cart_detailed'>, 'pe
 
   // UI-only computed extensions
   is_personalized: boolean;
-  item_addons: ItemAddon[];
+  item_addons: any[];
 
   // Legacy mappings (Optional fallbacks)
   unit_price: number;

@@ -42,7 +42,7 @@ export const getPartnerStoreData = cache(async (partnerId: string, category?: st
 
         // 2. Fetch Partner Items (Filtered by Category if provided)
         let query = supabase
-            .from('v_partner_store_items')
+            .from('v_partner_listings')
             .select('*')
             .eq('partner_id', partnerId);
 
@@ -58,49 +58,33 @@ export const getPartnerStoreData = cache(async (partnerId: string, category?: st
 
         const items = (itemsData as unknown as WyshkitItem[]) || [];
 
-        // 3. Fetch Distinct Categories for this Partner (for CircleRail)
+        // 3. Fetch Distinct Categories for this Partner (for navigation/filtering)
         const { data: catData } = await supabase
             .from('items')
             .select('category')
             .eq('partner_id', partnerId)
             .eq('is_active', true);
 
-        const distinctCategories = Array.from(new Set(catData?.map(i => i.category).filter(Boolean)))
-            .map(c => ({ id: c, name: c, slug: c, image_url: null })); // Simplified for now
+        const groupedItems = items.reduce((acc: any, item: any) => {
+            const cat = item.category || 'Other';
+            if (!acc[cat]) acc[cat] = [];
+            acc[cat].push({ ...item, partner_name: partner.name });
+            return acc;
+        }, {});
 
-        // 4. Construct SDUI Blocks
-        const blocks = [
-            {
-                id: 'store_header',
-                type: 'STORE_HEADER',
-                data: partner
-            },
-            {
-                id: 'category_rail',
-                type: 'CIRCLE_RAIL',
-                title: 'Categories',
-                data: [{ id: 'all', name: 'All', slug: 'All' }, ...distinctCategories]
-            },
-            {
-                id: 'items_grid',
-                type: 'PARTNER_GROUPED_GRID',
-                title: category ? `Results for ${category}` : 'All Items',
-                data: items.map(item => ({
-                    ...item,
-                    partner_name: partner.name // Required for PartnerGroupedGrid
-                }))
-            }
-        ];
+        const categories = Array.from(new Set(catData?.map(i => i.category).filter(Boolean)))
+            .map(c => ({ id: c, name: c, slug: c }));
 
         return {
             partner,
-            items,
-            blocks,
+            items: items.map(item => ({ ...item, partner_name: partner.name })),
+            itemsGroupedByCategory: groupedItems,
+            categories: [{ id: 'all', name: 'All', slug: 'All' }, ...categories],
             error: null
         };
     } catch (error) {
         logger.error('Unexpected error in getPartnerStoreData', error, { partnerId });
-        return { partner: null, items: [], blocks: [], error: 'Failed to fetch partner store data' };
+        return { partner: null, items: [], categories: [], error: 'Failed to fetch partner store data' };
     }
 });
 

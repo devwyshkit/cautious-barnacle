@@ -59,6 +59,7 @@ export function InterceptedItemSheet({ item, onCloseOverride }: InterceptedItemS
             description={`View details and add ${item.name || 'this item'} to your cart.`}
             className="md:max-w-[520px]"
             showClose={false}
+            lean
         >
             <div className="flex-1 relative h-full">
                 <ItemDetailView

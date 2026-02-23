@@ -46,7 +46,7 @@ export default async function PartnerPage({
 }
 
 async function AsyncPartnerContent({ id, category }: { id: string; category?: string }) {
-  const { partner, blocks, error } = await getPartnerStoreData(id, category);
+  const { partner, items, itemsGroupedByCategory, categories, error } = await getPartnerStoreData(id, category);
 
   if (!partner || error) {
     notFound();
@@ -56,7 +56,9 @@ async function AsyncPartnerContent({ id, category }: { id: string; category?: st
     <PartnerStorePage
       partnerId={id}
       initialData={(partner as unknown) as MappedPartner}
-      blocks={blocks}
+      items={items}
+      itemsGroupedByCategory={itemsGroupedByCategory}
+      categories={categories}
     />
   );
 }
