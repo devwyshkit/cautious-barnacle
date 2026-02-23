@@ -109,7 +109,7 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
         const itemName = item.item_name || 'Product';
         const quantity = item.quantity || 1;
         const unitPrice = item.unit_price || 0;
-        const totalPrice = item.total_price || 0;
+        const totalPrice = (item as any).total_price || (item as any).line_total || 0;
 
         return [
             itemName,

@@ -14,7 +14,7 @@ interface SearchParams {
 }
 
 interface SearchResults {
-  items: Tables<'v_item_listings'>[];
+  items: Tables<'v_item_listings_search'>[];
   partners: Tables<'v_partners_detailed'>[];
   total: number;
 }

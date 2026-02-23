@@ -158,14 +158,14 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
           <button
             onClick={handleUseCurrentLocation}
             disabled={usingGeolocation}
-            className="w-full flex items-center gap-4 p-4 rounded-2xl border border-zinc-100 hover:bg-zinc-50 hover:border-zinc-200 transition-all text-left group"
+            className="w-full flex items-center gap-4 p-4 rounded-xl border border-zinc-100 hover:bg-zinc-50 hover:border-zinc-200 transition-all text-left group"
           >
             <div className="size-10 rounded-xl bg-rose-50 flex items-center justify-center shrink-0 border border-rose-100/50 group-hover:bg-rose-100 transition-colors">
               {usingGeolocation ? <Loader2 className="size-4 animate-spin text-[#D91B24]" /> : <Locate className="size-4 text-[#D91B24]" />}
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold text-zinc-900">{usingGeolocation ? 'Pinpointing location…' : 'Use current location'}</span>
-              <span className="text-xs font-black text-[#D91B24] tracking-wider mt-0.5 leading-none">Using GPS</span>
+              <span className="text-xs font-black text-[#D91B24] tracking-tight mt-0.5 leading-none">Using GPS</span>
             </div>
           </button>
 
@@ -189,7 +189,7 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
           )}
 
           {(!user || addresses.length === 0) && (
-            <div className="py-12 px-6 rounded-[2rem] bg-zinc-50/50 border border-zinc-100 text-center space-y-4">
+            <div className="py-12 px-6 rounded-xl bg-zinc-50/50 border border-zinc-100 text-center space-y-4">
               <div className="size-10 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center mx-auto">
                 <Navigation className="size-5 text-[var(--primary)]" />
               </div>

@@ -18,7 +18,7 @@ export async function validateGSTINAction(gstin: string): Promise<GSTINValidatio
     // Clear GSTIN if empty
     const { executeCommerceIntent } = await import('./intent-engine');
     await executeCommerceIntent({ intent: 'SET_GSTIN', payload: { gstin: null } });
-    revalidatePath('/checkout');
+    revalidatePath('/');
     return { valid: true };
   }
 
@@ -39,6 +39,6 @@ export async function validateGSTINAction(gstin: string): Promise<GSTINValidatio
   const cookieStore = await cookies();
   cookieStore.set('gstin', trimmed, { maxAge: 60 * 60 });
 
-  revalidatePath('/checkout');
+  revalidatePath('/');
   return { valid: true };
 }

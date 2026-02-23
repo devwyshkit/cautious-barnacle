@@ -7,13 +7,13 @@
  * Hyperlocal Item Marketplace with Optional Personalization
  */
 
-import type { Tables } from '@/lib/supabase/database.types';
+import type { Tables, Views } from '@/lib/supabase/types';
 import type { PersonalizationConfig, SelectedPersonalization, SelectedAddon } from './personalization';
 
 // View type from Supabase
-export type ViewOrderDetailed = Tables<'v_orders_detailed'>;
+export type ViewOrderDetailed = Views<'v_orders_detailed'>;
 
-import type { OrderItem, OrderPersonalization } from '@/lib/supabase/types';
+import type { Order, OrderItem, OrderPersonalization } from '@/lib/supabase/types';
 export type { OrderItem, OrderPersonalization };
 
 /**
@@ -94,27 +94,7 @@ export interface OrderStatusHistory {
   metadata?: Record<string, unknown>;
 }
 
-export interface OrderDetail extends ViewOrderDetailed {
-  // Financials - snake_case strictly
-  subtotal?: number;
-  personalization_charges?: number;
-  delivery_fee?: number;
-  platform_fee?: number;
-  gst?: number;
-  discount?: number;
-  gstin?: string | null;
-  cashback_amount?: number | null;
-
-  has_personalization: boolean | null;
-  personalization_input: Record<string, unknown> | null;
-  personalization_status: string | null;
-  placed_at: string | null;
-  paid_at: string | null;
-  details_submitted_at?: string | null;
-  approved_at?: string | null;
-  design_deadline_at?: string | null;
-  cancellation_reason?: string | null;
-
+export interface OrderDetail extends Order {
   preview_submissions?: PreviewSubmission[];
   personalizations?: OrderPersonalization[];
   order_items?: OrderItemDetail[];

@@ -31,7 +31,7 @@ export function InterceptedItemSheet({ item, onCloseOverride }: InterceptedItemS
         // Swiggy 2026: Elite navigation stability.
         // We favor explicit paths over history.back() for intercepted sheets
         // to ensure we never land on a "dead end" or redirect loop.
-        const partnerPath = `/partner/${item.partner_id || searchParams.get('id')}`;
+        const partnerPath = `/store/${item.partner_id || searchParams.get('id')}`;
         const targetPath = onCloseOverride || partnerPath;
 
         // Small delay to allow drawer closing animation

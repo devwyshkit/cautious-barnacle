@@ -28,23 +28,25 @@ import { MappedPartner } from '@/lib/types/partner';
 
 export default async function PartnerPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ category?: string }>;
 }) {
   const { id } = await params;
+  const { category } = await searchParams;
 
   return (
     <div className="min-h-screen">
       <Suspense fallback={<PartnerSkeleton />}>
-        <AsyncPartnerContent id={id} />
+        <AsyncPartnerContent id={id} category={category} />
       </Suspense>
     </div>
   );
 }
 
-async function AsyncPartnerContent({ id }: { id: string }) {
-  const includeInactive = process.env.NODE_ENV === 'development';
-  const { partner, items, error } = await getPartnerStoreData(id, includeInactive);
+async function AsyncPartnerContent({ id, category }: { id: string; category?: string }) {
+  const { partner, blocks, error } = await getPartnerStoreData(id, category);
 
   if (!partner || error) {
     notFound();
@@ -54,8 +56,7 @@ async function AsyncPartnerContent({ id }: { id: string }) {
     <PartnerStorePage
       partnerId={id}
       initialData={(partner as unknown) as MappedPartner}
-      initialItems={items}
+      blocks={blocks}
     />
-
   );
 }

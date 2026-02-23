@@ -46,7 +46,7 @@ export function ModalHeader({
                 {showBack && (
                     <button
                         onClick={handleBack}
-                        className="size-10 flex items-center justify-center rounded-2xl bg-zinc-50 text-zinc-900 active:scale-95 transition-all"
+                        className="size-10 flex items-center justify-center rounded-xl bg-zinc-50 text-zinc-900 active:scale-95 transition-all"
                         aria-label="Go back"
                     >
                         <ChevronLeft className="size-6" />
@@ -64,7 +64,7 @@ export function ModalHeader({
                 {showClose && (
                     <button
                         onClick={handleClose}
-                        className="size-10 flex items-center justify-center rounded-2xl bg-zinc-50 text-zinc-900 active:scale-95 transition-all"
+                        className="size-10 flex items-center justify-center rounded-xl bg-zinc-50 text-zinc-900 active:scale-95 transition-all"
                         aria-label="Close"
                     >
                         <X className="size-5" />

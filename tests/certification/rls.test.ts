@@ -1,13 +1,18 @@
-import { describe, it, expect, vi } from 'vitest';
-import { createAnonClient } from '@/lib/supabase/server';
+import { expect, describe, it } from 'vitest';
+import { createClient as createBaseClient } from '@supabase/supabase-js';
+import { getSupabaseEnv } from '@/lib/env';
 
-describe('Swiggy 2026 Certification: RLS Policy Simulation', () => {
+describe('Row Level Security (RLS) Certification', () => {
     it('should deny unauthorized access to sensitive tables via anon client', async () => {
-        // [IMPORTANT] This test expects the environment to have Supabase keys
-        // or it will rely on the real Supabase backend.
-        const supabase = await createAnonClient();
+        const { url, key } = getSupabaseEnv();
+        const supabase = createBaseClient(url, key, { auth: { persistSession: false } });
 
         // 1. Attempt to fetch items from restricted tables
+        const { data: usersData, error: usersError } = await supabase.from('users').select('*');
+        expect(usersData || []).toHaveLength(0);
+        const { data: partnersData, error: partnersError } = await supabase.from('partner_users').select('*');
+        expect(partnersData || []).toHaveLength(0);
+
         // Orders should be empty for a fresh anon client
         const { data: orders, error: ordersError } = await supabase
             .from('orders')

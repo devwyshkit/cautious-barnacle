@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, Check } from 'lucide-react'
-import { processPartnerPayout } from '@/lib/actions/commerce/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import type { Database } from '@/lib/supabase/database.types'
 
 type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
@@ -55,7 +55,11 @@ export function PayoutTable({ payouts }: PayoutTableProps) {
 
   const handleProcess = async (id: string) => {
     setProcessing(id)
-    await processPartnerPayout(id)
+    await executeAdminIntent({
+      entity: 'payout',
+      action: 'PROCESS',
+      id
+    })
     setProcessing(null)
     router.refresh()
   }

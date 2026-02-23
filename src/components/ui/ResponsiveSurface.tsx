@@ -22,8 +22,29 @@ import {
 } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 
+// WYSHKIT 2026: Zero-Dependency Container Arbitration
+let globalActiveSheetId: string | null = null;
+const sheetListeners = new Set<() => void>();
+
+function setGlobalActiveSheetId(id: string | null) {
+    globalActiveSheetId = id;
+    sheetListeners.forEach(notify => notify());
+}
+
+function useSheetArbiter() {
+    const [activeSheetId, setActiveSheetId] = React.useState(globalActiveSheetId);
+
+    React.useEffect(() => {
+        const notify = () => setActiveSheetId(globalActiveSheetId);
+        sheetListeners.add(notify);
+        return () => { sheetListeners.delete(notify); };
+    }, []);
+
+    return { activeSheetId, setActiveSheetId: setGlobalActiveSheetId };
+}
+
 /**
- * WYSHKIT 2026: The "One Surface" Pattern
+ * WYSHKIT 2026: The "One Surface" Pattern w/ Container Arbitration
  * ResponsiveSurface unifies Drawers (Mobile) and Dialogs (Desktop).
  * Pattern: Elite Consolidation (Replace multiple components with one).
  */
@@ -44,16 +65,37 @@ export function ResponsiveSurface({
     trigger,
     title,
     description,
-    open,
+    open = false,
     onOpenChange,
     className,
     showClose = true
 }: ResponsiveSurfaceProps) {
     const isMobile = useIsMobile();
+    const componentId = React.useId();
+    const { activeSheetId, setActiveSheetId } = useSheetArbiter();
+
+    // WYSHKIT 2026: Container Arbitration Lock
+    // Background sheets logically close when a new sheet claims the token.
+    React.useEffect(() => {
+        if (open) {
+            setActiveSheetId(componentId);
+        } else if (activeSheetId === componentId) {
+            setActiveSheetId(null);
+        }
+    }, [open, componentId, setActiveSheetId]); // Intentionally omitting activeSheetId from deps
+
+    const isActuallyOpen = open && activeSheetId === componentId;
+
+    const handleOpenChange = React.useCallback((val: boolean) => {
+        if (onOpenChange) onOpenChange(val);
+        if (!val && activeSheetId === componentId) {
+            setActiveSheetId(null);
+        }
+    }, [onOpenChange, activeSheetId, componentId, setActiveSheetId]);
 
     if (isMobile) {
         return (
-            <Drawer open={open} onOpenChange={onOpenChange}>
+            <Drawer open={isActuallyOpen} onOpenChange={handleOpenChange}>
                 {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
                 <DrawerContent className={cn("flex flex-col max-h-[92vh]", className)}>
                     {(title || description) && (
@@ -74,7 +116,7 @@ export function ResponsiveSurface({
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={isActuallyOpen} onOpenChange={handleOpenChange}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
             <DialogContent className={cn("sm:max-w-[425px]", className)} showCloseButton={showClose}>
                 {(title || description) && (

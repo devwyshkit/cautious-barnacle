@@ -41,6 +41,34 @@ const AdminIntentSchema = z.discriminatedUnion('entity', [
         action: z.enum(['CREATE', 'TOGGLE_STATUS']),
         id: z.string().uuid().optional(),
         metadata: z.any().optional()
+    }),
+    z.object({
+        entity: z.literal('pincode'),
+        action: z.enum(['ADD', 'TOGGLE_STATUS', 'DELETE']),
+        id: z.string().uuid().optional(),
+        metadata: z.any().optional()
+    }),
+    z.object({
+        entity: z.literal('payout'),
+        action: z.enum(['PROCESS']),
+        id: z.string().uuid()
+    }),
+    z.object({
+        entity: z.literal('return'),
+        action: z.enum(['APPROVE', 'REJECT']),
+        id: z.string().uuid(),
+        metadata: z.any().optional()
+    }),
+    z.object({
+        entity: z.literal('wallet_credit'),
+        action: z.enum(['CREDIT']),
+        id: z.string().uuid(),
+        metadata: z.any().optional()
+    }),
+    z.object({
+        entity: z.literal('settings'),
+        action: z.enum(['UPDATE_SETTING']),
+        metadata: z.any()
     })
 ]);
 
@@ -53,80 +81,35 @@ export async function executeAdminIntent(intent: AdminIntent) {
     const validated = AdminIntentSchema.parse(intent);
 
     try {
+        // WYSHKIT 2026: Single Source of Truth
+        // All administrative actions are routed through the RPC for auditability and RBAC.
+        // Exception: Order Status updates must trigger side effects (refunds, cashback) in TS.
+        if (validated.entity === 'order' && validated.action === 'UPDATE_STATUS') {
+            const { update_order_status } = await import('@/lib/actions/commerce/orders');
+            const result = await update_order_status(validated.id, validated.target_status, {
+                reason: validated.metadata?.reason,
+                cancelled_by: 'admin'
+            });
+            if (!result.success) throw new Error(result.error);
+        } else {
+            const { data, error } = await supabase.rpc('execute_admin_intent', {
+                p_intent: validated
+            });
+            if (error) throw error;
+        }
+
+        // Frontend Cache Freshness
         switch (validated.entity) {
-            case 'partner':
-                if (validated.action === 'APPROVE_KYC') {
-                    await supabase.from('partners').update({ kyc_status: 'ACTIVE', is_active: true }).eq('id', validated.id);
-                } else if (validated.action === 'REJECT_KYC') {
-                    await supabase.from('partners').update({ kyc_status: 'REJECTED', is_active: false }).eq('id', validated.id);
-                } else if (validated.action === 'TOGGLE_STATUS') {
-                    await supabase.from('partners').update({ is_active: validated.metadata.isActive }).eq('id', validated.id);
-                }
-                revalidatePath('/admin/partners');
-                break;
-
-            case 'item':
-                if (validated.action === 'APPROVE') {
-                    await supabase.from('items').update({ approval_status: 'approved' }).in('id', validated.ids);
-                } else if (validated.action === 'REJECT') {
-                    await supabase.from('items').update({ approval_status: 'rejected' }).in('id', validated.ids);
-                } else if (validated.action === 'TOGGLE_STATUS') {
-                    await supabase.from('items').update({ is_active: validated.metadata.isActive }).in('id', validated.ids);
-                } else if (validated.action === 'TOGGLE_SPONSORED') {
-                    await supabase.from('items').update({ is_sponsored: validated.metadata.isSponsored }).in('id', validated.ids);
-                }
-                revalidatePath('/admin/catalog');
-                revalidatePath('/');
-                break;
-
-            case 'order':
-                if (validated.action === 'UPDATE_STATUS') {
-                    // Use idempotent transition RPC
-                    await supabase.rpc('transition_order_status', {
-                        p_order_id: validated.id,
-                        p_new_status: validated.target_status
-                    });
-                }
-                revalidatePath('/admin/orders');
-                break;
-
-            case 'category':
-                if (validated.action === 'CREATE') {
-                    await supabase.from('categories').insert({
-                        name: validated.metadata.name,
-                        slug: validated.metadata.slug
-                    });
-                } else if (validated.action === 'TOGGLE_STATUS') {
-                    await supabase.from('categories').update({
-                        is_active: validated.metadata.isActive
-                    }).eq('id', validated.id!);
-                } else if (validated.action === 'DELETE') {
-                    await supabase.from('categories').delete().eq('id', validated.id!);
-                }
-                revalidatePath('/admin/categories');
-                break;
-
-            case 'coupon':
-                if (validated.action === 'CREATE') {
-                    await supabase.from('coupons').insert({
-                        code: validated.metadata.code,
-                        discount_type: validated.metadata.discount_type,
-                        discount_value: validated.metadata.discount_value,
-                        min_order_value: validated.metadata.min_order_value,
-                        max_discount_amount: validated.metadata.max_discount_amount,
-                        usage_limit: validated.metadata.usage_limit
-                    });
-                } else if (validated.action === 'TOGGLE_STATUS') {
-                    await supabase.from('coupons').update({
-                        is_active: validated.metadata.isActive
-                    }).eq('id', validated.id!);
-                }
-                revalidatePath('/admin/coupons');
-                break;
+            case 'partner': revalidatePath('/admin/partners'); break;
+            case 'item': revalidatePath('/admin/catalog'); revalidatePath('/'); break;
+            case 'order': revalidatePath('/admin/orders'); break;
+            case 'category': revalidatePath('/admin/categories'); break;
+            case 'coupon': revalidatePath('/admin/coupons'); break;
         }
 
         return { success: true };
     } catch (error: any) {
+        console.error('Admin Intent Error:', error);
         return { success: false, error: error.message };
     }
 }

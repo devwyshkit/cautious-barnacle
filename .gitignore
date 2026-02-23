@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -29,6 +27,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+dev.log
+test_output.txt
 
 # vercel
 .vercel
@@ -51,10 +51,7 @@ next-env.d.ts
 *.old
 
 # cursor/editor files
-.cursor/test.log
-.cursor/plans/*.plan.md
+.cursor/
 
-# test scripts (keep for development, but ignore in git)
-# scripts/check-*.ts
-# scripts/test-*.ts
-./supabase/migrations
+# test scripts
+scripts/

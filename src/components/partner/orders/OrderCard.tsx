@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ORDER_STATUS, getOrderStatusDisplay, type OrderStatus } from '@/lib/types/order-status';
-import type { PartnerOrder } from '@/lib/actions/partner/partner-actions';
+import type { PartnerOrder } from '@/lib/actions/commerce/orders';
 import { cn } from '@/lib/utils';
 
 import { PreviewUploader } from '../personalization/PreviewUploader';
@@ -45,16 +45,20 @@ const getAvailableAction = (order: PartnerOrder) => {
   if (order.status === ORDER_STATUS.PLACED) return null;
 
   if (order.status === ORDER_STATUS.CONFIRMED) {
-    if (order.has_personalization) return null; // Awaiting user details
-    return { label: 'Start Preparing', nextStatus: ORDER_STATUS.IN_PRODUCTION };
-  }
+    if (!order.has_personalization) {
+      return { label: 'Start Preparing', nextStatus: ORDER_STATUS.IN_PRODUCTION };
+    }
 
-  if (order.status === ORDER_STATUS.DETAILS_RECEIVED || order.status === ORDER_STATUS.REVISION_REQUESTED) {
-    return { label: 'Upload Preview', isUpload: true };
-  }
+    // For personalized orders in CONFIRMED state:
+    if (order.personalization_status === 'submitted' || order.personalization_status === 'revision_requested') {
+      return { label: 'Upload Preview', isUpload: true };
+    }
 
-  if (order.status === ORDER_STATUS.APPROVED) {
-    return { label: 'Start Preparing', nextStatus: ORDER_STATUS.IN_PRODUCTION };
+    if (order.personalization_status === 'approved') {
+      return { label: 'Start Preparing', nextStatus: ORDER_STATUS.IN_PRODUCTION };
+    }
+
+    return null; // Awaiting user details or pending
   }
 
   if (order.status === ORDER_STATUS.IN_PRODUCTION) {
@@ -71,9 +75,6 @@ const getAvailableAction = (order: PartnerOrder) => {
 const STATUS_COLORS: Partial<Record<OrderStatus, string>> = {
   [ORDER_STATUS.PLACED]: 'bg-red-50 text-red-700 border-red-200',
   [ORDER_STATUS.CONFIRMED]: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  [ORDER_STATUS.DETAILS_RECEIVED]: 'bg-amber-50 text-amber-700 border-amber-200',
-  [ORDER_STATUS.PREVIEW_READY]: 'bg-blue-50 text-blue-700 border-blue-200',
-  [ORDER_STATUS.APPROVED]: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   [ORDER_STATUS.IN_PRODUCTION]: 'bg-purple-50 text-purple-700 border-purple-200',
   [ORDER_STATUS.PACKED]: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   [ORDER_STATUS.DISPATCHED]: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -90,7 +91,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
 
   const isNewOrder = order.status === ORDER_STATUS.PLACED;
   const isAwaitingDetails = order.has_personalization &&
-    (order.status === ORDER_STATUS.PLACED || order.status === ORDER_STATUS.DETAILS_RECEIVED);
+    (order.status === ORDER_STATUS.PLACED || order.personalization_status === 'submitted');
 
   // WYSHKIT 2026: Logic simplified because state machine is now unified
   // All orders (personalized or not) go through IN_PRODUCTION
@@ -175,14 +176,14 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
       <Card className="overflow-hidden">
         <CardContent className="p-0">
           {/* WYSHKIT 2026: Revision Feedback Block (Momentum Saver) */}
-          {order.status === ORDER_STATUS.REVISION_REQUESTED && order.latest_preview?.customer_feedback && (
+          {order.personalization_status === 'revision_requested' && order.latest_preview?.customer_feedback && (
             <div className="p-4 bg-orange-50 border-b border-orange-100 animate-in slide-in-from-top-1 duration-500">
               <div className="flex items-start gap-3">
                 <div className="size-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
                   <AlertTriangle className="size-4 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-xs font-black text-orange-900 tracking-wider leading-none mb-1">Action Required: Correction Requested</p>
+                  <p className="text-xs font-black text-orange-900 tracking-tight leading-none mb-1">Action Required: Correction Requested</p>
                   <p className="text-sm font-bold text-orange-800 leading-tight">
                     "{order.latest_preview.customer_feedback}"
                   </p>
@@ -253,7 +254,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
               {isExpress && order.status === ORDER_STATUS.PLACED && (
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 mb-2 animate-in slide-in-from-top-1 duration-300">
                   <Zap className="size-3 fill-emerald-600" />
-                  <span className="text-xs font-black tracking-wider">Express Fulfill</span>
+                  <span className="text-xs font-black tracking-tight">Express Fulfill</span>
                   <span className="text-[11px] font-medium opacity-70 ml-auto">No personalization needed</span>
                 </div>
               )}
@@ -297,8 +298,8 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
 
           {/* WYSHKIT 2026: Personalization Details Section */}
           {(order.personalization_input as any) && (
-            <div className="mx-4 mb-4 p-4 rounded-2xl bg-amber-50 border border-amber-100 space-y-3">
-              <p className="text-xs font-black text-amber-900 tracking-wider">Customer Design Details</p>
+            <div className="mx-4 mb-4 p-4 rounded-xl bg-amber-50 border border-amber-100 space-y-3">
+              <p className="text-xs font-black text-amber-900 tracking-tight">Customer Design Details</p>
               <div className="space-y-4">
                 {Object.entries(order.personalization_input as Record<string, any>).map(([itemId, data]: [string, any]) => {
                   const item = order.order_items.find(oi => oi.id === itemId || oi.item_id === itemId);

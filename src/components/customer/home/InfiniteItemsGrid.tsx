@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { EntityCard } from '@/components/ui/EntityCard';
+import { ItemCard } from '@/components/ui/ItemCard';
 import { getFilteredItems } from '@/lib/actions/discovery/search';
 import { WyshkitItem } from '@/lib/types/item';
 import { InfiniteFlow } from '@/components/ui/InfiniteFlow';
@@ -13,7 +13,6 @@ interface InfiniteItemsGridProps {
     categoryName?: string | null;
     startOffset?: number;
     totalCount?: number;
-    onQuickLook?: (id: string, type: any) => void;
 }
 
 /**
@@ -26,8 +25,7 @@ export function InfiniteItemsGrid({
     initialItems,
     category,
     startOffset = 0,
-    totalCount,
-    onQuickLook
+    totalCount
 }: InfiniteItemsGridProps) {
 
     const fetchMore = useCallback(async ({ limit, offset }: { limit: number; offset: number }) => {
@@ -43,11 +41,9 @@ export function InfiniteItemsGrid({
             initialData={initialItems}
             fetchAction={fetchMore}
             renderItem={(item) => (
-                <EntityCard
+                <ItemCard
                     key={item.id}
-                    type="item"
                     data={item}
-                    onQuickLook={onQuickLook}
                 />
             )}
             startOffset={startOffset}

@@ -58,6 +58,39 @@ Users pay a 20–30% premium for peace of mind. Returns collapse to near-zero.
 
 ---
 
+---
+
+## Developer Setup
+
+### 1. Prerequisites
+- Node.js 18+
+- Supabase Project (for DB & Auth)
+- Razorpay Account (for testing payments)
+
+### 2. Installation
+```bash
+npm install
+```
+
+### 3. Environment Configuration
+Copy `.env.example` to `.env` and fill in your credentials:
+```bash
+cp .env.example .env
+```
+Key variables required:
+- `NEXT_PUBLIC_SUPABASE_URL` & `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (for migrations/admin actions)
+- `NEXT_PUBLIC_RAZORPAY_KEY_ID`
+- `RAZORPAY_KEY_SECRET`
+
+### 4. Running Locally
+```bash
+npm run dev
+```
+The app will be available at `http://localhost:3000`.
+
+---
+
 ## The Stack
 
 | Layer | Tech |

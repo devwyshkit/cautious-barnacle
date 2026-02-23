@@ -25,12 +25,12 @@ export function OrderCard({ order }: OrderCardProps) {
   return (
     <Link
       href={`/orders/${orderId}`}
-      className="block bg-white p-5 rounded-[2rem] border border-zinc-100 active:scale-[0.98] transition-all hover:border-zinc-200 shadow-sm hover:shadow-xl hover:shadow-zinc-200/40 cursor-pointer group"
+      className="block bg-white p-5 rounded-xl border border-zinc-100 active:scale-[0.98] transition-all hover:border-zinc-200 shadow-sm hover:shadow-sm hover:shadow-zinc-200/40 cursor-pointer group"
       prefetch={false}
     >
       <div className="flex items-start gap-4">
         {/* Partner Avatar / Image */}
-        <div className="size-14 rounded-2xl bg-zinc-50 border border-zinc-100 overflow-hidden shrink-0 flex items-center justify-center relative">
+        <div className="size-14 rounded-xl bg-zinc-50 border border-zinc-100 overflow-hidden shrink-0 flex items-center justify-center relative">
           {order.first_item_image ? (
             <img src={order.first_item_image} alt={order.partner_name || 'Store'} className="size-full object-cover" />
           ) : (
@@ -47,7 +47,7 @@ export function OrderCard({ order }: OrderCardProps) {
               <h3 className="text-sm font-black text-zinc-900 truncate leading-tight group-hover:text-[var(--primary)] transition-colors">
                 {order.partner_name || "Wyshkit Partner"}
               </h3>
-              <p className="text-xs font-bold text-zinc-400 mt-0.5 tracking-wider">
+              <p className="text-xs font-bold text-zinc-400 mt-0.5 tracking-tight">
                 Order #{orderNumber}
               </p>
             </div>
@@ -56,7 +56,7 @@ export function OrderCard({ order }: OrderCardProps) {
 
           <div className="mt-3 flex flex-wrap gap-2">
             <span className={cn(
-              "px-2 py-0.5 rounded-md text-[11px] font-black tracking-wider",
+              "px-2 py-0.5 rounded-md text-[11px] font-black tracking-tight",
               status === 'DELIVERED' ? "bg-emerald-50 text-emerald-600" :
                 isActive ? "bg-amber-50 text-[var(--primary)]" :
                   "bg-zinc-100 text-zinc-600"
@@ -66,15 +66,15 @@ export function OrderCard({ order }: OrderCardProps) {
 
             {order.has_personalization && (
               <span className={cn(
-                "px-2 py-0.5 rounded-md text-[11px] font-black tracking-wider flex items-center gap-1",
-                order.personalization_status === 'SUBMITTED' ? "bg-amber-50 text-amber-600" :
-                  order.personalization_status === 'APPROVED' ? "bg-emerald-50 text-emerald-600" :
+                "px-2 py-0.5 rounded-md text-[11px] font-black tracking-tight flex items-center gap-1",
+                order.personalization_status === 'submitted' ? "bg-amber-50 text-amber-600" :
+                  order.personalization_status === 'approved' ? "bg-emerald-50 text-emerald-600" :
                     "bg-zinc-100 text-zinc-500"
               )}>
                 <div className={cn(
                   "size-1 rounded-full",
-                  order.personalization_status === 'SUBMITTED' ? "bg-amber-500 animate-pulse" :
-                    order.personalization_status === 'APPROVED' ? "bg-emerald-500" :
+                  order.personalization_status === 'submitted' ? "bg-amber-500 animate-pulse" :
+                    order.personalization_status === 'approved' ? "bg-emerald-500" :
                       "bg-zinc-400"
                 )} />
                 {order.personalization_status || 'Design Pending'}
@@ -93,7 +93,7 @@ export function OrderCard({ order }: OrderCardProps) {
           {created_at ? format(new Date(created_at), "MMM d, yyyy") : '—'}
         </div>
         <div className={cn(
-          "px-4 py-1.5 rounded-full text-xs font-black tracking-wider transition-all",
+          "px-4 py-1.5 rounded-full text-xs font-black tracking-tight transition-all",
           isActive
             ? "bg-[var(--primary)] text-white shadow-lg shadow-amber-900/10 active:scale-95"
             : "bg-zinc-50 text-zinc-500 group-hover:bg-zinc-900 group-hover:text-white"

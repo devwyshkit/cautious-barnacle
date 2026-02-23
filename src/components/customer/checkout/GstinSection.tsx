@@ -10,9 +10,10 @@ interface GstinSectionProps {
     initialGstin?: string;
     onGstinChange?: (gstin: string) => void;
     onBusinessNameChange?: (name: string | null) => void;
+    disabled?: boolean;
 }
 
-export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameChange }: GstinSectionProps) {
+export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameChange, disabled }: GstinSectionProps) {
     const [gstin, setGstin] = useState(initialGstin);
     const [expanded, setExpanded] = useState(false);
     const [validation, setValidation] = useState<'idle' | 'validating' | 'valid' | 'invalid'>('idle');
@@ -59,19 +60,20 @@ export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameC
     };
 
     return (
-        <section className="bg-white rounded-[28px] border border-zinc-100 overflow-hidden transition-all duration-300 shadow-sm">
+        <section className={cn("bg-white rounded-[28px] border border-zinc-100 overflow-hidden transition-all duration-300 shadow-sm", disabled && "opacity-50 pointer-events-none")}>
             <button
                 onClick={() => setExpanded(!expanded)}
                 className="w-full px-6 py-5 flex items-center justify-between hover:bg-zinc-50/50 transition-colors"
                 type="button"
+                disabled={disabled}
             >
                 <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-2xl bg-zinc-50 flex items-center justify-center text-zinc-400">
+                    <div className="size-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400">
                         <ShieldCheck className={cn("size-5", validation === 'valid' && "text-emerald-500")} />
                     </div>
                     <div className="text-left">
                         <p className="text-[13px] font-black tracking-tight text-zinc-900">Business purchase?</p>
-                        <p className="text-xs font-bold text-zinc-400 tracking-wider mt-0.5">
+                        <p className="text-xs font-bold text-zinc-400 tracking-tight mt-0.5">
                             {validation === 'valid' ? businessName : 'Add GSTIN for tax invoice (Optional)'}
                         </p>
                     </div>
@@ -87,9 +89,10 @@ export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameC
                             value={gstin}
                             onChange={handleChange}
                             onBlur={handleBlur}
+                            disabled={disabled || validation === 'validating'}
                             placeholder="Enter 15-digit GSTIN"
                             className={cn(
-                                "w-full h-14 bg-zinc-50 rounded-2xl px-5 text-sm font-bold border-2 transition-all outline-none",
+                                "w-full h-14 bg-zinc-50 rounded-xl px-5 text-sm font-bold border-2 transition-all outline-none",
                                 validation === 'idle' && "border-transparent focus:border-zinc-200",
                                 validation === 'validating' && "border-zinc-100",
                                 validation === 'valid' && "border-emerald-100 text-emerald-900 bg-emerald-50/30",
@@ -103,7 +106,7 @@ export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameC
                         </div>
                     </div>
                     {error && (
-                        <p className="mt-2 ml-1 text-xs font-bold text-rose-500 tracking-wider">{error}</p>
+                        <p className="mt-2 ml-1 text-xs font-bold text-rose-500 tracking-tight">{error}</p>
                     )}
                     <p className="mt-3 px-1 text-[11px] font-medium text-zinc-400 leading-relaxed">
                         Enter your GSTIN to claim input tax credit on business purchases. Verified in real time.

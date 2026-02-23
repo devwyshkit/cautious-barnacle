@@ -92,16 +92,27 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: 'Missing required data in payment notes' }, { status: 400 });
         }
 
-        // Fetch draft order
-        const { data: draft, error: draftError } = await supabase
-          .from('draft_orders')
+        // Fetch checkout session
+        const { data: session, error: sessionError } = await supabase
+          .from('checkout_sessions')
           .select('*')
           .eq('id', draftId)
           .single();
 
-        if (draftError || !draft) {
-          log.error('[webhooks/razorpay] Draft not found', { draftId, error: draftError });
-          return NextResponse.json({ received: true, message: 'Draft not found or expired' });
+        if (sessionError || !session) {
+          log.error('[webhooks/razorpay] Session not found', { sessionId: draftId, error: sessionError });
+          return NextResponse.json({ received: true, message: 'Session not found or expired' });
+        }
+
+        // Fetch current cart items for atomic placement
+        const { data: cart_items } = await supabase
+          .from('v_active_cart_detailed')
+          .select('*')
+          .eq('user_id', userId);
+
+        if (!cart_items || cart_items.length === 0) {
+          log.error('[webhooks/razorpay] Cart empty for user', { userId });
+          return NextResponse.json({ received: true, message: 'Cart empty' });
         }
 
         // Check if order already exists (Idempotency)
@@ -116,22 +127,23 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ received: true, message: 'Order already processed' });
         }
 
-        // Place order using draft data (Trigger-first model)
-        const metadata = (draft.metadata as Record<string, any>) || {};
-        const items = draft.items as unknown as any[];
-
+        // Place order using session data and current cart
         const order_result = await executeCommerceIntent({
           intent: 'PLACE_ORDER',
           payload: {
             razorpay_order_id: razorpayOrderId,
             payment_id: razorpayPaymentId,
-            items: items as any,
-            address_id: draft.address_id || undefined,
-            coupon_code: String(metadata.coupon_code || '') || undefined,
-            use_wallet: Boolean(metadata.use_wallet || false),
-            gstin: metadata.gstin ? String(metadata.gstin) : undefined,
-            delivery_instructions: metadata.delivery_instructions ? String(metadata.delivery_instructions) : undefined,
-            distance_km: metadata.distance_km ? Number(metadata.distance_km) : undefined
+            items: cart_items.map(item => ({
+              item_id: item.item_id,
+              variant_id: item.variant_id,
+              quantity: item.quantity,
+              personalization: item.personalization,
+              selected_addons: item.selected_addons
+            })) as any,
+            address_id: session.selected_address_id || undefined,
+            coupon_code: session.applied_coupon || undefined,
+            use_wallet: session.use_wallet || false,
+            gstin: session.gstin || undefined,
           }
         });
 
@@ -139,8 +151,8 @@ export async function POST(req: NextRequest) {
           throw new Error(String(order_result.error || 'Failed to create order atomically'));
         }
 
-        // Cleanup draft after successful placement
-        await supabase.from('draft_orders').delete().eq('id', draft.id);
+        // Cleanup session after successful placement
+        await supabase.from('checkout_sessions').delete().eq('id', session.id);
 
         log.info('[webhooks/razorpay] Order created atomically via triggers and draft cleaned', { order_id: (order_result.data as any).order_id, razorpayOrderId });
         return NextResponse.json({ received: true, order_id: (order_result.data as any).order_id });
@@ -164,8 +176,8 @@ export async function POST(req: NextRequest) {
         const draftId = razorpayOrder.notes?.draftId || razorpayOrder.notes?.draft_id;
 
         if (draftId) {
-          await supabase.from('draft_orders').delete().eq('id', String(draftId));
-          log.info('[webhooks/razorpay] Failed payment draft cleaned', { draftId, razorpayOrderId });
+          await supabase.from('checkout_sessions').delete().eq('id', String(draftId));
+          log.info('[webhooks/razorpay] Failed payment session cleaned', { sessionId: draftId, razorpayOrderId });
         }
 
       } catch (err) {

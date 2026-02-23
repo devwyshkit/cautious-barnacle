@@ -18,7 +18,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { ArrowLeft, Check, X, Loader2, ExternalLink } from 'lucide-react'
-import { approvePartnerKYC, rejectPartnerKYC, togglePartnerStatus, updatePartnerCommission } from '@/lib/actions/commerce/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import type { Partner } from '@/lib/types/admin.types'
 
 interface PartnerDetailViewProps {
@@ -57,7 +57,11 @@ export function PartnerDetailView({ partner, stats }: PartnerDetailViewProps) {
 
   const handleApprove = async () => {
     setLoading(true)
-    await approvePartnerKYC(partner.id)
+    await executeAdminIntent({
+      entity: 'partner',
+      action: 'APPROVE_KYC',
+      id: partner.id
+    })
     setLoading(false)
     router.refresh()
   }
@@ -65,20 +69,35 @@ export function PartnerDetailView({ partner, stats }: PartnerDetailViewProps) {
   const handleReject = async () => {
     if (!rejectReason.trim()) return
     setLoading(true)
-    await rejectPartnerKYC(partner.id, rejectReason)
+    await executeAdminIntent({
+      entity: 'partner',
+      action: 'REJECT_KYC',
+      id: partner.id,
+      metadata: { reason: rejectReason }
+    })
     setLoading(false)
     setRejectDialogOpen(false)
     router.refresh()
   }
 
   const handleToggle = async () => {
-    await togglePartnerStatus(partner.id, !(partner.is_active ?? false))
+    await executeAdminIntent({
+      entity: 'partner',
+      action: 'TOGGLE_STATUS',
+      id: partner.id,
+      metadata: { isActive: !(partner.is_active ?? false) }
+    })
     router.refresh()
   }
 
   const handleCommissionUpdate = async () => {
     setLoading(true)
-    await updatePartnerCommission(partner.id, parseFloat(commission))
+    await executeAdminIntent({
+      entity: 'partner',
+      action: 'UPDATE_COMMISSION',
+      id: partner.id,
+      metadata: { rate: parseFloat(commission) }
+    })
     setLoading(false)
     router.refresh()
   }
@@ -134,7 +153,7 @@ export function PartnerDetailView({ partner, stats }: PartnerDetailViewProps) {
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-zinc-500">Owner name</span>
-              <span>{(partner as { owner_name?: string }).owner_name ?? partner.partner_name ?? partner.name ?? '-'}</span>
+              <span>{(partner as { owner_name?: string }).owner_name ?? partner.business_name ?? partner.name ?? '-'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-zinc-500">Email</span>

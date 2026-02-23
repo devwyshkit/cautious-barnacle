@@ -6,7 +6,7 @@ import { ORDER_STATUS } from '@/lib/types/order-status';
 import { orderHasPersonalizedItems } from '@/lib/utils/personalization';
 import type { Order } from '@/lib/supabase/types';
 import { logError, handleActionError } from '@/lib/utils/error-handler';
-import { update_order_status } from '@/lib/actions/partner/partner-actions';
+import { update_order_status } from '@/lib/actions/commerce/orders';
 import { createAdminClient } from '@/lib/supabase/server';
 import { Json } from '@/lib/supabase/database.types';
 import { refund_payment } from '@/lib/services/razorpay';
@@ -91,7 +91,7 @@ export async function initiateReturn({ orderId, reason, description, images }: I
 
     const { refund_amount, return_delivery_fee } = pricingData as any;
 
-    // Create return record
+    // 3. Create return record (Intent)
     const { data: returnRecord, error: returnError } = await supabase
       .from('returns')
       .insert({
@@ -101,40 +101,49 @@ export async function initiateReturn({ orderId, reason, description, images }: I
         description,
         images: images || [],
         return_delivery_fee: return_delivery_fee,
-        status: 'pending',
+        status: 'processing', // WYSHKIT 2026: Intent first.
         refund_amount: refund_amount,
       })
       .select()
       .maybeSingle();
 
-    if (returnError) {
+    if (returnError || !returnRecord) {
       logError(returnError, 'InitiateReturn');
-      return { error: returnError.message };
+      return { error: 'Failed to create return intent' };
     }
 
-    if (!returnRecord) {
-      return { error: 'Failed to create return - no data returned' };
-    }
+    // 4. Log Intent to undeniable source of truth history BEFORE money moves
+    const adminSupabase = await createAdminClient();
+    await adminSupabase.rpc('log_order_status_history', {
+      p_order_id: orderId,
+      p_type: 'return_initiated',
+      p_title: 'Refund Processing',
+      p_description: `Return verified. Initiating refund of ₹${refund_amount || 0}.`,
+      p_metadata: { return_id: returnRecord.id, reason } as unknown as Json
+    });
 
-    // 4. TRIGGER ACTUAL RAZORPAY REFUND
-    // WYSHKIT 2026: "Orders are 100% advance paid".
-    // We must return the money for successful returns.
+    // 5. TRIGGER ACTUAL RAZORPAY REFUND
     if ((returnRecord.refund_amount || 0) > 0 && order.payment_id) {
       try {
         await refund_payment(
           order.payment_id,
           Math.round((returnRecord.refund_amount || 0) * 100), // Convert INR to Paise
-          {
-            order_id: orderId,
-            return_id: returnRecord.id,
-            reason: reason,
-          }
+          { order_id: orderId, return_id: returnRecord.id, reason }
         );
         logger.info('Razorpay refund successful', { orderId, amount: returnRecord.refund_amount });
       } catch (refundError: any) {
         logger.error('Razorpay refund failed', refundError);
-        // We log but don't strictly block the UI if the DB already updated, 
-        // as the return record is created. However, it's better to inform.
+
+        // Log failure
+        await supabase.from('returns').update({ status: 'failed' }).eq('id', returnRecord.id);
+        await adminSupabase.rpc('log_order_status_history', {
+          p_order_id: orderId,
+          p_type: 'return_failed',
+          p_title: 'Refund Failed',
+          p_description: `Gateway rejected refund. Escalating to support.`,
+          p_metadata: { error: refundError.message } as unknown as Json
+        });
+
         return {
           error: 'Refund failed at gateway. Please contact support.',
           details: refundError.message
@@ -142,25 +151,28 @@ export async function initiateReturn({ orderId, reason, description, images }: I
       }
     }
 
-    // 5. Update order status via state machine gateway
-    // WYSHKIT 2026: Returns use proper REFUNDED status, not CANCELLED.
-    const updateResult = await update_order_status(orderId, ORDER_STATUS.REFUNDED);
-
-    if (!updateResult.success) {
-      return { error: updateResult.error || 'Failed to update order status' };
-    }
-
-
-    // 5. Additional logging for the return context
-    const adminSupabase = await createAdminClient();
-    await adminSupabase.rpc('log_order_status_history', {
+    // 6. ATOMIC DB UPDATE: Update order status via specialized RPC ONLY after money moves
+    const { data: processData, error: processError } = await (adminSupabase as any).rpc('process_order_return', {
       p_order_id: orderId,
-      p_type: 'return_initiated',
-      p_title: 'Return Requested',
-      p_description: `Return requested: ${reason}. ${isPersonalized ? 'No refund for personalized items.' : `Refund amount: ₹${returnRecord.refund_amount || 0}`}`,
-      p_metadata: { return_id: returnRecord.id, reason, return_delivery_fee: return_delivery_fee } as unknown as Json
+      p_refund_amount: returnRecord.refund_amount,
+      p_reason: reason,
+      p_payment_id: order.payment_id
     });
 
+    if (processError) {
+      logger.error('CRITICAL: RPC process_order_return failed after successful refund', {
+        orderId,
+        returnId: returnRecord.id,
+        error: processError
+      });
+      // Return record is 'processing', but money is gone. 
+      // Manual reconciliation or automated retry required.
+      return {
+        success: true,
+        status: 'PENDING_SYNC',
+        message: 'Refund successful, but system sync failed. Support is notified.'
+      };
+    }
 
     revalidatePath(`/orders/${orderId}`);
     return {

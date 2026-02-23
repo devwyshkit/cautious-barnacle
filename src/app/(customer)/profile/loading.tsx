@@ -14,7 +14,7 @@ export default function ProfileLoading() {
             <div className="space-y-4">
                 <Skeleton className="h-4 w-24" />
                 {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+                    <div key={i} className="flex items-center justify-between p-4 bg-zinc-50 rounded-xl border border-zinc-100">
                         <div className="flex items-center gap-3">
                             <Skeleton className="size-5 rounded-lg" />
                             <Skeleton className="h-4 w-32" />
@@ -26,8 +26,8 @@ export default function ProfileLoading() {
 
             <div className="space-y-4 pt-4">
                 <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-12 w-full rounded-2xl" />
-                <Skeleton className="h-12 w-full rounded-2xl" />
+                <Skeleton className="h-12 w-full rounded-xl" />
+                <Skeleton className="h-12 w-full rounded-xl" />
             </div>
         </div>
     );

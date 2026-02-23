@@ -10,7 +10,7 @@ export function PartnerSkeleton() {
       {/* Header Skeleton */}
       <div className="relative aspect-[16/6] md:aspect-[16/5] w-full bg-zinc-50 animate-pulse" />
       <div className="px-5 -mt-10 md:-mt-14 relative z-10">
-        <div className="bg-white rounded-[32px] p-6 md:p-10 shadow-sm border border-zinc-100">
+        <div className="bg-white rounded-xl p-6 md:p-10 shadow-sm border border-zinc-100">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex-1 space-y-3">
               <Skeleton className="h-10 w-64" />

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
-import { update_order_status } from '@/lib/actions/partner/partner-actions';
 import { logger } from '@/lib/logging/logger';
 import { ORDER_STATUS } from '@/lib/types/order-status';
 

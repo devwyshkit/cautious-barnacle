@@ -195,7 +195,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-6 md:max-w-md">
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold tracking-wider text-zinc-500">Contact</Label>
+                    <Label className="text-xs font-bold tracking-tight text-zinc-500">Contact</Label>
                     <div className="grid grid-cols-2 gap-3">
                         <div className="relative">
                             <User className="absolute left-3 top-3 size-4 text-zinc-400" />
@@ -214,7 +214,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold tracking-wider text-zinc-500">Address Type</Label>
+                    <Label className="text-xs font-bold tracking-tight text-zinc-500">Address Type</Label>
                     <RadioGroup
                         value={form.watch('type')}
                         onValueChange={(val) => form.setValue('type', val as any)}
@@ -232,7 +232,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                                     className="flex flex-col items-center justify-between rounded-xl border-2 border-zinc-100 bg-white p-3 hover:bg-zinc-50 cursor-pointer transition-all peer-data-[state=checked]:border-zinc-900 peer-data-[state=checked]:[&_svg]:text-zinc-900"
                                 >
                                     <type.icon className="mb-2 size-5 text-zinc-400" />
-                                    <span className="text-xs font-bold tracking-wider">{type.label}</span>
+                                    <span className="text-xs font-bold tracking-tight">{type.label}</span>
                                 </Label>
                             </div>
                         ))}
@@ -240,7 +240,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold tracking-wider text-zinc-500">Location</Label>
+                    <Label className="text-xs font-bold tracking-tight text-zinc-500">Location</Label>
                     {entryMode === 'search' ? (
                         <>
                             <div className="flex gap-2">

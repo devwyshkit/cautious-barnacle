@@ -129,12 +129,12 @@ export function InfiniteFlow<T extends { id: string | number }>({
                 {isLoadingMore ? (
                     <div className="flex flex-col items-center gap-3">
                         <Loader2 className="size-6 text-[var(--primary)] animate-spin" />
-                        <p className="text-xs font-black text-zinc-400 tracking-wider">Hydrating Flow...</p>
+                        <p className="text-xs font-black text-zinc-400 tracking-tight">Hydrating Flow...</p>
                     </div>
                 ) : !hasMore && items.length > 0 ? (
                     <div className="flex flex-col items-center gap-3 opacity-30">
                         <Sparkles className="size-5 text-zinc-400" />
-                        <p className="text-xs font-black text-zinc-400 tracking-wider">End of Discovery</p>
+                        <p className="text-xs font-black text-zinc-400 tracking-tight">End of Discovery</p>
                     </div>
                 ) : null}
             </div>

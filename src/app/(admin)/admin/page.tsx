@@ -18,7 +18,7 @@ async function getMetrics(): Promise<DashboardMetrics> {
     supabase
       .from('partners')
       .select('id', { count: 'exact' })
-      .eq('status', 'active'),
+      .eq('kyc_status', 'ACTIVE'),
     supabase
       .from('partners')
       .select('id', { count: 'exact' })

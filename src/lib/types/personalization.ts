@@ -1,4 +1,4 @@
-import type { PersonalizationOption, ItemAddon } from '@/lib/supabase/types';
+import type { PersonalizationOption, ItemAddon, Views } from '@/lib/supabase/types';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 
 export interface PersonalizationConfig {
@@ -28,35 +28,28 @@ export interface SelectedAddon {
   requires_preview?: boolean;
 }
 
-export interface DraftLineItem {
-  id: string;
-  item_id: string;
-  item_name: string;
-  item_image?: string | null;
+/**
+ * DraftLineItem: Derived directly from DB v_active_cart_detailed view.
+ * Eliminates manual type-drift and shadow data.
+ */
+export interface DraftLineItem extends Omit<Views<'v_active_cart_detailed'>, 'personalization' | 'selected_addons' | 'personalization_options' | 'quantity'> {
+  // Overrides for more specific JSON typing
+  personalization: SelectedPersonalization;
+  selected_addons: SelectedAddon[];
+  personalization_options: PersonalizationOption[];
   quantity: number;
-  unit_price: number;
-  total_price: number;
-  selected_variant_id: string | null;
-  personalization?: SelectedPersonalization;
-  selected_addons?: SelectedAddon[];
-  partner_name?: string;
-  partner_id?: string | null;
-  partner_latitude?: number | null;
-  partner_longitude?: number | null;
-  // WYSHKIT 2026: Hydration fields for Checkout
-  base_price?: number | null;
-  variant_price?: number | null;
-  variant_name?: string;
-  personalization_price?: number | null;
-  addons_price?: number | null;
-  partner_city?: string | null;
-  partner_prep_hours?: number | null;
-  // WYSHKIT 2026: Metadata for hasItemPersonalization and IdentityForm
-  personalization_options?: PersonalizationOption[];
-  item_addons?: ItemAddon[];
-  is_personalized?: boolean;
-  personalization_details?: any; // Generic JSONB from DB
 
+  // DB-backed fields (Shadow Math Elimination)
+  line_total: number;
+  personalization_fee: number;
+
+  // UI-only computed extensions
+  is_personalized: boolean;
+  item_addons: ItemAddon[];
+
+  // Legacy mappings (Optional fallbacks)
+  unit_price: number;
+  addons_price?: number | null;
 }
 
 export interface DraftTransaction extends PricingBreakdown {

@@ -30,6 +30,8 @@ export async function createClient() {
     }
   )
 }
+import { createClient as createBaseClient } from '@supabase/supabase-js'
+
 export async function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -38,32 +40,15 @@ export async function createAdminClient() {
     throw new Error('Missing Supabase Admin environment variables')
   }
 
-  return createServerClient<Database>(
+  // SWIGGY 2026: Admin client requires the pure JS client, not SSR cookie client
+  return createBaseClient<Database>(
     url,
     serviceRoleKey,
     {
-      cookies: {
-        getAll: () => [],
-        setAll: () => { },
-      },
-    }
-  )
-}
-
-/**
- * WYSHKIT 2026: createAnonClient
- * Suitable for use inside unstable_cache as it does not access cookies().
- */
-export async function createAnonClient() {
-  const { url, key } = getSupabaseEnv()
-  return createServerClient<Database>(
-    url,
-    key,
-    {
-      cookies: {
-        getAll: () => [],
-        setAll: () => { },
-      },
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
     }
   )
 }

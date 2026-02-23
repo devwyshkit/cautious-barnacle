@@ -5,12 +5,17 @@ import type { User, AuthChangeEvent, Session } from "@supabase/supabase-js";
 import * as AuthCoreLib from "@/lib/auth/core";
 import { logger } from "@/lib/logging/logger";
 import { useEffect, useMemo, useState, createContext, useContext, useRef } from "react";
+import { normalizePhone } from "@/lib/utils/phone";
+import { mergeGuestCartToUser } from "@/lib/actions/cart/logic";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
     user: User | null;
     permissions: AuthCoreLib.UserPermissions | null;
     loading: boolean;
     error: string | null;
+    signInWithPhone: (phone: string) => Promise<{ success: boolean; error?: string; isRetryable?: boolean }>;
+    verifyOTP: (phone: string, token: string) => Promise<{ success: boolean; user?: User; error?: string }>;
     signOut: () => Promise<{ success: boolean; error?: string }>;
     refreshSession: () => Promise<void>;
 }
@@ -19,30 +24,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [permissions, setPermissions] = useState<AuthCoreLib.UserPermissions | null>(() => {
-        // WYSHKIT 2026: Hydrate permissions from cache if available for instant load
-        if (typeof window !== 'undefined') {
-            const cached = sessionStorage.getItem('wyshkit_perms');
-            if (cached) {
-                try {
-                    return JSON.parse(cached);
-                } catch {
-                    return null;
-                }
-            }
-        }
-        return null;
-    });
+    const [permissions, setPermissions] = useState<AuthCoreLib.UserPermissions | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     const supabase = useMemo(() => createClient(), []);
     const fetchingRef = useRef<string | null>(null);
-    const userIdRef = useRef<string | null>(user?.id);
+    const userIdRef = useRef<string | null>(null);
 
     // Sync ref with state
     useEffect(() => {
-        userIdRef.current = user?.id;
+        userIdRef.current = user?.id || null;
     }, [user?.id]);
 
     const updatePermissions = async (userId: string) => {
@@ -50,11 +43,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         fetchingRef.current = userId;
 
         try {
+            // SWIGGY 2026: Zero trust. Always fetch fresh permissions from DB.
             const perms = await AuthCoreLib.resolveUserPermissions(supabase, userId);
             setPermissions(perms);
-            if (typeof window !== 'undefined') {
-                sessionStorage.setItem('wyshkit_perms', JSON.stringify(perms));
-            }
             setError(null);
         } catch (innerErr) {
             logger.error('[AuthProvider] resolveUserPermissions failed', innerErr as Error);
@@ -66,28 +57,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const refreshSession = async () => {
         try {
             // WYSHKIT 2026: Security Hardening - Use getUser() as source of truth
-            // WYSHKIT 2026: Security Hardening - Use getUser() as source of truth
             const { data: { user: fetchedUser }, error: userError } = await supabase.auth.getUser();
-            let currentUser: User | null = fetchedUser;
 
-            if (userError || !currentUser) {
+            if (userError || !fetchedUser) {
                 setUser(null);
                 setPermissions(null);
                 setLoading(false);
-                sessionStorage.removeItem('wyshkit_perms');
                 return;
             }
 
-            if (!currentUser) {
-                setLoading(false);
-                return;
-            }
-
-            setUser(currentUser);
-
-            // Background fetch to ensure permissions are up to date
-            updatePermissions(currentUser.id);
-
+            setUser(fetchedUser);
+            updatePermissions(fetchedUser.id);
             setLoading(false);
         } catch (err) {
             logger.error('Auth Init Error:', err as Error);
@@ -109,7 +89,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     updatePermissions(currentUser.id);
                 } else {
                     setPermissions(null);
-                    sessionStorage.removeItem('wyshkit_perms');
                 }
             } else if (currentUser && !permissions && !fetchingRef.current) {
                 updatePermissions(currentUser.id);
@@ -124,14 +103,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
     }, [supabase]);
 
+    const signInWithPhone = async (phone: string) => {
+        try {
+            const authPhone = normalizePhone(phone);
+            const { error } = await supabase.auth.signInWithOtp({
+                phone: authPhone,
+                options: { channel: "sms" },
+            });
+            if (error) throw error;
+            return { success: true };
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to send OTP';
+            const isRetryable = errorMessage.includes("500") || errorMessage.includes("Twilio");
+            return { success: false, error: errorMessage, isRetryable };
+        }
+    };
+
+    const verifyOTP = async (phone: string, token: string) => {
+        try {
+            const authPhone = normalizePhone(phone);
+            const result = await supabase.auth.verifyOtp({
+                phone: authPhone,
+                token,
+                type: "sms",
+            });
+
+            if (!result.error && result.data.user) {
+                // Swiggy 2026: Parallelize critical path for faster TTI
+                await Promise.all([
+                    mergeGuestCartToUser().catch(e => logger.error('Cart merge failed', e as Error)),
+                    refreshSession()
+                ]);
+
+                return { success: true, user: result.data.user };
+            }
+
+            return { success: false, error: result.error?.message || "OTP verification failed" };
+        } catch (err: unknown) {
+            return { success: false, error: err instanceof Error ? err.message : "Failed to verify OTP" };
+        }
+    };
+
     const signOut = async () => {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            sessionStorage.removeItem('wyshkit_perms');
+            setUser(null);
+            setPermissions(null);
+            router.push("/");
             return { success: true };
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Failed to sign out';
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to sign out';
             return { success: false, error: errorMessage };
         }
     };
@@ -141,6 +163,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         permissions,
         loading,
         error,
+        signInWithPhone,
+        verifyOTP,
         signOut,
         refreshSession
     }), [user, permissions, loading, error]);
@@ -148,10 +172,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuthContext() {
+export function useAuth() {
     const context = useContext(AuthContext);
     if (context === undefined) {
-        throw new Error("useAuthContext must be used within an AuthProvider");
+        throw new Error("useAuth must be used within an AuthProvider");
     }
     return context;
 }

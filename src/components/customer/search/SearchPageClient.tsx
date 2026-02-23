@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import type { Tables } from "@/lib/supabase/database.types";
 import { cn } from "@/lib/utils";
 import { logger } from '@/lib/logging/logger';
-import { EntityCard } from "@/components/ui/EntityCard";
-import { QuickItemSheet } from "@/components/customer/item/QuickItemSheet";
+import { PartnerCard } from "@/components/ui/PartnerCard";
+import { ItemCard } from "@/components/ui/ItemCard";
 import Link from 'next/link';
 
 interface SearchPageClientProps {
@@ -79,13 +79,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
   const hasResults = results.items.length > 0 || results.partners.length > 0;
   const hasActiveFilters = currentQ || currentCategory;
 
-  // ELITE: Quick Look State
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-
-  const handleItemClick = (e: React.MouseEvent, item: any) => {
-    e.preventDefault();
-    setSelectedItemId(item.id);
-  };
+  // No local state for item selection - URL takes precedence
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -159,7 +153,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             <Button
               onClick={() => router.push('/')}
               variant="outline"
-              className="rounded-xl border-zinc-200 text-xs font-black tracking-wider px-8"
+              className="rounded-xl border-zinc-200 text-xs font-black tracking-tight px-8"
             >
               Back to Home
             </Button>
@@ -169,14 +163,12 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             <div className="space-y-8">
               {results.partners.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-black text-zinc-400 tracking-[0.2em] mb-4 px-1">Top Stores</h3>
+                  <h3 className="text-xs font-black text-zinc-400 tracking-tight mb-4 px-1">Top stores</h3>
                   <div className="space-y-4">
                     {results.partners.map((partner) => (
-                      <EntityCard
+                      <PartnerCard
                         key={partner.id}
-                        type="partner"
                         data={partner}
-                        variant="row"
                         className="bg-zinc-50/50 p-2"
                       />
                     ))}
@@ -186,7 +178,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
 
               {results.items.length > 0 && (
                 <div className="pb-safe">
-                  <h3 className="text-xs font-black text-zinc-400 tracking-[0.2em] mb-4 px-1">Items from Stores</h3>
+                  <h3 className="text-xs font-black text-zinc-400 tracking-tight mb-4 px-1">Items from stores</h3>
                   <div className="space-y-6">
                     {Object.entries(
                       results.items.reduce((acc: Record<string, { partnerName: string, items: any[] }>, item: any) => {
@@ -198,19 +190,17 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                     ).map(([pId, group]) => (
                       <div key={pId} className="space-y-3">
                         <div className="flex items-center justify-between px-1">
-                          <Link href={`/partner/${pId}`} className="text-xs font-black text-zinc-900 tracking-tight hover:text-[var(--primary)] transition-colors">
+                          <Link href={`/store/${pId}`} className="text-xs font-black text-zinc-900 tracking-tight hover:text-[var(--primary)] transition-colors">
                             {group.partnerName}
                           </Link>
-                          <span className="text-[11px] font-bold text-zinc-400 tracking-wider">{group.items.length} Match{group.items.length > 1 ? 'es' : ''}</span>
+                          <span className="text-[11px] font-bold text-zinc-400 tracking-tight">{group.items.length} Match{group.items.length > 1 ? 'es' : ''}</span>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-2 gap-x-3 gap-y-6">
                           {group.items.map((item) => (
-                            <EntityCard
+                            <ItemCard
                               key={item.id}
-                              type="item"
                               data={item}
-                              onQuickLook={(id) => setSelectedItemId(id)}
                             />
                           ))}
                         </div>
@@ -223,14 +213,6 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
           </div>
         )}
       </div>
-
-      {/* WYSHKIT 2026: Quick Look Sheet */}
-      <QuickItemSheet
-        itemId={selectedItemId}
-        open={!!selectedItemId}
-        onClose={() => setSelectedItemId(null)}
-      />
     </div>
   );
 }
-

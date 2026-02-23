@@ -28,48 +28,20 @@ export async function getPartnerFromSession(): Promise<Partner | null> {
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session || !session.user) return null;
+  const user = session.user;
 
-  // 1. Check partner_users table (preferred method for all users including admins)
-  const { data: partnerLink } = await supabase
-    .from('partner_users')
-    .select('partner_id, partners(*)')
-    .eq('user_id', user.id)
-    .maybeSingle();
+  // WYSHKIT 2026: Single-Trip Partner Resolution via RPC
+  const { data: partner, error } = await (supabase as any).rpc('get_partner_from_session', {
+    p_user_id: user.id,
+    p_email: user.email || null,
+    p_app_metadata: user.app_metadata || {}
+  });
 
-  if ((partnerLink as any)?.partner_id) {
-    return (partnerLink as any)?.partners || null;
+  if (error || !partner) {
+    return null;
   }
 
-  // 2. Check users table role and try to match by email
-  const { data: dbUser } = await supabase
-    .from('users')
-    .select('role, email')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if ((dbUser as any)?.role === 'partner' && user.email) {
-    const { data: partnerByEmail } = await supabase
-      .from('partners')
-      .select('*')
-      .eq('email', user.email)
-      .maybeSingle();
-
-    if (partnerByEmail) return partnerByEmail as Partner;
-  }
-
-  // 3. Check app_metadata for partner_id
-  const partnerId = user.app_metadata?.partner_id;
-  if (partnerId) {
-    const { data: partner } = await supabase
-      .from('partners')
-      .select('*')
-      .eq('id', partnerId)
-      .maybeSingle();
-
-    if (partner) return partner as Partner;
-  }
-
-  return null;
+  return partner as unknown as Partner;
 }

@@ -192,7 +192,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
               onClick={() => handleReorder(order)}
               disabled={isPending || isReordering || !isOrderAvailable}
               className={cn(
-                "shrink-0 w-[260px] bg-white rounded-2xl border border-zinc-100 overflow-hidden",
+                "shrink-0 w-[260px] bg-white rounded-xl border border-zinc-100 overflow-hidden",
                 "hover:border-zinc-200 hover:shadow-lg transition-all duration-300",
                 "active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed",
                 !isOrderAvailable && "grayscale",

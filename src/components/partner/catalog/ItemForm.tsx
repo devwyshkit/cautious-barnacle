@@ -33,11 +33,8 @@ import {
   createVariant,
   updateVariant,
   deleteVariant,
-  createPersonalizationOption,
-  deletePersonalizationOption,
   type ItemInput,
   type VariantInput,
-  type PersonalizationOptionInput,
 } from '@/lib/actions/partner/catalog';
 import type { Database } from '@/lib/supabase/database.types';
 
@@ -146,7 +143,7 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
     sku: '',
   });
 
-  const [newPersonalization, setNewPersonalization] = useState<PersonalizationOptionInput>({
+  const [newPersonalization, setNewPersonalization] = useState<Partial<PersonalizationOption>>({
     name: '',
     price: 0,
     input_type: 'text',
@@ -177,8 +174,23 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
 
     setSaving(true);
     try {
+      const fullInput: ItemInput = {
+        ...formData,
+        personalization_options: personalizationOptions.map(p => ({
+          name: p.name,
+          price: p.price || 0,
+          input_type: p.input_type || 'text',
+          char_limit: p.char_limit || null,
+          instructions: p.instructions || null
+        })),
+        item_addons: addons.map(a => ({
+          name: a.name,
+          price: a.price || 0
+        }))
+      };
+
       if (isEdit && item) {
-        const result = await updateItem(item.id, formData);
+        const result = await updateItem(item.id, fullInput);
         if (result.error) {
           toast.error(result.error);
           return;
@@ -205,28 +217,9 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
           }
         }
 
-        // WYSHKIT 2026: Update logic for personalization and addons
-        // In a real production scenario, we'd do an atomic sync/upsert. 
-        // For now, we ensure new ones created in form are persisted.
-        for (const p of personalizationOptions) {
-          if (!p.id) {
-            await createPersonalizationOption(item.id, {
-              name: p.name,
-              price: p.price || 0,
-              input_type: p.input_type as 'text' | 'image' | 'both',
-              char_limit: p.char_limit || undefined,
-              instructions: p.instructions || undefined,
-            });
-          }
-        }
-
-        // Addons currently lack a dedicated update action in item-actions, 
-        // they are typically handled via the items.items_addons JSON or separate table.
-        // If they are in a separate table, we'd sync them here.
-
         toast.success('Item updated');
       } else {
-        const result = await createItem(partnerId, formData);
+        const result = await createItem(partnerId, fullInput);
         if (result.error) {
           toast.error(result.error);
           return;
@@ -240,16 +233,6 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
               mrp: v.mrp || undefined,
               stock_quantity: v.stock_quantity ?? 0,
               sku: v.sku || undefined,
-            });
-          }
-
-          for (const p of personalizationOptions) {
-            await createPersonalizationOption(result.data.id, {
-              name: p.name,
-              price: p.price || 0,
-              input_type: p.input_type as 'text' | 'image' | 'both',
-              char_limit: p.char_limit || undefined,
-              instructions: p.instructions || undefined,
             });
           }
         }
@@ -290,20 +273,16 @@ export function ItemForm({ partnerId, item, open, onOpenChange, onSuccess }: Ite
   };
 
   const handleAddPersonalization = () => {
-    if (!newPersonalization.name.trim()) {
+    if (!newPersonalization.name?.trim()) {
       toast.error('Option name required');
       return;
     }
-    setPersonalizationOptions([...personalizationOptions, { ...newPersonalization, is_active: true }]);
+    setPersonalizationOptions([...personalizationOptions, { ...newPersonalization as PersonalizationOption, is_active: true }]);
     setNewPersonalization({ name: '', price: 0, input_type: 'text', char_limit: 50 });
     setFormData({ ...formData, has_personalization: true });
   };
 
   const handleRemovePersonalization = async (index: number) => {
-    const option = personalizationOptions[index];
-    if (option.id) {
-      await deletePersonalizationOption(option.id);
-    }
     const newOptions = personalizationOptions.filter((_, i) => i !== index);
     setPersonalizationOptions(newOptions);
     if (newOptions.length === 0) {

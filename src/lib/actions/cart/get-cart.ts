@@ -38,59 +38,45 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
         }
 
         const cartIdentity = user?.id ?? guestSessionId ?? 'empty';
-        const queryClient = user ? supabase : await createAdminClient();
+        const queryClient = supabase; // Swiggy 2026: RLS handles guest reads via session_id
 
-        // 2. Swiggy 2026: Parallel Context Fetch
-        const [detailedRes, totalsRes, sessionRes] = await Promise.all([
-            queryClient
-                .from('v_active_cart_detailed')
-                .select('*')
-                .or(user ? `user_id.eq.${user.id}` : `session_id.eq.${guestSessionId}`)
-                .order('id'),
-            queryClient
-                .from('v_active_cart_totals')
-                .select('pricing')
-                .or(user ? `user_id.eq.${user.id}` : `session_id.eq.${guestSessionId}`)
-                .maybeSingle(),
-            queryClient
-                .from('checkout_sessions')
-                .select('applied_coupon, use_wallet, selected_address_id, gstin')
-                .or(user ? `user_id.eq.${user.id}` : `session_id.eq.${guestSessionId}`)
-                .maybeSingle()
-        ]);
+        // 2. Swiggy 2026: Single Trip Context Fetch
+        const { data: context, error: contextError } = await queryClient
+            .rpc('get_cart_context', {
+                p_user_id: user?.id ?? undefined,
+                p_session_id: guestSessionId ?? undefined
+            });
 
-        if (detailedRes.error) logError(detailedRes.error, 'GetCartDetailed');
-        if (totalsRes.error) logError(totalsRes.error, 'GetCartTotals');
-        if (sessionRes.error) logError(sessionRes.error, 'GetCartSession');
+        if (contextError) {
+            logError(contextError, 'GetCartContextRPC');
+            return { cart: EMPTY_CART, error: contextError.message };
+        }
 
-        const itemRows = detailedRes.data || [];
-        const dbRes = (totalsRes.data?.pricing as unknown as PricingBreakdown) || {} as PricingBreakdown;
+        const data = context as any;
+        const itemRows = data.items || [];
+        const dbRes = data.pricing || {};
+        const sessionData = data.session || {};
 
         // 3. Mapping with Purified Logic
-        const items: DraftLineItem[] = itemRows.map(row => {
+        const items: DraftLineItem[] = itemRows.map((row: any) => {
             const quantity = Number(row.quantity) || 1;
             const base_price = Number(row.variant_price ?? row.base_price ?? 0);
-
             const selected_addons = (row.selected_addons as unknown as SelectedAddon[]) || [];
             const addons_price = selected_addons.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
-
             const personalization = (row.personalization as unknown as SelectedPersonalization) || { enabled: false };
-            // Note: Personalization fee is handled at the order total level, 
-            // but we can show it here if needed for UI.
-            const personalization_price = personalization.enabled ? 50 : 0; // Legacy fallback, will be mastered by individual items later
 
-            const unit_price = base_price + addons_price;
-            const line_total = (unit_price + personalization_price) * quantity;
-
+            // WYSHKIT 2026: Zero Shadow Math. 
+            // We trust the DB's line_total and personalization_fee 100%. No fallback derivations.
             return {
                 id: row.id || '',
                 item_id: row.item_id || '',
                 item_name: row.item_name || 'Product',
                 item_image: row.item_image || '/images/logo.png',
                 quantity: quantity,
-                unit_price: unit_price,
-                total_price: line_total,
-                selected_variant_id: row.selected_variant_id,
+                unit_price: base_price + addons_price,
+                line_total: Number(row.line_total || 0), // ALIGNED WITH DB
+                personalization_fee: Number(row.personalization_fee || 0), // ALIGNED WITH DB
+                selected_variant_id: row.variant_id ?? row.selected_variant_id,
                 personalization: personalization,
                 selected_addons: selected_addons,
                 partner_name: row.partner_name || 'Store',
@@ -102,10 +88,8 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
                 base_price: Number(row.base_price || 0),
                 variant_price: row.variant_price != null ? Number(row.variant_price) : null,
                 variant_name: row.variant_name || undefined,
-                personalization_price: personalization_price,
                 addons_price: addons_price,
                 is_personalized: !!personalization?.enabled,
-                personalization_details: personalization?.enabled ? personalization : null,
                 personalization_options: (row.personalization_options as Tables<'personalization_options'>[]) || [],
                 item_addons: [],
             };
@@ -113,7 +97,6 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
 
         const partnerIds = new Set(items.map(item => item.partner_id).filter(Boolean));
         const partnerId = partnerIds.size === 1 ? Array.from(partnerIds)[0] as string : null;
-        const sessionData = (sessionRes.data as any) || {};
 
         const cart: DraftTransaction = {
             items,
@@ -126,6 +109,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
             discount: Number(dbRes.discount) || 0,
             wallet_discount: Number(dbRes.wallet_discount) || 0,
             total: Number(dbRes.total) || 0,
+            cashback_amount: Number((dbRes as any).cashback_amount) || 0,
             item_count: items.reduce((sum, item) => sum + item.quantity, 0),
             applied_coupon: sessionData.applied_coupon,
             use_wallet: sessionData.use_wallet || false,

@@ -60,7 +60,7 @@ export function HyperlocalTimer({
 
     if (variant === 'minimal') {
         return (
-            <div className={cn("flex items-center gap-1.5 tabular-nums text-xs font-black tracking-wider", isUrgent ? "text-rose-500" : "text-amber-500", className)}>
+            <div className={cn("flex items-center gap-1.5 tabular-nums text-xs font-black tracking-tight", isUrgent ? "text-rose-500" : "text-amber-500", className)}>
                 <div className={cn("size-1 rounded-full", isUrgent ? "bg-rose-500 animate-ping" : "bg-amber-500")} />
                 {timeLeft}
             </div>
@@ -83,7 +83,7 @@ export function HyperlocalTimer({
 
     return (
         <div className={cn(
-            "flex items-center gap-3 p-3 rounded-2xl border transition-all duration-300",
+            "flex items-center gap-3 p-3 rounded-xl border transition-all duration-300",
             isUrgent ? "bg-rose-50/50 border-rose-100 shadow-[0_4px_12px_rgba(225,29,72,0.05)]" : (isDark ? "bg-white/5 border-white/10" : "bg-white border-zinc-100"),
             className
         )}>

@@ -125,7 +125,7 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
       <label className="label-overline">Delivery address</label>
 
       {isAddingAddress ? (
-        <div className="p-4 bg-white rounded-2xl border border-zinc-200 shadow-sm">
+        <div className="p-4 bg-white rounded-xl border border-zinc-200 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-zinc-900">Add New Address</h3>
           </div>

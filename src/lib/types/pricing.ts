@@ -13,4 +13,5 @@ export interface PricingBreakdown {
     discount: number;
     wallet_discount: number;
     total: number;
+    cashback_amount: number;
 }

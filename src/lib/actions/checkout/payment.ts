@@ -62,38 +62,26 @@ export async function create_payment_order(
         await supabase.from('stock_reservations').delete().eq('user_id', user.id);
 
         // 1.6. WYSHKIT 2026: BATCHED INVENTORY CHECK (F4)
-        const stock_checks = payload.draft_items.map(async (item) => {
-            const v_id = item.selected_variant_id || null;
-            const item_id = item.item_id;
-            const qty_needed = item.quantity || 1;
-
-            const { data: available_stock, error: stock_error } = await supabase.rpc('get_available_stock', {
-                p_variant_id: v_id || undefined,
-                p_item_id: item_id,
-                p_exclude_user_id: user.id
-            });
-
-            if (stock_error) throw new Error(`Stock verification failed for ${item.item_name || item_id}`);
-            const available = Number(available_stock) || 0;
-            if (available < qty_needed) {
-                throw new Error(`Insufficient stock for "${item.item_name || 'Item'}". Only ${available} available.`);
-            }
-            return true;
+        const { data: batchStock, error: batchStockError } = await supabase.rpc('check_batch_stock' as any, {
+            p_items: payload.draft_items.map(item => ({
+                item_id: item.item_id,
+                variant_id: item.variant_id || null,
+                quantity: item.quantity || 1
+            })) as unknown as Json,
+            p_exclude_user_id: user.id
         });
 
-        try {
-            await Promise.all(stock_checks);
-        } catch (err) {
-            const e = err as Error;
-            logger.error('Inventory check failed', { error: e.message });
-            return { error: e.message, status: 409 };
+        if (batchStockError || !batchStock || !(batchStock as any).success) {
+            const errorMsg = (batchStock as any)?.error || 'Insufficient stock for one or more items.';
+            logger.error('Inventory check failed (batch)', { error: errorMsg });
+            return { error: errorMsg, status: 409 };
         }
 
         // 2. FETCH PRICING FROM DB RPC
         const { calculateOrderTotalRPC } = await import('./pricing');
         const pricingItems = payload.draft_items.map((item) => ({
-            item_id: item.item_id,
-            variant_id: item.selected_variant_id || null,
+            item_id: item.item_id as string,
+            variant_id: item.variant_id || null,
             quantity: item.quantity,
             has_personalization: !!item.personalization?.enabled,
             personalization_option_id: item.personalization?.option_id || null,
@@ -129,37 +117,22 @@ export async function create_payment_order(
             return { error: 'Price discrepancy too high. Please refresh cart.', status: 400 };
         }
 
-        // 4. PERSIST DRAFT (WYSHKIT 2026: Bypass Razorpay Notes Limit)
-        const { data: draft, error: draft_error } = await supabase
-            .from('draft_orders')
-            .insert({
-                user_id: user.id,
-                items: payload.draft_items.map((item) => ({
-                    item_id: item.item_id,
-                    variant_id: item.selected_variant_id || null,
-                    quantity: item.quantity,
-                    has_personalization: !!item.personalization?.enabled,
-                    personalization_config: item.personalization || null,
-                    selected_addons: item.selected_addons || [],
-                })) as unknown as Json,
-                address_id: payload.address_id,
-                metadata: {
-                    gstin: payload.gstin || null,
-                    delivery_instructions: (payload.delivery_instructions || '').trim(),
-                    coupon_code: payload.applied_coupon?.code || null,
-                    use_wallet: !!(payload.wallet_discount && payload.wallet_discount > 0),
-                    pricing: pricingData,
-                    distance_km: distance_km,
-                    delivery_fee: pricingData?.delivery_fee
-                } as unknown as Json
-            })
-            .select('id')
-            .single();
+        // 4. PERSIST METADATA TO CHECKOUT SESSION (WYSHKIT 2026)
+        const { error: session_error } = await supabase.rpc('update_checkout_session', {
+            p_user_id: user.id,
+            p_applied_coupon: payload.applied_coupon?.code || undefined,
+            p_gstin: payload.gstin || undefined,
+            p_selected_address_id: payload.address_id,
+            p_use_wallet: !!(payload.wallet_discount && payload.wallet_discount > 0)
+        });
 
-        if (draft_error) {
-            logger.error('Failed to create draft order', draft_error);
-            return { error: 'Failed to prepare order', status: 500 };
+        if (session_error) {
+            logger.error('Failed to update checkout session', session_error);
+            return { error: 'Failed to prepare order session', status: 500 };
         }
+
+        const { data: session } = await supabase.from('checkout_sessions').select('id').eq('user_id', user.id).single();
+        const sessionId = session?.id || user.id;
 
         // 5. RAZORPAY ORDER
         const receipt = `order_${Date.now()}`;
@@ -169,7 +142,7 @@ export async function create_payment_order(
             receipt,
             {
                 userId: user.id,
-                draftId: draft.id,
+                sessionId: sessionId,
             }
         );
 
@@ -178,7 +151,7 @@ export async function create_payment_order(
             user_id: user.id,
             payment_intent_id: order.id,
             item_id: item.item_id,
-            variant_id: item.selected_variant_id || null,
+            variant_id: item.variant_id || null,
             quantity: item.quantity || 1,
             expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString()
         }));
@@ -197,7 +170,7 @@ export async function create_payment_order(
                 amount: order.amount,
                 currency: order.currency,
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-                draftId: draft.id
+                sessionId: sessionId
             },
             error: null
         };
@@ -227,16 +200,25 @@ export async function verify_payment_signature(
             return { error: 'User session not found', status: 401 };
         }
 
-        // 1. Fetch Draft Data
-        const { data: draft, error: draft_error } = await supabase
-            .from('draft_orders')
+        // 1. Fetch Session & Cart Data
+        const { data: session, error: session_error } = await supabase
+            .from('checkout_sessions')
             .select('*')
             .eq('id', payload.draft_id)
             .single();
 
-        if (draft_error || !draft) {
-            logger.error('verify_payment_signature: draft not found', { draftId: payload.draft_id });
+        if (session_error || !session) {
+            logger.error('verify_payment_signature: session not found', { sessionId: payload.draft_id });
             return { error: 'Order session expired. Please try again.', status: 404 };
+        }
+
+        const { data: cart_items, error: cart_error } = await supabase
+            .from('v_active_cart_detailed')
+            .select('*')
+            .eq('user_id', user.id);
+
+        if (cart_error || !cart_items || cart_items.length === 0) {
+            return { error: 'Your cart is empty. Cannot finalize order.', status: 400 };
         }
 
         // 2. Verification Logic
@@ -272,24 +254,25 @@ export async function verify_payment_signature(
         }
 
         // 3. ATOMIC ORDER PLACEMENT
-        const metadata = (draft.metadata as unknown as DraftMetadata) || {};
-
-        // Calculate personalization flag for UI feedback
-        const draft_items = (draft.items as unknown as DraftLineItem[]) || [];
-        const has_pers = hasAnyPersonalization(draft_items);
+        const has_pers = cart_items.some(item => (item.personalization as any)?.enabled);
 
         const order_result = await executeCommerceIntent({
             intent: 'PLACE_ORDER',
             payload: {
                 razorpay_order_id: razorpay_order_id,
                 payment_id: razorpay_payment_id,
-                items: draft_items as any,
-                address_id: draft.address_id || undefined,
-                coupon_code: metadata.coupon_code || undefined,
-                use_wallet: metadata.use_wallet,
-                gstin: metadata.gstin || undefined,
-                delivery_instructions: metadata.delivery_instructions || undefined,
-                distance_km: metadata.distance_km || undefined
+                items: cart_items.map(item => ({
+                    item_id: item.item_id,
+                    variant_id: item.variant_id,
+                    quantity: item.quantity,
+                    personalization: item.personalization,
+                    selected_addons: item.selected_addons
+                })) as any,
+                address_id: session.selected_address_id || undefined,
+                coupon_code: session.applied_coupon || undefined,
+                use_wallet: session.use_wallet || false,
+                gstin: session.gstin || undefined,
+                // [DEPRECATION] instructions/distance moved to RPC context or hardcoded defaults
             }
         });
 
@@ -300,8 +283,9 @@ export async function verify_payment_signature(
         const order_id = (order_result.data as any)?.order_id;
         const order_number = (order_result.data as any)?.order_number;
 
-        // Cleanup draft
-        await supabase.from('draft_orders').delete().eq('id', draft.id);
+        // Session cleanup happens inside executeCommerceIntent('PLACE_ORDER') switch case
+        // But for guard:
+        await supabase.from('checkout_sessions').delete().eq('id', session.id);
 
         return {
             success: true,
@@ -325,23 +309,23 @@ export async function verify_payment_signature(
  * WYSHKIT 2026: Cleanup logic for stale draft orders.
  * This can be called from a maintenance worker or cron job.
  */
-export async function cleanup_draft_orders() {
+export async function cleanup_stale_sessions() {
     try {
         const { createAdminClient } = await import('@/lib/supabase/server');
         const supabase = await createAdminClient();
         const { error } = await supabase
-            .from('draft_orders')
+            .from('checkout_sessions')
             .delete()
-            .lt('expires_at', new Date().toISOString());
+            .lt('updated_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
         if (error) {
-            logger.error('Failed to cleanup draft orders', error);
+            logger.error('Failed to cleanup sessions', error);
             return { success: false, error };
         }
 
         return { success: true };
     } catch (error) {
-        logError(error, 'cleanup_draft_orders');
+        logError(error, 'cleanup_stale_sessions');
         return { success: false, error };
     }
 }

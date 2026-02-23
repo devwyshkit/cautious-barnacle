@@ -12,7 +12,7 @@ export default function CheckoutLoading() {
 
         <div className="px-4 py-6 space-y-6">
           {/* Cart Card Skeleton */}
-          <div className="bg-white rounded-[32px] p-6 shadow-sm border border-zinc-100 space-y-4">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-zinc-100 space-y-4">
             <div className="flex items-center gap-3 border-b border-zinc-50 pb-4">
               <Skeleton className="size-10 rounded-xl" />
               <div className="space-y-2">
@@ -35,14 +35,14 @@ export default function CheckoutLoading() {
           </div>
 
           {/* Location Card Skeleton */}
-          <div className="bg-white rounded-[32px] p-6 shadow-sm border border-zinc-100 space-y-4">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-zinc-100 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 tracking-tighter font-black">
                 <Skeleton className="size-5 rounded-full" />
                 <Skeleton className="h-4 w-32" />
               </div>
             </div>
-            <div className="flex gap-4 items-center p-4 bg-zinc-50/50 rounded-2xl border border-zinc-100">
+            <div className="flex gap-4 items-center p-4 bg-zinc-50/50 rounded-xl border border-zinc-100">
               <Skeleton className="size-10 rounded-full" />
               <div className="space-y-2 flex-1">
                 <Skeleton className="h-4 w-full" />
@@ -52,7 +52,7 @@ export default function CheckoutLoading() {
           </div>
 
           {/* Bill Detail Skeleton */}
-          <div className="bg-white rounded-[32px] p-6 shadow-sm border border-zinc-100 space-y-4">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-zinc-100 space-y-4">
             <Skeleton className="h-4 w-24" />
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -77,7 +77,7 @@ export default function CheckoutLoading() {
             <Skeleton className="h-3 w-16" />
             <Skeleton className="h-5 w-20" />
           </div>
-          <Skeleton className="h-12 flex-1 rounded-2xl" />
+          <Skeleton className="h-12 flex-1 rounded-xl" />
         </div>
       </div>
     </div>

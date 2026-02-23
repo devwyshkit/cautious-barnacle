@@ -25,11 +25,11 @@ export function LayoutGrid({
 
     const gapClasses = {
         none: 'gap-0',
-        xs: 'gap-1 md:gap-2',
-        sm: 'gap-2 md:gap-3',
-        md: 'gap-4 md:gap-6',
-        lg: 'gap-6 md:gap-8',
-        xl: 'gap-8 md:gap-12'
+        xs: 'gap-[var(--space-1)]',
+        sm: 'gap-[var(--space-2)]',
+        md: 'gap-[var(--space-4)]',
+        lg: 'gap-[var(--space-6)]',
+        xl: 'gap-[var(--space-8)]'
     };
 
     return (

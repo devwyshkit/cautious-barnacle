@@ -24,7 +24,6 @@ interface PartnerTopBarProps {
   partner: {
     id: string;
     name: string;
-    display_name?: string | null;
     is_online?: boolean | null;
   };
 }
@@ -64,7 +63,7 @@ export function PartnerTopBar({ partner }: PartnerTopBarProps) {
           </div>
           <div className="hidden lg:block">
             <h1 className="text-sm font-medium text-zinc-900 truncate max-w-[200px]">
-              {partner.display_name || partner.name}
+              {partner.name}
             </h1>
           </div>
         </div>

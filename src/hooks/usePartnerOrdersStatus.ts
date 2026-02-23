@@ -22,7 +22,7 @@ export function usePartnerOrdersStatus(partnerId: string | undefined) {
                 .from('orders')
                 .select('*', { count: 'exact', head: true })
                 .eq('partner_id', partnerId)
-                .in('status', [ORDER_STATUS.PLACED, ORDER_STATUS.DETAILS_RECEIVED, ORDER_STATUS.DETAILS_RECEIVED]);
+                .in('status', [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED]);
 
             if (error) {
                 if (error.message?.includes('AbortError') || error.code?.includes('AbortError')) {

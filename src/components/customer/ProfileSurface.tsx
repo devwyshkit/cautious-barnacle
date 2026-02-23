@@ -85,14 +85,14 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
             <h2 className="text-lg font-bold text-zinc-900">+91 {user.phone}</h2>
             <button
               onClick={() => setActiveTab('settings')}
-              className="text-xs font-semibold text-zinc-400 tracking-wider mt-1 hover:text-zinc-600 transition-colors"
+              className="text-xs font-semibold text-zinc-400 tracking-tight mt-1 hover:text-zinc-600 transition-colors"
             >
               Edit Profile
             </button>
           </div>
           {permissions?.isAdmin && (
             <Link href="/admin">
-              <Button size="default" variant="outline" className="h-12 px-4 text-xs font-bold tracking-wider rounded-xl border-zinc-200">
+              <Button size="default" variant="outline" className="h-12 px-4 text-xs font-bold tracking-tight rounded-xl border-zinc-200">
                 Admin
               </Button>
             </Link>
@@ -113,7 +113,7 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
               )}
             >
               <tab.icon className={cn("size-5", activeTab === tab.id ? "fill-zinc-900/5" : "")} />
-              <span className="text-xs font-bold tracking-wider">{tab.label}</span>
+              <span className="text-xs font-bold tracking-tight">{tab.label}</span>
               {activeTab === tab.id && (
                 <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-zinc-900 rounded-t-full" />
               )}
@@ -127,15 +127,15 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
         {activeTab === 'account' && (
           <div className="p-6 space-y-6">
             {(permissions?.isPartner || permissions?.isAdmin) && (
-              <section className="bg-zinc-900 rounded-[2.5rem] p-6 text-white relative overflow-hidden shadow-xl mb-6">
+              <section className="bg-zinc-900 rounded-xl p-6 text-white relative overflow-hidden shadow-sm mb-6">
                 <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
                   <Logo variant="minimal" className="size-32" />
                 </div>
                 <div className="relative z-10 space-y-3">
                   <h3 className="text-xs font-black text-white/40 tracking-[0.3em] mb-4">Professional Access</h3>
                   {permissions.isPartner && (
-                    <Link href="/partner" className="flex items-center gap-4 p-4 bg-white/10 rounded-3xl hover:bg-white/15 transition-all border border-white/5 group">
-                      <div className="size-12 rounded-2xl bg-indigo-500 flex items-center justify-center shrink-0">
+                    <Link href="/partner" className="flex items-center gap-4 p-4 bg-white/10 rounded-xl hover:bg-white/15 transition-all border border-white/5 group">
+                      <div className="size-12 rounded-xl bg-indigo-500 flex items-center justify-center shrink-0">
                         <Store className="size-6 text-white" />
                       </div>
                       <div className="flex-1">
@@ -146,8 +146,8 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
                     </Link>
                   )}
                   {permissions.isAdmin && (
-                    <Link href="/admin" className="flex items-center gap-4 p-4 bg-white/10 rounded-3xl hover:bg-white/15 transition-all border border-white/5 group">
-                      <div className="size-12 rounded-2xl bg-rose-500 flex items-center justify-center shrink-0">
+                    <Link href="/admin" className="flex items-center gap-4 p-4 bg-white/10 rounded-xl hover:bg-white/15 transition-all border border-white/5 group">
+                      <div className="size-12 rounded-xl bg-rose-500 flex items-center justify-center shrink-0">
                         <ShieldCheck className="size-6 text-white" />
                       </div>
                       <div className="flex-1">
@@ -162,19 +162,19 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
             )}
 
             <section>
-              <h3 className="text-[11px] font-bold text-zinc-400 tracking-[0.2em] mb-4">Quick Actions</h3>
+              <h3 className="text-[11px] font-bold text-zinc-400 tracking-tight mb-4">Quick Actions</h3>
               <div className="grid grid-cols-3 gap-3">
-                <button onClick={() => setActiveTab('orders')} className="p-4 bg-zinc-50 rounded-2xl flex flex-col items-center gap-2 border border-zinc-100">
+                <button onClick={() => setActiveTab('orders')} className="p-4 bg-zinc-50 rounded-xl flex flex-col items-center gap-2 border border-zinc-100">
                   <Package className="size-5" />
-                  <span className="text-xs font-bold tracking-wider">Orders</span>
+                  <span className="text-xs font-bold tracking-tight">Orders</span>
                 </button>
-                <button onClick={() => setActiveTab('orders')} className="p-4 bg-zinc-900 rounded-2xl flex flex-col items-center gap-2 border border-zinc-800 text-white shadow-lg">
+                <button onClick={() => setActiveTab('orders')} className="p-4 bg-zinc-900 rounded-xl flex flex-col items-center gap-2 border border-zinc-800 text-white shadow-lg">
                   <Sparkles className="size-5 text-amber-400" />
-                  <span className="text-xs font-bold tracking-wider">Briefs</span>
+                  <span className="text-xs font-bold tracking-tight">Briefs</span>
                 </button>
-                <button onClick={() => setActiveTab('addresses')} className="p-4 bg-zinc-50 rounded-2xl flex flex-col items-center gap-2 border border-zinc-100">
+                <button onClick={() => setActiveTab('addresses')} className="p-4 bg-zinc-50 rounded-xl flex flex-col items-center gap-2 border border-zinc-100">
                   <MapPin className="size-5" />
-                  <span className="text-xs font-bold tracking-wider">Address</span>
+                  <span className="text-xs font-bold tracking-tight">Address</span>
                 </button>
               </div>
             </section>
@@ -199,7 +199,7 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
 
         {activeTab === 'settings' && (
           <div className="p-6">
-            <h3 className="text-[11px] font-bold text-zinc-400 tracking-[0.2em] mb-4">Settings</h3>
+            <h3 className="text-[11px] font-bold text-zinc-400 tracking-tight mb-4">Settings</h3>
             <div className="p-4 bg-zinc-50 rounded-xl border border-zinc-100 text-zinc-400 font-medium">
               +91 {user.phone}
             </div>

@@ -6,10 +6,10 @@ import { getFilteredItems } from "@/lib/actions/discovery/search";
 import { getServerLocation } from "@/lib/actions/discovery/location";
 import { HomeSkeleton } from "@/components/customer/home/HomeSkeleton";
 import { WyshkitItem } from '@/lib/types/item';
-import { HeroCarousel } from "@/components/customer/home/HeroCarousel";
 import { BlocksEngine } from "@/components/ui/BlocksEngine";
 import { Masthead } from "@/components/customer/home/Masthead";
 import { ReorderWidget } from "@/components/customer/home/ReorderWidget";
+import { cn } from "@/lib/utils";
 import { SurfaceErrorBoundaryWithRouter } from "@/components/error/SurfaceErrorBoundary";
 
 
@@ -26,9 +26,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const hour = new Date().getHours();
-  const systemStatus = (hour >= 22 || hour < 6) ? 'delayed' : (hour >= 18 && hour < 21) ? 'capacity' : 'normal';
-
   // WYSHKIT 2026: Elite Surface Aggregator (One Trip)
   // Consolidates Categories, Trending Items, Featured Partners, and Active Orders.
   const discovery = await getHomeSurfaceContext(
@@ -44,31 +41,26 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     <div className="min-h-screen max-w-[1440px] mx-auto animate-in font-sans selection:bg-[#D91B24]/10 bg-white">
       <main className="pb-24">
         <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
-        {!category && (
-          <Masthead
-            locationName={location?.name || 'Bangalore'}
-            status={systemStatus}
-          />
+
+        {/* WYSHKIT 2026: Real-time Contextual Masthead */}
+        <Masthead
+          status={discovery.metadata?.system_status as 'normal' | 'delayed' | 'capacity'}
+          locationName={location.name || 'Your Area'}
+        />
+
+        {/* WYSHKIT 2026: Intent-based Reorder Widget */}
+        {!category && discovery.activeOrders?.length > 0 && (
+          <ReorderWidget initialOrders={discovery.metadata?.orders} />
         )}
 
-        {/* WYSHKIT 2026: Discovery Sections (Server Driven) */}
-        {discovery.sections && discovery.sections.map((section: any) => (
-          <SurfaceErrorBoundaryWithRouter key={section.id} surfaceName={section.title}>
-            <BlocksEngine blocks={[section]} />
-          </SurfaceErrorBoundaryWithRouter>
-        ))}
-
-        <div className="mt-4">
-          <SurfaceErrorBoundaryWithRouter surfaceName="Discover" fallback={<DiscoveryErrorFallback />}>
-            <Suspense fallback={<HomeSkeleton />}>
-              <AsyncDiscoveryGrid
-                category={category}
-                categories={discovery.categories}
-                preloadedItems={discoveryItems}
-              />
-            </Suspense>
-          </SurfaceErrorBoundaryWithRouter>
-        </div>
+        {discovery.sections && (
+          <div className="mt-2">
+            <BlocksEngine
+              blocks={discovery.sections}
+              context={{ ...discovery.metadata, selected_category: category }}
+            />
+          </div>
+        )}
       </main>
     </div>
   );
@@ -82,71 +74,63 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 async function AsyncDiscoveryGrid({
   category,
   categories,
-  preloadedItems
+  metadata
 }: {
   category: string | null;
   categories: any[];
-  preloadedItems: WyshkitItem[];
+  metadata?: any;
 }) {
-
   const selectedCategoryName = category
     ? (categories.find((c: any) => c.slug === category) as any)?.name
     : null;
 
-  // If filtering by category, fetch explicitly. Otherwise use preloaded slice.
-  let initialItems: WyshkitItem[] = preloadedItems;
+  const itemsRes = await getFilteredItems({ limit: 24, category: category || undefined });
+  const initialItems = itemsRes.data?.items || [];
+  const totalCount = itemsRes.data?.total;
 
-  let totalCount: number | undefined;
-  if (category) {
-    const itemsRes = await getFilteredItems({ limit: 24, category });
-    initialItems = itemsRes.data?.items || [];
-    totalCount = itemsRes.data?.total;
-  } else if (initialItems.length === 0) {
-    const itemsRes = await getFilteredItems({ limit: 12 });
-    initialItems = itemsRes.data?.items || [];
-    totalCount = itemsRes.data?.total;
-  } else {
-    // preloadedItems came from getHomeDiscovery RPC — no exact total known
-    // Set totalCount to preloadedItems.length to prevent over-fetch attempts
-    // (RPC only returns limited results; genuine total would require separate count query)
-    totalCount = preloadedItems.length;
-  }
+  const blocks = [
+    {
+      id: 'categories_rail',
+      type: 'CIRCLE_RAIL' as const,
+      title: "What's on your mind?",
+      data: categories,
+      metadata: { selected_category: category }
+    },
+    ...(initialItems.length > 0 ? [{
+      id: 'discovery_grid',
+      type: 'PARTNER_GROUPED_GRID' as const,
+      title: selectedCategoryName || 'Discover',
+      data: initialItems
+    }] : []),
+    {
+      id: 'infinite_discovery',
+      type: 'INFINITE_GRID' as const,
+      data: [],
+      metadata: {
+        category: category,
+        totalCount: totalCount
+      }
+    }
+  ];
 
-  if (initialItems.length === 0) {
+  if (initialItems.length === 0 && category) {
     return (
-      <section className="px-4 py-24 md:px-8">
-        <div className="flex flex-col items-center justify-center py-24 px-8 text-center bg-zinc-50 rounded-[40px] border border-dashed border-zinc-200">
-          <div className="size-20 rounded-full bg-white flex items-center justify-center mb-6 shadow-sm">
-            <span className="text-3xl">🧺</span>
-          </div>
-          <p className="text-lg font-black text-zinc-950 tracking-tighter">No items found</p>
-          <p className="text-sm text-zinc-500 mt-2 font-medium">Try another category or check back later.</p>
+      <div className="flex flex-col gap-6">
+        <BlocksEngine blocks={[blocks[0]]} context={metadata} />
+        <div className="flex flex-col items-center justify-center py-24 px-8 text-center bg-zinc-50 rounded-[32px] border border-dashed border-zinc-200 mx-4">
+          <span className="text-3xl mb-4 grayscale">🧺</span>
+          <p className="text-sm font-black text-zinc-950 uppercase tracking-widest">No items found</p>
+          <p className="text-[11px] text-zinc-400 mt-1 font-bold uppercase tracking-tighter">Try another category</p>
         </div>
-      </section>
+      </div>
     );
   }
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 md:px-8">
+    <div className="max-w-[1440px] mx-auto pb-24">
       <BlocksEngine
-        blocks={[
-          {
-            id: 'discovery_grid',
-            type: 'PARTNER_GROUPED_GRID',
-            title: selectedCategoryName ? `${selectedCategoryName} for you` : 'Discover Items',
-            subtitle: selectedCategoryName ? 'Curated stores' : 'Popular in your area',
-            data: initialItems
-          },
-          {
-            id: 'infinite_discovery',
-            type: 'INFINITE_GRID',
-            data: [], // Starts empty, InfiniteFlow handles it
-            metadata: {
-              category: category,
-              totalCount: totalCount
-            }
-          }
-        ]}
+        blocks={blocks}
+        context={{ ...metadata, selected_category: category }}
       />
     </div>
   );

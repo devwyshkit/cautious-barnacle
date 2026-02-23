@@ -36,7 +36,7 @@ export default function CheckoutError({
                 <div className="space-y-3 pt-2">
                     <Button
                         onClick={() => reset()}
-                        className="w-full h-12 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold"
+                        className="w-full h-12 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold"
                     >
                         <RefreshCcw className="size-4 mr-2" />
                         Try Again
@@ -45,7 +45,7 @@ export default function CheckoutError({
                     <Button
                         variant="ghost"
                         asChild
-                        className="w-full h-12 rounded-2xl text-zinc-500 font-bold"
+                        className="w-full h-12 rounded-xl text-zinc-500 font-bold"
                     >
                         <Link href="/">
                             <ShoppingBag className="size-4 mr-2" />

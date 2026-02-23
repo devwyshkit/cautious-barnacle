@@ -66,9 +66,6 @@ export function StatusCard({ order }: StatusCardProps) {
     const getStatusIcon = (status: string) => {
         switch (status) {
             case ORDER_STATUS.PLACED: return <Clock className="size-5" />;
-            case ORDER_STATUS.DETAILS_RECEIVED: return <Package className="size-5" />;
-            case ORDER_STATUS.PREVIEW_READY: return <Camera className="size-5" />;
-            case ORDER_STATUS.APPROVED: return <CheckCircle2 className="size-5" />;
             case ORDER_STATUS.DELIVERED: return <CheckCircle2 className="size-5" />;
             default: return <Clock className="size-5" />;
         }
@@ -78,10 +75,6 @@ export function StatusCard({ order }: StatusCardProps) {
         const map: Record<string, string> = {
             [ORDER_STATUS.PLACED]: 'Order placed',
             [ORDER_STATUS.CONFIRMED]: 'Partner confirmed',
-            [ORDER_STATUS.DETAILS_RECEIVED]: 'Details reviewed',
-            [ORDER_STATUS.PREVIEW_READY]: 'Preview is ready',
-            [ORDER_STATUS.REVISION_REQUESTED]: 'Revision in progress',
-            [ORDER_STATUS.APPROVED]: 'Ready to craft',
             [ORDER_STATUS.IN_PRODUCTION]: 'Crafting now',
             [ORDER_STATUS.PACKED]: 'Ready to fly',
             [ORDER_STATUS.DISPATCHED]: 'On the way',
@@ -97,9 +90,6 @@ export function StatusCard({ order }: StatusCardProps) {
                 return hasPersonalization ? 'Waiting for your design details' : 'Waiting for partner to accept';
             case ORDER_STATUS.CONFIRMED:
                 return hasPersonalization ? 'Share identity to start crafting' : 'Partner is securing your items';
-            case ORDER_STATUS.DETAILS_RECEIVED: return 'Partner is sketching your vision';
-            case ORDER_STATUS.PREVIEW_READY: return 'Review and approve your design preview';
-            case ORDER_STATUS.APPROVED: return 'Partner is starting production';
             case ORDER_STATUS.IN_PRODUCTION: return 'Your gift is being masterfully prepared';
             case ORDER_STATUS.PACKED: return 'Gift is being gift-wrapped for delivery';
             case ORDER_STATUS.OUT_FOR_DELIVERY: return 'Valet is arriving at your location';
@@ -115,7 +105,7 @@ export function StatusCard({ order }: StatusCardProps) {
 
     return (
         <section className={cn(
-            "rounded-3xl border p-6 shadow-sm overflow-hidden relative transition-all duration-500",
+            "rounded-xl border p-6 shadow-sm overflow-hidden relative transition-all duration-500",
             isBreached ? "bg-rose-50/50 border-rose-100 shadow-rose-100/50" : "bg-white border-zinc-100"
         )}>
             {/* WYSHKIT 2026: Live Pulse Header */}
@@ -128,7 +118,7 @@ export function StatusCard({ order }: StatusCardProps) {
                         <span className={cn("absolute inline-flex h-full w-full animate-ping rounded-full opacity-75", isBreached ? "bg-white" : "bg-emerald-400")}></span>
                         <span className={cn("relative inline-flex size-1.5 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]", isBreached ? "bg-white" : "bg-emerald-500")}></span>
                     </div>
-                    <span className="text-xs font-black text-white tracking-wider">
+                    <span className="text-xs font-black text-white tracking-tight">
                         {isBreached ? 'SLA Breach' : 'Live Pulse'}
                     </span>
                 </div>
@@ -136,11 +126,9 @@ export function StatusCard({ order }: StatusCardProps) {
 
             <div className="flex items-start gap-4">
                 <div className={cn(
-                    "size-14 rounded-2xl flex items-center justify-center shrink-0 relative transition-all duration-500",
+                    "size-14 rounded-xl flex items-center justify-center shrink-0 relative transition-all duration-500",
                     isBreached ? "bg-rose-100 text-rose-600" : (
-                        order.status === ORDER_STATUS.PREVIEW_READY
-                            ? "bg-rose-50 text-[var(--primary)]"
-                            : order.status === ORDER_STATUS.DELIVERED ? "bg-emerald-50 text-emerald-600" : "bg-zinc-100 text-zinc-600"
+                        order.status === ORDER_STATUS.DELIVERED ? "bg-emerald-50 text-emerald-600" : "bg-zinc-100 text-zinc-600"
                     ),
                 )}>
                     {isBreached ? <AlertCircle className="size-6 animate-bounce" /> : getStatusIcon(order.status || '')}
@@ -168,7 +156,7 @@ export function StatusCard({ order }: StatusCardProps) {
 
                             if (order.status === ORDER_STATUS.PLACED && pendingCount > 0) {
                                 return (
-                                    <span className="text-[11px] font-black bg-[var(--primary)] text-white px-2 py-0.5 rounded-full animate-pulse tracking-wider whitespace-nowrap">
+                                    <span className="text-[11px] font-black bg-[var(--primary)] text-white px-2 py-0.5 rounded-full animate-pulse tracking-tight whitespace-nowrap">
                                         Action Req: {pendingCount} {pendingCount === 1 ? 'Item' : 'Items'}
                                     </span>
                                 );
@@ -206,18 +194,18 @@ export function StatusCard({ order }: StatusCardProps) {
             </div>
 
             {isBreached && (
-                <div className="mt-4 p-4 bg-white rounded-2xl border border-rose-100 shadow-sm animate-in slide-in-from-bottom-2 duration-500">
-                    <p className="text-xs font-black text-rose-600 tracking-wider mb-3">Escalation Options</p>
+                <div className="mt-4 p-4 bg-white rounded-xl border border-rose-100 shadow-sm animate-in slide-in-from-bottom-2 duration-500">
+                    <p className="text-xs font-black text-rose-600 tracking-tight mb-3">Escalation Options</p>
                     <div className="flex gap-2">
                         <button
                             onClick={() => window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`}
-                            className="flex-1 py-3 bg-rose-600 text-white rounded-xl text-xs font-black tracking-wider active:scale-95 transition-all"
+                            className="flex-1 py-3 bg-rose-600 text-white rounded-xl text-xs font-black tracking-tight active:scale-95 transition-all"
                         >
                             Priority Call
                         </button>
                         <button
                             onClick={() => toast.info("Requesting automated refund status...")}
-                            className="flex-1 py-3 bg-zinc-50 border border-rose-100 text-rose-600 rounded-xl text-xs font-black tracking-wider active:scale-95 transition-all"
+                            className="flex-1 py-3 bg-zinc-50 border border-rose-100 text-rose-600 rounded-xl text-xs font-black tracking-tight active:scale-95 transition-all"
                         >
                             Instant Refund
                         </button>
@@ -230,10 +218,6 @@ export function StatusCard({ order }: StatusCardProps) {
                     const stepStatuses: Record<string, number> = {
                         [ORDER_STATUS.PLACED]: 0,
                         [ORDER_STATUS.CONFIRMED]: 0,
-                        [ORDER_STATUS.DETAILS_RECEIVED]: 1,
-                        [ORDER_STATUS.PREVIEW_READY]: 1,
-                        [ORDER_STATUS.REVISION_REQUESTED]: 1,
-                        [ORDER_STATUS.APPROVED]: 1,
                         [ORDER_STATUS.IN_PRODUCTION]: 1,
                         [ORDER_STATUS.PACKED]: 2,
                         [ORDER_STATUS.DISPATCHED]: 3,
@@ -282,7 +266,7 @@ export function StatusCard({ order }: StatusCardProps) {
                             }
                         });
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-2xl text-[11px] font-bold text-zinc-600 hover:bg-zinc-100 active:scale-95 transition-all"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-[11px] font-bold text-zinc-600 hover:bg-zinc-100 active:scale-95 transition-all"
                 >
                     <FileText className="size-3.5" />
                     Estimate
@@ -311,7 +295,7 @@ export function StatusCard({ order }: StatusCardProps) {
                                 }
                             });
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-2xl text-[11px] font-bold text-emerald-600 hover:bg-emerald-100 active:scale-95 transition-all"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl text-[11px] font-bold text-emerald-600 hover:bg-emerald-100 active:scale-95 transition-all"
                     >
                         <Download className="size-3.5" />
                         Invoice
@@ -319,7 +303,7 @@ export function StatusCard({ order }: StatusCardProps) {
                 )}
                 <button
                     onClick={handleShare}
-                    className="flex-1 h-11 bg-zinc-900 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-black tracking-wider hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-zinc-200"
+                    className="flex-1 h-11 bg-zinc-900 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-black tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-zinc-200"
                 >
                     <Share2 className="size-3.5" />
                     Share Track

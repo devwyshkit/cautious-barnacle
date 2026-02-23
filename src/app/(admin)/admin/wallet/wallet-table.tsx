@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Search, Plus, Loader2 } from 'lucide-react'
-import { creditWallet } from '@/lib/actions/commerce/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import type { Database } from '@/lib/supabase/database.types'
 
 type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
@@ -40,7 +40,12 @@ export function WalletTable({ wallets }: WalletTableProps) {
   const handleCredit = async () => {
     if (!creditDialog || !amount) return
     setLoading(true)
-    await creditWallet(creditDialog.userId, parseFloat(amount), reason || 'Admin credit')
+    await executeAdminIntent({
+      entity: 'wallet_credit',
+      action: 'CREDIT',
+      id: creditDialog.userId,
+      metadata: { amount: parseFloat(amount), description: reason || 'Admin credit' }
+    })
     setAmount('')
     setReason('')
     setCreditDialog(null)

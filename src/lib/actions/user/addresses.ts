@@ -69,7 +69,7 @@ export async function createAddress(payload: {
 
   if (error) return { error: 'Failed to create address' }
 
-  revalidatePath('/checkout')
+  revalidatePath('/')
   revalidatePath('/profile')
   return { address }
 }
@@ -110,7 +110,7 @@ export async function updateAddress(
     .single()
 
   if (error) return { error: 'Failed to update address' }
-  revalidatePath('/checkout')
+  revalidatePath('/')
   revalidatePath('/profile')
   return { address: data }
 }
@@ -128,7 +128,7 @@ export async function deleteAddress(addressId: string) {
 
   if (error) return { error: 'Failed to delete address' }
 
-  revalidatePath('/checkout')
+  revalidatePath('/')
   revalidatePath('/profile')
   return { success: true }
 }
@@ -151,7 +151,7 @@ export async function setDefaultAddress(addressId: string) {
 
   if (error) return { error: 'Failed to set default address' }
 
-  revalidatePath('/checkout')
+  revalidatePath('/')
   revalidatePath('/profile')
   return { success: true }
 }

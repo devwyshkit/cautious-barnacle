@@ -55,8 +55,8 @@ export function FeedbackStep({ orderId, items, onComplete }: FeedbackStepProps) 
 
     if (submitted) {
         return (
-            <div className="p-8 text-center bg-emerald-50 rounded-[32px] border border-emerald-100 animate-in fade-in zoom-in duration-500">
-                <div className="size-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="p-8 text-center bg-emerald-50 rounded-xl border border-emerald-100 animate-in fade-in zoom-in duration-500">
+                <div className="size-16 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="size-8 text-emerald-600" />
                 </div>
                 <h3 className="text-lg font-black text-emerald-900 tracking-tight mb-2">Feedback Received</h3>
@@ -66,13 +66,13 @@ export function FeedbackStep({ orderId, items, onComplete }: FeedbackStepProps) 
     }
 
     return (
-        <section className="bg-white rounded-[32px] border border-zinc-100 p-6 shadow-sm overflow-hidden">
+        <section className="bg-white rounded-xl border border-zinc-100 p-6 shadow-sm overflow-hidden">
             <div className="flex items-center gap-3 mb-6">
                 <div className="size-10 bg-amber-50 rounded-xl flex items-center justify-center">
                     <Star className="size-5 text-amber-500 fill-amber-500" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-black text-zinc-900 tracking-wider">Rate your experience</h3>
+                    <h3 className="text-sm font-black text-zinc-900 tracking-tight">Rate your experience</h3>
                     <p className="text-xs text-zinc-400 font-medium mt-0.5">How was your order #{orderId.slice(0, 8)}?</p>
                 </div>
             </div>
@@ -100,13 +100,13 @@ export function FeedbackStep({ orderId, items, onComplete }: FeedbackStepProps) 
                 <div className="space-y-2">
                     <div className="flex items-center gap-2 px-1">
                         <MessageSquare className="size-3 text-zinc-400" />
-                        <span className="text-xs font-bold text-zinc-400 tracking-wider">Comments (Optional)</span>
+                        <span className="text-xs font-bold text-zinc-400 tracking-tight">Comments (Optional)</span>
                     </div>
                     <textarea
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         placeholder="Tell us what you liked or how we can improve..."
-                        className="w-full h-24 p-5 rounded-2xl bg-zinc-50 border border-zinc-100 text-sm focus:bg-white focus:border-zinc-900 transition-all outline-none resize-none placeholder:text-zinc-300 border shadow-none text-zinc-900 leading-relaxed"
+                        className="w-full h-24 p-5 rounded-xl bg-zinc-50 border border-zinc-100 text-sm focus:bg-white focus:border-zinc-900 transition-all outline-none resize-none placeholder:text-zinc-300 border shadow-none text-zinc-900 leading-relaxed"
                     />
                 </div>
 

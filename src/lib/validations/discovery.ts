@@ -33,7 +33,6 @@ export const EliteSignalsSchema = z.object({
 export const PartnerSchema = z.object({
     id: z.string(),
     name: z.string(),
-    display_name: z.string().nullable().optional(),
     image_url: z.string().nullable().optional(),
     rating: z.number().nullable().optional(),
     city: z.string().nullable().optional(),

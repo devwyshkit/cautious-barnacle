@@ -1,9 +1,16 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import ErrorReporter from "@/components/ErrorReporter";
 import { Providers } from "@/components/Providers";
 import { validateEnv, checkRecommendedEnv } from "@/lib/env";
+import { cn } from "@/lib/utils";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 validateEnv();
 checkRecommendedEnv();
@@ -54,8 +61,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="min-h-screen w-full selection:bg-rose-100 selection:text-rose-900">
-      <body className="antialiased min-h-screen w-full bg-zinc-50">
+    <html lang="en" className={cn("min-h-screen w-full selection:bg-rose-100 selection:text-rose-900", inter.variable)}>
+      <body className="font-sans antialiased min-h-screen w-full bg-white">
         <ErrorReporter />
         <Providers>
           {children}

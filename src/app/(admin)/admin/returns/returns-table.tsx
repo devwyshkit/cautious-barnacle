@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, Check, X } from 'lucide-react'
-import { approveReturn, rejectReturn } from '@/lib/actions/commerce/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import type { Database } from '@/lib/supabase/database.types'
 
 type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
@@ -72,14 +72,23 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
 
   const handleApprove = async (id: string, amount: number) => {
     setProcessing(id)
-    await approveReturn(id, amount)
+    await executeAdminIntent({
+      entity: 'return',
+      action: 'APPROVE',
+      id,
+      metadata: { refund_amount: amount }
+    })
     setProcessing(null)
     router.refresh()
   }
 
   const handleReject = async (id: string) => {
     setProcessing(id)
-    await rejectReturn(id)
+    await executeAdminIntent({
+      entity: 'return',
+      action: 'REJECT',
+      id
+    })
     setProcessing(null)
     router.refresh()
   }

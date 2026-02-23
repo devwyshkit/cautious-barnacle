@@ -10,7 +10,10 @@ import { useSearch } from "@/hooks/useSearch";
 import type { Tables } from "@/lib/supabase/database.types";
 import { ActionSlider } from "@/components/ui/ActionSlider";
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-import { EntityCard, type EntityItem, type EntityPartner } from "@/components/ui/EntityCard";
+import { PartnerCard } from "@/components/ui/PartnerCard";
+
+type EntityItem = any;
+type EntityPartner = any;
 
 export function GlobalSearch() {
   const router = useRouter();
@@ -99,10 +102,8 @@ export function GlobalSearch() {
                       key={partner.id as any}
                       onClick={() => triggerHaptic(HapticPattern.ACTION)}
                     >
-                      <EntityCard
-                        type="partner"
+                      <PartnerCard
                         data={partner}
-                        variant="row"
                       />
                     </div>
                   ))}

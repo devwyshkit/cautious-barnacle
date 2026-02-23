@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PreviewUploader } from './PreviewUploader';
-import type { PartnerOrder } from '@/lib/actions/partner/partner-actions';
+import type { PartnerOrder } from '@/lib/actions/commerce/orders';
 import { ORDER_STATUS, getOrderStatusDisplay } from '@/lib/types/order-status';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -30,12 +30,10 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
   const [orders, setOrders] = useState(initialOrders);
   const [uploadState, setUploadState] = useState<{ orderId: string; orderItemId: string; orderNumber: string } | null>(null);
 
-  const waitingForInput = orders.filter(o => o.status === ORDER_STATUS.PLACED);
-  const needsPreview = orders.filter(o =>
-    [ORDER_STATUS.DETAILS_RECEIVED, ORDER_STATUS.IN_PRODUCTION].includes(o.status as typeof ORDER_STATUS.DETAILS_RECEIVED)
-  );
-  const revisionRequested = orders.filter(o => o.status === ORDER_STATUS.REVISION_REQUESTED);
-  const awaitingApproval = orders.filter(o => o.status === ORDER_STATUS.PREVIEW_READY);
+  const waitingForInput = orders.filter(o => o.has_personalization && (!o.personalization_status || o.personalization_status === 'pending'));
+  const needsPreview = orders.filter(o => o.has_personalization && o.personalization_status === 'submitted');
+  const revisionRequested = orders.filter(o => o.has_personalization && o.personalization_status === 'revision_requested');
+  const awaitingApproval = orders.filter(o => o.has_personalization && o.personalization_status === 'preview_ready');
 
   const handleUploadClick = (orderId: string, orderItemId: string, orderNumber: string) => {
     setUploadState({ orderId, orderItemId, orderNumber });
@@ -123,14 +121,14 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                   variant="outline"
                   className={cn(
                     'text-xs',
-                    order.status === ORDER_STATUS.REVISION_REQUESTED
+                    order.personalization_status === 'revision_requested'
                       ? 'bg-orange-50 text-orange-700 border-orange-200'
-                      : order.status === ORDER_STATUS.PREVIEW_READY
+                      : order.personalization_status === 'preview_ready'
                         ? 'bg-blue-50 text-blue-700 border-blue-200'
                         : 'bg-amber-50 text-amber-700 border-amber-200'
                   )}
                 >
-                  {getOrderStatusDisplay(order.status)}
+                  {order.personalization_status?.replace('_', ' ')?.toUpperCase() || 'PENDING'}
                 </Badge>
               </div>
               <div className="flex items-center gap-1.5 text-zinc-500">
@@ -150,7 +148,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 text-xs font-bold tracking-wider text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        className="h-8 text-xs font-bold tracking-tight text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                         onClick={() => handleUploadClick(order.id, item.id, order.order_number || '')}
                       >
                         <Upload className="size-3.5 mr-1" />
@@ -189,7 +187,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                 <div className="mt-4 pt-4 border-t border-zinc-100">
                   <button
                     onClick={() => setShowHistory(!showHistory)}
-                    className="flex items-center gap-2 text-xs font-black tracking-wider text-zinc-400 hover:text-zinc-600 transition-colors"
+                    className="flex items-center gap-2 text-xs font-black tracking-tight text-zinc-400 hover:text-zinc-600 transition-colors"
                   >
                     <RotateCcw className={cn("size-3 transition-transform", showHistory && "rotate-180")} />
                     Design History ({designHistory.length})

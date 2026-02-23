@@ -59,7 +59,7 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
               id="location-trigger"
               aria-label="Delivery Location"
               onClick={() => setIsLocationOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-50 rounded-2xl transition-all group"
+              className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-50 rounded-xl transition-all group"
             >
               <div className="size-8 rounded-xl bg-zinc-50 flex items-center justify-center group-hover:bg-white transition-all">
                 <MapPin className="size-4 text-zinc-900" />
@@ -76,7 +76,7 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
           <div className="flex-1 max-w-xl">
             <button
               onClick={() => router.push('/search')}
-              className="w-full flex items-center gap-3 h-11 px-4 bg-zinc-100/50 rounded-2xl hover:bg-zinc-100 transition-all group"
+              className="w-full flex items-center gap-3 h-11 px-4 bg-zinc-100/50 rounded-xl hover:bg-zinc-100 transition-all group"
             >
               <Search className="size-4 text-zinc-400 group-hover:text-zinc-600" />
               <span className="text-[14px] text-zinc-500 font-medium">Search for items, stores...</span>
@@ -87,7 +87,7 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
             <HeaderCart />
             <Button
               onClick={() => user ? router.push('/profile') : router.push('/auth')}
-              className="h-10 px-4 rounded-2xl hover:bg-zinc-50 gap-2.5 font-bold text-[14px] text-zinc-900 active:scale-95 transition-all"
+              className="h-10 px-4 rounded-xl hover:bg-zinc-50 gap-2.5 font-bold text-[14px] text-zinc-900 active:scale-95 transition-all"
             >
               {loading ? (
                 <div className="flex items-center gap-2.5">
@@ -112,27 +112,38 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
           </div>
         </div>
 
-        {/* Mobile Header */}
-        <div className="md:hidden flex flex-col px-4 pt-2 pb-1.5">
-          <div className="flex items-center justify-between">
+        {/* Mobile Header: High Density Swiggy 2026 Style */}
+        <div className="md:hidden flex flex-col gap-2.5 px-4 pt-3 pb-2.5">
+          <div className="flex items-center justify-between gap-4">
             <button
               id="location-trigger-mobile"
-              aria-label="Delivery Location"
               onClick={() => setIsLocationOpen(true)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 group overflow-hidden"
             >
-              <div className="size-9 rounded-2xl bg-zinc-50 flex items-center justify-center">
-                <MapPin className="size-4.5 text-zinc-900" />
-              </div>
-              <div className="flex flex-col items-start text-left">
-                <div className="flex items-center gap-1">
-                  <span className="text-[14px] font-bold text-zinc-950 leading-none">{location.name}</span>
-                  <ChevronDown className="size-3 text-zinc-400" />
+              <MapPin className="size-5 text-rose-600 shrink-0" />
+              <div className="flex flex-col items-start min-w-0">
+                <div className="flex items-center gap-1 w-full">
+                  <span className="text-[14px] font-black text-zinc-950 truncate tracking-tight">{location.name}</span>
+                  <ChevronDown className="size-3.5 text-zinc-400 group-active:text-zinc-950 transition-colors" />
                 </div>
-                <span className="text-[11px] font-medium text-zinc-500 mt-0.5 truncate max-w-[180px]">{location.address}</span>
+                <span className="text-[10px] font-bold text-zinc-400 truncate w-full tracking-tight">{location.address}</span>
               </div>
             </button>
+            <Link
+              href="/profile"
+              className="size-9 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center shrink-0"
+            >
+              <User className="size-4.5 text-zinc-600" />
+            </Link>
           </div>
+
+          <button
+            onClick={() => router.push('/search')}
+            className="flex items-center gap-3 h-12 px-4 bg-zinc-100/50 rounded-2xl border border-zinc-100/50 active:scale-[0.98] transition-all"
+          >
+            <Search className="size-4.5 text-rose-600" />
+            <span className="text-[13px] font-bold text-zinc-400">Search "Best Birthday Cakes"</span>
+          </button>
         </div>
       </header>
 

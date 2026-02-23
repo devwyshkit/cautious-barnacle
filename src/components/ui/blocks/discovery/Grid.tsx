@@ -1,26 +1,20 @@
-'use client';
-
-import { EntityCard } from '@/components/ui/EntityCard';
+import { PartnerCard } from '@/components/ui/PartnerCard';
 import { LayoutGrid } from '@/components/ui/LayoutGrid';
 
 interface GridProps {
     data: any[];
-    onQuickLook?: (id: string, type: any) => void;
 }
 
-export function Grid({ data, onQuickLook }: GridProps) {
+export function Grid({ data }: GridProps) {
     if (!data || data.length === 0) return null;
 
     return (
-        <LayoutGrid cols={3} gap="md">
+        <LayoutGrid cols={2} gap="md" className="px-4 md:px-0">
             {data.map((item: any) => (
-                <EntityCard
+                <PartnerCard
                     key={item.id}
-                    type={item.partner_id ? 'item' : 'partner'}
                     data={item}
-                    variant="portrait"
-                    onQuickLook={onQuickLook}
-                    className="bg-zinc-50/50 border-zinc-100 hover:bg-white hover:shadow-xl transition-all"
+                    className="bg-white"
                 />
             ))}
         </LayoutGrid>

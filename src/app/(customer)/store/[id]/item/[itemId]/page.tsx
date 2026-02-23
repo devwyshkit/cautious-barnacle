@@ -11,11 +11,10 @@ export default async function ItemPage({
   params: Promise<{ id: string; itemId: string }>;
 }) {
   const { id, itemId } = await params;
-  const includeInactive = process.env.NODE_ENV === 'development';
 
   // WYSHKIT 2026: Immersive Store Context
   // Tapping a shared link to an item should show the store in the background, not a standalone page.
-  const { partner, items, error } = await getPartnerStoreData(id, includeInactive);
+  const { partner, items, blocks, error } = await getPartnerStoreData(id);
 
   const item = items?.find(i => String(i.id) === itemId);
 
@@ -28,7 +27,7 @@ export default async function ItemPage({
       <PartnerStorePage
         partnerId={id}
         initialData={(partner as unknown) as MappedPartner}
-        initialItems={items}
+        blocks={blocks}
       />
 
       <InterceptedItemSheet

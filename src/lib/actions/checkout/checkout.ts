@@ -55,13 +55,25 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         const guestSessionId = !user ? await getGuestSessionIdReadOnly() : null;
 
         // 1. Resolve Session State
+        if (!user && !guestSessionId) {
+            return {
+                items: [],
+                addresses: [],
+                wallet_info: null,
+                pricing: null,
+                applied_coupon: null,
+                use_wallet: false,
+                selected_address_id: null,
+                user: null,
+                error: 'Session not found'
+            }
+        }
+
         let sessionQuery = supabase.from('checkout_sessions').select('*');
         if (user) {
             sessionQuery = sessionQuery.eq('user_id', user.id);
-        } else if (guestSessionId) {
-            sessionQuery = sessionQuery.eq('session_id', guestSessionId);
         } else {
-            sessionQuery = sessionQuery.eq('id', '00000000-0000-0000-0000-000000000000');
+            sessionQuery = sessionQuery.eq('session_id', guestSessionId!);
         }
 
         const { data: checkoutSession } = await sessionQuery.maybeSingle();
@@ -127,7 +139,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
             selected_address_id: selectedAddressId,
             gstin: gstin || null,
             user: user ? { id: user.id, email: user.email } : null,
-            partner_name: items[0]?.partner_name,
+            partner_name: items[0]?.partner_name || undefined,
             partner_city: items[0]?.partner_city || 'Bangalore',
             partner_prep_mins: items[0]?.partner_prep_hours ? items[0].partner_prep_hours * 60 : 30,
             distance_km: distanceKm,

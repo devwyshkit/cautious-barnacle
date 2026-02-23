@@ -11,7 +11,6 @@ import { getGuestSessionIdReadOnly } from '@/lib/session';
 
 export async function revalidateCartPaths() {
     revalidatePath('/');
-    revalidatePath('/checkout');
 }
 
 /**

@@ -47,7 +47,7 @@ export class PaymentErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="p-6 bg-red-50 border border-red-200 rounded-2xl space-y-4">
+        <div className="p-6 bg-red-50 border border-red-200 rounded-xl space-y-4">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
               <CreditCard className="size-5 text-red-600" />

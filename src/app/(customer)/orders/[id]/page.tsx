@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { OrderDetailsPageClient } from "@/components/customer/orders/OrderDetailsPageClient";
+import { OrderTracker } from "@/components/customer/orders/OrderTracker";
 import { SurfaceErrorBoundaryWithRouter as ErrorBoundary } from "@/components/error/SurfaceErrorBoundary";
 
 /**
@@ -26,6 +26,8 @@ export default async function OrderDetailsPage({
     redirect(`/auth?intent=signin&returnUrl=/orders/${id}`);
   }
 
+  const { id } = await params;
+
   return (
     <div className="min-h-screen">
       <ErrorBoundary surfaceName="Order Details">
@@ -34,7 +36,7 @@ export default async function OrderDetailsPage({
             <div className="text-sm text-zinc-500">Loading order...</div>
           </div>
         }>
-          <OrderDetailsPageClient params={params} />
+          <OrderTracker orderId={id} />
         </Suspense>
       </ErrorBoundary>
     </div>

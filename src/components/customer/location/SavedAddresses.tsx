@@ -34,7 +34,7 @@ export function SavedAddresses({
 }: SavedAddressesProps) {
     return (
         <div className="space-y-4">
-            <p className="text-[11px] font-black text-zinc-600 tracking-wider px-1">Saved addresses</p>
+            <p className="text-[11px] font-black text-zinc-600 tracking-tight px-1">Saved addresses</p>
             <div className="space-y-2">
                 {addresses.map((addr) => {
                     const isSelected = selectedAddressId === addr.id;
@@ -46,9 +46,9 @@ export function SavedAddresses({
                         <div
                             key={addr.id}
                             className={cn(
-                                "w-full flex items-center gap-4 p-4 rounded-2xl border transition-all duration-300",
+                                "w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-300",
                                 isSelected
-                                    ? "bg-zinc-900 border-zinc-900 shadow-xl shadow-zinc-200"
+                                    ? "bg-zinc-900 border-zinc-900 shadow-sm shadow-zinc-200"
                                     : "bg-white border-zinc-100 hover:border-zinc-200"
                             )}
                         >
@@ -95,7 +95,7 @@ export function SavedAddresses({
                                         {isDeleting ? <Loader2 className="size-4 animate-spin" /> : <MoreVertical className="size-4" />}
                                     </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48 rounded-2xl p-1.5 border-zinc-100 shadow-xl">
+                                <DropdownMenuContent align="end" className="w-48 rounded-xl p-1.5 border-zinc-100 shadow-sm">
                                     <DropdownMenuItem
                                         onClick={() => onEdit(addr.id)}
                                         className="rounded-xl flex items-center gap-2.5 px-3 py-2.5 font-bold text-xs text-zinc-600 focus:text-zinc-900"
@@ -121,7 +121,7 @@ export function SavedAddresses({
 
                 <button
                     onClick={onAdd}
-                    className="w-full flex items-center gap-4 p-4 rounded-2xl border-2 border-dashed border-zinc-100 hover:bg-zinc-50 hover:border-zinc-200 transition-all text-left group"
+                    className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-dashed border-zinc-100 hover:bg-zinc-50 hover:border-zinc-200 transition-all text-left group"
                 >
                     <div className="size-10 rounded-xl bg-zinc-50 flex items-center justify-center shrink-0 group-hover:bg-zinc-100 transition-colors">
                         <Plus className="size-4 text-zinc-400 group-hover:text-zinc-600" />

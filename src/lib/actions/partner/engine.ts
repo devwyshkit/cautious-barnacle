@@ -58,14 +58,14 @@ export async function executePartnerIntent(intent: PartnerIntent) {
                 if (order?.partner_id !== partner.id) throw new Error('Access denied');
 
                 if (validated.action === 'ACCEPT') {
-                    const { update_order_status } = await import('./partner-actions');
+                    const { update_order_status } = await import('../commerce/orders');
                     return await update_order_status(validated.id, ORDER_STATUS.CONFIRMED);
                 } else if (validated.action === 'REJECT') {
                     const { reject_order } = await import('./partner-actions');
                     return await reject_order(validated.id, validated.metadata?.reason || 'Store busy');
                 } else if (validated.action === 'UPDATE_STATUS') {
-                    const { update_order_status } = await import('./partner-actions');
-                    return await update_order_status(validated.id, validated.target_status!);
+                    const { update_order_status } = await import('../commerce/orders');
+                    return await update_order_status(validated.id, validated.target_status as any);
                 } else if (validated.action === 'UPLOAD_PREVIEW') {
                     const { upload_preview } = await import('./partner-actions');
                     return await upload_preview(

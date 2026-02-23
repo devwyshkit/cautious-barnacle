@@ -14,6 +14,7 @@ interface WalletSlotProps {
     useWalletBalance: boolean;
     pricing: PricingBreakdown | null;
     onOptimisticToggle?: (checked: boolean) => void;
+    disabled?: boolean;
 }
 
 /**
@@ -22,7 +23,7 @@ interface WalletSlotProps {
  * Swiggy 2026 Pattern: Stateless & Seamless
  * - Mutations via Server Actions + router.refresh()
  */
-export function WalletSlot({ walletInfo, useWalletBalance, pricing }: WalletSlotProps) {
+export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: WalletSlotProps) {
     const [state, toggleAction, isPending] = useActionState(async () => {
         await toggleWalletAction(!useWalletBalance);
         return { success: true };
@@ -33,7 +34,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing }: WalletSlot
     return (
         <div className="py-2">
             <div className={cn(
-                "flex items-center justify-between p-4 rounded-2xl border transition-all duration-300",
+                "flex items-center justify-between p-4 rounded-xl border transition-all duration-300",
                 useWalletBalance
                     ? "bg-zinc-900 border-zinc-900 text-white shadow-lg shadow-zinc-200"
                     : "bg-zinc-50 border-zinc-100 text-zinc-900"
@@ -50,7 +51,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing }: WalletSlot
                             Wyshkit Money
                         </p>
                         <p className={cn(
-                            "text-xs font-bold tracking-wider mt-0.5",
+                            "text-xs font-bold tracking-tight mt-0.5",
                             useWalletBalance ? "text-white/60" : "text-zinc-400"
                         )}>
                             Balance: {formatCurrency(walletInfo.balance)}
@@ -70,7 +71,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing }: WalletSlot
                         <Switch
                             checked={useWalletBalance}
                             onCheckedChange={() => toggleAction()}
-                            disabled={isPending}
+                            disabled={isPending || disabled}
                             className={cn(
                                 "data-[state=checked]:bg-emerald-500",
                                 !useWalletBalance && "bg-zinc-200"

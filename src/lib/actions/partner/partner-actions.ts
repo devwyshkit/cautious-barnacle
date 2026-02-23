@@ -16,21 +16,7 @@ import {
 import { ShadowfaxService } from '@/lib/services/shadowfax';
 import { ORDER_STATUS } from '@/lib/types/order-status';
 import { logger } from '@/lib/logging/logger';
-
-export type OrderStatus = Database['public']['Enums']['order_status'];
-
-// WYSHKIT 2026: PartnerOrder Type with strict check
-export type PartnerOrder = Omit<Order, 'delivery_address' | 'partner'> & {
-  order_items: (OrderItem & {
-    item?: Item | null;
-    variant?: { stock_quantity: number } | null;
-    personalization_entry?: Tables<'order_personalization'> | null;
-  })[];
-  order_personalization?: Tables<'order_personalization'>[];
-  latest_preview?: PreviewSubmission | null;
-  delivery_address?: Address | Address[] | null;
-  partner?: Partner | Partner[] | null;
-};
+import { update_order_status, validate_status_transition, type OrderStatus, type PartnerOrder } from '@/lib/actions/commerce/orders';
 
 export type PartnerStats = {
   today_orders: number;
@@ -46,51 +32,7 @@ function logError(error: unknown, context: string) {
   logger.error(`Partner action error in ${context}`, error, { context });
 }
 
-// WYSHKIT 2026: Order State Machine - Valid Transitions
-// WYSHKIT 2026: Order State Machine - Valid Transitions (STRICT)
-// Enforces "Commitment Before Creativity" and "One-Trip" Principles
-const VALID_TRANSITIONS: Record<string, string[]> = {
-  PLACED: ['CONFIRMED', 'CANCELLED', 'IN_PRODUCTION'],
-  CONFIRMED: ['DETAILS_RECEIVED', 'IN_PRODUCTION', 'PREVIEW_READY', 'CANCELLED'],
-  DETAILS_RECEIVED: ['PREVIEW_READY', 'CANCELLED'],
-  PREVIEW_READY: ['APPROVED', 'REVISION_REQUESTED', 'CANCELLED'],
-  REVISION_REQUESTED: ['PREVIEW_READY', 'CANCELLED'],
-  APPROVED: ['IN_PRODUCTION', 'CANCELLED'],
-  IN_PRODUCTION: ['PACKED', 'CANCELLED'],
-  PACKED: ['DISPATCHED', 'CANCELLED'],
-  DISPATCHED: ['OUT_FOR_DELIVERY', 'DELIVERED'],
-  OUT_FOR_DELIVERY: ['DELIVERED'],
-  DELIVERED: ['REFUNDED'], // Returns flow
-  CANCELLED: [],
-  REFUNDED: [],
-};
-
-function validate_status_transition(
-  from: string,
-  to: string,
-  has_personalization: boolean
-): string | null {
-
-
-  if (from === ORDER_STATUS.PLACED && to === ORDER_STATUS.DETAILS_RECEIVED) {
-    // Note: We allow this if triggered by customer, but validateStatusTransition is usually for partner actions.
-    // We'll keep it strict for partner actions to ensure they "Accept" first.
-    return 'Partner MUST accept order (CONFIRMED) before moving to production design cycle.';
-  }
-
-  // Universal Rule: Can't skip "Preparing" (IN_PRODUCTION)
-  // This applies to BOTH personalized (from APPROVED) and non-personalized (from CONFIRMED)
-  if ((from === ORDER_STATUS.APPROVED || from === ORDER_STATUS.CONFIRMED) && to === ORDER_STATUS.PACKED) {
-    return 'Orders must be marked as "Preparing" (IN_PRODUCTION) before they can be marked as Ready (PACKED).';
-  }
-
-  const valid_next_statuses = VALID_TRANSITIONS[from];
-  if (!valid_next_statuses || !valid_next_statuses.includes(to)) {
-    return `Invalid transition from "${from}" to "${to}".`;
-  }
-
-  return null;
-}
+// [PURGED] validate_status_transition & VALID_TRANSITIONS (Moved to lib/actions/commerce/orders.ts)
 
 export async function get_partner_orders(
   partner_id: string,
@@ -147,123 +89,7 @@ export async function get_partner_stats(partner_id: string): Promise<{ data?: Pa
   }
 }
 
-export async function update_order_status(
-  order_id: string,
-  status: OrderStatus | string
-): Promise<{ success: boolean; error?: string }> {
-  try {
-    const supabase = await createClient();
-
-    const { data: raw_order_data, error: order_error } = await supabase
-      .from('orders')
-      .select(`
-        *,
-        delivery_address:addresses(*),
-        partner:partners(*)
-      `)
-      .eq('id', order_id)
-      .single();
-
-    if (order_error || !raw_order_data) throw new Error('Order not found');
-
-    const order = (raw_order_data as unknown) as PartnerOrder;
-
-    const current_status = order.status as OrderStatus;
-    const has_personalization = order.has_personalization === true;
-
-    const validation_error = validate_status_transition(current_status, status, has_personalization);
-    if (validation_error) {
-      return { success: false, error: validation_error };
-    }
-
-    if (status === 'PACKED') {
-      try {
-        const { dispatch_order } = await import('@/lib/services/dispatch');
-        const dispatch_result = await dispatch_order({ order_id: order_id });
-        if (dispatch_result.success) {
-          logger.info(`[update_order_status] Auto-dispatch successful for ${order_id}, moving to DISPATCHED.`);
-          status = ORDER_STATUS.DISPATCHED; // Automatically move to DISPATCHED
-        } else {
-          logger.error('Auto-dispatch failed during PACKED transition', undefined, { order_id, error: dispatch_result.error });
-        }
-      } catch (dispatch_error) {
-        logger.error('Dispatch trigger failed', dispatch_error, { order_id });
-      }
-    }
-
-    let payment_status_update: Database['public']['Tables']['orders']['Update'] = {};
-    if (status === 'CANCELLED') {
-      if (order.payment_status === 'paid' || order.payment_status === 'captured') {
-        const payment_id = order.payment_id;
-        if (payment_id) {
-          try {
-            const { refund_payment } = await import('@/lib/services/razorpay');
-            await refund_payment(payment_id);
-            payment_status_update = {
-              payment_status: 'refunded',
-              return_status: 'auto_refunded'
-            };
-            logger.info('Auto-refund successful', { order_id, payment_id });
-          } catch (refund_error) {
-            logger.error('Auto-refund failed', refund_error, { order_id, payment_id });
-          }
-        }
-      }
-    }
-
-    // WYSHKIT 2026: Auto-transition to DETAILS_RECEIVED if details were pre-uploaded during PLACED.
-    // This maintains "Commitment Before Creativity" (Partner accepted) while honoring "Instant Momentum" (Customer uploaded).
-    let target_status = status as OrderStatus;
-    if (status === ORDER_STATUS.CONFIRMED && order.has_personalization && order.personalization_status === 'submitted') {
-      logger.info(`[update_order_status] Auto-transitioning ${order_id} to DETAILS_RECEIVED as personalization already present.`);
-      target_status = ORDER_STATUS.DETAILS_RECEIVED;
-    }
-
-    const status_updates: Database['public']['Tables']['orders']['Update'] = {
-      status: target_status,
-      ...payment_status_update,
-      updated_at: new Date().toISOString()
-    };
-
-    // WYSHKIT 2026: Set design deadline when partner accepts a personalized order
-    if (status === 'CONFIRMED' && has_personalization) {
-      const deadline = new Date();
-      deadline.setHours(deadline.getHours() + 24); // 24-hour window for details
-      status_updates.design_deadline_at = deadline.toISOString();
-    }
-
-    const { error: update_error } = await supabase
-      .from('orders')
-      .update(status_updates)
-      .eq('id', order_id);
-
-    if (update_error) throw update_error;
-
-    await supabase.rpc('log_order_status_history', {
-      p_order_id: order_id,
-      p_type: 'status_update',
-      p_title: `Status: ${status}`,
-      p_description: `Order status updated to ${status} by partner.`,
-      p_metadata: ({ source: 'partner', status }) as unknown as Json
-    });
-
-
-    if (status === 'DELIVERED') {
-      try {
-        const { credit_cashback_on_delivery } = await import('@/lib/actions/user/cashback');
-        await credit_cashback_on_delivery(order_id, order.user_id, Number(order.total));
-        logger.info('Cashback credited successfully on delivery', { order_id });
-      } catch (cashback_error) {
-        logger.error('Failed to credit cashback on delivery', cashback_error, { order_id });
-      }
-    }
-
-    return { success: true };
-  } catch (error) {
-    logError(error, `update_order_status:${order_id}:${status}`);
-    return { success: false, error: 'Failed to update order status' };
-  }
-}
+// [PURGED] update_order_status (Moved to lib/actions/commerce/orders.ts)
 
 export async function accept_order(order_id: string): Promise<{ success: boolean; error?: string }> {
   return update_order_status(order_id, 'CONFIRMED');
@@ -273,35 +99,10 @@ export async function reject_order(
   order_id: string,
   reason: string
 ): Promise<{ success: boolean; error?: string }> {
-  try {
-    const supabase = await createClient();
-
-    const { error } = await supabase
-      .from('orders')
-      .update({
-        status: 'CANCELLED',
-        cancellation_reason: reason,
-        cancelled_by: 'partner',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', order_id);
-
-    if (error) throw error;
-
-    await supabase.rpc('log_order_status_history', {
-      p_order_id: order_id,
-      p_type: 'status_update',
-      p_title: 'Status: CANCELLED',
-      p_description: `Order rejected by partner. Reason: ${reason}`,
-      p_metadata: ({ source: 'partner', status: 'CANCELLED', reason }) as unknown as Json
-    });
-
-
-    return { success: true };
-  } catch (error) {
-    logError(error, `reject_order:${order_id}`);
-    return { success: false, error: 'Failed to reject order' };
-  }
+  return update_order_status(order_id, 'CANCELLED', {
+    reason: reason,
+    cancelled_by: 'partner'
+  });
 }
 
 export type ItemWithCounts = Item & {
@@ -316,47 +117,27 @@ export async function get_partner_items(partner_id: string): Promise<{ data?: It
   try {
     const supabase = await createClient();
 
+    // WYSHKIT 2026: Single Join Query (Eliminate N+1 Waterfall)
     const { data: items, error } = await supabase
       .from('items')
-      .select('*')
+      .select(`
+        *,
+        variants(*),
+        personalization_options(*)
+      `)
       .eq('partner_id', partner_id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
-    if (!items || items.length === 0) {
-      return { data: [] };
-    }
-
-    const item_ids = items.map(i => i.id);
-
-    const [variants_res, personalization_res] = await Promise.all([
-      supabase
-        .from('variants')
-        .select('item_id, stock_quantity')
-        .in('item_id', item_ids),
-      supabase
-        .from('personalization_options')
-        .select('item_id')
-        .in('item_id', item_ids),
-    ]);
-
-    const variants_data = variants_res.data || [];
-    const personalization_data = personalization_res.data || [];
-
-    const enriched_items: ItemWithCounts[] = (items as Item[]).map(item => {
-      const item_variants = variants_data.filter(v => v.item_id === item.id);
-      const item_personalization = personalization_data.filter(p => p.item_id === item.id);
-
-      return {
-        ...item,
-        variants_count: item_variants.length,
-        total_stock: item_variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0),
-        personalization_count: item_personalization.length,
-        variants: item_variants as Partial<Tables<'variants'>>[],
-        personalization_options: item_personalization as Partial<Tables<'personalization_options'>>[]
-      };
-    });
+    const enriched_items: ItemWithCounts[] = (items as any[] || []).map(item => ({
+      ...item,
+      variants_count: item.variants?.length || 0,
+      total_stock: (item.variants || []).reduce((sum: number, v: any) => sum + (v.stock_quantity || 0), 0),
+      personalization_count: item.personalization_options?.length || 0,
+      variants: item.variants || [],
+      personalization_options: item.personalization_options || []
+    }));
 
     return { data: enriched_items };
   } catch (error) {
@@ -377,38 +158,14 @@ export async function get_partner_financials(partner_id: string): Promise<{
   try {
     const supabase = await createClient();
 
-    const { data: partner, error: partner_error } = await supabase
-      .from('partners')
-      .select('commission_percentage')
-      .eq('id', partner_id)
-      .single();
+    // WYSHKIT 2026: Single RPC call (Eliminate Shadow Math in JS)
+    const { data, error } = await (supabase.rpc as any)('get_partner_financials_v2', {
+      p_partner_id: partner_id
+    });
 
-    if (partner_error) throw partner_error;
+    if (error) throw error;
 
-    const { data: orders, error: orders_error } = await supabase
-      .from('orders')
-      .select('total, net_settlement_amount, payout_status, status')
-      .eq('partner_id', partner_id)
-      .eq('status', 'DELIVERED');
-
-    if (orders_error) throw orders_error;
-
-    const delivered_orders = orders || [];
-    const total_earnings = delivered_orders.reduce(
-      (sum, o) => sum + Number(o.net_settlement_amount || 0), 0
-    );
-    const pending_settlement = delivered_orders
-      .filter(o => o.payout_status !== 'completed')
-      .reduce((sum, o) => sum + Number(o.net_settlement_amount || 0), 0);
-
-    return {
-      data: {
-        total_earnings,
-        pending_settlement,
-        last_payout: null,
-        commission_rate: Number(partner.commission_percentage || 15),
-      }
-    };
+    return { data: data as any };
   } catch (error) {
     logError(error, 'get_partner_financials');
     return { error: 'Failed to fetch financials' };
@@ -450,7 +207,7 @@ export async function get_partner_profile(partner_id: string): Promise<{ data?: 
 
     const { data, error } = await supabase
       .from('partners')
-      .select('id, name, business_name, owner_name, email, phone, rating, commission_percentage, is_online, is_active, kyc_status, address, city, pincode, base_delivery_charge, gstin, pan')
+      .select('id, name, business_name, owner_name, email, phone, rating, commission_percentage, is_online, is_active, kyc_status, address, city, pincode, base_delivery_charge, gstin, pan_number')
       .eq('id', partner_id)
       .single();
 
@@ -559,7 +316,7 @@ export async function upload_preview(
 
     if (fetch_error || !order) throw new Error('Order not found');
 
-    const validation_error = validate_status_transition(
+    const validation_error = await validate_status_transition(
       order.status,
       'PREVIEW_READY',
       !!order.has_personalization

@@ -50,13 +50,13 @@ export interface OrderDetails extends Order {
 }
 
 export type ItemWithPartner = Item & {
-    partners: Pick<Partner, 'id' | 'name' | 'slug' | 'display_name' | 'image_url'> | null;
+    partners: Pick<Partner, 'id' | 'name' | 'slug' | 'image_url'> | null;
 };
 
-export type ItemListing = Views<'v_item_listings'>;
+export type ItemListing = Views<'v_item_listings_search'>;
 
 export type ItemWithFullSpec = Item & {
-    partners: Pick<Partner, 'id' | 'name' | 'slug' | 'city' | 'rating' | 'display_name' | 'image_url' | 'fssai_license' | 'gstin'> | null;
+    partners: Pick<Partner, 'id' | 'name' | 'slug' | 'city' | 'rating' | 'image_url' | 'fssai_license' | 'gstin'> | null;
     variants: Variant[];
     item_addons: ItemAddon[];
     personalization_options: PersonalizationOption[];

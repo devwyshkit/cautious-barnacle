@@ -73,7 +73,7 @@ export async function resolveUserPermissionsWithTimeout(
   userId: string
 ): Promise<UserPermissions> {
   const timeout = new Promise<UserPermissions>((_, reject) =>
-    setTimeout(() => reject(new Error('Permissions fetch timed out')), 15000)
+    setTimeout(() => reject(new Error('Permissions fetch timed out')), 2500)
   );
 
   return Promise.race([

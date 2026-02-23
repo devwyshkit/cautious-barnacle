@@ -52,20 +52,20 @@ export function PreviewApproval({
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 rounded-full shadow-sm">
                     <div className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs text-white font-bold tracking-wider">Review</span>
+                    <span className="text-xs text-white font-bold tracking-tight">Review</span>
                 </div>
             </div>
 
             {/* WYSHKIT 2026: Requirement Context (Cross-Verification) */}
             {orderItem?.personalization_details && (
-                <div className="bg-zinc-50 rounded-2xl border border-zinc-100 overflow-hidden">
+                <div className="bg-zinc-50 rounded-xl border border-zinc-100 overflow-hidden">
                     <button
                         onClick={() => setShowContext(!showContext)}
                         className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-zinc-100/50 transition-colors"
                     >
                         <div className="flex items-center gap-2">
                             <FileText className="size-3.5 text-zinc-400" />
-                            <span className="text-xs font-black text-zinc-500 tracking-wider">Your Requirements</span>
+                            <span className="text-xs font-black text-zinc-500 tracking-tight">Your Requirements</span>
                         </div>
                         {showContext ? <ChevronUp className="size-3.5 text-zinc-400" /> : <ChevronDown className="size-3.5 text-zinc-400" />}
                     </button>
@@ -81,7 +81,7 @@ export function PreviewApproval({
             )}
 
             {/* WYSHKIT 2026: Immersive Preview Card */}
-            <div className="relative aspect-[4/5] bg-zinc-100 rounded-[32px] overflow-hidden shadow-sm border border-zinc-100 group">
+            <div className="relative aspect-[4/5] bg-zinc-100 rounded-xl overflow-hidden shadow-sm border border-zinc-100 group">
                 <Image
                     src={preview.preview_url}
                     alt="Preview"
@@ -93,13 +93,13 @@ export function PreviewApproval({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 {preview.partner_notes && (
-                    <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-xl p-4 rounded-2xl shadow-lg border border-white/20">
+                    <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-xl p-4 rounded-xl shadow-lg border border-white/20">
                         <div className="flex items-start gap-3">
                             <div className="size-8 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
                                 <span className="text-xs">🧑‍🎨</span>
                             </div>
                             <div className="space-y-0.5">
-                                <span className="text-xs font-black tracking-wider text-zinc-400">Partner Note</span>
+                                <span className="text-xs font-black tracking-tight text-zinc-400">Partner Note</span>
                                 <p className="text-sm font-medium text-zinc-900 leading-snug">
                                     "{preview.partner_notes}"
                                 </p>
@@ -111,7 +111,7 @@ export function PreviewApproval({
 
             <div className="space-y-3 pt-2">
                 {showFeedback ? (
-                    <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100 space-y-3">
+                    <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-100 space-y-3">
                         <div className="flex justify-between items-center pb-2 border-b border-zinc-200/50">
                             <span className="text-xs font-bold text-zinc-900">Request Changes</span>
                             <button
@@ -132,7 +132,7 @@ export function PreviewApproval({
                         <button
                             onClick={() => onRequestChange(feedback)}
                             disabled={isApproving || !feedback.trim()}
-                            className="w-full h-12 bg-zinc-900 text-white rounded-xl font-bold text-xs tracking-wider disabled:opacity-50"
+                            className="w-full h-12 bg-zinc-900 text-white rounded-xl font-bold text-xs tracking-tight disabled:opacity-50"
                         >
                             {isApproving ? 'Sending Request...' : 'Send Feedback'}
                         </button>
@@ -156,7 +156,7 @@ export function PreviewApproval({
                         <button
                             onClick={() => setShowFeedback(true)}
                             disabled={isApproving || isRejecting || changesRemaining <= 0}
-                            className="w-full py-3 text-xs font-black text-zinc-500 hover:text-zinc-800 underline decoration-zinc-200 tracking-wider transition-colors disabled:no-underline disabled:opacity-30"
+                            className="w-full py-3 text-xs font-black text-zinc-500 hover:text-zinc-800 underline decoration-zinc-200 tracking-tight transition-colors disabled:no-underline disabled:opacity-30"
                         >
                             Request a change ({changesRemaining} left)
                         </button>
@@ -166,14 +166,14 @@ export function PreviewApproval({
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setConfirmReject(false)}
-                                        className="flex-1 py-3 text-xs font-black text-zinc-500 border border-zinc-200 rounded-xl tracking-wider"
+                                        className="flex-1 py-3 text-xs font-black text-zinc-500 border border-zinc-200 rounded-xl tracking-tight"
                                     >
                                         Keep preview
                                     </button>
                                     <button
                                         onClick={() => { setConfirmReject(false); onReject(); }}
                                         disabled={isApproving || isRejecting}
-                                        className="flex-1 py-3 text-xs font-black text-white bg-rose-500 hover:bg-rose-600 rounded-xl tracking-wider disabled:opacity-50 flex items-center justify-center gap-1.5"
+                                        className="flex-1 py-3 text-xs font-black text-white bg-rose-500 hover:bg-rose-600 rounded-xl tracking-tight disabled:opacity-50 flex items-center justify-center gap-1.5"
                                     >
                                         <AlertTriangle className="size-3" />
                                         {isRejecting ? 'Processing...' : 'Confirm & Refund'}
@@ -183,7 +183,7 @@ export function PreviewApproval({
                                 <button
                                     onClick={() => setConfirmReject(true)}
                                     disabled={isApproving || isRejecting}
-                                    className="w-full py-3 mt-1 text-xs font-black text-rose-500 hover:text-rose-700 underline decoration-rose-200 tracking-wider transition-colors disabled:no-underline disabled:opacity-30"
+                                    className="w-full py-3 mt-1 text-xs font-black text-rose-500 hover:text-rose-700 underline decoration-rose-200 tracking-tight transition-colors disabled:no-underline disabled:opacity-30"
                                 >
                                     Reject & get instant refund
                                 </button>

@@ -37,8 +37,8 @@ export function Masthead({
                     bg: 'bg-amber-50/50 border-amber-100/50',
                     text: 'text-amber-900',
                     icon: <Clock className="size-3.5 text-amber-600 shrink-0" />,
-                    label: message || 'Unprecedented demand. We are prioritizing early orders.',
-                    tag: 'High Intent'
+                    label: message || 'More orders than usual. Allow a few extra minutes.',
+                    tag: 'Busy'
                 };
             default:
                 return {
@@ -80,7 +80,7 @@ export function Masthead({
                             status === 'normal' ? 'bg-emerald-500' : status === 'delayed' ? 'bg-rose-500' : 'bg-amber-500'
                         )} />
                         <span className={cn(
-                            "text-xs font-black tracking-wider",
+                            "text-xs font-black tracking-tight",
                             status === 'normal' ? 'text-emerald-700' : status === 'delayed' ? 'text-rose-700' : 'text-amber-700'
                         )}>
                             {config.tag}

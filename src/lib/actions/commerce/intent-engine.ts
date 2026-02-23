@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { logError } from '@/lib/utils/error-handler';
 import { logger } from '@/lib/logging/logger';
 import { getGuestSessionId, getGuestSessionIdReadOnly } from '@/lib/session';
@@ -107,8 +107,8 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_item_id: validated.payload.item_id,
                         p_quantity: validated.payload.quantity,
                         p_mode: 'ADD',
-                        p_user_id: user?.id,
-                        p_session_id: sessionId,
+                        p_user_id: user?.id ?? undefined,
+                        p_session_id: sessionId ?? undefined,
                         p_variant_id: validated.payload.variant_id ?? undefined,
                         p_personalization: (validated.payload.personalization as any) || { enabled: false },
                         p_selected_addons: (validated.payload.selected_addons as any) || []
@@ -122,8 +122,8 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_item_id: validated.payload.item_id,
                         p_quantity: validated.payload.quantity,
                         p_mode: 'SET',
-                        p_user_id: user?.id,
-                        p_session_id: sessionId,
+                        p_user_id: user?.id ?? undefined,
+                        p_session_id: sessionId ?? undefined,
                         p_variant_id: validated.payload.variant_id ?? undefined
                     });
                     if (error) throw error;
@@ -134,62 +134,51 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                 }
 
                 case 'APPLY_COUPON': {
-                    const { error } = await supabase
-                        .from('checkout_sessions')
-                        .upsert({
-                            user_id: user?.id,
-                            session_id: sessionId,
-                            applied_coupon: validated.payload.code
-                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    const { error } = await supabase.rpc('update_checkout_session', {
+                        p_applied_coupon: validated.payload.code ?? undefined,
+                        p_user_id: user?.id ?? undefined,
+                        p_session_id: sessionId ?? undefined
+                    });
                     if (error) throw error;
                     break;
                 }
 
                 case 'TOGGLE_WALLET': {
-                    const { error } = await supabase
-                        .from('checkout_sessions')
-                        .upsert({
-                            user_id: user?.id,
-                            session_id: sessionId,
-                            use_wallet: validated.payload.enabled
-                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    const { error } = await supabase.rpc('update_checkout_session', {
+                        p_use_wallet: validated.payload.enabled,
+                        p_user_id: user?.id ?? undefined,
+                        p_session_id: sessionId ?? undefined
+                    });
                     if (error) throw error;
                     break;
                 }
 
                 case 'SET_ADDRESS': {
-                    const { error } = await supabase
-                        .from('checkout_sessions')
-                        .upsert({
-                            user_id: user?.id,
-                            session_id: sessionId,
-                            selected_address_id: validated.payload.address_id
-                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    const { error } = await supabase.rpc('update_checkout_session', {
+                        p_selected_address_id: validated.payload.address_id ?? undefined,
+                        p_user_id: user?.id ?? undefined,
+                        p_session_id: sessionId ?? undefined
+                    });
                     if (error) throw error;
                     break;
                 }
 
                 case 'SET_GSTIN': {
-                    const { error } = await supabase
-                        .from('checkout_sessions')
-                        .upsert({
-                            user_id: user?.id,
-                            session_id: sessionId,
-                            gstin: validated.payload.gstin
-                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    const { error } = await supabase.rpc('update_checkout_session', {
+                        p_gstin: validated.payload.gstin ?? undefined,
+                        p_user_id: user?.id ?? undefined,
+                        p_session_id: sessionId ?? undefined
+                    });
                     if (error) throw error;
                     break;
                 }
 
                 case 'SET_GUEST_LOCATION': {
-                    const { error } = await supabase
-                        .from('checkout_sessions')
-                        .upsert({
-                            user_id: user?.id,
-                            session_id: sessionId,
-                            guest_lat: validated.payload.lat,
-                            guest_lng: validated.payload.lng
-                        }, { onConflict: (user ? 'user_id' : 'session_id') });
+                    const { error } = await supabase.rpc('update_checkout_session', {
+                        p_guest_lat: validated.payload.lat ?? undefined,
+                        p_guest_lng: validated.payload.lng ?? undefined,
+                        p_session_id: sessionId ?? undefined
+                    });
                     if (error) throw error;
                     break;
                 }
@@ -216,6 +205,8 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         supabase.from('checkout_sessions').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`)
                     ]);
 
+                    revalidatePath('/');
+                    revalidateTag('orders');
                     return { success: true, data };
                 }
 
@@ -247,7 +238,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                 }
             }
 
-            revalidatePath('/checkout');
+            revalidateTag('cart');
             return { success: true };
         } catch (err: any) {
             logError(err, 'IntentEngineError');

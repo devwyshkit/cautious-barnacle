@@ -103,6 +103,21 @@ export function SlideToPay({
         setDragX(clampedX);
     }, [isDragging, startX, threshold]);
 
+    const prevProcessing = useRef(isProcessing);
+    useEffect(() => {
+        // WYSHKIT 2026: Slider Reset on Failure
+        // If processing goes from true -> false without unmounting/navigating, it failed.
+        if (prevProcessing.current && !isProcessing && isSuccess) {
+            const timer = setTimeout(() => {
+                setIsSuccess(false);
+                setDragX(0);
+                triggerHaptic(HapticPattern.ERROR);
+            }, 150);
+            return () => clearTimeout(timer);
+        }
+        prevProcessing.current = isProcessing;
+    }, [isProcessing, isSuccess]);
+
     const handlePointerUp = useCallback(() => {
         if (!isDragging) return;
         setIsDragging(false);
@@ -120,7 +135,7 @@ export function SlideToPay({
 
     if (isProcessing) {
         return (
-            <div className="w-full h-16 bg-[#D91B24] rounded-[24px] flex items-center justify-center shadow-lg shadow-red-500/20">
+            <div className="w-full h-16 bg-[#D91B24] rounded-xl flex items-center justify-center shadow-lg shadow-red-500/20">
                 <div className="size-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
             </div>
         );
@@ -138,7 +153,7 @@ export function SlideToPay({
                     triggerHaptic(HapticPattern.SUCCESS);
                     onPay();
                 }}
-                className="w-full h-16 rounded-[24px] text-[13px] font-black tracking-[0.2em] shadow-xl shadow-red-500/10 gap-3 group overflow-hidden relative"
+                className="w-full h-16 rounded-xl text-[13px] font-black tracking-tight shadow-sm shadow-red-500/10 gap-3 group overflow-hidden relative"
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <ShieldCheck className="size-5" />
@@ -150,7 +165,7 @@ export function SlideToPay({
     return (
         <div
             ref={constraintsRef}
-            className="relative w-full h-16 bg-zinc-100 rounded-[24px] overflow-hidden p-1.5 select-none border border-zinc-200 shadow-inner"
+            className="relative w-full h-16 bg-zinc-100 rounded-xl overflow-hidden p-1.5 select-none border border-zinc-200 shadow-inner"
         >
             {/* Background Progress */}
             <div
@@ -168,7 +183,7 @@ export function SlideToPay({
                     style={{ opacity: textOpacity }}
                 >
                     <ChevronRight className="size-4 text-zinc-400 animate-pulse" />
-                    <span className="text-[11px] font-black tracking-[0.2em] text-zinc-500 select-none">
+                    <span className="text-[11px] font-black tracking-tight text-zinc-500 select-none">
                         Slide to pay {formatCurrency(amount)}
                     </span>
                 </div>
@@ -187,7 +202,7 @@ export function SlideToPay({
                 onPointerUp={handlePointerUp}
                 onPointerCancel={handlePointerUp}
                 className={cn(
-                    "relative z-10 size-13 bg-white rounded-[18px] shadow-xl flex items-center justify-center cursor-grab active:cursor-grabbing transition-transform duration-150",
+                    "relative z-10 size-13 bg-white rounded-[18px] shadow-sm flex items-center justify-center cursor-grab active:cursor-grabbing transition-transform duration-150",
                     isDragging && "scale-95",
                     isSuccess && "scale-90 opacity-0 transition-all duration-300"
                 )}

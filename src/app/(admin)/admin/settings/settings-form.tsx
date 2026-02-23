@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
-import { updateSetting } from '@/lib/actions/commerce/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 
 interface SettingsFormProps {
   settings: Record<string, unknown>
@@ -28,7 +28,11 @@ export function SettingsForm({ settings }: SettingsFormProps) {
 
   const handleSave = async (key: string, value: string | number | boolean) => {
     setLoading(true)
-    await updateSetting(key, value)
+    await executeAdminIntent({
+      entity: 'settings',
+      action: 'UPDATE_SETTING',
+      metadata: { key, value }
+    })
     setLoading(false)
     router.refresh()
   }
@@ -44,13 +48,13 @@ export function SettingsForm({ settings }: SettingsFormProps) {
           <div className="flex items-center gap-4">
             <div className="flex-1 space-y-2">
               <Label>Default commission rate (%)</Label>
-              <Input 
-                type="number" 
-                value={form.default_commission_rate} 
-                onChange={(e) => setForm({ ...form, default_commission_rate: e.target.value })} 
+              <Input
+                type="number"
+                value={form.default_commission_rate}
+                onChange={(e) => setForm({ ...form, default_commission_rate: e.target.value })}
               />
             </div>
-            <Button 
+            <Button
               onClick={() => handleSave('default_commission_rate', parseFloat(form.default_commission_rate))}
               disabled={loading}
               className="mt-6"
@@ -70,35 +74,35 @@ export function SettingsForm({ settings }: SettingsFormProps) {
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Default delivery fee (₹)</Label>
-              <Input 
-                type="number" 
-                value={form.default_delivery_fee} 
-                onChange={(e) => setForm({ ...form, default_delivery_fee: e.target.value })} 
+              <Input
+                type="number"
+                value={form.default_delivery_fee}
+                onChange={(e) => setForm({ ...form, default_delivery_fee: e.target.value })}
               />
             </div>
             <div className="space-y-2">
               <Label>Free delivery above (₹)</Label>
-              <Input 
-                type="number" 
-                value={form.free_delivery_threshold} 
-                onChange={(e) => setForm({ ...form, free_delivery_threshold: e.target.value })} 
+              <Input
+                type="number"
+                value={form.free_delivery_threshold}
+                onChange={(e) => setForm({ ...form, free_delivery_threshold: e.target.value })}
               />
             </div>
           </div>
           <div className="space-y-2">
             <Label>Minimum order value (₹)</Label>
-            <Input 
-              type="number" 
-              value={form.min_order_value} 
-              onChange={(e) => setForm({ ...form, min_order_value: e.target.value })} 
+            <Input
+              type="number"
+              value={form.min_order_value}
+              onChange={(e) => setForm({ ...form, min_order_value: e.target.value })}
             />
           </div>
-          <Button 
+          <Button
             onClick={async () => {
               setLoading(true)
-              await updateSetting('default_delivery_fee', parseFloat(form.default_delivery_fee))
-              await updateSetting('free_delivery_threshold', parseFloat(form.free_delivery_threshold))
-              await updateSetting('min_order_value', parseFloat(form.min_order_value))
+              await executeAdminIntent({ entity: 'settings', action: 'UPDATE_SETTING', metadata: { key: 'default_delivery_fee', value: parseFloat(form.default_delivery_fee) } })
+              await executeAdminIntent({ entity: 'settings', action: 'UPDATE_SETTING', metadata: { key: 'free_delivery_threshold', value: parseFloat(form.free_delivery_threshold) } })
+              await executeAdminIntent({ entity: 'settings', action: 'UPDATE_SETTING', metadata: { key: 'min_order_value', value: parseFloat(form.min_order_value) } })
               setLoading(false)
               router.refresh()
             }}
@@ -109,22 +113,22 @@ export function SettingsForm({ settings }: SettingsFormProps) {
         </CardContent>
       </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">Personalization</CardTitle>
-            <CardDescription>Preview and personalization settings</CardDescription>
-          </CardHeader>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">Personalization</CardTitle>
+          <CardDescription>Preview and personalization settings</CardDescription>
+        </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="flex-1 space-y-2">
               <Label>Max preview revisions</Label>
-              <Input 
-                type="number" 
-                value={form.max_preview_revisions} 
-                onChange={(e) => setForm({ ...form, max_preview_revisions: e.target.value })} 
+              <Input
+                type="number"
+                value={form.max_preview_revisions}
+                onChange={(e) => setForm({ ...form, max_preview_revisions: e.target.value })}
               />
             </div>
-            <Button 
+            <Button
               onClick={() => handleSave('max_preview_revisions', parseInt(form.max_preview_revisions))}
               disabled={loading}
               className="mt-6"
@@ -146,12 +150,12 @@ export function SettingsForm({ settings }: SettingsFormProps) {
               <p className="font-medium">Maintenance mode</p>
               <p className="text-sm text-zinc-500">Disable customer-facing features temporarily</p>
             </div>
-            <Switch 
-              checked={form.maintenance_mode} 
+            <Switch
+              checked={form.maintenance_mode}
               onCheckedChange={async (v) => {
                 setForm({ ...form, maintenance_mode: v })
                 await handleSave('maintenance_mode', v)
-              }} 
+              }}
             />
           </div>
         </CardContent>

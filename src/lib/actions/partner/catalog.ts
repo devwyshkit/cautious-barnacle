@@ -29,6 +29,8 @@ export type ItemInput = {
     dimensions_cm?: { length: number; width: number; height: number };
     hsn_code?: string;
     gst_percentage?: number;
+    personalization_options?: any;
+    item_addons?: any;
 };
 
 export type VariantInput = {
@@ -38,15 +40,6 @@ export type VariantInput = {
     attributes?: Record<string, string>;
     stock_quantity?: number;
     sku?: string;
-    is_active?: boolean;
-};
-
-export type PersonalizationOptionInput = {
-    name: string;
-    price: number;
-    input_type: 'text' | 'image' | 'both';
-    char_limit?: number;
-    instructions?: string;
     is_active?: boolean;
 };
 
@@ -68,11 +61,11 @@ export async function createItem(partnerId: string, input: ItemInput) {
 
         const { data: partner } = await supabase
             .from('partners')
-            .select('status')
+            .select('kyc_status')
             .eq('id', partnerId)
             .maybeSingle();
 
-        const approvalStatus = partner?.status === 'active' ? 'approved' : 'pending';
+        const approvalStatus = partner?.kyc_status === 'ACTIVE' ? 'approved' : 'pending';
 
         const slug = input.name
             .toLowerCase()
@@ -102,6 +95,8 @@ export async function createItem(partnerId: string, input: ItemInput) {
                 hsn_code: input.hsn_code || CATEGORY_TAX_MAP[input.category?.toLowerCase() || '']?.hsn || '9983',
                 gst_percentage: input.gst_percentage || CATEGORY_TAX_MAP[input.category?.toLowerCase() || '']?.gst || 5.00,
                 approval_status: approvalStatus,
+                personalization_options: input.personalization_options || [],
+                item_addons: input.item_addons || [],
             } as Database['public']['Tables']['items']['Insert'])
             .select('id')
             .single();
@@ -138,6 +133,8 @@ export async function updateItem(itemId: string, input: Partial<ItemInput>) {
                 ...input,
                 dimensions_cm: input.dimensions_cm ? `${input.dimensions_cm.length}x${input.dimensions_cm.width}x${input.dimensions_cm.height}` : undefined,
                 updated_at: new Date().toISOString(),
+                personalization_options: input.personalization_options !== undefined ? input.personalization_options : undefined,
+                item_addons: input.item_addons !== undefined ? input.item_addons : undefined,
             } as Database['public']['Tables']['items']['Update'])
             .eq('id', itemId);
 
@@ -166,10 +163,8 @@ export async function deleteItem(itemId: string) {
             .eq('id', itemId)
             .single();
 
-        // Cascade deletions (variants, personalization, addons, reviews)
+        // Cascade deletions (variants, reviews)
         await supabase.from('variants').delete().eq('item_id', itemId);
-        await supabase.from('personalization_options').delete().eq('item_id', itemId);
-        await supabase.from('item_addons').delete().eq('item_id', itemId);
         await supabase.from('item_reviews').delete().eq('item_id', itemId);
 
         const { error } = await supabase
@@ -292,36 +287,6 @@ export async function deleteVariant(variantId: string) {
     }
 }
 
-/**
- * Personalization & Stock mutations
- */
-export async function createPersonalizationOption(itemId: string, input: PersonalizationOptionInput) {
-    try {
-        const supabase = await createClient();
-        const { data, error } = await supabase
-            .from('personalization_options')
-            .insert({
-                item_id: itemId,
-                name: input.name,
-                price: input.price,
-                input_type: input.input_type,
-                char_limit: input.char_limit || null,
-                instructions: input.instructions || null,
-                is_active: input.is_active ?? true,
-            })
-            .select('id')
-            .single();
-
-        if (error) throw error;
-        await supabase.from('items').update({ has_personalization: true }).eq('id', itemId);
-        revalidatePath('/partner/catalog');
-        return { data: { id: data.id } };
-    } catch (error) {
-        logger.error('Failed to create personalization option', error, { itemId });
-        return { error: 'Failed to create personalization option' };
-    }
-}
-
 export async function bulkUpdateStockStatus(itemIds: string[], stockStatus: string) {
     try {
         const supabase = await createClient();
@@ -352,21 +317,5 @@ export async function toggleItemActive(itemId: string, isActive: boolean) {
     } catch (error) {
         logger.error('Failed to toggle item active status', error, { itemId });
         return { success: false, error: 'Failed to update status' };
-    }
-}
-
-export async function deletePersonalizationOption(optionId: string) {
-    try {
-        const supabase = await createClient();
-        const { error } = await supabase
-            .from('personalization_options')
-            .delete()
-            .eq('id', optionId);
-        if (error) throw error;
-        revalidatePath('/partner/catalog');
-        return { success: true };
-    } catch (error) {
-        logger.error('Failed to delete personalization option', error, { optionId });
-        return { success: false, error: 'Failed to delete option' };
     }
 }

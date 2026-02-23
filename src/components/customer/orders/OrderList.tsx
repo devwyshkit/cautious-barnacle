@@ -88,7 +88,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
           actionLabel="Browse items"
           onAction={() => router.push("/")}
         >
-          <div className="size-16 rounded-3xl bg-zinc-50 flex items-center justify-center mb-4">
+          <div className="size-16 rounded-xl bg-zinc-50 flex items-center justify-center mb-4">
             <PackageOpen className="size-8 text-zinc-300" />
           </div>
         </EmptyState>

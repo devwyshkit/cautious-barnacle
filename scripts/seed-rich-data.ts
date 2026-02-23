@@ -1,342 +1,126 @@
-import { createClient } from '@supabase/supabase-js'
-import * as dotenv from 'dotenv'
-import { randomUUID } from 'crypto'
+import { createClient } from '@supabase/supabase-js';
+import * as dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config({ path: '.env.local' })
+// Load env vars
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-// WYSHKIT 2026: Allow seed in development, block in production
-if (process.env.NODE_ENV === 'production') {
-    console.error('Seed script cannot run in production. Use development environment.')
-    process.exit(1)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+    console.error('Missing Supabase credentials in .env');
+    process.exit(1);
 }
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Supabase credentials in .env.local')
-    process.exit(1)
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey)
-
-async function clearDatabase() {
-    console.log('🧹 Clearing existing data...')
-    // Delete in order of dependency to avoid foreign key constraints
-    await supabase.from('order_items').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('orders').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('draft_orders').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('cart_items').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('items').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('partners').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('categories').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    console.log('✨ Data cleared.')
-}
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function seed() {
-    console.log('🚀 Starting Rich Data Injection (Wyshkit 2026)...')
+    console.log('--- WyshKit Swiggy 2026 Enrichment ---');
 
-    await clearDatabase();
+    // 1. Categories
+    console.log('Upserting categories...');
+    await supabase.from('categories').upsert([
+        { name: 'Mugs', slug: 'mugs', is_active: true, image_url: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&q=80', display_order: 1 },
+        { name: 'Photo Frames', slug: 'photo-frames', is_active: true, image_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80', display_order: 2 },
+        { name: 'Cushions', slug: 'cushions', is_active: true, image_url: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80', display_order: 3 },
+        { name: 'Cakes', slug: 'cakes', is_active: true, image_url: 'https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=400&q=80', display_order: 4 },
+        { name: 'Keychains', slug: 'keychains', is_active: true, image_url: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=400&q=80', display_order: 5 }
+    ], { onConflict: 'slug' });
 
-    // 1. Unified Categories (Occasions + Product Types)
-    const categories = [
+    // 2. Partners
+    console.log('Upserting partners...');
+    await supabase.from('partners').upsert([
         {
-            id: randomUUID(),
-            name: 'Cakes',
-            slug: 'cakes',
+            id: '00000000-0000-0000-0000-000000000001',
+            name: 'Signature Gifts Koramangala',
+            slug: 'signature-gifts-koramangala',
+            city: 'Bengaluru',
             is_active: true,
-            display_order: 1,
-            image_url: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: randomUUID(),
-            name: 'Flowers',
-            slug: 'flowers',
-            is_active: true,
-            display_order: 2,
-            image_url: 'https://images.unsplash.com/photo-1562690868-60bbe7293e94?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: randomUUID(),
-            name: 'Birthdays',
-            slug: 'birthdays', // Occasion as Category
-            is_active: true,
-            display_order: 3,
-            image_url: 'https://images.unsplash.com/photo-1530103862676-de3c9da59af7?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: randomUUID(),
-            name: 'Anniversary',
-            slug: 'anniversary', // Occasion as Category
-            is_active: true,
-            display_order: 4,
-            image_url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: randomUUID(),
-            name: 'Chocolates',
-            slug: 'chocolates',
-            is_active: true,
-            display_order: 5,
-            image_url: 'https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: randomUUID(),
-            name: 'Hampers',
-            slug: 'hampers',
-            is_active: true,
-            display_order: 6,
-            image_url: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: randomUUID(),
-            name: 'Personalized',
-            slug: 'personalized',
-            is_active: true,
-            display_order: 7,
-            image_url: 'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=400'
-        },
-        {
-            id: randomUUID(),
-            name: 'Plants',
-            slug: 'plants',
-            is_active: true,
-            display_order: 8,
-            image_url: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&q=80&w=400'
-        }
-    ]
-
-    console.log('Injecting categories...')
-    const { error: catError } = await supabase.from('categories').upsert(categories)
-    if (catError) console.error('Error seeding categories:', catError)
-
-    // 2. Partners (Premium Brands)
-    const partnerIds = {
-        smoor: randomUUID(),
-        magnolia: randomUUID(),
-        fnp: randomUUID(),
-        interflora: randomUUID(),
-        theobroma: randomUUID()
-    };
-
-    const partners = [
-        {
-            id: partnerIds.smoor,
-            name: 'Smoor',
-            display_name: 'Smoor Chocolates',
-            description: 'Luxury couverture chocolates and signature bakes. Experience true indulgence.',
-            city: 'Bangalore',
             rating: 4.8,
-            is_active: true,
-            is_online: true,
-            image_url: 'https://images.unsplash.com/photo-1548848221-0c2e497ed557?auto=format&fit=crop&q=80&w=800',
-            base_delivery_charge: 40,
-            status: 'active',
-            latitude: 12.9716, // Bangalore Central
-            longitude: 77.5946,
-            slug: 'smoor-chocolates-bangalore'
+            prep_hours: 1,
+            delivery_fee: 40,
+            latitude: 12.935,
+            longitude: 77.614,
+            description: 'Premium personalized gifts delivered in minutes.',
+            image_url: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&q=80'
         },
         {
-            id: partnerIds.magnolia,
-            name: 'Magnolia Bakery',
-            display_name: 'Magnolia Bakery',
-            description: 'World-famous banana pudding and classic American desserts.',
-            city: 'Bangalore',
-            rating: 4.9,
+            id: '00000000-0000-0000-0000-000000000002',
+            name: 'Bake & Bloom',
+            slug: 'bake-and-bloom',
+            city: 'Bengaluru',
             is_active: true,
-            is_online: true,
-            image_url: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&q=80&w=800',
-            base_delivery_charge: 60,
-            status: 'active',
-            latitude: 12.9784,
-            longitude: 77.6408, // Indiranagar
-            slug: 'magnolia-bakery-indiranagar'
-        },
-        {
-            id: partnerIds.fnp,
-            name: 'Ferns N Petals',
-            display_name: 'FNP Elite',
-            description: 'Premium floral arrangements and same-day gifting.',
-            city: 'Bangalore',
             rating: 4.5,
-            is_active: true,
-            is_online: true,
-            image_url: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=800',
-            base_delivery_charge: 30,
-            status: 'active',
-            latitude: 12.9352,
-            longitude: 77.6245, // Koramangala
-            slug: 'fnp-elite-koramangala'
-        },
-        {
-            id: partnerIds.interflora,
-            name: 'Interflora',
-            display_name: 'Interflora',
-            description: 'The world’s most trusted luxury floral delivery network.',
-            city: 'Bangalore',
-            rating: 4.7,
-            is_active: true,
-            is_online: true,
-            image_url: 'https://images.unsplash.com/photo-1596073419667-9d77d59f033f?auto=format&fit=crop&q=80&w=800',
-            base_delivery_charge: 100,
-            status: 'active',
-            latitude: 12.9279,
-            longitude: 77.6271,
-            slug: 'interflora-bangalore'
+            prep_hours: 1,
+            delivery_fee: 40,
+            latitude: 12.938,
+            longitude: 77.622,
+            description: 'Custom cakes and floral arrangements for every occasion.',
+            image_url: 'https://images.unsplash.com/photo-1486427944299-d1955d23e34d?w=400&q=80'
         }
-    ]
+    ], { onConflict: 'id' });
 
-    console.log('Injecting partners...')
-    const { error: partError } = await supabase.from('partners').upsert(partners)
-    if (partError) console.error('Error seeding partners:', partError)
-
-    // 3. Items (Rich Catalog)
-    const items = [
-        // SMOOR
+    // 3. Items
+    console.log('Upserting items...');
+    await supabase.from('items').upsert([
         {
-            id: randomUUID(),
-            partner_id: partnerIds.smoor,
-            name: 'Royal Chocolate Box (12pc)',
-            description: 'Assorted handcrafted pralines in a luxury gift box.',
-            base_price: 850,
+            id: '11111111-1111-1111-1111-111111111111',
+            partner_id: '00000000-0000-0000-0000-000000000001',
+            name: 'Magic Personalized Mug',
+            slug: 'magic-personalized-mug',
+            description: 'Heat-sensitive mug that reveals your photo.',
+            base_price: 399,
+            category: 'mugs',
             is_active: true,
-            approval_status: 'approved',
-            stock_status: 'in_stock',
-            stock_quantity: 100,
-            category: 'Chocolates',
-            has_personalization: false,
-            images: ['https://images.unsplash.com/photo-1549007994-cb92ca714503?auto=format&fit=crop&q=80&w=800'],
-            slug: 'royal-chocolate-box-12pc'
-        },
-        {
-            id: randomUUID(),
-            partner_id: partnerIds.smoor,
-            name: 'Intense 70% Dark Chocolate Cake',
-            description: 'Rich, dense, and glossy. The ultimate dark chocolate indulgence.',
-            base_price: 1400,
-            is_active: true,
-            approval_status: 'approved',
-            stock_status: 'in_stock',
-            stock_quantity: 100,
-            category: 'Cakes',
+            images: ['https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800&q=80'],
             has_personalization: true,
-            personalization_options: [{ id: 'msg', name: 'Message on Cake', type: 'text', maxLength: 25 }],
-            images: ['https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=800'],
-            slug: 'intense-70-dark-chocolate-cake'
+            approval_status: 'approved'
         },
-
-        // MAGNOLIA
         {
-            id: randomUUID(),
-            partner_id: partnerIds.magnolia,
-            name: 'Classic Banana Pudding',
-            description: 'Layers of vanilla wafers, fresh bananas and creamy vanilla pudding.',
-            base_price: 450,
-            is_active: true,
-            approval_status: 'approved',
-            stock_status: 'in_stock',
-            stock_quantity: 100,
-            category: 'Cakes',
-            has_personalization: false,
-            images: ['https://images.unsplash.com/photo-1587314168485-3236d6710814?auto=format&fit=crop&q=80&w=800'],
-            slug: 'classic-banana-pudding'
-        },
-
-        // FNP
-        {
-            id: randomUUID(),
-            partner_id: partnerIds.fnp,
-            name: '10 Red Roses Bouquet',
-            description: 'Classic symbol of love. Premium long-stemmed roses in paper packaging.',
+            id: '11111111-1111-1111-1111-111111111112',
+            partner_id: '00000000-0000-0000-0000-000000000001',
+            name: 'Wooden Photo Frame',
+            slug: 'wooden-photo-frame',
+            description: 'Classic oak frame with custom engraving.',
             base_price: 599,
+            category: 'photo-frames',
             is_active: true,
-            approval_status: 'approved',
-            stock_status: 'in_stock',
-            category: 'Flowers',
+            images: ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80'],
             has_personalization: true,
-            personalization_options: [{ id: 'card', name: 'Gift Card Message', type: 'text', maxLength: 100 }],
-            images: ['https://images.unsplash.com/photo-1562690868-60bbe7293e94?auto=format&fit=crop&q=80&w=800'],
-            slug: '10-red-roses-bouquet'
+            approval_status: 'approved'
         },
-        // INTERFLORA
         {
-            id: randomUUID(),
-            partner_id: partnerIds.interflora,
-            name: 'Luxury Orchid Arrangement',
-            description: 'Exotic purple orchids arranged in a glass vase.',
-            base_price: 2400,
+            id: '11111111-1111-1111-1111-111111111113',
+            partner_id: '00000000-0000-0000-0000-000000000002',
+            name: 'Chocolate Truffle Cake',
+            slug: 'chocolate-truffle-cake',
+            description: '1kg moist chocolate truffle cake.',
+            base_price: 899,
+            category: 'cakes',
             is_active: true,
-            approval_status: 'approved',
-            stock_status: 'in_stock',
-            category: 'Flowers',
-            has_personalization: true,
-            personalization_options: [{ id: 'card', name: 'Luxury Note Card', type: 'text', maxLength: 150 }],
-            images: ['https://images.unsplash.com/photo-1561181286-d3fee7d55364?auto=format&fit=crop&q=80&w=800'],
-            slug: 'luxury-orchid-arrangement'
-        },
-
-        // BIRTHDAY SPECIALS
-        {
-            id: randomUUID(),
-            partner_id: partnerIds.smoor,
-            name: 'Ultimate Birthday Hamper',
-            description: 'Cake, chocolates, and balloons. Everything you need for a party.',
-            base_price: 2999,
-            is_active: true,
-            approval_status: 'approved',
-            stock_status: 'in_stock',
-            category: 'Birthdays',
-            has_personalization: true,
-            personalization_options: [{ id: 'card', name: 'Birthday Wish', type: 'text', maxLength: 100 }],
-            images: ['https://images.unsplash.com/photo-1530103862676-de3c9da59af7?auto=format&fit=crop&q=80&w=800'],
-            slug: 'ultimate-birthday-hamper'
-        },
-
-        // ANNIVERSARY SPECIALS
-        {
-            id: randomUUID(),
-            partner_id: partnerIds.interflora,
-            name: 'Classic Romance Combo',
-            description: 'Red roses and truffle cake. The perfect anniversary gift.',
-            base_price: 1800,
-            is_active: true,
-            approval_status: 'approved',
-            stock_status: 'in_stock',
-            category: 'Anniversary',
-            has_personalization: true,
-            personalization_options: [{ id: 'card', name: 'Love Note', type: 'text', maxLength: 150 }],
-            images: ['https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800'],
-            slug: 'classic-romance-combo'
-        },
-
-        // PERSONALIZED
-        {
-            id: randomUUID(),
-            partner_id: partnerIds.fnp,
-            name: 'Personalized Photo Frame',
-            description: 'Wooden frame with your custom memory.',
-            base_price: 499,
-            is_active: true,
-            approval_status: 'approved',
-            stock_status: 'in_stock',
-            category: 'Personalized',
-            has_personalization: true,
-            personalization_options: [
-                { id: 'photo', name: 'Upload Photo', type: 'image', required: true },
-                { id: 'caption', name: 'Caption', type: 'text', maxLength: 50 }
-            ],
-            images: ['https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=800'],
-            slug: 'personalized-photo-frame'
+            images: ['https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?w=800&q=80'],
+            has_personalization: false,
+            approval_status: 'approved'
         }
+    ], { onConflict: 'id' });
 
-    ]
+    // 4. Platform Settings
+    console.log('Upserting platform settings...');
+    await supabase.from('platform_settings').upsert([
+        { key: 'platform_fee', value: [10] },
+        { key: 'personalization_unit_fee', value: [50] },
+        { key: 'delivery_slabs', value: [{ max_km: 3, fee: 40 }, { max_km: 7, fee: 60 }, { max_km: null, fee: 80 }] },
+        {
+            key: 'home_layout', value: [
+                { id: 'categories_rail', type: 'CIRCLE_RAIL', title: 'What on your mind?', source: 'categories' },
+                { id: 'trending_scroll', type: 'CARD_RAIL', title: 'Trending Around You', source: 'trendingItems' },
+                { id: 'featured_stores', type: 'GRID', title: 'Top Stores Near You', source: 'featuredPartners' }
+            ]
+        }
+    ], { onConflict: 'key' });
 
-    console.log('Injecting items...')
-    const { error: itemError } = await supabase.from('items').upsert(items)
-    if (itemError) console.error('Error seeding items:', itemError)
-
-    console.log('✅ Rich Data Seeded Successfully!')
-    console.log('Tables cleared and replenished with premium content.')
+    console.log('--- Enrichment Complete ---');
 }
 
-seed().catch(console.error)
+seed().catch(console.error);

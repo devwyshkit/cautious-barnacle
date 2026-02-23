@@ -38,7 +38,7 @@ export async function getItemWithFullSpec(itemId: string) {
         const [itemRes, variantsRes, addonsRes, personalizationRes] = await Promise.all([
             supabase
                 .from('items')
-                .select('*, partners:partners(id, name, slug, city, rating, display_name, image_url, fssai_license, gstin)')
+                .select('*, partners:partners(id, name, slug, city, rating, image_url, fssai_license, gstin)')
                 .eq('id', itemId)
                 .eq('is_active', true)
                 .eq('approval_status', 'approved')
@@ -103,7 +103,6 @@ export async function getItemReviews(itemId: string) {
         user:users(full_name, email)
       `)
             .eq('item_id', itemId)
-            .eq('is_active', true)
             .order('created_at', { ascending: false });
 
         if (error) throw error;

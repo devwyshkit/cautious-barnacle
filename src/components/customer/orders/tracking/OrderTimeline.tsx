@@ -20,12 +20,12 @@ export function OrderTimeline({ events }: OrderTimelineProps) {
     if (!events.length) return null;
 
     return (
-        <section className="bg-white rounded-2xl border border-zinc-100 overflow-hidden">
+        <section className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-full px-5 py-4 flex items-center justify-between hover:bg-zinc-50/50 transition-colors"
             >
-                <span className="text-xs font-bold text-zinc-900 tracking-wider">Order Updates</span>
+                <span className="text-xs font-bold text-zinc-900 tracking-tight">Order Updates</span>
                 {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
             </button>
             {isExpanded && (

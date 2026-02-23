@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { OrderCard } from './OrderCard';
 import { executePartnerIntent } from '@/lib/actions/partner/engine';
-import type { PartnerOrder } from '@/lib/actions/partner/partner-actions';
+import type { PartnerOrder } from '@/lib/actions/commerce/orders';
 import { usePartnerRealtime } from '@/hooks/usePartnerRealtime';
 import { toast } from 'sonner';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/types/order-status';
@@ -22,7 +22,7 @@ const STATUS_TABS: { id: StatusTab; label: string; statuses: OrderStatus[] }[] =
   {
     id: 'preparing',
     label: 'Preparing',
-    statuses: [ORDER_STATUS.CONFIRMED, ORDER_STATUS.DETAILS_RECEIVED, ORDER_STATUS.PREVIEW_READY, ORDER_STATUS.REVISION_REQUESTED, ORDER_STATUS.APPROVED, ORDER_STATUS.IN_PRODUCTION]
+    statuses: [ORDER_STATUS.CONFIRMED, ORDER_STATUS.IN_PRODUCTION]
   },
   {
     id: 'ready',

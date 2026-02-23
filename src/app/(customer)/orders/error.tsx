@@ -33,7 +33,7 @@ export default function GeneralError({
 
                 <Button
                     onClick={() => reset()}
-                    className="w-full h-12 rounded-2xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold"
+                    className="w-full h-12 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white font-bold"
                 >
                     <RefreshCcw className="size-4 mr-2" />
                     Try Again

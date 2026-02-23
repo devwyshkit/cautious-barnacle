@@ -43,16 +43,12 @@ export async function GET(req: NextRequest) {
 
         // Note: We use raw DELETE on cart_items. Cascade will handle remaining reservations (if any left).
         // We check updated_at OR created_at for legacy rows.
+        // Note: We use raw DELETE on cart_items. 
+        // WYSHKIT 2026: Safety check for active sessions is handled by DB-level foreign keys or left to application-level session expiry.
         const { error: cartError, count: cartCount } = await supabase
             .from('cart_items')
             .delete({ count: 'exact' })
-            .lt('updated_at', thirtyMinsAgo.toISOString())
-            // Safety: ensure we don't delete items currently being checked out (linked to draft_orders?)
-            // draft_orders table holds the checkout snapshot. 
-            // cart_items are the "Active Cart".
-            // If user is inside checkout for >30m, their cart might clear. 
-            // This is acceptable behavior ("Session Timed Out").
-            ;
+            .lt('updated_at', thirtyMinsAgo.toISOString());
 
         if (cartError) {
             logger.error('Cron: Failed to cleanup carts', cartError);

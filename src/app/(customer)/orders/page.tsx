@@ -44,21 +44,21 @@ export default async function OrdersPage() {
                         <h1 className="text-2xl font-black text-zinc-900 tracking-tight flex items-center gap-2">
                             My Orders
                         </h1>
-                        <p className="text-[11px] font-bold text-zinc-400 tracking-wider mt-0.5">
+                        <p className="text-[11px] font-bold text-zinc-400 tracking-tight mt-0.5">
                             Track and manage your orders
                         </p>
                     </div>
-                    <span className="text-xs font-black text-zinc-500 tracking-wider bg-white px-3 py-1.5 rounded-full border border-zinc-100 shadow-sm">
+                    <span className="text-xs font-black text-zinc-500 tracking-tight bg-white px-3 py-1.5 rounded-full border border-zinc-100 shadow-sm">
                         {orders?.length || 0} Total
                     </span>
                 </div>
 
                 {error ? (
-                    <div className="p-8 text-center bg-white rounded-3xl border border-zinc-100 shadow-sm">
+                    <div className="p-8 text-center bg-white rounded-xl border border-zinc-100 shadow-sm">
                         <p className="text-sm font-medium text-zinc-500">Failed to load orders. Please try again.</p>
                     </div>
                 ) : !orders || orders.length === 0 ? (
-                    <div className="p-12 text-center bg-white rounded-[2.5rem] border border-zinc-100 shadow-sm">
+                    <div className="p-12 text-center bg-white rounded-xl border border-zinc-100 shadow-sm">
                         <div className="size-16 rounded-full bg-zinc-50 flex items-center justify-center mx-auto mb-4 border border-zinc-100">
                             <Package className="size-8 text-zinc-300" />
                         </div>

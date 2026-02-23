@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowLeft, Package, Truck, User, Store, CreditCard, Clock, Loader2 } from 'lucide-react'
-import { updateOrderStatus } from '@/lib/actions/commerce/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import { ORDER_STATUS } from '@/lib/types/admin.types'
 import type { Tables, Json } from '@/lib/supabase/database.types'
 
@@ -54,7 +54,12 @@ export function OrderDetail({ order }: OrderDetailProps) {
 
   const handleStatusChange = async (newStatus: string) => {
     setUpdating(true)
-    await updateOrderStatus(order.id, newStatus)
+    await executeAdminIntent({
+      entity: 'order',
+      action: 'UPDATE_STATUS',
+      id: order.id,
+      target_status: newStatus
+    })
     setUpdating(false)
     router.refresh()
   }

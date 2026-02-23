@@ -58,11 +58,16 @@ export function usePaymentFlow({
             const params = new URLSearchParams();
             params.set('success', 'true');
             if (finalHasPersonalization) params.set('identity', 'true');
-            // SWIGGY 2026: router.replace — checkout should NOT be in history stack.
-            // Back button should go to homepage, not back to empty checkout.
-            router.replace(`/orders/${finalOrderId}?${params.toString()}`);
+
+            // SWIGGY 2026: Success Ripple Glory Time.
+            // We allow the success overlay to breathe before redirecting.
+            setTimeout(() => {
+                router.replace(`/orders/${finalOrderId}?${params.toString()}`);
+            }, 1500);
         } else {
-            router.replace('/orders');
+            setTimeout(() => {
+                router.replace('/orders');
+            }, 1500);
         }
     }, [clearDraftOrder, router]);
 
@@ -127,7 +132,7 @@ export function usePaymentFlow({
                                 razorpayResponse.razorpay_payment_id,
                                 razorpayResponse.razorpay_signature,
                                 {
-                                    draft_id: orderData.draftId
+                                    draft_id: orderData.sessionId
                                 }
                             );
 

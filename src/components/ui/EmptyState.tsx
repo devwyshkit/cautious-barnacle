@@ -42,7 +42,7 @@ export function EmptyState({
         )} />
 
         <div className={cn(
-          "relative size-24 rounded-[32px] flex items-center justify-center shadow-sm transition-transform duration-700 group-hover:scale-110 group-hover:rotate-3",
+          "relative size-24 rounded-xl flex items-center justify-center shadow-sm transition-transform duration-700 group-hover:scale-110 group-hover:rotate-3",
           variant === 'premium'
             ? "bg-gradient-to-br from-rose-500 to-orange-500 shadow-rose-500/20"
             : "bg-white border border-zinc-100 shadow-zinc-200/50"
@@ -90,7 +90,7 @@ export function EmptyState({
         <Button
           onClick={onAction}
           className={cn(
-            "mt-10 rounded-2xl px-10 font-black tracking-wider h-14 shadow-xl active:scale-95 transition-all duration-300",
+            "mt-10 rounded-xl px-10 font-black tracking-tight h-14 shadow-sm active:scale-95 transition-all duration-300",
             variant === 'premium'
               ? "bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white shadow-rose-500/20"
               : "bg-zinc-950 hover:bg-zinc-800 text-white"

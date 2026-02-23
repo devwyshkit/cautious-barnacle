@@ -23,7 +23,7 @@ export default function Error({
       <div className="w-full max-w-lg text-center space-y-8">
         {/* Command Center Icon */}
         <div className="relative inline-block">
-          <div className="size-24 bg-[#D91B24] rounded-[2rem] flex items-center justify-center shadow-sm shadow-red-100 animate-pulse">
+          <div className="size-24 bg-[#D91B24] rounded-xl flex items-center justify-center shadow-sm shadow-red-100 animate-pulse">
             <AlertTriangle className="size-10 text-white" />
           </div>
           <div className="absolute -bottom-2 -right-2 size-8 bg-white rounded-lg border-4 border-[#F8F9FA] flex items-center justify-center">
@@ -42,7 +42,7 @@ export default function Error({
         <div className="bg-zinc-900 rounded-xl p-6 text-left font-mono space-y-2 border border-zinc-800 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <Terminal className="size-3 text-red-500" />
-            <span className="text-xs text-red-500 font-bold tracking-wider">Stack Trace / Diagnostics</span>
+            <span className="text-xs text-red-500 font-bold tracking-tight">Stack Trace / Diagnostics</span>
           </div>
           <p className="text-[11px] text-zinc-400 truncate"><span className="text-zinc-600">$</span> error: <span className="text-red-400">{error.message || 'Unknown Runtime Exception'}</span></p>
           <p className="text-[11px] text-zinc-400"><span className="text-zinc-600">$</span> digest: <span className="text-red-400">{error.digest || 'N/A'}</span></p>
@@ -52,14 +52,14 @@ export default function Error({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
           <button
             onClick={() => reset()}
-            className="px-8 h-12 bg-[var(--primary)] text-white font-black text-xs tracking-wider rounded-2xl active:scale-95 transition-all w-full md:w-auto"
+            className="px-8 h-12 bg-[var(--primary)] text-white font-black text-xs tracking-tight rounded-xl active:scale-95 transition-all w-full md:w-auto"
           >
             <RefreshCcw className="size-4" /> Attempt Recovery
           </button>
           <Button
             variant="outline"
             onClick={() => router.push('/')}
-            className="h-12 border-zinc-200 rounded-lg px-8 font-black text-[11px] tracking-wider text-zinc-400"
+            className="h-12 border-zinc-200 rounded-lg px-8 font-black text-[11px] tracking-tight text-zinc-400"
           >
             Abort to Home
           </Button>
@@ -68,7 +68,7 @@ export default function Error({
 
       {/* Footer Branding */}
       <div className="fixed bottom-8 flex items-center gap-2">
-        <span className="text-xs font-black text-zinc-300 tracking-[0.2em]">Wyshkit Infrastructure 2026</span>
+        <span className="text-xs font-black text-zinc-300 tracking-tight">Wyshkit Infrastructure 2026</span>
       </div>
     </div>
   );

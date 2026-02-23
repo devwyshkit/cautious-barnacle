@@ -1,12 +1,10 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useRef, useEffect } from 'react';
 import { TopHeader } from './TopHeader';
 import { BottomNav } from './BottomNav';
 import { LocationData } from '@/lib/actions/discovery/location';
 import { ComplianceFooter } from './ComplianceFooter';
-import { useSurfaceScribe } from '@/providers/SurfaceScribeProvider';
 
 interface NavShellProps {
     initialLocation: LocationData;
@@ -24,7 +22,9 @@ export function NavShell({ initialLocation, children }: NavShellProps) {
     const pathname = usePathname();
 
     // Immersive routes where we hide the global header/nav
-    const isImmersive = pathname === '/checkout' || pathname.startsWith('/auth') || (pathname.startsWith('/orders/') && pathname !== '/orders');
+    const isImmersive = pathname.startsWith('/auth') ||
+        pathname === '/checkout' ||
+        (pathname.startsWith('/orders/') && pathname !== '/orders');
 
     // WYSHKIT 2026: Footer Allowlist (Strict Mode)
     // Only show on Hub pages. Never on transactional pages.
@@ -32,21 +32,8 @@ export function NavShell({ initialLocation, children }: NavShellProps) {
         pathname.startsWith('/category/') ||
         pathname.startsWith('/collection/');
 
-    const { setBottomNavHeight } = useSurfaceScribe();
-
-    // WYSHKIT 2026: Synchronize layout variables with visibility
-    useEffect(() => {
-        if (isImmersive) {
-            setBottomNavHeight(0);
-        } else {
-            // WYSHKIT 2026: Mobile bottom nav is 64px (h-16) + safe-area
-            const h = window.innerWidth < 768 ? 80 : 0; // 64 (nav) + 16 (margin)
-            setBottomNavHeight(h);
-        }
-    }, [isImmersive, pathname, setBottomNavHeight]);
-
     return (
-        <>
+        <div data-immersive={isImmersive}>
             {!isImmersive && <TopHeader initialLocation={initialLocation} />}
             <div className={!isImmersive ? "pt-[72px] md:pt-16 min-h-screen" : "min-h-screen"}>
                 {children}
@@ -54,6 +41,6 @@ export function NavShell({ initialLocation, children }: NavShellProps) {
                 {!isImmersive && showFooter && <ComplianceFooter className="hidden md:block" />}
             </div>
             {!isImmersive && <BottomNav />}
-        </>
+        </div>
     );
 }

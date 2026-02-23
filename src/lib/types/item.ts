@@ -17,7 +17,7 @@ export type ItemListItem = Tables<'items'> & {
   price?: number;
   image_url?: string;
   partner_name?: string;
-  partners?: { id: string; name: string; display_name?: string } | null;
+  partners?: { id: string; name: string } | null;
   variants?: Array<{ id: string; name: string | null; price: number | null; stock_quantity: number | null }>;
   stock_quantity?: number;
   production_time_minutes?: number;
@@ -42,7 +42,6 @@ export interface WyshkitItem extends Omit<Tables<'items'>, 'personalization_opti
   partners?: {
     id: string;
     name: string;
-    display_name?: string;
     city?: string;
     rating?: number;
     image_url?: string;

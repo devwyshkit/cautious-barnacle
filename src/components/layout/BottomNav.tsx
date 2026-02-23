@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Home", href: "/", icon: Home },
   { label: "Search", href: "/search", icon: Search },
-  { label: "Orders", href: "/profile?tab=orders", icon: ShoppingBag },
+  { label: "Orders", href: "/orders", icon: ShoppingBag },
   { label: "Profile", href: "/profile", icon: User },
 ];
 
@@ -20,10 +20,9 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-safe">
-      <div className="glass-morphism mx-4 mb-4 rounded-[28px] px-2 py-2 flex items-center justify-around translate-y-0 transition-transform duration-500">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 backdrop-blur-md border-t border-zinc-100 pb-safe">
+      <div className="flex items-center justify-around h-14 px-2">
         {navItems.map(({ label, href, icon: Icon }) => {
-          // Strict matching for home, startsWith for others
           const isActive = href === "/"
             ? pathname === "/"
             : pathname.startsWith(href.split('?')[0]);
@@ -33,21 +32,24 @@ export function BottomNav() {
               key={label}
               href={href}
               className={cn(
-                "flex flex-col items-center justify-center gap-1.5 min-w-[64px] py-1.5 transition-all duration-300 rounded-[20px]",
-                isActive
-                  ? "bg-rose-50/50 text-rose-600 scale-105"
-                  : "text-zinc-400 hover:text-zinc-600"
+                "flex flex-col items-center justify-center gap-1 flex-1 py-1 transition-all duration-200",
+                isActive ? "text-zinc-950" : "text-zinc-400"
               )}
             >
-              <Icon
-                className={cn(
-                  "size-5.5 transition-all duration-500",
-                  isActive ? "fill-rose-600/10 stroke-[2.5px]" : "stroke-[2px]"
+              <div className="relative">
+                <Icon
+                  className={cn(
+                    "size-5.5 transition-transform duration-300",
+                    isActive ? "stroke-[3px] scale-110" : "stroke-[2px]"
+                  )}
+                />
+                {isActive && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-zinc-950" />
                 )}
-              />
+              </div>
               <span className={cn(
-                "text-xs font-black tracking-[0.05em] transition-opacity duration-300",
-                isActive ? "opacity-100" : "opacity-0"
+                "text-[10px] font-black uppercase tracking-widest",
+                isActive ? "opacity-100" : "opacity-60"
               )}>
                 {label}
               </span>

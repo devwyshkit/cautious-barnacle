@@ -22,7 +22,7 @@ export function DashboardHeader({ type }: DashboardHeaderProps) {
               className="h-8 w-auto"
               priority
             />
-            <span className="text-xs font-black tracking-wider text-primary block -mt-1">
+            <span className="text-xs font-black tracking-tight text-primary block -mt-1">
                 {type === 'admin' ? 'Control Center' : 'Partner Manager'}
               </span>
           </Link>

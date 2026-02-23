@@ -52,7 +52,7 @@ export function BillSummary({ order }: BillSummaryProps) {
     };
 
     return (
-        <div className="bg-white rounded-[2rem] border border-zinc-100 overflow-hidden">
+        <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
             <button
                 onClick={() => {
                     setIsExpanded(!isExpanded);
@@ -120,7 +120,7 @@ export function BillSummary({ order }: BillSummaryProps) {
 
                         {((order.discount || 0) + (order.cashback_amount || 0)) > 0 && (
                             <div className="flex justify-between items-center py-2 px-3 bg-emerald-50/50 rounded-xl border border-emerald-100/50">
-                                <span className="text-xs font-black text-emerald-700 tracking-wider">Total Savings</span>
+                                <span className="text-xs font-black text-emerald-700 tracking-tight">Total Savings</span>
                                 <span className="text-sm font-black text-emerald-700">-{formatCurrency((order.discount || 0) + (order.cashback_amount || 0))}</span>
                             </div>
                         )}

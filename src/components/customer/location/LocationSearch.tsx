@@ -28,7 +28,7 @@ export function LocationSearch({ query, onQueryChange, results, searching, onSel
                         value={query}
                         onChange={(e) => onQueryChange(e.target.value)}
                         placeholder="Search for area, street name..."
-                        className="w-full bg-zinc-50 border-none rounded-2xl py-3.5 pl-11 pr-11 text-sm font-semibold placeholder:text-zinc-400 focus:ring-2 focus:ring-[#D91B24]/10 transition-all outline-none"
+                        className="w-full bg-zinc-50 border-none rounded-xl py-3.5 pl-11 pr-11 text-sm font-semibold placeholder:text-zinc-400 focus:ring-2 focus:ring-[#D91B24]/10 transition-all outline-none"
                     />
                     {query && (
                         <button
@@ -47,7 +47,7 @@ export function LocationSearch({ query, onQueryChange, results, searching, onSel
                         <button
                             key={result.place_id}
                             onClick={() => onSelectPlace(result.place_id)}
-                            className="w-full flex items-start gap-4 p-4 rounded-2xl hover:bg-zinc-50 transition-all text-left group"
+                            className="w-full flex items-start gap-4 p-4 rounded-xl hover:bg-zinc-50 transition-all text-left group"
                         >
                             <div className="size-10 rounded-xl bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-rose-50 transition-colors">
                                 <MapPin className="size-4 text-zinc-400 group-hover:text-[#D91B24]" />

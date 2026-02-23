@@ -5,9 +5,11 @@ import { ShoppingBag, ChevronRight, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/components/customer/CartProvider';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-import { hasAnyPersonalization } from '@/lib/utils/personalization';
+import { hasAnyPersonalization, hasItemPersonalization } from '@/lib/utils/personalization';
+import { formatCurrency } from '@/lib/utils/pricing';
 
 /**
  * WYSHKIT 2026: FloatingCartBar - CSS transitions (zero JS overhead)
@@ -17,21 +19,18 @@ import { hasAnyPersonalization } from '@/lib/utils/personalization';
 export function FloatingCartBar() {
   const router = useRouter();
   const pathname = usePathname();
-  const { draftOrder, loading, setCartOpen } = useCart();
+  const { draftOrder, loading } = useCart();
+  const { user: authUser } = useAuth();
 
-  // WYSHKIT 2026: Single source of truth - useDraftOrder
   const displayCart = draftOrder;
-
-  const isCheckoutOpen = pathname.startsWith('/checkout');
   const hasItems = displayCart && displayCart.item_count > 0;
-
-  // WYSHKIT 2026: Visibility Logic
-  const isVisible = hasItems && !isCheckoutOpen;
+  const isVisible = hasItems;
 
   const handleOpenCart = (e: React.MouseEvent) => {
     e.preventDefault();
     triggerHaptic(HapticPattern.ACTION);
-    setCartOpen(true);
+
+    router.push('/checkout');
   };
 
   const firstItemImage = displayCart?.items?.[0]?.item_image;
@@ -78,7 +77,7 @@ export function FloatingCartBar() {
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && handleOpenCart(e as any)}
         className={cn(
-          "bg-emerald-600 backdrop-blur-3xl rounded-2xl shadow-sm border border-emerald-500 overflow-hidden",
+          "bg-emerald-600 backdrop-blur-3xl rounded-xl shadow-sm border border-emerald-500 overflow-hidden",
           "transition-all duration-300 cursor-pointer active:scale-[0.98]",
           shouldPulse && "scale-[1.02] bg-emerald-500",
           isLoading && "opacity-70 pointer-events-none"
@@ -105,7 +104,7 @@ export function FloatingCartBar() {
                 {hasPersonalization && (
                   <div className="flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-white/20">
                     <Sparkles className="size-2 text-white" />
-                    <span className="text-[9px] font-black text-white tracking-widest leading-none">PREVIEW</span>
+                    <span className="text-[9px] font-black text-white tracking-tight leading-none">Personalized</span>
                   </div>
                 )}
               </div>
@@ -115,7 +114,7 @@ export function FloatingCartBar() {
           {/* Right: Price & CTA */}
           <div className="flex items-center gap-2">
             <span className="text-sm font-black text-white tabular-nums">
-              ₹{displayTotal.toFixed(0)}
+              {formatCurrency(displayTotal)}
             </span>
             <div className="flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full text-white font-bold text-xs">
               View

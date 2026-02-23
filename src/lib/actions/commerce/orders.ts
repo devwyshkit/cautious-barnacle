@@ -5,11 +5,58 @@ import { ORDER_STATUS } from '@/lib/types/order-status';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 import { Database, Json } from '@/lib/supabase/database.types';
-import type { Order, Tables, OrderDetails, OrderWithRelations, OrderStatusHistory } from '@/lib/supabase/types';
+import type { Order, Tables, OrderDetails, OrderWithRelations, OrderStatusHistory, Address, Partner, OrderItem, PreviewSubmission } from '@/lib/supabase/types';
 import { logError, handleActionError } from '@/lib/utils/error-handler';
 import { logger } from '@/lib/logging/logger';
 import { hasItemPersonalization } from '@/lib/utils/personalization';
 import { withTrace } from '@/lib/observability/tracer';
+
+export type OrderStatus = Database['public']['Enums']['order_status'];
+
+// WYSHKIT 2026: Order State Machine - Valid Transitions (STRICT)
+// Enforces "Commitment Before Creativity" and "One-Trip" Principles
+// No Circular States allowed. Revisions change personalization_status, but NOT order.status.
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  PLACED: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['IN_PRODUCTION', 'CANCELLED'],
+  IN_PRODUCTION: ['PACKED', 'CANCELLED'],
+  PACKED: ['DISPATCHED', 'CANCELLED'],
+  DISPATCHED: ['OUT_FOR_DELIVERY', 'DELIVERED'],
+  OUT_FOR_DELIVERY: ['DELIVERED'],
+  DELIVERED: ['REFUNDED'], // Returns flow
+  CANCELLED: [],
+  REFUNDED: [],
+};
+
+export async function validate_status_transition(
+  from: string,
+  to: string,
+  has_personalization: boolean
+): Promise<string | null> {
+  // Universal Rule: Can't skip "Preparing" (IN_PRODUCTION)
+  if (from === ORDER_STATUS.CONFIRMED && to === ORDER_STATUS.PACKED) {
+    return 'Orders must be marked as "Preparing" (IN_PRODUCTION) before they can be marked as Ready (PACKED).';
+  }
+
+  const valid_next_statuses = VALID_TRANSITIONS[from];
+  if (!valid_next_statuses || !valid_next_statuses.includes(to)) {
+    return `Invalid transition from "${from}" to "${to}".`;
+  }
+
+  return null;
+}
+
+export type PartnerOrder = Omit<Order, 'delivery_address' | 'partner'> & {
+  order_items: (OrderItem & {
+    item?: Tables<'items'> | null;
+    variant?: { stock_quantity: number } | null;
+    personalization_entry?: Tables<'order_personalization'> | null;
+  })[];
+  order_personalization?: Tables<'order_personalization'>[];
+  latest_preview?: PreviewSubmission | null;
+  delivery_address?: Address | Address[] | null;
+  partner?: Partner | Partner[] | null;
+};
 
 // WYSHKIT 2026: Strict Payload Validation (Swiggy Standard)
 // [PURGED] placeOrderSchema and PlaceOrderPayload (Superseded by Intent Engine)
@@ -27,6 +74,127 @@ async function log_order_status_history(order_id: string, type: string, title: s
 
   if (error) logError(error, 'OrderStatusHistory');
 }
+
+export async function update_order_status(
+  order_id: string,
+  status: OrderStatus | string,
+  metadata?: {
+    reason?: string;
+    cancelled_by?: 'partner' | 'admin' | 'customer' | 'system';
+  }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createClient();
+
+    const { data: raw_order_data, error: order_error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        delivery_address:addresses(*),
+        partner:partners(*)
+      `)
+      .eq('id', order_id)
+      .single();
+
+    if (order_error || !raw_order_data) throw new Error('Order not found');
+
+    const order = (raw_order_data as unknown) as PartnerOrder;
+    const current_status = order.status as OrderStatus;
+    const has_personalization = order.has_personalization === true;
+
+    // 1. Validation
+    const validation_error = await validate_status_transition(current_status, status, has_personalization);
+    if (validation_error) {
+      return { success: false, error: validation_error };
+    }
+
+    // 2. Side Effect: Auto-Dispatch
+    if (status === 'PACKED') {
+      try {
+        const { dispatch_order } = await import('@/lib/services/dispatch');
+        const dispatch_result = await dispatch_order({ order_id: order_id });
+        if (dispatch_result.success) {
+          logger.info(`[update_order_status] Auto-dispatch successful for ${order_id}, moving to DISPATCHED.`);
+          status = ORDER_STATUS.DISPATCHED;
+        }
+      } catch (dispatch_error) {
+        logger.error('Dispatch trigger failed', dispatch_error, { order_id });
+      }
+    }
+
+    // 3. Side Effect: Auto-Refund
+    let payment_status_update: Database['public']['Tables']['orders']['Update'] = {};
+    if (status === 'CANCELLED' || status === 'REFUNDED') {
+      if (order.payment_status === 'paid' || order.payment_status === 'captured') {
+        const payment_id = order.payment_id;
+        if (payment_id) {
+          try {
+            const { refund_payment } = await import('@/lib/services/razorpay');
+            await refund_payment(payment_id);
+            payment_status_update = {
+              payment_status: 'refunded',
+              return_status: 'auto_refunded'
+            };
+            logger.info('Auto-refund successful', { order_id, payment_id });
+          } catch (refund_error) {
+            logger.error('Auto-refund failed', refund_error, { order_id, payment_id });
+          }
+        }
+      }
+    }
+
+    // 4. Build Final Update
+    const status_updates: Database['public']['Tables']['orders']['Update'] = {
+      status: status as OrderStatus,
+      ...payment_status_update,
+      updated_at: new Date().toISOString()
+    };
+
+    if (metadata?.reason) status_updates.cancellation_reason = metadata.reason;
+    if (metadata?.cancelled_by) status_updates.cancelled_by = metadata.cancelled_by;
+
+    if (status === 'CONFIRMED' && has_personalization) {
+      const deadline = new Date();
+      deadline.setHours(deadline.getHours() + 24);
+      status_updates.design_deadline_at = deadline.toISOString();
+    }
+
+    const { error: update_error } = await supabase
+      .from('orders')
+      .update(status_updates)
+      .eq('id', order_id);
+
+    if (update_error) throw update_error;
+
+    // 6. Audit & Persistence
+    await supabase.rpc('log_order_status_history', {
+      p_order_id: order_id,
+      p_type: 'status_update',
+      p_title: `Status: ${status}`,
+      p_description: metadata?.reason ? `Order ${status}. Reason: ${metadata.reason}` : `Order status updated to ${status}.`,
+      p_metadata: ({ source: metadata?.cancelled_by || 'system', status, ...metadata }) as unknown as Json
+    });
+
+    // 7. Side Effect: Cashback
+    if (status === 'DELIVERED') {
+      try {
+        const { credit_cashback_on_delivery } = await import('@/lib/actions/user/cashback');
+        await credit_cashback_on_delivery(order_id, order.user_id, Number(order.total));
+      } catch (cashback_error) {
+        logger.error('Failed to credit cashback on delivery', cashback_error, { order_id });
+      }
+    }
+
+    revalidateTag(`order-${order_id}`);
+    revalidateTag('orders');
+    return { success: true };
+  } catch (error) {
+    logError(error, `update_order_status:${order_id}:${status}`);
+    return { success: false, error: 'Failed to update order status' };
+  }
+}
+
+import { PERSONALIZATION_STATUS } from '@/lib/types/order-status';
 
 export async function submit_order_personalization(order_id: string, personalization_input: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
   return withTrace('submit_order_personalization', async (span) => {
@@ -69,16 +237,11 @@ export async function submit_order_personalization(order_id: string, personaliza
 
       // 2. Validate Current State
       // WYSHKIT 2026: "Momentum First" - Allow upload during PLACED, but only move status for CONFIRMED.
-      const can_submit = ([ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED, ORDER_STATUS.DETAILS_RECEIVED, ORDER_STATUS.REVISION_REQUESTED] as string[]).includes(order.status);
+      const can_submit = ([ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED] as string[]).includes(order.status);
 
       if (!can_submit) {
         return { success: false, error: `Cannot submit details in ${order.status} state.` };
       }
-
-      // 3. Determine Next Status
-      // Only move to DETAILS_RECEIVED if we were already CONFIRMED or in the loop.
-      // If PLACED, we stay PLACED until the partner commits (Accepts).
-      const next_status = order.status === ORDER_STATUS.PLACED ? ORDER_STATUS.PLACED : ORDER_STATUS.DETAILS_RECEIVED;
 
       // 3. WYSHKIT 2026: Atomic Submission
       const admin_supabase = await createAdminClient();
@@ -121,7 +284,6 @@ export async function mark_order_as_packed(order_id: string) {
     if (!order_id || order_id.trim() === '') {
       return { success: false, error: 'Invalid Order ID' };
     }
-    const { update_order_status } = await import('@/lib/actions/partner/partner-actions');
     const result = await update_order_status(order_id, ORDER_STATUS.PACKED);
 
     if (!result.success) {
@@ -151,46 +313,40 @@ export async function approve_preview(preview_submission_id: string, order_id: s
 
     if (fetch_error || !preview) throw new Error('Preview not found');
 
-    // 2. Approve the preview
-    const { error: preview_error } = await admin_supabase
-      .from('preview_submissions')
-      .update({ status: 'approved' })
-      .eq('id', preview_submission_id);
+    // 2. Swiggy 2026: Route via Admin Intent RPC (Audit Trail)
+    // This now updates personalization_status to 'approved'
+    const { error: intentError } = await admin_supabase.rpc('execute_admin_intent', {
+      p_intent: {
+        entity: 'order',
+        action: 'UPDATE_PERSONALIZATION_STATUS',
+        id: order_id,
+        metadata: { target_status: PERSONALIZATION_STATUS.APPROVED }
+      }
+    });
 
-    if (preview_error) throw preview_error;
+    if (intentError) throw intentError;
 
-    // 3. Update the specific item status to IN_PRODUCTION (Liability Shift)
+    // Approve the preview submission record
+    await admin_supabase.from('preview_submissions').update({ status: 'approved' }).eq('id', preview_submission_id);
+
+    // Update specific item status
     if (preview.order_item_id) {
-      await admin_supabase
-        .from('order_items')
-        .update({
-          status: ORDER_STATUS.IN_PRODUCTION,
-          liability_shifted_at: new Date().toISOString()
-        })
-        .eq('id', preview.order_item_id);
+      await admin_supabase.from('order_items').update({
+        status: ORDER_STATUS.IN_PRODUCTION,
+        liability_shifted_at: new Date().toISOString()
+      }).eq('id', preview.order_item_id);
     }
 
-    // 4. Check if ALL personalized items are approved/in_production
-    const { data: items } = await admin_supabase
-      .from('order_items')
-      .select('id, status, is_personalized')
-      .eq('order_id', order_id);
+    // Final check for order-wide status
+    const { data: items } = await admin_supabase.from('order_items').select('id, status').eq('order_id', order_id);
+    const personalized_items = (items || []).filter(i => i.status !== ORDER_STATUS.CANCELLED);
+    const all_approved = personalized_items.every(i => i.status === ORDER_STATUS.IN_PRODUCTION);
 
-    const personalized_items = (items || []).filter(i => i.is_personalized);
-    const active_personalized_items = personalized_items.filter(i => i.status !== ORDER_STATUS.CANCELLED && i.status !== ORDER_STATUS.REFUNDED);
-    const all_active_approved = active_personalized_items.length > 0 && active_personalized_items.every(i => i.status === ORDER_STATUS.IN_PRODUCTION);
-
-    // 5. Update Order Status
-    const { error: order_error } = await admin_supabase
-      .from('orders')
-      .update({
-        status: all_active_approved ? ORDER_STATUS.IN_PRODUCTION : ORDER_STATUS.PREVIEW_READY,
-        approved_at: all_active_approved ? new Date().toISOString() : null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', order_id);
-
-    if (order_error) throw order_error;
+    if (all_approved) {
+      await admin_supabase.from('orders').update({
+        status: ORDER_STATUS.IN_PRODUCTION
+      }).eq('id', order_id);
+    }
 
     await log_order_status_history(order_id, 'preview_approved', 'Preview Approved', `You have approved the preview. Engraving has begun (Liability Shifted).`, {
       preview_submission_id: preview_submission_id,
@@ -321,17 +477,16 @@ export async function request_change(preview_submission_id: string, order_id: st
     if (preview_error) throw preview_error;
 
     // 3. Update the specific item status
-    if (preview.order_item_id) {
-      await admin_supabase
-        .from('order_items')
-        .update({ status: ORDER_STATUS.REVISION_REQUESTED })
-        .eq('id', preview.order_item_id);
-    }
+    // Note: order_item.status remains IN_PRODUCTION or similar if it already started, 
+    // but we use personalization_status for loop state.
+    // Legacy support: We might still update order_item.status if it was REVISION_REQUESTED.
+    // However, Swiggy 2026 prefers keeping item status as IN_PRODUCTION 
+    // once accepted, and using loop status.
 
     const { error: update_order_error } = await admin_supabase
       .from('orders')
       .update({
-        status: ORDER_STATUS.REVISION_REQUESTED,
+        personalization_status: PERSONALIZATION_STATUS.REVISION_REQUESTED,
         change_request_count: change_request_count,
         updated_at: new Date().toISOString()
       })

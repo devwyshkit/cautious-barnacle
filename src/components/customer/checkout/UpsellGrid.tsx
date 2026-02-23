@@ -54,7 +54,7 @@ export const UpsellGrid: React.FC<UpsellGridProps> = ({
 
             return (
               <div key={item.id} className="shrink-0 w-[140px] flex flex-col gap-2">
-                <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-zinc-100">
+                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-100">
                   <Image
                     src={item.image_url || '/images/logo.png'}
                     alt={item.name}

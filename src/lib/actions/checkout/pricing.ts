@@ -74,6 +74,7 @@ export async function calculateOrderTotalRPC(
         discount: Number(result.discount) || 0,
         wallet_discount: Number(result.wallet_discount) || 0,
         total: Number(result.total) || 0,
+        cashback_amount: Number(result.cashback_amount) || 0,
       },
     };
   } catch (error) {

@@ -51,7 +51,7 @@ export function AddressManager({ initialAddresses, isAdding, onToggleAdding }: A
                     className="flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors"
                 >
                     <ChevronLeft className="size-4" />
-                    <span className="text-xs font-bold tracking-wider">Back to addresses</span>
+                    <span className="text-xs font-bold tracking-tight">Back to addresses</span>
                 </button>
 
                 <div>
@@ -59,7 +59,7 @@ export function AddressManager({ initialAddresses, isAdding, onToggleAdding }: A
                     <p className="text-xs text-zinc-500 mt-1">We'll save this for your next orders</p>
                 </div>
 
-                <div className="bg-zinc-50 rounded-3xl p-6 border border-zinc-100">
+                <div className="bg-zinc-50 rounded-xl p-6 border border-zinc-100">
                     <AddressForm
                         onCancel={() => onToggleAdding(false)}
                         onSuccess={(newAddr) => {
@@ -75,14 +75,14 @@ export function AddressManager({ initialAddresses, isAdding, onToggleAdding }: A
 
     return (
         <>
-            <h3 className="text-[11px] font-bold text-zinc-400 tracking-[0.2em] mb-4">Saved Addresses</h3>
+            <h3 className="text-[11px] font-bold text-zinc-400 tracking-tight mb-4">Saved Addresses</h3>
 
             {loading ? (
                 <div className="flex items-center justify-center py-12">
                     <Loader2 className="size-6 animate-spin text-zinc-400" />
                 </div>
             ) : addresses.length === 0 ? (
-                <div className="p-8 bg-zinc-50 rounded-2xl text-center">
+                <div className="p-8 bg-zinc-50 rounded-xl text-center">
                     <div className="size-12 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-3">
                         <MapPin className="size-5 text-zinc-400" />
                     </div>
@@ -95,7 +95,7 @@ export function AddressManager({ initialAddresses, isAdding, onToggleAdding }: A
                         const Icon = addr.type === 'home' ? Home : addr.type === 'work' ? Briefcase : MapPin;
                         return (
                             <div key={addr.id} className={cn(
-                                "p-4 rounded-2xl border transition-all",
+                                "p-4 rounded-xl border transition-all",
                                 addr.is_default ? "bg-zinc-50 border-zinc-200" : "border-zinc-100"
                             )}>
                                 <div className="flex items-start gap-3">

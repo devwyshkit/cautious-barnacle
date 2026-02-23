@@ -10,46 +10,22 @@ import { cn } from '@/lib/utils';
 
 interface CircleRailProps {
     data: any[];
+    context?: any;
 }
 
-export function CircleRail({ data }: CircleRailProps) {
+export function CircleRail({ data, context }: CircleRailProps) {
     const searchParams = useSearchParams();
-    const selectedCategory = searchParams?.get('category') || null;
-    const isAllSelected = selectedCategory === null;
+    const selectedCategory = context?.selected_category || searchParams?.get('category') || null;
 
-    if (!data || data.length === 0) return null;
+    // Robustness: If no data, show Recommended.
+    const categories = data && data.length > 0 ? data : [
+        { id: 'all', name: 'Recommended', slug: 'Recommended', image_url: null }
+    ];
 
     return (
-        <div className="flex gap-8 md:gap-10 overflow-x-auto no-scrollbar py-4 pb-2 px-1">
-            {/* "All" Category Button */}
-            <Link
-                href="/"
-                onClick={() => triggerHaptic(HapticPattern.ACTION)}
-                className="flex flex-col items-center gap-1.5 shrink-0 group active:scale-95 transition-all duration-200"
-                scroll={false}
-                prefetch={false}
-            >
-                <div className={cn(
-                    "size-[68px] md:size-[84px] rounded-full overflow-hidden bg-zinc-100/50 relative transition-all duration-300 flex items-center justify-center group-hover:bg-zinc-100",
-                    isAllSelected
-                        ? "ring-2 ring-zinc-900 ring-offset-2"
-                        : "border border-zinc-100/30"
-                )}>
-                    <LayoutGrid className={cn(
-                        "size-6 transition-colors",
-                        isAllSelected ? "text-zinc-900" : "text-zinc-400"
-                    )} />
-                </div>
-                <span className={cn(
-                    "text-xs md:text-[11px] font-bold tracking-tight text-center leading-tight transition-colors",
-                    isAllSelected ? "text-zinc-900" : "text-zinc-600"
-                )}>
-                    All
-                </span>
-            </Link>
-
+        <div className="flex gap-3 md:gap-5 overflow-x-auto no-scrollbar py-2 px-0.5">
             {/* Dynamic Categories */}
-            {data.map((item) => {
+            {categories.map((item: any) => {
                 const isSelected = selectedCategory === item.slug;
 
                 return (
@@ -57,39 +33,59 @@ export function CircleRail({ data }: CircleRailProps) {
                         key={item.id}
                         href={item.slug?.startsWith('/') ? item.slug : `/?category=${item.slug}`}
                         onClick={() => triggerHaptic(HapticPattern.ACTION)}
-                        className="flex flex-col items-center gap-1.5 shrink-0 group active:scale-95 transition-all duration-200"
                         scroll={false}
-                        prefetch={false}
+                        className="outline-none"
                     >
-                        <div className={cn(
-                            "size-[68px] md:size-[84px] rounded-full overflow-hidden bg-zinc-50 relative transition-all duration-300 group-hover:shadow-lg group-hover:shadow-zinc-200/50",
-                            isSelected
-                                ? "ring-2 ring-zinc-900 ring-offset-2"
-                                : "border border-zinc-100/30"
-                        )}>
-                            {item.image_url ? (
-                                <Image
-                                    src={item.image_url}
-                                    alt={item.name}
-                                    fill
-                                    className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                                    sizes="(max-width: 768px) 64px, 80px"
-                                />
-                            ) : (
-                                <div className="flex items-center justify-center h-full bg-zinc-100">
-                                    <LayoutGrid className="size-6 text-zinc-300" />
-                                </div>
-                            )}
+                        <div className="flex flex-col items-center gap-1.5 shrink-0 group active:scale-95 transition-all duration-300">
+                            <div className={cn(
+                                "size-14 md:size-16 rounded-full overflow-hidden relative transition-all duration-500 border-2",
+                                isSelected
+                                    ? "border-zinc-900 bg-white"
+                                    : "border-transparent bg-zinc-50"
+                            )}>
+                                {item.image_url ? (
+                                    <Image
+                                        src={item.image_url}
+                                        alt={item.name}
+                                        fill
+                                        className={cn(
+                                            "object-cover transition-all duration-700 ease-in-out group-hover:scale-110",
+                                            isSelected ? "scale-90" : "scale-100"
+                                        )}
+                                        sizes="(max-width: 768px) 56px, 64px"
+                                    />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full">
+                                        <LayoutGrid className="size-5 text-zinc-300" />
+                                    </div>
+                                )}
+                            </div>
+                            <span className={cn(
+                                "text-[10px] font-black tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
+                                isSelected ? "text-zinc-950" : "text-zinc-400"
+                            )}>
+                                {item.name === 'ALL' ? (
+                                    <span className="text-[10px] font-black tracking-widest text-[#D91B24]">All</span>
+                                ) : (
+                                    item.name
+                                )}
+                            </span>
                         </div>
-                        <span className={cn(
-                            "text-xs md:text-[11px] font-bold tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
-                            isSelected ? "text-zinc-900" : "text-zinc-600"
-                        )}>
-                            {item.name}
-                        </span>
                     </Link>
                 );
             })}
+
+            {/* Empty State Fallback if totally empty */}
+            {categories.length === 0 && (
+                <div className="flex gap-4 animate-pulse">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="flex flex-col items-center gap-1.5 shrink-0">
+                            <div className="size-[68px] md:size-[80px] rounded-full bg-zinc-50" />
+                            <div className="h-2 w-10 bg-zinc-50 rounded" />
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

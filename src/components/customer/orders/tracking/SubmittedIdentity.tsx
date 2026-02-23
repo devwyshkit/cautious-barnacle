@@ -24,7 +24,7 @@ export function SubmittedIdentity({ details, itemName, isOptimisticSubmitted }: 
     }
 
     return (
-        <div className="rounded-2xl bg-zinc-50 border border-zinc-100 overflow-hidden transition-all duration-300">
+        <div className="rounded-xl bg-zinc-50 border border-zinc-100 overflow-hidden transition-all duration-300">
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-zinc-100/50 transition-colors"
@@ -34,7 +34,7 @@ export function SubmittedIdentity({ details, itemName, isOptimisticSubmitted }: 
                         <FileText className="size-4 text-zinc-400" />
                     </div>
                     <div>
-                        <p className="text-xs font-black text-zinc-400 tracking-wider">
+                        <p className="text-xs font-black text-zinc-400 tracking-tight">
                             {isOptimisticSubmitted && !hasContent ? 'Brief Processing...' : 'Submitted Identity'}
                         </p>
                         <p className="text-xs font-bold text-zinc-900 truncate max-w-[150px]">

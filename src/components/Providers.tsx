@@ -1,7 +1,7 @@
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { RealtimeProvider } from '@/providers/RealtimeProvider';
-import { SurfaceScribeProvider } from '@/providers/SurfaceScribeProvider';
+// SurfaceScribeProvider removed - using native CSS env() for safe areas
 
 /**
  * Providers Component
@@ -12,13 +12,11 @@ import { SurfaceScribeProvider } from '@/providers/SurfaceScribeProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SurfaceScribeProvider>
-      <AuthProvider>
-        <RealtimeProvider>
-          {children}
-          <Toaster position="top-center" richColors />
-        </RealtimeProvider>
-      </AuthProvider>
-    </SurfaceScribeProvider>
+    <AuthProvider>
+      <RealtimeProvider>
+        {children}
+        <Toaster position="top-center" richColors />
+      </RealtimeProvider>
+    </AuthProvider>
   );
 }

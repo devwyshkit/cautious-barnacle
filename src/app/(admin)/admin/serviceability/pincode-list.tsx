@@ -6,15 +6,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogTrigger,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -25,7 +25,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Plus, Search, Trash2, Loader2 } from 'lucide-react'
-import { addPincode, togglePincodeStatus, deletePincode } from '@/lib/actions/commerce/admin-actions'
+import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import type { ServiceablePincode } from '@/lib/types/admin.types'
 
 interface PincodeListProps {
@@ -47,7 +47,11 @@ export function PincodeList({ pincodes }: PincodeListProps) {
   const handleCreate = async () => {
     if (!form.pincode) return
     setLoading(true)
-    await addPincode(form.pincode)
+    await executeAdminIntent({
+      entity: 'pincode',
+      action: 'ADD',
+      metadata: { pincode: form.pincode }
+    })
     setForm({ pincode: '' })
     setOpen(false)
     setLoading(false)
@@ -55,14 +59,23 @@ export function PincodeList({ pincodes }: PincodeListProps) {
   }
 
   const handleToggle = async (id: string, current: boolean) => {
-    await togglePincodeStatus(id, !current)
+    await executeAdminIntent({
+      entity: 'pincode',
+      action: 'TOGGLE_STATUS',
+      id,
+      metadata: { isActive: !current }
+    })
     router.refresh()
   }
 
   const handleDelete = async () => {
     if (!deleteId) return
     setLoading(true)
-    await deletePincode(deleteId)
+    await executeAdminIntent({
+      entity: 'pincode',
+      action: 'DELETE',
+      id: deleteId
+    })
     setDeleteId(null)
     setLoading(false)
     router.refresh()
@@ -85,11 +98,11 @@ export function PincodeList({ pincodes }: PincodeListProps) {
               <DialogDescription>Add a new serviceable pincode</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 pt-4">
-              <Input 
-                placeholder="Pincode" 
-                value={form.pincode} 
-                onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) })} 
-                maxLength={6} 
+              <Input
+                placeholder="Pincode"
+                value={form.pincode}
+                onChange={(e) => setForm({ ...form, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                maxLength={6}
               />
               <Button onClick={handleCreate} disabled={loading || !form.pincode} className="w-full">
                 {loading ? <Loader2 className="size-4 animate-spin" /> : 'Add'}
@@ -121,10 +134,10 @@ export function PincodeList({ pincodes }: PincodeListProps) {
                     <Switch checked={pincode.is_active ?? false} onCheckedChange={() => handleToggle(pincode.id, pincode.is_active ?? false)} />
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => setDeleteId(pincode.id)} 
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setDeleteId(pincode.id)}
                       className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="size-4" />

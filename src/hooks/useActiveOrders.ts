@@ -12,6 +12,7 @@ export interface ActiveOrder {
     order_number: string;
     status: OrderStatus;
     has_personalization: boolean;
+    personalization_status?: string;
     total: number;
     partner_name?: string;
     items?: { name: string }[];
@@ -31,7 +32,7 @@ export function useActiveOrders() {
     const fetchActiveOrders = async (uid: string) => {
         const { data, error } = await supabase
             .from('orders')
-            .select('id,order_number,status,has_personalization,total,partners(name),order_items(item_name)')
+            .select('id,order_number,status,has_personalization,personalization_status,total,partners(name),order_items(item_name)')
             .eq('user_id', uid)
             .not('status', 'in', `(${[ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED, ORDER_STATUS.REFUNDED].join(',')})`)
             .order('created_at', { ascending: false });
@@ -44,6 +45,7 @@ export function useActiveOrders() {
                 order_number: o.order_number,
                 status: o.status as OrderStatus,
                 has_personalization: o.has_personalization,
+                personalization_status: o.personalization_status,
                 total: o.total,
                 partner_name: o.partners?.name,
                 items: Array.isArray(o.order_items) ? o.order_items.map((i: any) => ({ name: i.item_name })) : []

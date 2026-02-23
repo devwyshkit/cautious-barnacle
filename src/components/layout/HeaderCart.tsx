@@ -58,7 +58,7 @@ export function HeaderCart() {
                 variant="ghost"
                 onClick={handleCheckout}
                 className={cn(
-                    "h-10 px-4 rounded-2xl hover:bg-zinc-50 gap-3 font-bold text-[14px] text-zinc-900 active:scale-95 transition-all border border-zinc-100",
+                    "h-10 px-4 rounded-xl hover:bg-zinc-50 gap-3 font-bold text-[14px] text-zinc-900 active:scale-95 transition-all border border-zinc-100",
                     shouldBounce && "scale-105 bg-emerald-50 border-emerald-200"
                 )}
             >
@@ -74,7 +74,7 @@ export function HeaderCart() {
                     )}
                 </div>
                 <div className="flex flex-col items-start leading-none">
-                    <span className="text-xs text-zinc-500 font-medium tracking-wider">Cart</span>
+                    <span className="text-xs text-zinc-500 font-medium tracking-tight">Cart</span>
                     <span className="tabular-nums">{formatCurrency(displayTotal)}</span>
                 </div>
             </Button>

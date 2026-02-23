@@ -122,9 +122,9 @@ export function ItemReviews({ itemId, initialReviews }: ItemReviewsProps) {
       </div>
 
       {user && (
-        <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+        <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
           <div className="space-y-2">
-            <label className="text-xs font-bold text-zinc-500 tracking-wider">Your Rating</label>
+            <label className="text-xs font-bold text-zinc-500 tracking-tight">Your Rating</label>
             <div className="flex items-center gap-2">
               {[1, 2, 3, 4, 5].map((s) => (
                 <button
@@ -144,7 +144,7 @@ export function ItemReviews({ itemId, initialReviews }: ItemReviewsProps) {
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-xs font-bold text-zinc-500 tracking-wider">Your Experience</label>
+            <label className="text-xs font-bold text-zinc-500 tracking-tight">Your Experience</label>
             <Textarea
               placeholder="Tell others what you liked or disliked about this item..."
               value={comment}
@@ -200,7 +200,7 @@ export function ItemReviews({ itemId, initialReviews }: ItemReviewsProps) {
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-10 space-y-3 bg-zinc-50 rounded-2xl border border-dashed border-zinc-200">
+          <div className="flex flex-col items-center justify-center py-10 space-y-3 bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
             <div className="size-12 rounded-full bg-white flex items-center justify-center shadow-sm">
               <MessageSquare className="size-6 text-zinc-200" />
             </div>

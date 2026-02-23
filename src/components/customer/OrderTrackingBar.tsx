@@ -1,31 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Package, Sparkles, ChevronRight, Clock, AlertCircle } from 'lucide-react';
-import { usePathname } from 'next/navigation';
-import { useActiveOrders, type ActiveOrder } from '@/hooks/useActiveOrders';
+import { useState } from 'react';
+import { ChevronRight, AlertCircle } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useActiveOrders } from '@/hooks/useActiveOrders';
 import { useCart } from '@/components/customer/CartProvider';
-import { ORDER_STATUS, getStatusConfig } from '@/lib/types/order-status';
+import { ORDER_STATUS, PERSONALIZATION_STATUS, getStatusConfig } from '@/lib/types/order-status';
 import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
-import { OrderTracker } from '@/components/customer/orders/OrderTracker';
-import { useSurfaceScribe } from '@/providers/SurfaceScribeProvider';
 
 export function OrderTrackingBar() {
     const { activeOrders, loading } = useActiveOrders();
     const { draftOrder } = useCart();
     const pathname = usePathname();
-    const [isOpen, setIsOpen] = useState(false);
+    const router = useRouter();
 
-    const isCheckoutOpen = pathname?.startsWith('/checkout');
     const hasCartItems = draftOrder && draftOrder.item_count > 0;
-    const isCartVisible = hasCartItems && !isCheckoutOpen;
+    const isCartVisible = hasCartItems;
 
     // WYSHKIT 2026: Show all active orders, but highlight those needing action
     const needsAttention = activeOrders.filter(o =>
         (o.status === ORDER_STATUS.PLACED && o.has_personalization) ||
-        o.status === ORDER_STATUS.PREVIEW_READY
+        o.personalization_status === PERSONALIZATION_STATUS.PREVIEW_READY
     );
 
     // Prioritize "Needs Attention" orders, otherwise show most recent active order
@@ -33,25 +29,15 @@ export function OrderTrackingBar() {
 
     // Don't show on checkout to avoid clutter. 
     // Swiggy 2026 Pattern: Even if we are on the order page, the bar can remain if there's ANOTHER order needing attention.
-    const isExcludedPage = pathname === '/checkout' || (orderToShow && pathname === `/orders/${orderToShow.id}`);
+    const isExcludedPage = orderToShow && pathname === `/orders/${orderToShow.id}`;
 
     const isVisible = !loading && orderToShow && !isExcludedPage;
-
-    const { setTrackingBarHeight } = useSurfaceScribe();
-
-    useEffect(() => {
-        if (isVisible) {
-            setTrackingBarHeight(72);
-        } else {
-            setTrackingBarHeight(0);
-        }
-    }, [isVisible, setTrackingBarHeight]);
 
     if (!isVisible) return null;
 
     const handleOpen = () => {
         triggerHaptic(HapticPattern.ACTION);
-        setIsOpen(true);
+        router.push(`/orders/${orderToShow.id}`);
     };
 
     const config = getStatusConfig(orderToShow);
@@ -75,7 +61,7 @@ export function OrderTrackingBar() {
                     onKeyDown={(e) => e.key === 'Enter' && handleOpen()}
                     className={cn(
                         "w-full transition-all duration-300 ease-out cursor-pointer active:scale-[0.98]",
-                        "rounded-2xl shadow-sm border overflow-hidden flex items-center p-3 gap-3 min-h-[56px]",
+                        "rounded-xl shadow-sm border overflow-hidden flex items-center p-3 gap-3 min-h-[56px]",
                         isUrgent
                             ? "bg-rose-50 border-rose-200"
                             : "bg-zinc-950/95 backdrop-blur-3xl border-white/10"
@@ -126,18 +112,6 @@ export function OrderTrackingBar() {
                     </div>
                 </div>
             </div>
-
-            <ResponsiveSurface
-                open={isOpen}
-                onOpenChange={setIsOpen}
-                title="Order Tracking"
-                description={`Tracking your ${orderToShow.partner_name || 'order'}...`}
-                className="p-0 sm:max-w-md"
-            >
-                <div className="h-[80vh] overflow-y-auto">
-                    <OrderTracker orderId={orderToShow.id} isSheet />
-                </div>
-            </ResponsiveSurface>
         </>
     );
 }

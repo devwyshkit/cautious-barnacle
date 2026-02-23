@@ -42,19 +42,10 @@ export async function updateSession(request: NextRequest) {
     const isPartnerHost = host.startsWith('partner.')
     const isAdminHost = host.startsWith('admin.')
 
-    // WYSHKIT 2026: Distinguish partner admin routes from customer-facing routes
-    // Partner admin routes: /partner/login, /partner/onboarding, /partner/orders, etc.
-    // Customer routes: /partner/[id] (item detail via ?item= query, NOT partner admin)
-    const partnerAdminRoutes = [
-      '/partner/login',
-      '/partner/onboarding',
-      '/partner/orders',
-      '/partner/catalog',
-      '/partner/financials',
-      '/partner/insights',
-      '/partner/personalization',
-    ];
-    const isPartnerAdminRoute = pathname === '/partner' || partnerAdminRoutes.some(route => pathname.startsWith(route));
+    // WYSHKIT 2026: Strict Prefix Routing
+    // All partner admin routes now exclusively own the /partner prefix.
+    // Customer facing stores have been moved to /store/[id].
+    const isPartnerAdminRoute = pathname.startsWith('/partner');
 
     // Path-based fallback for local dev
     const isAdminSurface = isAdminHost || pathname.startsWith('/admin')
@@ -70,8 +61,8 @@ export async function updateSession(request: NextRequest) {
     // Role/KYC checks delegated to layouts (getAdminSession, getPartnerFromSession)
     let user = null
     try {
-      const { data } = await supabase.auth.getUser()
-      user = data?.user || null
+      const { data } = await supabase.auth.getSession()
+      user = data?.session?.user || null
     } catch {
     }
 

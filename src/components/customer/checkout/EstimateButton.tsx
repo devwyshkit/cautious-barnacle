@@ -63,12 +63,12 @@ export function EstimateButton({
                 },
                 order_items: items.map(it => ({
                     id: it.id || '',
-                    item_id: it.item_id,
+                    item_id: it.item_id || '',
                     item_name: it.item_name || 'Product',
                     quantity: it.quantity,
                     quantity_number: it.quantity,
                     unit_price: it.unit_price,
-                    total_price: it.total_price,
+                    total_price: it.line_total,
                     is_personalized: it.is_personalized || false,
                     status: 'DRAFT'
                 }))
@@ -82,9 +82,9 @@ export function EstimateButton({
 
     return (
         <form action={dispatch} className="flex flex-col gap-3">
-            <div className="flex items-start gap-3 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+            <div className="flex items-start gap-3 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
                 <Info className="size-4 text-zinc-400 mt-0.5" />
-                <p className="text-xs font-bold text-zinc-500 leading-relaxed tracking-wider">
+                <p className="text-xs font-bold text-zinc-500 leading-relaxed tracking-tight">
                     Need a pro-forma estimate for your business? Click below to generate a PDF.
                 </p>
             </div>
@@ -92,7 +92,7 @@ export function EstimateButton({
                 type="submit"
                 disabled={loading}
                 variant="outline"
-                className="w-full h-14 rounded-2xl border-2 border-zinc-100 hover:border-zinc-900 gap-3 font-black tracking-wider text-[11px]"
+                className="w-full h-14 rounded-xl border-2 border-zinc-100 hover:border-zinc-900 gap-3 font-black tracking-tight text-[11px]"
             >
                 {loading ? (
                     <Loader2 className="size-4 animate-spin" />

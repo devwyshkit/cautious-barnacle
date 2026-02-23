@@ -106,12 +106,12 @@ export function GstinIdentity({
             },
             order_items: items.map(it => ({
                 id: it.id || '',
-                item_id: it.item_id,
+                item_id: it.item_id || '',
                 item_name: it.item_name || 'Product',
                 quantity: it.quantity,
                 quantity_number: it.quantity,
                 unit_price: it.unit_price,
-                total_price: it.total_price,
+                total_price: it.line_total,
                 is_personalized: it.is_personalized || false,
                 status: 'DRAFT'
             }))
@@ -121,12 +121,12 @@ export function GstinIdentity({
     };
 
     return (
-        <div className="p-4 rounded-2xl border bg-zinc-50/50 border-zinc-100">
+        <div className="p-4 rounded-xl border bg-zinc-50/50 border-zinc-100">
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <ShieldCheck className="size-4 text-zinc-900" />
-                        <span className="text-xs font-bold tracking-wider text-zinc-900">Tax Identity (GSTIN)</span>
+                        <span className="text-xs font-bold tracking-tight text-zinc-900">Tax Identity (GSTIN)</span>
                     </div>
                     <span className="text-xs font-medium text-emerald-600 tracking-tighter">Save with Tax Credit</span>
                 </div>
@@ -167,7 +167,7 @@ export function GstinIdentity({
                     <button
                         type="button"
                         onClick={handleDownloadEstimate}
-                        className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-zinc-900 hover:underline transition-all"
+                        className="flex items-center gap-1.5 text-xs font-bold tracking-tight text-zinc-900 hover:underline transition-all"
                     >
                         <FileText className="size-3" />
                         Get Estimate

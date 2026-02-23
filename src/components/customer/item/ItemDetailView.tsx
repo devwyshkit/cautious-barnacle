@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Plus, Minus, Star, Check, Loader2, PlayCircle, Clock, ShieldCheck, Info, AlertTriangle, Sparkles, IndianRupee } from 'lucide-react';
+import { Plus, Minus, Star, Check, Loader2, PlayCircle, Clock, ShieldCheck, Info, AlertTriangle, Sparkles, IndianRupee, ShoppingBag } from 'lucide-react';
 import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 import { useCart, CartActionResult } from '@/components/customer/CartProvider';
 
@@ -82,7 +82,6 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
 
     const unitPrice = useMemo(() => {
         const basePrice = Number(item.base_price) || 0;
-        // WYSHKIT 2026: Variant price is an override, not an addition. Standard Swiggy pattern.
         const effectiveBasePrice = selectedVariant ? (Number(selectedVariant.price) || 0) : basePrice;
 
         const addonsSum = selectedAddons.reduce((sum, addon) => sum + (Number(addon.price) || 0), 0);
@@ -109,21 +108,17 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                 ...selectedPersonalizations.map(p => ({
                     id: String(p.id),
                     name: p.name || 'Personalization',
-                    price: Number(p.price) || 0, // DYNAMIC PRICE from DB
+                    price: Number(p.price) || 0,
                     requires_preview: true
                 }))
             ];
 
             let result;
             if (isEditMode && initialState?.cartItemId) {
-                // Swiggy 2026: Direct Update for Momentum flow
-                // We'll need to implement this in CartProvider/draft-order.ts
-                // For now, we fallback to removal + addition if update is missing, 
-                // but we should implement update for premium feel.
                 result = await addToDraftOrder(
                     item.id,
                     selectedVariantId,
-                    { enabled: false }, // Placeholder, logic below handles it
+                    { enabled: false },
                     allSelectedAddons,
                     quantity,
                     {
@@ -131,7 +126,7 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                         item_image: item.images?.[0] || FALLBACK_IMAGE,
                         unit_price: unitPrice,
                         partner_id: item.partner_id!,
-                        partner_name: item.partners?.name || item.partners?.display_name || partnerId,
+                        partner_name: item.partners?.name || partnerId,
                         update_item_id: initialState.cartItemId
                     }
                 );
@@ -147,21 +142,16 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                         item_image: item.images?.[0] || FALLBACK_IMAGE,
                         unit_price: unitPrice,
                         partner_id: item.partner_id!,
-                        partner_name: item.partners?.name || item.partners?.display_name || partnerId,
+                        partner_name: item.partners?.name || partnerId,
                     }
                 );
             }
 
             if (result && result.success) {
                 triggerHaptic(HapticPattern.SUCCESS);
-                // Wyshkit 2026: Direct dismissal for "One-Tap-Feel"
-                if (onBack) {
-                    onBack();
-                } else {
-                    router.back();
-                }
+                if (onBack) onBack();
+                else router.back();
             } else if (result && result.code === 'PARTNER_MISMATCH') {
-                // Handled globally by CartProvider (shows Replace Cart Dialog)
             } else if (result && result.error) {
                 toast.error(result.error || "Could not save changes");
             }
@@ -184,10 +174,10 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar" data-vaul-no-drag>
                 {/* Immersive Navigation Bar */}
-                <div className="fixed top-0 left-0 right-0 z-50 p-4 pointer-events-none">
+                <div className="sticky top-0 left-0 right-0 z-50 p-4 pointer-events-none">
                     <button
                         onClick={handleBack}
-                        className="size-11 rounded-full bg-white/80 backdrop-blur-md shadow-xl flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-black/5"
+                        className="size-11 rounded-full bg-white/80 backdrop-blur-md shadow-sm flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-black/5"
                         aria-label="Back"
                     >
                         <Plus className="size-5 rotate-45 text-zinc-900" />
@@ -250,53 +240,55 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     )}
                 </div>
 
-                <div className="px-6 py-6 space-y-8">
+                <div className="px-5 py-5 space-y-6">
                     {/* Header Info */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         <div className="flex items-start justify-between gap-4">
                             <div className="space-y-1">
-                                {item.brand && (
-                                    <p className="text-xs font-black text-[var(--primary)] tracking-[0.2em]">{item.brand}</p>
-                                )}
-                                <h1 className="text-2xl font-black text-zinc-950 leading-tight tracking-tighter">
-                                    {item.name}
-                                </h1>
-                                <p className="text-sm font-black text-zinc-500 tracking-wider">{item.category}</p>
-                            </div>
-                            <div className="flex flex-col items-end gap-1.5">
-                                <div className="flex items-baseline gap-1.5">
-                                    <span className="text-2xl font-black text-zinc-950 tracking-tighter">{formatCurrency(unitPrice)}</span>
-                                    {item.mrp && item.mrp > unitPrice && (
-                                        <span className="text-xs text-zinc-500 line-through font-bold">{formatCurrency(item.mrp)}</span>
-                                    )}
+                                <div className="flex items-center gap-2">
+                                    <p className="text-sm font-semibold text-zinc-500 tracking-tight">{item.category}</p>
+                                    <div className="size-1 rounded-full bg-zinc-200" />
+                                    <p className="text-sm font-semibold text-zinc-500 tracking-tight">{item.partners?.name || partnerId}</p>
                                 </div>
+                                <h2 className="text-2xl font-black text-zinc-900 leading-tight tracking-tight">
+                                    {item.name}
+                                </h2>
+                            </div>
+                            <div className="flex flex-col items-end shrink-0">
+                                <span className="text-2xl font-black text-[var(--primary)] tabular-nums">
+                                    {formatCurrency(unitPrice)}
+                                </span>
                                 {item.mrp && item.mrp > unitPrice && (
-                                    <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md tracking-wider border border-emerald-100/50">
-                                        {Math.round(((item.mrp - unitPrice) / item.mrp) * 100)}% OFF
+                                    <span className="text-sm text-zinc-400 line-through tabular-nums decoration-zinc-300">
+                                        {formatCurrency(item.mrp)}
                                     </span>
                                 )}
                             </div>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2 pt-2">
-                            {((item.rating || item.partners?.rating) ?? 0) > 0 && (
-                                <div className="flex items-center gap-1 bg-zinc-900 px-2 py-1 rounded-lg">
-                                    <span className="text-[11px] font-black text-white leading-none">
-                                        {((item.rating || item.partners?.rating) ?? 0).toFixed(1)}
-                                    </span>
-                                    <Star className="size-2.5 fill-white text-white" />
+                        <div className="flex flex-wrap items-center gap-2 pt-1">
+                            {('is_veg' in item && (item as any).is_veg !== null) && (
+                                <span className={cn(
+                                    "text-[11px] font-semibold px-2 py-0.5 rounded-md tracking-tight border",
+                                    (item as any).is_veg
+                                        ? "text-emerald-600 bg-emerald-50 border-emerald-100/50"
+                                        : "text-rose-600 bg-rose-50 border-rose-100/50"
+                                )}>
+                                    {(item as any).is_veg ? 'VEG' : 'NON-VEG'}
+                                </span>
+                            )}
+                            {('is_bestseller' in item && (item as any).is_bestseller) && (
+                                <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md tracking-tight border border-amber-100/50">
+                                    BESTSELLER
+                                </span>
+                            )}
+                            {item.preview_time_minutes && item.preview_time_minutes > 0 && (
+                                <div className="flex items-center gap-1.5 px-2 py-1 bg-zinc-900 text-white rounded-lg shadow-sm">
+                                    <Sparkles className="size-3 text-amber-400" />
+                                    <span className="text-[11px] font-semibold tracking-tight">{item.preview_time_minutes} min preview</span>
                                 </div>
                             )}
-                            {item.preview_time_minutes && (
-                                <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 rounded-lg text-amber-600 border border-amber-100/50">
-                                    <Sparkles className="size-3" />
-                                    <span className="text-[11px] font-black tracking-wider">{item.preview_time_minutes} min preview</span>
-                                </div>
-                            )}
-                            <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-50 rounded-lg text-zinc-600 border border-zinc-100">
-                                <IndianRupee className="size-3" />
-                                <span className="text-[11px] font-black tracking-wider">Inc. {item.gst_percentage || 0}% GST</span>
-                            </div>
+                            <span className="text-[11px] font-semibold text-zinc-400 tracking-tight">Inc. {item.gst_percentage || 0}% GST</span>
                         </div>
                     </div>
 
@@ -304,8 +296,8 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     {variantsArray.length > 0 && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-[11px] font-black text-zinc-400 tracking-[0.2em]">Select Option</h3>
-                                <span className="text-[11px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 tracking-wider">REQUIRED</span>
+                                <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight">Select Option</h3>
+                                <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 tracking-tight">Required</span>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 {variantsArray.map((v) => {
@@ -321,28 +313,22 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                                 triggerHaptic(HapticPattern.ACTION);
                                             }}
                                             className={cn(
-                                                "p-4 rounded-[24px] border-2 transition-all text-left group relative",
+                                                "flex flex-col items-start p-3 rounded-xl border text-left transition-all active:scale-[0.98]",
                                                 isSelected
-                                                    ? "bg-zinc-900 border-zinc-900 text-white shadow-xl shadow-zinc-200"
+                                                    ? "bg-zinc-900 border-zinc-900 text-white shadow-md shadow-zinc-200"
                                                     : isOutOfStock
                                                         ? "bg-zinc-50 border-zinc-100 text-zinc-300 cursor-not-allowed"
                                                         : "bg-white border-zinc-100 text-zinc-600 hover:border-zinc-200"
                                             )}
                                         >
-                                            <span className="text-sm font-black block leading-tight">{v.name}</span>
-                                            <div className="flex items-baseline gap-1 mt-1">
-                                                <span className={cn("text-xs font-bold", isSelected ? "text-white" : isOutOfStock ? "text-zinc-300" : "text-zinc-900")}>
-                                                    {formatCurrency(v.price || 0)}
-                                                </span>
-                                                {isOutOfStock && <span className="text-[11px] font-black text-rose-500 tracking-tighter ml-1">Sold Out</span>}
-                                            </div>
-                                            {isSelected && (
-                                                <div className="absolute top-3 right-3">
-                                                    <div className="size-4 bg-white rounded-full flex items-center justify-center">
-                                                        <Check className="size-2.5 text-zinc-900 stroke-[4]" />
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <span className="text-xs font-semibold leading-tight mb-1">{v.name}</span>
+                                            <span className={cn(
+                                                "text-xs font-bold tabular-nums",
+                                                isSelected ? "text-white/80" : isOutOfStock ? "text-zinc-300" : "text-zinc-400"
+                                            )}>
+                                                {formatCurrency(v.price || 0)}
+                                            </span>
+                                            {isOutOfStock && <span className="text-[11px] font-semibold text-rose-500 tracking-tight ml-1">Sold Out</span>}
                                         </button>
                                     );
                                 })}
@@ -350,36 +336,23 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                         </section>
                     )}
 
-                    {/* Identity Section (WYSHKIT 2026 AUDIT FIX) */}
+                    {/* Identity Section */}
                     {personalizationArray.length > 0 && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Sparkles className="size-4 text-amber-500" />
-                                    <h3 className="text-[11px] font-black text-zinc-950 tracking-[0.2em]">Add Identity</h3>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-[11px] font-black text-zinc-400 bg-zinc-50 px-2 py-0.5 rounded-md border border-zinc-100 tracking-wider">Optional</span>
-                                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-900 text-white text-[11px] font-black tracking-wider">
-                                        <Clock className="size-3" />
-                                        <span>4hr Preview</span>
-                                    </div>
+                                    <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight">Add Personalization</h3>
+                                    {personalizationArray.some(p => ('is_required' in p && (p as any).is_required)) && (
+                                        <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 tracking-tight">Required</span>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Non-returnable warning */}
-                            <div className={cn(
-                                "grid transition-all duration-300 ease-in-out overflow-hidden",
-                                selectedPersonalizations.length > 0 ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                            )}>
-                                <div className="min-h-0">
-                                    <div className="flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 rounded-2xl mb-2">
-                                        <AlertTriangle className="size-4 text-[var(--primary)] shrink-0" />
-                                        <p className="text-[11px] font-bold text-[var(--primary)] leading-tight tracking-wider">
-                                            Important: Identity-linked items are non-returnable and non-refundable.
-                                        </p>
-                                    </div>
-                                </div>
+                            <div className="flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 rounded-xl mb-2">
+                                <AlertTriangle className="size-4 text-rose-500 shrink-0" />
+                                <p className="text-[11px] font-semibold text-rose-800 leading-tight">
+                                    Personalized items are crafted specially for you and are non-returnable.
+                                </p>
                             </div>
 
                             <div className="space-y-3">
@@ -395,25 +368,27 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                                 setSelectedAddonIds(next);
                                             }}
                                             className={cn(
-                                                "w-full flex items-center justify-between p-5 rounded-[24px] border-2 transition-all text-left",
+                                                "w-full flex items-center justify-between p-4 rounded-xl border transition-all active:scale-[0.99]",
                                                 isSelected
-                                                    ? "bg-[var(--primary)]/5 border-[var(--primary)] text-[var(--primary)]"
+                                                    ? "bg-zinc-900 border-zinc-900 text-white shadow-md"
                                                     : "bg-white border-zinc-100 text-zinc-600 hover:border-zinc-200"
                                             )}
                                         >
-                                            <div className="flex gap-4">
+                                            <div className="flex items-center gap-3">
                                                 <div className={cn(
-                                                    "size-6 rounded-lg border-2 flex items-center justify-center transition-all shrink-0",
-                                                    isSelected ? "bg-[var(--primary)] border-[var(--primary)]" : "border-zinc-200"
+                                                    "size-5 rounded-md border flex items-center justify-center transition-colors",
+                                                    isSelected ? "bg-white border-white" : "bg-zinc-50 border-zinc-200"
                                                 )}>
-                                                    {isSelected && <Check className="size-3.5 text-white stroke-[4]" />}
+                                                    {isSelected && <Check className="size-3 text-zinc-900" strokeWidth={4} />}
                                                 </div>
-                                                <div>
-                                                    <span className="text-[15px] font-black block leading-none">{p.name}</span>
-                                                    <span className="text-[11px] font-bold tracking-wider mt-1.5 opacity-60 block italic">Requires Design Approval</span>
-                                                </div>
+                                                <span className="text-sm font-semibold">{p.name}</span>
                                             </div>
-                                            <span className="text-[15px] font-black tabular-nums">+{formatCurrency(p.price || 0)}</span>
+                                            <span className={cn(
+                                                "text-xs font-bold tabular-nums",
+                                                isSelected ? "text-white/60" : "text-zinc-400"
+                                            )}>
+                                                +{formatCurrency(p.price || 0)}
+                                            </span>
                                         </button>
                                     );
                                 })}
@@ -424,7 +399,10 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                     {/* Standard Add-ons Section */}
                     {addonsArray.length > 0 && (
                         <section className="space-y-4">
-                            <h3 className="text-[11px] font-black text-zinc-400 tracking-[0.2em]">Complementary Gifts</h3>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight">Add Extras</h3>
+                                <span className="text-[11px] font-semibold text-zinc-400 bg-zinc-50 px-2 py-0.5 rounded-md border border-zinc-100 tracking-tight">Optional</span>
+                            </div>
                             <div className="space-y-3">
                                 {addonsArray.map((addon) => {
                                     const isSelected = selectedAddonIds.has(addon.id);
@@ -443,24 +421,34 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                                                 setSelectedAddonIds(next);
                                             }}
                                             className={cn(
-                                                "w-full flex items-center justify-between p-5 rounded-[24px] border-2 transition-all text-left",
+                                                "w-full flex items-center justify-between p-4 rounded-xl border transition-all active:scale-[0.99]",
                                                 isSelected
-                                                    ? "bg-zinc-900 border-zinc-900 text-white"
+                                                    ? "bg-[var(--primary)] border-[var(--primary)] text-white shadow-md shadow-rose-100"
                                                     : "bg-white border-zinc-100 text-zinc-600 hover:border-zinc-200"
                                             )}
                                         >
-                                            <div className="flex gap-4">
+                                            <div className="flex items-center gap-3">
                                                 <div className={cn(
-                                                    "size-6 rounded-lg border-2 flex items-center justify-center transition-all shrink-0",
-                                                    isSelected ? "bg-white border-white" : "border-zinc-200"
+                                                    "size-5 rounded-md border flex items-center justify-center transition-colors",
+                                                    isSelected ? "bg-white border-white" : "bg-zinc-50 border-zinc-200"
                                                 )}>
-                                                    {isSelected && <Check className="size-3.5 text-zinc-900 stroke-[4]" />}
+                                                    {isSelected && <Check className="size-3 text-[var(--primary)]" strokeWidth={4} />}
                                                 </div>
-                                                <div>
-                                                    <span className="text-[15px] font-black block leading-none">{addon.name}</span>
+                                                <div className="flex flex-col items-start">
+                                                    <span className="text-sm font-semibold">{addon.name}</span>
+                                                    {isSelected && (
+                                                        <p className="text-[11px] font-bold text-white/80 leading-tight tracking-tight">
+                                                            Added to your gift
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
-                                            <span className="text-[15px] font-black tabular-nums">+{formatCurrency(addon.price || 0)}</span>
+                                            <span className={cn(
+                                                "text-xs font-bold tabular-nums",
+                                                isSelected ? "text-white/80" : "text-zinc-400"
+                                            )}>
+                                                +{formatCurrency(addon.price || 0)}
+                                            </span>
                                         </button>
                                     );
                                 })}
@@ -468,71 +456,65 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
                         </section>
                     )}
 
-                    {/* Technical Metadata Table - WYSHKIT 2026 AUDIT FIX */}
+                    {/* Technical Metadata Table */}
                     <section className="space-y-4 pt-6 border-t border-zinc-100">
-
-                        <div className="flex items-center gap-2">
-                            <h3 className="text-[11px] font-black text-zinc-950 tracking-[0.2em]">Product Specifications</h3>
-                            <div className="h-px flex-1 bg-zinc-100" />
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-2 bg-zinc-50/50 rounded-[28px] p-2 border border-zinc-100">
-                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-4 rounded-2xl bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-black text-zinc-500 tracking-wider">Dimensions</span>
-                                <span className="text-[13px] font-bold text-zinc-900 tracking-tight">
+                        <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight px-1">Specifications</h3>
+                        <div className="grid grid-cols-1 gap-2 bg-zinc-50/50 rounded-xl p-2 border border-zinc-100">
+                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
+                                <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Dimensions</span>
+                                <span className="text-xs font-semibold text-zinc-900">
                                     {item.length_cm || '–'} × {item.width_cm || '–'} × {item.height_cm || '–'} cm
                                 </span>
                             </div>
-                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-4 rounded-2xl bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-black text-zinc-500 tracking-wider">Weight</span>
-                                <span className="text-[13px] font-bold text-zinc-900 tracking-tight">
+                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
+                                <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Weight</span>
+                                <span className="text-xs font-semibold text-zinc-900">
                                     {item.weight_kg ? `${item.weight_kg} kg` : item.weight_grams ? `${item.weight_grams} g` : '–'}
                                 </span>
                             </div>
-                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-4 rounded-2xl bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-black text-zinc-500 tracking-wider">Material</span>
-                                <span className="text-[13px] font-bold text-zinc-900 tracking-tight">{item.material || 'Premium Finish'}</span>
+                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
+                                <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Material</span>
+                                <span className="text-xs font-semibold text-zinc-900">{item.material || 'Premium Finish'}</span>
                             </div>
-                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-4 rounded-2xl bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-black text-zinc-500 tracking-wider">HSN Code</span>
-                                <span className="text-[13px] font-bold text-emerald-600 tracking-wider">{item.hsn_code || '4901'} ({item.gst_percentage || 0}%)</span>
+                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
+                                <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">HSN Code</span>
+                                <span className="text-xs font-semibold text-emerald-600 tracking-tight">{item.hsn_code || '4901'} ({item.gst_percentage || 0}%)</span>
                             </div>
                             {item.manufacturer_info && (
-                                <div className="p-4 rounded-2xl bg-white border border-zinc-100/50 flex flex-col gap-2">
-                                    <span className="text-[11px] font-black text-zinc-500 tracking-wider">Manufacturer Details</span>
-                                    <span className="text-[12px] font-medium text-zinc-600 leading-snug italic line-clamp-2">
+                                <div className="flex flex-col gap-1.5 p-3 rounded-lg bg-white border border-zinc-100/50">
+                                    <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Manufacturer Details</span>
+                                    <span className="text-[11px] font-medium text-zinc-400 leading-relaxed line-clamp-2">
                                         {item.manufacturer_info}
                                     </span>
                                 </div>
                             )}
                         </div>
+                    </section>
 
-                        <div className="flex gap-2">
-                            <div className={cn(
-                                "flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl border-2 font-black tracking-wider text-[11px]",
-                                item.return_eligible ? "bg-blue-50 border-blue-100 text-blue-600" : "bg-zinc-50 border-zinc-100 text-zinc-500"
-                            )}>
-                                <Info className="size-3" />
-                                {item.return_eligible ? '7-Day Return' : 'Final Sale - No Returns'}
-                            </div>
-                            <div className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl border-2 bg-zinc-50 border-zinc-100 text-zinc-500 font-black tracking-wider text-[11px]">
-                                <ShieldCheck className="size-3" />
-                                Quality Assured
-                            </div>
+                    {/* Support Section */}
+                    <section className="flex items-center gap-3 pt-4">
+                        <div className={cn(
+                            "flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 font-semibold tracking-tight text-[11px]",
+                            item.return_eligible ? "bg-blue-50 border-blue-100 text-blue-600" : "bg-zinc-50 border-zinc-100 text-zinc-500"
+                        )}>
+                            <Info className="size-4" />
+                            {item.return_eligible ? '7-Day Return' : 'Final Sale - No Returns'}
+                        </div>
+                        <div className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 bg-zinc-50 border-zinc-100 text-zinc-500 font-semibold tracking-tight text-[11px]">
+                            <ShieldCheck className="size-4" />
+                            Secure Order
                         </div>
                     </section>
 
                     {/* Description Section */}
                     {item.description && (
                         <section className="space-y-3">
-                            <h3 className="text-[11px] font-black text-zinc-400 tracking-[0.2em]">About this product</h3>
-                            <p className="text-[15px] text-zinc-600 leading-relaxed font-medium">
+                            <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight px-1">About product</h3>
+                            <p className="text-sm text-zinc-600 leading-relaxed font-medium">
                                 {item.description}
                             </p>
                         </section>
                     )}
-
-
 
                     {/* Buffer for footer */}
                     <div className="h-10" />
@@ -540,30 +522,31 @@ export function ItemDetailView({ item, onBack, partnerId, initialState }: ItemDe
             </div>
 
             {/* Fixed Action Footer */}
-            <div className="bg-white px-6 py-6 pb-safe border-t border-zinc-50 shrink-0 shadow-[0_-20px_60px_-10px_rgba(0,0,0,0.05)]">
+            <div className="bg-white px-5 py-5 pb-safe border-t border-zinc-50 shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
                 <div className="flex items-center gap-4">
-                    <div className="flex items-center bg-zinc-100 rounded-2xl p-1 shrink-0">
+                    {/* Quantity controls */}
+                    <div className="flex items-center bg-zinc-100 rounded-xl p-1 shrink-0">
                         <button
-                            className="size-11 flex items-center justify-center rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-20"
-                            onClick={() => { setQuantity(Math.max(1, quantity - 1)); triggerHaptic(HapticPattern.ACTION); }}
-                            disabled={quantity <= 1 || continuing}
-                            aria-label="Decrease quantity"
+                            onClick={() => { triggerHaptic(HapticPattern.ACTION); setQuantity(Math.max(1, quantity - 1)); }}
+                            className="size-10 flex items-center justify-center active:scale-90 transition-all text-zinc-900"
+                            disabled={quantity <= 1}
                         >
-                            <Minus className="size-4" />
+                            <span className="text-xl font-bold">−</span>
                         </button>
-                        <span className="w-8 text-center text-sm font-black tabular-nums" aria-live="polite">{quantity}</span>
+                        <span className="w-8 text-center font-black text-sm tabular-nums text-zinc-900">
+                            {quantity}
+                        </span>
                         <button
-                            className="size-11 flex items-center justify-center rounded-xl hover:bg-zinc-200 transition-colors disabled:opacity-20"
-                            onClick={() => { setQuantity(quantity + 1); triggerHaptic(HapticPattern.ACTION); }}
-                            disabled={continuing}
-                            aria-label="Increase quantity"
+                            onClick={() => { triggerHaptic(HapticPattern.ACTION); setQuantity(quantity + 1); }}
+                            className="size-10 flex items-center justify-center active:scale-90 transition-all text-zinc-900"
                         >
-                            <Plus className="size-4" />
+                            <span className="text-xl font-bold">+</span>
                         </button>
                     </div>
 
+                    {/* Add to Cart Button */}
                     <button
-                        className="flex-1 h-12 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-black text-[13px] tracking-wider rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                        className="flex-1 h-12 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold text-[14px] tracking-tight rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                         onClick={handleAddToCart}
                         data-testid="add-to-cart-drawer"
                         disabled={continuing || !canAdd}

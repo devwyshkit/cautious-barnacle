@@ -9,7 +9,7 @@ export default function PartnerPageLoading() {
         <Skeleton className="h-4 w-32" />
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="aspect-square rounded-2xl" />
+            <Skeleton key={i} className="aspect-square rounded-xl" />
           ))}
         </div>
       </div>

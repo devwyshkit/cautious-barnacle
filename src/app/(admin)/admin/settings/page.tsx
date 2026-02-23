@@ -4,7 +4,7 @@ import { SettingsForm } from './settings-form'
 async function getSettings() {
   const supabase = await createClient()
   const { data } = await supabase
-    .from('app_settings')
+    .from('platform_settings')
     .select('*')
 
   return (data || []) as Array<{ key: string; value: string }>;

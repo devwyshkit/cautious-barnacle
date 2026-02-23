@@ -23,16 +23,14 @@ export interface StatusConfig {
 
 // ✅ STRICT: Type derived directly from database enum
 // We explicitly EXCLUDE deprecated values that might technically exist in DB but should never be used in code.
-export type OrderStatus = Exclude<Database['public']['Enums']['order_status'], 'INPUT_RECEIVED' | 'CHANGE_REQUESTED'>;
+export type OrderStatus = Exclude<Database['public']['Enums']['order_status'],
+  'INPUT_RECEIVED' | 'CHANGE_REQUESTED' | 'DETAILS_RECEIVED' | 'PREVIEW_READY' | 'REVISION_REQUESTED' | 'APPROVED'
+>;
 
 // ✅ STRICT: Const object with values matching DB enum (UPPERCASE)
 export const ORDER_STATUS = {
   PLACED: 'PLACED',
   CONFIRMED: 'CONFIRMED',
-  DETAILS_RECEIVED: 'DETAILS_RECEIVED',
-  PREVIEW_READY: 'PREVIEW_READY',
-  REVISION_REQUESTED: 'REVISION_REQUESTED',
-  APPROVED: 'APPROVED',
   IN_PRODUCTION: 'IN_PRODUCTION',
   PACKED: 'PACKED',
   DISPATCHED: 'DISPATCHED',
@@ -45,6 +43,16 @@ export const ORDER_STATUS = {
   READY: 'PACKED',
 } as const satisfies Record<string, OrderStatus>;
 
+export type PersonalizationStatus = Database['public']['Enums']['personalization_status'];
+
+export const PERSONALIZATION_STATUS = {
+  PENDING: 'pending',
+  SUBMITTED: 'submitted',
+  PREVIEW_READY: 'preview_ready',
+  REVISION_REQUESTED: 'revision_requested',
+  APPROVED: 'approved',
+} as const;
+
 // WYSHKIT 2026: Centralized Status Configuration
 // Used by OrderTrackingBar and OrderTracker for consistent UI
 export function getStatusConfig(order: {
@@ -56,9 +64,10 @@ export function getStatusConfig(order: {
 }): StatusConfig {
   // 1. Action Needed: Personalization (STRICT: Only if has_personalization is true and order is CONFIRMED or PLACED)
   // Swiggy 2026: Allow immediate input after payment (PLACED) to maintain momentum.
-  if ((order.status === ORDER_STATUS.CONFIRMED || order.status === ORDER_STATUS.PLACED) &&
-    order.has_personalization &&
-    order.personalization_status !== 'submitted') {
+  const hasInputReady = order.has_personalization &&
+    (!order.personalization_status || order.personalization_status === PERSONALIZATION_STATUS.PENDING);
+
+  if ((order.status === ORDER_STATUS.CONFIRMED || order.status === ORDER_STATUS.PLACED) && hasInputReady) {
     return {
       label: "Design Input Needed",
       subLabel: "Upload your design details now",
@@ -80,7 +89,7 @@ export function getStatusConfig(order: {
   }
 
   // 2. Action Needed: Preview Approval
-  if (order.status === ORDER_STATUS.PREVIEW_READY) {
+  if (order.personalization_status === PERSONALIZATION_STATUS.PREVIEW_READY) {
     return {
       label: "Preview Ready",
       subLabel: "Tap to approve and ship",
@@ -108,8 +117,7 @@ export function isValidOrderStatus(status: string): status is OrderStatus {
 // Helper to get all valid statuses
 export function getAllOrderStatuses(): OrderStatus[] {
   return [
-    'PLACED', 'CONFIRMED', 'DETAILS_RECEIVED', 'PREVIEW_READY', 'REVISION_REQUESTED',
-    'APPROVED', 'IN_PRODUCTION', 'PACKED', 'DISPATCHED', 'DELIVERED',
+    'PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED', 'DISPATCHED', 'DELIVERED',
     'CANCELLED', 'REFUNDED', 'OUT_FOR_DELIVERY'
   ];
 }
@@ -118,10 +126,6 @@ export function getAllOrderStatuses(): OrderStatus[] {
 const STATUS_DISPLAY: Record<string, string> = {
   PLACED: 'Order Placed',
   CONFIRMED: 'Accepted',
-  DETAILS_RECEIVED: 'Reviewing Details',
-  PREVIEW_READY: 'Preview Uploaded',
-  REVISION_REQUESTED: 'Revision Requested',
-  APPROVED: 'Approved',
   IN_PRODUCTION: 'Preparing Order',
   PACKED: 'Ready',
   DISPATCHED: 'Dispatched',
@@ -136,10 +140,6 @@ const STATUS_DISPLAY: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   PLACED: 'bg-rose-50 text-[var(--primary)] border-rose-100',
   CONFIRMED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
-  DETAILS_RECEIVED: 'bg-amber-50 text-amber-600 border-amber-100',
-  PREVIEW_READY: 'bg-rose-50 text-[var(--primary)] border-rose-100',
-  REVISION_REQUESTED: 'bg-rose-50 text-[var(--primary)] border-rose-100',
-  APPROVED: 'bg-blue-50 text-blue-600 border-blue-100',
   IN_PRODUCTION: 'bg-amber-50 text-amber-600 border-amber-100',
   PACKED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
   DISPATCHED: 'bg-amber-50 text-amber-600 border-amber-100',
@@ -159,17 +159,13 @@ export function getOrderStatusColor(status: string): string {
 
 // Status grouping helpers (for UI/logic)
 export const STATUS_GROUPS = {
-  // Customer action required
-  CUSTOMER_ACTION: [
-    ORDER_STATUS.PREVIEW_READY,
-  ] as const,
+  CUSTOMER_ACTION: [] as const,
 
   // Partner action required
   PARTNER_ACTION: [
     ORDER_STATUS.PLACED, // 2026: Partner needs to Accept
-    ORDER_STATUS.DETAILS_RECEIVED,
-    ORDER_STATUS.REVISION_REQUESTED,
-    ORDER_STATUS.APPROVED,
+    ORDER_STATUS.CONFIRMED,
+    ORDER_STATUS.IN_PRODUCTION,
   ] as const,
 
   // In progress
@@ -201,7 +197,7 @@ export function isFinalStatus(status: string): boolean {
 }
 
 export function canCancelOrder(status: string): boolean {
-  return [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED, ORDER_STATUS.DETAILS_RECEIVED].includes(status as any);
+  return [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED].includes(status as any);
 }
 // WYSHKIT 2026: Item-level status configuration
 // Used by OrderItemsList and CreativeBrief for consistent item status badges

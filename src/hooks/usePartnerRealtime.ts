@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRealtime } from '@/providers/RealtimeProvider';
 import { logger } from '@/lib/logging/logger';
 import { toast } from 'sonner';
-import type { PartnerOrder } from '@/lib/actions/partner/partner-actions';
+import type { PartnerOrder } from '@/lib/actions/commerce/orders';
 
 interface UsePartnerRealtimeOptions {
     partnerId: string;

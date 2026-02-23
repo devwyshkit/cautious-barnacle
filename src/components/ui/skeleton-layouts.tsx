@@ -54,8 +54,8 @@ export function ItemSurfaceSkeleton() {
           </div>
           <Skeleton className="h-10 w-32 rounded-full" />
           <div className="grid grid-cols-2 gap-3 pt-2">
-            <Skeleton className="h-12 rounded-2xl" />
-            <Skeleton className="h-12 rounded-2xl" />
+            <Skeleton className="h-12 rounded-xl" />
+            <Skeleton className="h-12 rounded-xl" />
           </div>
         </div>
         <div className="space-y-4">
@@ -76,7 +76,7 @@ export function PartnerSheetSkeleton() {
     <div className="flex flex-col animate-in fade-in duration-500">
       <Skeleton className="aspect-[16/10] w-full rounded-none" />
       <div className="px-5 -mt-10 relative z-10">
-        <div className="bg-white rounded-[24px] p-5 border border-zinc-100 space-y-4">
+        <div className="bg-white rounded-xl p-5 border border-zinc-100 space-y-4">
           <div className="flex justify-between">
             <div className="space-y-2 flex-1">
               <Skeleton className="h-7 w-3/4 rounded-full" />

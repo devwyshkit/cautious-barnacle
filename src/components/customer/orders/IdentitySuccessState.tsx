@@ -26,7 +26,7 @@ export function IdentitySuccessState({ onClose }: IdentitySuccessStateProps) {
             <div className="pt-8">
                 <button
                     onClick={onClose}
-                    className="h-14 px-8 bg-zinc-900 text-white rounded-2xl font-black tracking-wider hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-zinc-950/20"
+                    className="h-14 px-8 bg-zinc-900 text-white rounded-xl font-black tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm shadow-zinc-950/20"
                 >
                     Great, thanks
                 </button>

@@ -101,39 +101,29 @@ export async function getFilteredItems(options: {
         const supabase = await createClient();
         const { limit = 12, offset = 0, category, search, minPrice, maxPrice, lat, lng } = options;
 
-        // ELITE: If coords are provided, use the nearby RPC for prioritized results
-        if (lat && lng) {
-            const { data, error } = await supabase.rpc('get_nearby_items', {
-                user_lat: lat,
-                user_lng: lng,
-                radius_km: 15,
-                include_out_of_stock: false
-            });
-
-            if (!error && data) {
-                const validated = z.array(WyshkitItemSchema).safeParse(data);
-                if (validated.success) {
-                    // Filter locally for simplicity since RPC might not support all filters yet
-                    let filtered = validated.data as unknown as WyshkitItem[];
-                    if (category) filtered = filtered.filter(i => i.category?.toLowerCase() === category.toLowerCase());
-                    if (search) filtered = filtered.filter(i => i.name.toLowerCase().includes(search.toLowerCase()));
-
-                    return { data: { items: filtered.slice(offset, offset + limit), total: filtered.length } };
-                }
-            }
-        }
+        // ELITE: If coords are provided, we should use a proximity-aware query.
+        // For now, we utilize the standard view but we can add distance calculation if PostGIS is available.
+        // SWIGGY 2026: Never filter client-side.
 
         let query = supabase
             .from('v_item_listings_search')
-            .select('*', { count: 'exact' })
-            .eq('is_active', true)
-            .order('created_at', { ascending: false });
+            .select('*', { count: 'exact' });
+
+        if (lat && lng) {
+            // Ideally we'd use a postgres function that takes lat/lng/radius/category/search
+            // Since we're in a hard purge, let's simplify to a single source of truth query.
+            // If the user wants nearby, we should have the nearby logic in the view or a better RPC.
+            // For now, let's fix the immediate Shadow Filtering bug.
+        }
+
+        query = query.eq('is_active', true);
 
         if (category) {
             query = query.ilike('category', category);
         }
         if (search) {
-            query = query.ilike('item_name', `%${search}%`);
+            // v_item_listings_search uses 'name' for item name based on previous view definition check
+            query = query.ilike('name', `%${search}%`);
         }
         if (minPrice !== undefined) {
             query = query.gte('base_price', minPrice);
@@ -142,7 +132,10 @@ export async function getFilteredItems(options: {
             query = query.lte('base_price', maxPrice);
         }
 
-        const { data, error, count } = await query.range(offset, offset + limit - 1);
+        const { data, error, count } = await query
+            .order('created_at', { ascending: false })
+            .range(offset, offset + limit - 1);
+
         if (error) throw error;
 
         const validated = z.array(WyshkitItemSchema).safeParse(data);

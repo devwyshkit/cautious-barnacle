@@ -132,14 +132,14 @@ export function AuthPageClient({
           {step === "otp" ? (
             <button
               onClick={() => setStep("phone")}
-              className="size-9 rounded-2xl bg-zinc-100 flex items-center justify-center transition-colors hover:bg-zinc-200"
+              className="size-9 rounded-xl bg-zinc-100 flex items-center justify-center transition-colors hover:bg-zinc-200"
             >
               <ChevronLeft className="size-5 text-zinc-600" />
             </button>
           ) : !hideBack ? (
             <button
               onClick={() => router.back()}
-              className="size-9 rounded-2xl bg-zinc-100 flex items-center justify-center transition-colors hover:bg-zinc-200"
+              className="size-9 rounded-xl bg-zinc-100 flex items-center justify-center transition-colors hover:bg-zinc-200"
             >
               <ChevronLeft className="size-5 text-zinc-600" />
             </button>
@@ -174,7 +174,7 @@ export function AuthPageClient({
             onClick={handleSendOTP}
             disabled={loading || phone.length !== 10}
             className={cn(
-              "w-full h-14 rounded-2xl font-semibold text-base transition-all shadow-none",
+              "w-full h-14 rounded-xl font-semibold text-base transition-all shadow-none",
               phone.length === 10 ? "bg-zinc-900 hover:bg-zinc-800 text-white" : "bg-zinc-100 text-zinc-400"
             )}
           >
