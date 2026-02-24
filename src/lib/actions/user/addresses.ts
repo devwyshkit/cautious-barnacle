@@ -10,7 +10,7 @@ export async function getAddresses() {
   if (!user) return { error: 'Unauthorized' }
 
   const { data: addresses, error } = await supabase
-    .from('addresses')
+    .from('user_addresses')
     .select('*')
     .eq('user_id', user.id)
     .order('is_default', { ascending: false })
@@ -41,13 +41,13 @@ export async function createAddress(payload: {
   if (!user) return { error: 'Unauthorized' }
 
   if (payload.is_default) {
-    await supabase.from('addresses')
+    await supabase.from('user_addresses')
       .update({ is_default: false })
       .eq('user_id', user.id)
   }
 
   const { data: address, error } = await supabase
-    .from('addresses')
+    .from('user_addresses')
     .insert({
       user_id: user.id,
       type: payload.type,
@@ -97,12 +97,12 @@ export async function updateAddress(
   if (!user) return { error: 'Unauthorized' }
 
   if (payload.is_default) {
-    await supabase.from('addresses')
+    await supabase.from('user_addresses')
       .update({ is_default: false })
       .eq('user_id', user.id)
   }
 
-  const { data, error } = await supabase.from('addresses')
+  const { data, error } = await supabase.from('user_addresses')
     .update(payload)
     .eq('id', addressId)
     .eq('user_id', user.id)
@@ -121,7 +121,7 @@ export async function deleteAddress(addressId: string) {
   if (!user) return { error: 'Unauthorized' }
 
   const { error } = await supabase
-    .from('addresses')
+    .from('user_addresses')
     .delete()
     .eq('id', addressId)
     .eq('user_id', user.id)
@@ -140,11 +140,11 @@ export async function setDefaultAddress(addressId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Unauthorized' }
 
-  await supabase.from('addresses')
+  await supabase.from('user_addresses')
     .update({ is_default: false })
     .eq('user_id', user.id)
 
-  const { error } = await supabase.from('addresses')
+  const { error } = await supabase.from('user_addresses')
     .update({ is_default: true })
     .eq('id', addressId)
     .eq('user_id', user.id)

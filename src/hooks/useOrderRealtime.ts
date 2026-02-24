@@ -57,7 +57,7 @@ export function useOrderRealtime({
 
   /**
    * WYSHKIT 2026: Single-trip fetch using v_order_detail view.
-   * All related data (items, timeline, previews) come in one round trip via JSON aggregation.
+   * All related data (products, timeline, previews) come in one round trip via JSON aggregation.
    */
   const fetchOrderData = useCallback(async (retryCount = 0) => {
     const supabase = createClient();
@@ -147,7 +147,7 @@ export function useOrderRealtime({
               triggerHaptic(HapticPattern.SUCCESS);
             });
             onStatusChange?.(newData.status, prev.status);
-            // Full re-fetch on status change to refresh timeline, previews, and items
+            // Full re-fetch on status change to refresh timeline, previews, and products
             fetchOrderData();
           }
           if (payload.eventType === 'INSERT') {
@@ -191,18 +191,18 @@ export function useOrderRealtime({
       }
     );
 
-    // 4. Order items — optimistic update only (full re-fetch on status change covers the rest)
+    // 4. Order products — optimistic update only (full re-fetch on status change covers the rest)
     orderChannel.on(
       'postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'order_items', filter: `order_id=eq.${orderId}` },
+      { event: 'UPDATE', schema: 'public', table: 'order_products', filter: `order_id=eq.${orderId}` },
       (payload) => {
         const updatedItem = payload.new as OrderItemDetail;
         setOrder(prev => {
-          if (!prev || !prev.order_items) return prev;
+          if (!prev || !prev.order_products) return prev;
           return {
             ...prev,
-            order_items: prev.order_items.map(item =>
-              item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+            order_products: prev.order_products.map(product =>
+              product.id === updatedItem.id ? { ...product, ...updatedItem } : product
             ),
           };
         });

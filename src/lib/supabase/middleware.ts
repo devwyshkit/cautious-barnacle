@@ -39,21 +39,21 @@ export async function updateSession(request: NextRequest) {
     }
 
     // --- SUBDOMAIN & SURFACE DETECTION ---
-    const isPartnerHost = host.startsWith('partner.')
+    const isPartnerHost = host.startsWith('vendor.')
     const isAdminHost = host.startsWith('admin.')
 
     // WYSHKIT 2026: Strict Prefix Routing
-    // All partner admin routes now exclusively own the /partner prefix.
+    // All vendor admin routes now exclusively own the /vendor prefix.
     // Customer facing stores have been moved to /store/[id].
-    const isPartnerAdminRoute = pathname.startsWith('/partner');
+    const isPartnerAdminRoute = pathname.startsWith('/vendor');
 
     // Path-based fallback for local dev
     const isAdminSurface = isAdminHost || pathname.startsWith('/admin')
-    // Only treat as partner surface if it's a partner admin route (not customer-facing routes)
+    // Only treat as vendor surface if it's a vendor admin route (not customer-facing routes)
     const isPartnerSurface = isPartnerHost || isPartnerAdminRoute
 
     // Auth Routes
-    const isPartnerLogin = pathname === '/partner/login' || (isPartnerHost && pathname === '/login')
+    const isPartnerLogin = pathname === '/vendor/login' || (isPartnerHost && pathname === '/login')
     const isAdminLogin = pathname === '/admin/login' || (isAdminHost && pathname === '/login')
     const isGlobalLogin = pathname === '/login' || pathname === '/signup' || pathname === '/auth/login'
 
@@ -68,7 +68,7 @@ export async function updateSession(request: NextRequest) {
 
     const roles = user?.app_metadata?.roles || [user?.app_metadata?.role || 'customer']
     const isAdmin = roles.includes('admin')
-    const isPartner = roles.includes('partner')
+    const isPartner = roles.includes('vendor')
 
     // --- ACCESS CONTROL ---
 
@@ -77,7 +77,7 @@ export async function updateSession(request: NextRequest) {
     // A. Guest Access (Not Logged In)
     if (!user) {
       if (isAdminSurface && !isAdminLogin) return createRedirectResponse('/admin/login')
-      if (isPartnerSurface && !isPartnerLogin) return createRedirectResponse('/partner/login')
+      if (isPartnerSurface && !isPartnerLogin) return createRedirectResponse('/vendor/login')
 
       // WYSHKIT 2026: Progressive Authentication - Guests can access checkout
       // Auth required only at payment step (handled in PaymentIntentBlock)
@@ -93,34 +93,34 @@ export async function updateSession(request: NextRequest) {
     }
 
     // B. Authenticated Access (Logged In)
-    // Role enforcement: admin surface requires app_metadata admin; partner surface deferred to layout
+    // Role enforcement: admin surface requires app_metadata admin; vendor surface deferred to layout
     if (user) {
       if (isAdminSurface && !isAdmin && !isAdminLogin) {
-        return createRedirectResponse(isPartner ? '/partner' : '/')
+        return createRedirectResponse(isPartner ? '/vendor' : '/')
       }
-      // Partner surface: let through; (partner)/layout.tsx does DB-backed partner+KYC check
+      // Vendor surface: let through; (vendor)/layout.tsx does DB-backed vendor+KYC check
 
       // 2. Login Page Logic (Already logged in)
       if (isAuthRoute) {
         if (isAdminLogin && isAdmin) return createRedirectResponse('/admin')
-        if (isPartnerLogin && isPartner) return createRedirectResponse('/partner')
+        if (isPartnerLogin && isPartner) return createRedirectResponse('/vendor')
 
         if (isGlobalLogin) {
           if (isAdmin) return createRedirectResponse('/admin')
-          if (isPartner) return createRedirectResponse('/partner')
+          if (isPartner) return createRedirectResponse('/vendor')
           return createRedirectResponse('/')
         }
 
         // If logged in but on the "wrong" login page, redirect to correct dashboard
         if (isPartnerLogin && isAdmin && !isPartner) return createRedirectResponse('/admin')
-        if (isAdminLogin && isPartner && !isAdmin) return createRedirectResponse('/partner')
+        if (isAdminLogin && isPartner && !isAdmin) return createRedirectResponse('/vendor')
       }
     }
 
     // C. Entry Redirects
     if (pathname === '/dashboard') {
       if (isAdmin) return createRedirectResponse('/admin')
-      if (isPartner) return createRedirectResponse('/partner')
+      if (isPartner) return createRedirectResponse('/vendor')
       return createRedirectResponse('/profile')
     }
 

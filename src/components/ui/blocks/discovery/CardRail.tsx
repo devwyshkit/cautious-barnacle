@@ -6,8 +6,8 @@ import {
     CarouselContent,
     CarouselItem,
 } from "@/components/ui/carousel";
-import { ItemCard } from '@/components/ui/ItemCard';
-import { PartnerCard } from '@/components/ui/PartnerCard';
+import { ProductCard } from '@/components/ui/ProductCard';
+import { VendorCard } from '@/components/ui/VendorCard';
 
 interface CardRailProps {
     data: any[];
@@ -19,19 +19,19 @@ export function CardRail({ data }: CardRailProps) {
     return (
         <Carousel opts={{ align: "start", dragFree: true }} className="w-full">
             <CarouselContent className="-ml-4">
-                {data.map((item, index) => {
-                    const isItem = !!item.partner_id;
+                {data.map((product, index) => {
+                    const isItem = !!product.vendor_id || !!product.base_price;  // products have vendor_id; fallback: has base_price
                     return (
-                        <CarouselItem key={item.id} className="pl-4 basis-[200px] sm:basis-[240px]">
+                        <CarouselItem key={product.id} className="pl-4 basis-[200px] sm:basis-[240px]">
                             {isItem ? (
-                                <ItemCard
-                                    data={item}
+                                <ProductCard
+                                    data={product}
                                     variant="portrait"
                                     className="hover:shadow-sm transition-all duration-500"
                                 />
                             ) : (
-                                <PartnerCard
-                                    data={item}
+                                <VendorCard
+                                    data={product}
                                     className="hover:shadow-sm transition-all duration-500"
                                 />
                             )}

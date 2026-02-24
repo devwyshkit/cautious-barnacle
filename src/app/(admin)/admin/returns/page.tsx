@@ -5,7 +5,7 @@ async function getReturns(status?: string) {
   const supabase = await createClient()
   let query = supabase
     .from('returns')
-    .select('*, orders(order_number, total, partners(business_name))')
+    .select('*, orders(order_number, total, vendors(business_name))')
     .order('created_at', { ascending: false })
     .limit(100)
 

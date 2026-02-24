@@ -11,7 +11,7 @@ export const HERO_SLIDES = [
   {
     id: "1",
     title: "Shop from local stores, delivered fast",
-    subtitle: "Premium items with optional personalization",
+    subtitle: "Premium products with optional personalization",
     image: "/images/logo-horizontal.png",
     ctaText: "Explore stores",
     ctaLink: "/search",
@@ -22,6 +22,6 @@ export const HERO_SLIDES = [
     subtitle: "Same-day delivery from stores near you",
     image: "/images/logo-horizontal.png",
     ctaText: "Find stores",
-    ctaLink: "/search?tab=partners",
+    ctaLink: "/search?tab=vendors",
   },
 ];

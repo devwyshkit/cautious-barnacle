@@ -18,8 +18,8 @@ checkRecommendedEnv();
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: "WyshKit | Premium Hyperlocal Personalization",
-  description: "The gold standard for hyperlocal gifts and items. Order from premium local partners with seamless, optional personalization.",
-  keywords: ["hyperlocal", "marketplace", "personalization", "delivery", "local partners", "wyshkit"],
+  description: "The gold standard for hyperlocal gifts and products. Order from premium local vendors with seamless, optional personalization.",
+  keywords: ["hyperlocal", "marketplace", "personalization", "delivery", "local vendors", "wyshkit"],
   authors: [{ name: "Wyshkit" }],
   icons: {
     icon: '/favicon.ico',
@@ -36,13 +36,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Wyshkit",
-    title: "Wyshkit | Hyperlocal Item Marketplace",
-    description: "Hyperlocal item marketplace with optional personalization. Order from local partners.",
+    title: "Wyshkit | Hyperlocal Product Marketplace",
+    description: "Hyperlocal product marketplace with optional personalization. Order from local vendors.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Wyshkit | Hyperlocal Item Marketplace",
-    description: "Hyperlocal item marketplace with optional personalization. Order from local partners.",
+    title: "Wyshkit | Hyperlocal Product Marketplace",
+    description: "Hyperlocal product marketplace with optional personalization. Order from local vendors.",
   },
 };
 
@@ -60,14 +60,29 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" className={cn("min-h-screen w-full selection:bg-rose-100 selection:text-rose-900", inter.variable)}>
-      <body className="font-sans antialiased min-h-screen w-full bg-white">
-        <ErrorReporter />
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-    </html >
-  );
+  try {
+    return (
+      <html lang="en" className={cn("min-h-screen w-full selection:bg-rose-100 selection:text-rose-900", inter.variable)}>
+        <body className="font-sans antialiased min-h-screen w-full bg-white">
+          <ErrorReporter />
+          <Providers>
+            {children}
+          </Providers>
+        </body>
+      </html >
+    );
+  } catch (err: any) {
+    return (
+      <html lang="en">
+        <body>
+          <div className="p-10 text-red-600 bg-red-50 min-h-screen font-mono">
+            <h1 className="text-xl font-bold mb-4">Root Layout Error (Debug)</h1>
+            <pre className="whitespace-pre-wrap text-xs bg-white p-4 rounded border border-red-100 shadow-sm">
+              {err.stack || err.message || String(err)}
+            </pre>
+          </div>
+        </body>
+      </html>
+    );
+  }
 }

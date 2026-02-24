@@ -1,8 +1,8 @@
 import type { DraftTransaction } from '@/lib/types/personalization';
 
 export const EMPTY_CART: DraftTransaction = {
-    items: [],
-    partner_id: null,
+    products: [],
+    vendor_id: null,
     subtotal: 0,
     personalization_charges: 0,
     delivery_fee: 0,

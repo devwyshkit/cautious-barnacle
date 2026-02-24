@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { searchFiltered } from '@/lib/actions/discovery/search';
-import type { Tables } from '@/lib/supabase/database.types';
+import { ValidatedWyshkitItem, ValidatedPartner } from '@/lib/validations/discovery';
 
 interface SearchParams {
   q?: string;
@@ -14,15 +14,15 @@ interface SearchParams {
 }
 
 interface SearchResults {
-  items: Tables<'v_item_listings_search'>[];
-  partners: Tables<'v_partners_detailed'>[];
+  products: ValidatedWyshkitItem[];
+  vendors: ValidatedPartner[];
   total: number;
 }
 
 /**
  * useSearch Hook - Wyshkit 2026
  * 
- * Hyperlocal Item Marketplace Search
+ * Hyperlocal Product Marketplace Search
  * Supabase real-time subscriptions handle real-time data updates.
  */
 export function useSearch(params: SearchParams) {
@@ -56,9 +56,9 @@ export function useSearch(params: SearchParams) {
 
         if (!cancelled) {
           setResults({
-            items: (result.items || []) as any[],
-            partners: (result.partners || []) as any[],
-            total: result.total || (result.items?.length || 0) + (result.partners?.length || 0),
+            products: (result.products || []) as any[],
+            vendors: (result.vendors || []) as any[],
+            total: result.total || (result.products?.length || 0) + (result.vendors?.length || 0),
           });
         }
       } catch (err) {

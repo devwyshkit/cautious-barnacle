@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
 import { ORDER_STATUS } from '@/lib/types/order-status';
+import type { Database, Json } from '@/lib/supabase/database.types';
 
 /**
  * SHADOWFAX WEBHOOK HANDLER (F11)
@@ -32,16 +33,23 @@ export async function POST(req: NextRequest) {
 
     const supabase = await createAdminClient();
 
-    // 1. Log Webhook for Audit (Elite Pattern)
-    const { data: log, error: logError } = await supabase.from('webhook_logs' as any).insert({
-      source: 'shadowfax',
-      external_id: awb_number || client_order_id,
-      payload: body
-    }).select().single();
+    // 1. Log Webhook for Audit (Elite Pattern - Idempotent)
+    const { data: log, error: logError } = await supabase
+      .from('webhook_logs')
+      .upsert({
+        source: 'shadowfax',
+        external_id: awb_number || client_order_id,
+        payload: body as unknown as Json
+      }, { onConflict: 'external_id' })
+      .select()
+      .single();
 
     if (logError) {
+      if (logError.code === '23505') { // Unique violation, already processed
+        logger.info('Shadowfax Webhook: Already processed', { external_id: awb_number || client_order_id });
+        return NextResponse.json({ success: true, message: 'Already processed' });
+      }
       logger.error('Shadowfax Webhook: Failed to log payload', logError);
-      // We continue even if log fails, but it's not ideal
     }
 
     // 2. Map Shadowfax status to WyshKit ORDER_STATUS
@@ -65,10 +73,10 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Perform Idempotent Transition via RPC
-    const { data: transitioned, error: transitionError } = await supabase.rpc('transition_order_status', {
+    const { data: transitioned, error: transitionError } = await supabase.rpc('transition_order', {
       p_order_id: client_order_id,
-      p_new_status: targetStatus,
-      p_metadata: { webhook_log_id: (log as any)?.id }
+      p_target_status: targetStatus as Database['public']['Enums']['order_status'],
+      p_metadata: { webhook_log_id: log?.id } as unknown as Json
     });
 
     if (transitionError) {
@@ -79,13 +87,13 @@ export async function POST(req: NextRequest) {
     if (transitioned) {
       // 4. Mark log as processed
       if (log) {
-        await supabase.from('webhook_logs' as any).update({ processed_at: new Date().toISOString() }).eq('id', (log as any).id);
+        await supabase.from('webhook_logs').update({ processed_at: new Date().toISOString() }).eq('id', log.id);
       }
 
       // 5. Trigger Post-Delivery Events
       if (targetStatus === ORDER_STATUS.DELIVERED) {
         try {
-          const { trigger_post_delivery_events } = await import('@/lib/actions/partner/settlement');
+          const { trigger_post_delivery_events } = await import('@/lib/actions/vendor/settlement');
           await trigger_post_delivery_events(client_order_id);
         } catch (postDeliveryError) {
           logger.error('Shadowfax Webhook: Post-delivery triggers failed', postDeliveryError);

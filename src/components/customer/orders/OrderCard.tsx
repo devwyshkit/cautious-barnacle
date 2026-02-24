@@ -20,7 +20,7 @@ export function OrderCard({ order }: OrderCardProps) {
   const created_at = order.created_at ?? '';
   const item_count = order.item_count ?? 1;
 
-  const isActive = ['PLACED', 'DETAILS_RECEIVED', 'PREVIEW_READY', 'REVISION_REQUESTED', 'IN_PRODUCTION', 'OUT_FOR_DELIVERY'].includes(status);
+  const isActive = ['PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED', 'OUT_FOR_DELIVERY'].includes(status);
 
   return (
     <Link
@@ -29,10 +29,10 @@ export function OrderCard({ order }: OrderCardProps) {
       prefetch={false}
     >
       <div className="flex items-start gap-4">
-        {/* Partner Avatar / Image */}
+        {/* Vendor Avatar / Image */}
         <div className="size-14 rounded-xl bg-zinc-50 border border-zinc-100 overflow-hidden shrink-0 flex items-center justify-center relative">
-          {order.first_item_image ? (
-            <img src={order.first_item_image} alt={order.partner_name || 'Store'} className="size-full object-cover" />
+          {order.first_product_name ? (
+            <img src={order.first_product_name} alt={order.vendor_name || 'Store'} className="size-full object-cover" />
           ) : (
             <Package className="size-6 text-zinc-300" />
           )}
@@ -45,7 +45,7 @@ export function OrderCard({ order }: OrderCardProps) {
           <div className="flex items-start justify-between">
             <div>
               <h3 className="text-sm font-black text-zinc-900 truncate leading-tight group-hover:text-[var(--primary)] transition-colors">
-                {order.partner_name || "Wyshkit Partner"}
+                {order.vendor_name || "Wyshkit Vendor"}
               </h3>
               <p className="text-xs font-bold text-zinc-400 mt-0.5 tracking-tight">
                 Order #{orderNumber}
@@ -83,7 +83,7 @@ export function OrderCard({ order }: OrderCardProps) {
           </div>
 
           <p className="text-[11px] font-medium text-zinc-500 mt-3 line-clamp-1">
-            {order.first_item_name || "Order Details"}
+            {order.first_product_name || "Order Details"}
           </p>
         </div>
       </div>

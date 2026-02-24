@@ -24,13 +24,13 @@ export function CartSlot({ initialHydratedItems = [] }: CartSlotProps) {
   const { draftOrder, updateQuantity, removeFromDraftOrder } = useCart();
 
   // WYSHKIT 2026: Live sync CartSlot
-  // We prefer live items from context if available, fallback to SSR items
+  // We prefer live products from context if available, fallback to SSR products
   const displayItems = useMemo(() => {
-    if (draftOrder.items.length > 0) {
-      return draftOrder.items;
+    if (draftOrder.products.length > 0) {
+      return draftOrder.products;
     }
     return initialHydratedItems;
-  }, [draftOrder.items, initialHydratedItems]);
+  }, [draftOrder.products, initialHydratedItems]);
 
   const handleUpdateQuantity = async (itemId: string, variantId: string | null, quantity: number) => {
     try {
@@ -45,7 +45,7 @@ export function CartSlot({ initialHydratedItems = [] }: CartSlotProps) {
     try {
       await removeFromDraftOrder(itemId, variantId);
     } catch (e) {
-      toast.error("Failed to remove item");
+      toast.error("Failed to remove product");
     }
   };
 
@@ -59,7 +59,7 @@ export function CartSlot({ initialHydratedItems = [] }: CartSlotProps) {
 
   return (
     <DraftSummaryBlock
-      items={displayItems}
+      products={displayItems}
       onUpdateQuantity={handleUpdateQuantity}
       onRemoveItem={handleRemoveItem}
       editable={true}

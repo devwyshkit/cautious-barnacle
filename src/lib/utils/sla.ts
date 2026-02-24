@@ -14,9 +14,9 @@ export interface SLASignal {
     colorClass: string;
 }
 
-export function getDeliverySLASignal(item: any): SLASignal | null {
-    const category = item.category?.toLowerCase();
-    const productionTime = item.production_time_minutes;
+export function getDeliverySLASignal(product: any): SLASignal | null {
+    const category = product.category?.toLowerCase();
+    const productionTime = product.production_time_minutes;
 
     if (category === 'flowers' || category === 'cakes') {
         return {
@@ -39,11 +39,11 @@ export function getDeliverySLASignal(item: any): SLASignal | null {
     return null;
 }
 
-export function getStockSLASignal(item: any): SLASignal | null {
-    const stockQuantity = item.stock_quantity;
-    const isPersonalizable = item.has_personalization || (item.personalization_options?.length > 0);
+export function getStockSLASignal(product: any): SLASignal | null {
+    const stockQuantity = product.stock_quantity;
+    const isPersonalizable = product.has_personalization || (product.personalization_options?.length > 0);
 
-    // Swiggy 2026: Only show scarcity for non-personalized items (physical stock matters)
+    // Swiggy 2026: Only show scarcity for non-personalized products (physical stock matters)
     if (!isPersonalizable && typeof stockQuantity === 'number' && stockQuantity > 0 && stockQuantity <= 3) {
         return {
             type: 'scarcity',
@@ -100,11 +100,12 @@ export function calculateTravelTime(distanceKm?: number | null): { min: number; 
  * Centralized formatting for delivery and prep times.
  */
 
-export function formatPrepTime(prepHours: number): string {
-    if (prepHours < 1) {
-        return `${Math.round(prepHours * 60)}m`;
+export function formatPrepTime(prepMins: number): string {
+    if (prepMins < 60) {
+        return `${Math.round(prepMins)}m`;
     }
-    return `${prepHours}h`;
+    const hours = prepMins / 60;
+    return hours % 1 === 0 ? `${hours}h` : `${hours.toFixed(1)}h`;
 }
 
 export function formatDeliveryTime(min: number, max: number): string {

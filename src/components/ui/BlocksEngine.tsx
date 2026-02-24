@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { cn } from '@/lib/utils';
-import { InfiniteItemsGrid } from '@/components/customer/home/InfiniteItemsGrid';
+import { InfiniteItemsGrid } from '@/components/customer/home/InfiniteProductsGrid';
 
 /**
  * WYSHKIT 2026: Server-Driven UI Engine
@@ -13,7 +13,7 @@ const CircleRail = React.lazy(() => import('./blocks/discovery/CircleRail').then
 const CardRail = React.lazy(() => import('./blocks/discovery/CardRail').then(m => ({ default: m.CardRail })));
 const BannerBento = React.lazy(() => import('./blocks/discovery/BannerBento').then(m => ({ default: m.BannerBento })));
 const Grid = React.lazy(() => import('./blocks/discovery/Grid').then(m => ({ default: m.Grid })));
-const PartnerGroupedGrid = React.lazy(() => import('./blocks/discovery/PartnerGroupedGrid').then(m => ({ default: m.PartnerGroupedGrid })));
+const VendorGroupedGrid = React.lazy(() => import('./blocks/discovery/VendorGroupedGrid').then(m => ({ default: m.VendorGroupedGrid })));
 const StoreHeader = React.lazy(() => import('./blocks/store/StoreHeader').then(m => ({ default: m.StoreHeader })));
 
 // Checkout Blocks - PURGED as per Wyshkit 2026 Structural Blueprint (SPI Principle)
@@ -54,7 +54,7 @@ export function BlocksEngine({ blocks, className, context }: BlocksEngineProps) 
                 return <Grid data={block.data} />;
             case 'PARTNER_LIST':
             case 'PARTNER_GROUPED_GRID':
-                return <PartnerGroupedGrid data={block.data} title={block.title} subtitle={block.subtitle} context={context} />;
+                return <VendorGroupedGrid data={block.data} title={block.title} subtitle={block.subtitle} context={context} />;
             case 'INFINITE_GRID':
                 return (
                     <InfiniteItemsGrid

@@ -18,19 +18,20 @@ export async function enforce_design_deadlines() {
         let processed_count = 0;
 
         // 1. CLEANUP: No Personalization Details for 24h
-        // WYSHKIT 2026: Partial Refund Policy - Partner slot reservation fee (₹50) retained.
+        // [AUDIT 2026] personalisation_input column missing from orders table. 
+        /*
         const { data: detail_timeouts } = await supabase
             .from('orders')
             .select('id, order_number, payment_id, total, payment_status')
             .eq('status', ORDER_STATUS.CONFIRMED)
             .eq('has_personalization', true)
-            .is('personalization_input', null)
+            // .is('personalization_input', null) // Column missing
             .lt('created_at', twenty_four_hours_ago);
 
         if (detail_timeouts && detail_timeouts.length > 0) {
             for (const order of detail_timeouts) {
                 let payment_updates = {};
-                const partner_stake = 50; // Partner compensation for reservation slot
+                const partner_stake = 50; 
                 const refund_amount = Math.max(0, (Number(order.total) || 0) - partner_stake);
 
                 if (['paid', 'PAID', 'captured', 'CAPTURED'].includes(order.payment_status || '') && order.payment_id) {
@@ -50,16 +51,16 @@ export async function enforce_design_deadlines() {
                 await supabase.from('orders').update({
                     status: ORDER_STATUS.CANCELLED,
                     updated_at: now_iso,
-                    cancellation_reason: `Design deadline expired (24h). Partner compensated ₹${partner_stake} for time slot.`,
+                    cancellation_reason: `Design deadline expired (24h). Vendor compensated ₹${partner_stake} for time slot.`,
                     cancelled_by: 'system',
                     ...payment_updates
                 }).eq('id', order.id);
 
                 await (supabase as unknown as { rpc: any }).rpc('log_order_status_history', {
                     p_order_id: order.id,
-                    p_type: 'auto_cancelled_timeout',
+                    p_status: ORDER_STATUS.CANCELLED, // Fixed p_type to p_status
                     p_title: 'Order Cancelled',
-                    p_description: `Personalization details were not shared within 24 hours. A refund of ₹${refund_amount} has been initiated (₹${partner_stake} retained for partner).`,
+                    p_description: `Personalization details were not shared within 24 hours. A refund of ₹${refund_amount} has been initiated (₹${partner_stake} retained for vendor).`,
                     p_metadata: {
                         reason: 'design_timeout',
                         original_total: order.total,
@@ -71,14 +72,16 @@ export async function enforce_design_deadlines() {
                 processed_count++;
             }
         }
+        */
 
         // 2. AUTO-APPROVE: No Preview Action for 24h
-        // WYSHKIT 2026: "Silence is Consent" - Move to APPROVED so production can start.
+        // [AUDIT 2026] personalization_status and order_personalization table missing.
+        /*
         const { data: preview_timeouts } = await supabase
             .from('orders')
             .select('id, order_number')
-            .eq('personalization_status', 'preview_ready')
-            .lt('preview_uploaded_at', twenty_four_hours_ago);
+            // .eq('personalization_status', 'preview_ready') // Column missing
+            // .lt('preview_uploaded_at', twenty_four_hours_ago); // Column missing
 
         if (preview_timeouts && preview_timeouts.length > 0) {
             for (const order of preview_timeouts) {
@@ -92,14 +95,13 @@ export async function enforce_design_deadlines() {
                 if (preview) {
                     await supabase.from('order_personalization').update({ status: 'approved', approved_at: now_iso }).eq('order_id', order.id);
                     await supabase.from('orders').update({
-                        personalization_status: 'approved',
-                        approved_at: now_iso,
+                        // personalization_status: 'approved',
                         updated_at: now_iso
                     }).eq('id', order.id);
 
                     await (supabase as unknown as { rpc: any }).rpc('log_order_status_history', {
                         p_order_id: order.id,
-                        p_type: 'auto_approved',
+                        p_status: 'CONFIRMED', // Adjusted
                         p_title: 'Design Auto-Approved',
                         p_description: 'The design has been auto-approved after 24 hours of inactivity. Production will begin shortly.',
                         p_metadata: { reason: 'preview_timeout' }
@@ -109,6 +111,7 @@ export async function enforce_design_deadlines() {
                 }
             }
         }
+        */
 
         return { count: processed_count };
     } catch (error) {
@@ -120,18 +123,20 @@ export async function enforce_design_deadlines() {
 /**
  * ENFORCE ACCEPTANCE DEADLINES (Hyperlocal Speed)
  * Scans for orders in PLACED state that have passed their accept_deadline (5m)
- * Automatically cancels and issues a FULL refund since partner failed to act.
+ * Automatically cancels and issues a FULL refund since vendor failed to act.
  */
 export async function enforce_acceptance_deadlines() {
     try {
         const supabase = await createAdminClient();
         const now_iso = new Date().toISOString();
 
+        const five_minutes_ago = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+
         const { data: expired_orders, error } = await supabase
             .from('orders')
             .select('id, order_number, payment_status, payment_id, total')
             .eq('status', ORDER_STATUS.PLACED)
-            .lt('accept_deadline', now_iso);
+            .lt('created_at', five_minutes_ago);
 
         if (error) throw error;
         if (!expired_orders || expired_orders.length === 0) return { count: 0 };
@@ -157,15 +162,15 @@ export async function enforce_acceptance_deadlines() {
                 status: ORDER_STATUS.CANCELLED,
                 updated_at: now_iso,
                 cancelled_by: 'system',
-                cancellation_reason: 'Partner acceptance timeout (5m)',
+                cancellation_reason: 'Vendor acceptance timeout (5m)',
                 ...payment_updates
             }).eq('id', order.id);
 
             await supabase.rpc('log_order_status_history', {
                 p_order_id: order.id,
-                p_type: 'auto_cancelled_deadline',
+                p_status: ORDER_STATUS.CANCELLED,
                 p_title: 'Order Expired',
-                p_description: 'Order automatically cancelled as the partner did not accept it within the deadline. Full refund initiated.',
+                p_description: 'Order automatically cancelled as the vendor did not accept it within the deadline. Full refund initiated.',
                 p_metadata: { reason: 'acceptance_timeout' } as unknown as any
             });
             processed_count++;

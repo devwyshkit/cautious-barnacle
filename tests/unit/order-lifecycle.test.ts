@@ -16,7 +16,7 @@ describe('Order Lifecycle State Machine', () => {
         expect(canCancelOrder(ORDER_STATUS.PLACED)).toBe(true);
         expect(canCancelOrder(ORDER_STATUS.CONFIRMED)).toBe(true);
         expect(canCancelOrder(ORDER_STATUS.IN_PRODUCTION)).toBe(false);
-        expect(canCancelOrder(ORDER_STATUS.DISPATCHED)).toBe(false);
+        expect(canCancelOrder(ORDER_STATUS.OUT_FOR_DELIVERY)).toBe(false);
         expect(canCancelOrder(ORDER_STATUS.DELIVERED)).toBe(false);
     });
 

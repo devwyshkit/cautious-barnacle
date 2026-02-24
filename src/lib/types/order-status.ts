@@ -28,9 +28,9 @@ export type OrderStatus = Database['public']['Enums']['order_status'];
 export const ORDER_STATUS = {
   PLACED: 'PLACED',
   CONFIRMED: 'CONFIRMED',
-  PREPARING: 'PREPARING',
-  READY: 'READY',
-  SHIPPED: 'SHIPPED',
+  IN_PRODUCTION: 'IN_PRODUCTION',
+  PACKED: 'PACKED',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
   DELIVERED: 'DELIVERED',
   CANCELLED: 'CANCELLED',
   REFUNDED: 'REFUNDED',
@@ -84,7 +84,7 @@ export function getStatusConfig(order: {
   if (order.status === ORDER_STATUS.PLACED) {
     return {
       label: "Order Placed",
-      subLabel: "Waiting for partner to accept",
+      subLabel: "Waiting for vendor to accept",
       icon: React.createElement(Clock, { className: "size-4 text-zinc-400" }),
       color: "bg-zinc-50",
       pulse: true
@@ -115,9 +115,9 @@ export function getAllOrderStatuses(): OrderStatus[] {
 const STATUS_DISPLAY: Record<string, string> = {
   PLACED: 'Order Placed',
   CONFIRMED: 'Accepted',
-  PREPARING: 'Preparing Order',
-  READY: 'Ready',
-  SHIPPED: 'Shipped',
+  IN_PRODUCTION: 'Being Prepared',
+  PACKED: 'Quality Check & Packed',
+  OUT_FOR_DELIVERY: 'Out for Delivery',
   DELIVERED: 'Delivered',
   CANCELLED: 'Cancelled',
   REFUNDED: 'Refunded',
@@ -127,9 +127,9 @@ const STATUS_DISPLAY: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   PLACED: 'bg-rose-50 text-[var(--primary)] border-rose-100',
   CONFIRMED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
-  PREPARING: 'bg-amber-50 text-amber-600 border-amber-100',
-  READY: 'bg-emerald-50 text-[#60B246] border-emerald-100',
-  SHIPPED: 'bg-amber-50 text-amber-600 border-amber-100',
+  IN_PRODUCTION: 'bg-amber-50 text-amber-600 border-amber-100',
+  PACKED: 'bg-rose-50 text-rose-600 border-rose-100',
+  OUT_FOR_DELIVERY: 'bg-amber-50 text-amber-600 border-amber-100',
   DELIVERED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
   CANCELLED: 'bg-zinc-100 text-zinc-500 border-zinc-200',
   REFUNDED: 'bg-zinc-100 text-zinc-500 border-zinc-200',
@@ -147,9 +147,9 @@ export function getOrderStatusColor(status: string): string {
 const ORDER_TRACKING_STEPS = [
   ORDER_STATUS.PLACED,
   ORDER_STATUS.CONFIRMED,
-  ORDER_STATUS.PREPARING,
-  ORDER_STATUS.READY,
-  ORDER_STATUS.SHIPPED,
+  ORDER_STATUS.IN_PRODUCTION,
+  ORDER_STATUS.PACKED,
+  ORDER_STATUS.OUT_FOR_DELIVERY,
   ORDER_STATUS.DELIVERED
 ];
 
@@ -167,16 +167,17 @@ export function isFinalStatus(status: string): boolean {
 export function canCancelOrder(status: string): boolean {
   return [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED].includes(status as any);
 }
-// Swiggy 2026: Order Item Status Configuration
+// Swiggy 2026: Order Product Status Configuration
 export function getItemStatusConfig(itemStatus: string) {
-  // Map legacy item statuses to the lean model if needed
+  // Map legacy product statuses to the lean model if needed
   const display = STATUS_DISPLAY[itemStatus] || itemStatus;
   const color = STATUS_COLORS[itemStatus] || 'bg-zinc-100 text-zinc-600 border-zinc-200';
 
   return {
     label: display,
     color,
+    icon: [ORDER_STATUS.DELIVERED].includes(itemStatus as any) ? CheckCircle2 : Package,
     isComplete: itemStatus === ORDER_STATUS.DELIVERED,
-    isProcessing: [ORDER_STATUS.CONFIRMED, ORDER_STATUS.PREPARING, ORDER_STATUS.READY, ORDER_STATUS.SHIPPED].includes(itemStatus as any)
+    isProcessing: [ORDER_STATUS.CONFIRMED, ORDER_STATUS.IN_PRODUCTION, ORDER_STATUS.PACKED, ORDER_STATUS.OUT_FOR_DELIVERY].includes(itemStatus as any)
   };
 }

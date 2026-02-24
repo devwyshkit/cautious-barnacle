@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { validateGSTINAction } from '@/lib/actions/commerce/gstin';
 import { toast } from 'sonner';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
-import { getPartnerInfo } from '@/lib/actions/discovery/partners';
+import { getPartnerInfo } from '@/lib/actions/discovery/vendors';
 import { DraftLineItem } from '@/lib/types/personalization';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 import { Address } from '@/lib/types/address';
@@ -15,7 +15,7 @@ import type { User } from '@supabase/supabase-js';
 
 interface GstinIdentityProps {
     initialGstin: string;
-    items: DraftLineItem[];
+    products: DraftLineItem[];
     pricing: PricingBreakdown;
     user: User | null;
     selectedAddress: Address | null;
@@ -29,7 +29,7 @@ interface GstinIdentityProps {
  */
 export function GstinIdentity({
     initialGstin,
-    items,
+    products,
     pricing,
     user,
     selectedAddress,
@@ -74,14 +74,14 @@ export function GstinIdentity({
     };
 
     const handleDownloadEstimate = async () => {
-        const firstItem = items[0];
-        const partnerId = firstItem.partner_id;
+        const firstItem = products[0];
+        const partnerId = firstItem.vendor_id;
         if (!partnerId) {
-            toast.error("Partner information missing");
+            toast.error("Vendor information missing");
             return;
         }
 
-        const { data: partner } = await getPartnerInfo(partnerId);
+        const { data: vendor } = await getPartnerInfo(partnerId);
 
         generateEstimatePDF({
             date: new Date().toLocaleDateString(),
@@ -89,13 +89,13 @@ export function GstinIdentity({
             business_name: businessName || undefined,
             billing_address: selectedAddress,
             gstin: gstin || undefined,
-            partner: partner
+            vendor: vendor
                 ? {
-                    name: partner.name,
-                    address: partner.address || 'Bangalore, India',
-                    gstin: partner.gstin || undefined,
+                    name: vendor.name,
+                    address: vendor.address || 'Bangalore, India',
+                    gstin: vendor.gstin || undefined,
                 }
-                : { name: 'Partner', address: 'Bangalore, India' },
+                : { name: 'Vendor', address: 'Bangalore, India' },
             totals: {
                 item_total: pricing.subtotal,
                 delivery_fee: pricing.delivery_fee,
@@ -104,10 +104,10 @@ export function GstinIdentity({
                 grand_total: pricing.total,
                 discount: pricing.discount || 0
             },
-            order_items: items.map(it => ({
+            order_products: products.map(it => ({
                 id: it.id || '',
-                item_id: it.item_id || '',
-                item_name: it.item_name || 'Product',
+                product_id: it.product_id || '',
+                product_name: it.product_name || 'Item',
                 quantity: it.quantity,
                 quantity_number: it.quantity,
                 unit_price: it.unit_price,

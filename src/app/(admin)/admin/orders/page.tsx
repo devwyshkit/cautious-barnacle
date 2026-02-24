@@ -13,7 +13,7 @@ async function getOrders(status?: string, page = 1) {
 
   let query = supabase
     .from('orders')
-    .select('*, partners(business_name), users(full_name, phone)', { count: 'exact' })
+    .select('*, vendors(business_name), users(full_name, phone)', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(from, to)
 

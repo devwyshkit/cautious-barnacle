@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Store, Search } from 'lucide-react';
 
 /**
- * WYSHKIT 2026: Partner Not Found Page
+ * WYSHKIT 2026: Vendor Not Found Page
  * Swiggy 2026 Pattern: Proper 404 handling with helpful navigation
  */
 export default function PartnerNotFound() {

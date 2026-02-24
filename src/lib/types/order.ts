@@ -4,7 +4,7 @@
  * All types derive directly from Supabase database types.
  * UI-only types are kept for display transformations.
  * 
- * Hyperlocal Item Marketplace with Optional Personalization
+ * Hyperlocal Product Marketplace with Optional Personalization
  */
 
 import type { Tables, Views } from '@/lib/supabase/types';
@@ -13,27 +13,18 @@ import type { PersonalizationConfig, SelectedPersonalization, SelectedAddon } fr
 // View type from Supabase
 export type ViewOrderDetailed = Views<'v_order_tracking'>;
 
-import type { Order, OrderItem, OrderPersonalization } from '@/lib/supabase/types';
-export type { OrderItem, OrderPersonalization };
-
 /**
  * OrderListItem: Unified shape for order lists.
  * Derives directly from v_order_tracking view.
  */
-export interface OrderListItem {
-  id: string;
-  order_number: string;
-  status: string;
-  total: number;
-  created_at: string;
-  has_personalization?: boolean | null;
-  personalization_status?: string | null;
-  partner_name: string | null;
-  partner_image: string | null;
-  items: any[];
+export interface OrderListItem extends Omit<Views<'v_order_tracking'>, 'personalization_status' | 'first_product_name' | 'vendor_name'> {
+  // Any extra UI fields NOT in the view can be added here
+  // But for WYSHKIT 2026, we prefer view-authority
+  products?: any[]; // Keep for compatibility if needed, though view uses first_product_name
+  personalization_status?: string | null; // Placeholder if needed
   item_count?: number;
-  first_item_image?: string | null;
-  first_item_name?: string | null;
+  first_product_name?: string | null;
+  vendor_name?: string | null;
 }
 
 export interface OrderForPDF {
@@ -46,12 +37,12 @@ export interface OrderForPDF {
   personalization_charges: number;
   discount: number;
   total: number;
-  partner: {
+  vendor: {
     name: string;
     gstin?: string;
   };
-  order_items: Array<{
-    item_name: string;
+  order_products: Array<{
+    product_name: string;
     quantity: number;
     unit_price: number;
     total_price: number;
@@ -68,7 +59,7 @@ export interface PartnerForPDF {
 export interface PreviewSubmission {
   id: string;
   order_id: string;
-  order_item_id: string;
+  order_product_id: string;
   preview_url: string;
   status: 'pending' | 'approved' | 'change_requested';
   partner_notes?: string;
@@ -79,8 +70,8 @@ export interface PreviewSubmission {
 
 export interface OrderItemDetail {
   id: string;
-  item_id: string;
-  item_name: string;
+  product_id: string;
+  product_name: string;
   quantity: number;
   quantity_number: number;
   unit_price: number;
@@ -103,17 +94,19 @@ export interface OrderStatusHistory {
   metadata?: Record<string, unknown>;
 }
 
-export interface OrderDetail extends Order {
+export interface OrderDetail extends Tables<'orders'> {
   order_personalization?: PreviewSubmission[];
-  personalizations?: OrderPersonalization[];
-  order_items?: OrderItemDetail[];
+  personalizations?: any[];
+  order_products?: OrderItemDetail[];
   status_history?: Record<string, any>[] | null;
 
   // Composite/Joins
-  partners?: Pick<Tables<'partners'>, 'name' | 'image_url'> | null;
+  vendors?: Pick<Tables<'vendors'>, 'name' | 'image_url'> | null;
   users?: Pick<Tables<'users'>, 'full_name' | 'email'> | null;
 
   // Mapped for UI Convenience (snake_case)
-  partner_name: string | null;
+  vendor_name: string | null;
   partner_image: string | null;
+  personalization_status?: string | null;
+  gst?: number | null;
 }

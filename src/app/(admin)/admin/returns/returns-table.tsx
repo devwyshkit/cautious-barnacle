@@ -17,7 +17,7 @@ type ReturnWithOrder = Tables<'returns'> & {
   orders: {
     order_number: string
     total: number
-    partners: { business_name: string | null } | null
+    vendors: { business_name: string | null } | null
   } | null
 }
 
@@ -58,7 +58,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
 
   const filtered = returns.filter((r) =>
     r.orders?.order_number?.toLowerCase().includes(search.toLowerCase()) ||
-    r.orders?.partners?.business_name?.toLowerCase().includes(search.toLowerCase()) ||
+    r.orders?.vendors?.business_name?.toLowerCase().includes(search.toLowerCase()) ||
     r.reason?.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -120,7 +120,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
           <TableHeader>
             <TableRow>
               <TableHead>Order</TableHead>
-              <TableHead className="hidden md:table-cell">Partner</TableHead>
+              <TableHead className="hidden md:table-cell">Vendor</TableHead>
               <TableHead>Reason</TableHead>
               <TableHead>Refund</TableHead>
               <TableHead>Status</TableHead>
@@ -142,7 +142,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
                     #{returnItem.orders?.order_number || '-'}
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-zinc-500">
-                    {returnItem.orders?.partners?.business_name || '-'}
+                    {returnItem.orders?.vendors?.business_name || '-'}
                   </TableCell>
                   <TableCell className="max-w-[200px] truncate" title={returnItem.reason ?? undefined}>
                     {returnItem.reason}

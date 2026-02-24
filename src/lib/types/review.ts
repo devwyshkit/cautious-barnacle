@@ -7,7 +7,13 @@ type Tables<T extends keyof Database['public']['Tables']> = Database['public']['
  */
 
 // ✅ UI-optimized types for review operations
-export type ItemReview = Tables<'item_reviews'> & {
+export type ItemReview = {
+  id: string;
+  product_id: string;
+  user_id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
   user?: {
     full_name: string | null;
     avatar_url: string | null;
@@ -15,7 +21,7 @@ export type ItemReview = Tables<'item_reviews'> & {
 };
 
 export interface CreateReviewInput {
-  item_id: string;
+  product_id: string;
   rating: number;
   comment?: string;
   images?: string[];

@@ -1,5 +1,5 @@
-import type { Views } from '@/lib/supabase/types';
 import type { PricingBreakdown } from '@/lib/types/pricing';
+
 
 export interface PersonalizationConfig {
   allow_text?: boolean;
@@ -29,32 +29,56 @@ export interface SelectedAddon {
 }
 
 /**
- * DraftLineItem: Derived directly from DB v_active_cart_detailed view.
+ * DraftLineItem: Maps directly to output columns from v_active_cart_detailed view.
  * Eliminates manual type-drift and shadow data.
+ * NOTE: We no longer extend the view type directly to avoid optional/non-optional conflicts.
  */
-export interface DraftLineItem extends Omit<Views<'v_active_cart_detailed'>, 'personalization' | 'selected_addons' | 'personalization_options' | 'quantity'> {
-  // Overrides for more specific JSON typing
-  personalization: SelectedPersonalization;
-  selected_addons: SelectedAddon[];
-  personalization_options: any[];
-  quantity: number;
+export interface DraftLineItem {
+  // Cart item identity
+  id: string;
+  product_id: string;
+  product_name: string;
+  product_image: string;
 
-  // DB-backed fields (Shadow Math Elimination)
+  // Session routing
+  user_id?: string | null;
+  session_id?: string | null;
+
+  // DB product fields
+  unit_price: number;
+  quantity: number;
   line_total: number;
-  personalization_fee: number;
+  personalization_fee?: number | null;
+  has_personalization?: boolean | null;
+  is_personalized: boolean;
+
+  // Variants
+  variant_id?: string | null;
+  variant_name?: string | null;
+
+  // Typed JSON overrides
+  personalization?: SelectedPersonalization;
+  selected_addons: SelectedAddon[];
+
+  // Vendor context (DB-aligned v_active_cart_detailed column names)
+  vendor_id?: string | null;
+  vendor_name?: string | null;
+  vendor_city?: string | null;
+  vendor_prep_mins?: number | null;
 
   // UI-only computed extensions
-  is_personalized: boolean;
   item_addons: any[];
-
-  // Legacy mappings (Optional fallbacks)
-  unit_price: number;
   addons_price?: number | null;
+  base_price?: number;
+  variant_price?: number | null;
+  product_addons?: any;
+  personalization_options?: any[];
 }
 
+
 export interface DraftTransaction extends PricingBreakdown {
-  items: DraftLineItem[];
-  partner_id: string | null;
+  products: DraftLineItem[];
+  vendor_id: string | null;
   item_count: number;
   // Session fields
   applied_coupon?: string | null;

@@ -25,13 +25,13 @@ export function CircleRail({ data, context }: CircleRailProps) {
     return (
         <div className="flex gap-3 md:gap-5 overflow-x-auto no-scrollbar py-2 px-0.5">
             {/* Dynamic Categories */}
-            {categories.map((item: any) => {
-                const isSelected = selectedCategory === item.slug;
+            {categories.map((product: any) => {
+                const isSelected = selectedCategory === product.slug;
 
                 return (
                     <Link
-                        key={item.id}
-                        href={item.slug?.startsWith('/') ? item.slug : `/?category=${item.slug}`}
+                        key={product.id}
+                        href={product.slug?.startsWith('/') ? product.slug : `/?category=${product.slug}`}
                         onClick={() => triggerHaptic(HapticPattern.ACTION)}
                         scroll={false}
                         className="outline-none"
@@ -43,10 +43,10 @@ export function CircleRail({ data, context }: CircleRailProps) {
                                     ? "border-zinc-900 bg-white"
                                     : "border-transparent bg-zinc-50"
                             )}>
-                                {item.image_url ? (
+                                {product.image_url ? (
                                     <Image
-                                        src={item.image_url}
-                                        alt={item.name}
+                                        src={product.image_url}
+                                        alt={product.name}
                                         fill
                                         className={cn(
                                             "object-cover transition-all duration-700 ease-in-out group-hover:scale-110",
@@ -64,10 +64,10 @@ export function CircleRail({ data, context }: CircleRailProps) {
                                 "text-[10px] font-black tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
                                 isSelected ? "text-zinc-950" : "text-zinc-400"
                             )}>
-                                {item.name === 'ALL' ? (
+                                {product.name === 'ALL' ? (
                                     <span className="text-[10px] font-black tracking-widest text-[#D91B24]">All</span>
                                 ) : (
-                                    item.name
+                                    product.name
                                 )}
                             </span>
                         </div>

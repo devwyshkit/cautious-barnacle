@@ -50,7 +50,7 @@ export async function create_payment_order(
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) return { error: 'Unauthorized', status: 401 };
-        if (!payload.draft_items || payload.draft_items.length === 0) return { error: 'No items in cart', status: 400 };
+        if (!payload.draft_items || payload.draft_items.length === 0) return { error: 'No products in cart', status: 400 };
         if (!payload.address_id || payload.address_id === 'guest_location') return { error: 'Please select a valid delivery address.', status: 400 };
 
         // WYSHKIT 2026: Pricing and delivery fees are strictly computed by the database RPC.
@@ -58,34 +58,17 @@ export async function create_payment_order(
         const distance_km = payload.distance_km || 0;
         const delivery_fee = undefined; // Force RPC to compute from distance
 
-        // 1.5. WYSHKIT 2026: CLEANUP PREVIOUS RESERVATIONS (Self-Lockout Prevention)
-        await supabase.from('stock_reservations').delete().eq('user_id', user.id);
-
-        // 1.6. WYSHKIT 2026: BATCHED INVENTORY CHECK (F4)
-        const { data: batchStock, error: batchStockError } = await supabase.rpc('check_batch_stock' as any, {
-            p_items: payload.draft_items.map(item => ({
-                item_id: item.item_id,
-                variant_id: item.variant_id || null,
-                quantity: item.quantity || 1
-            })) as unknown as Json,
-            p_exclude_user_id: user.id
-        });
-
-        if (batchStockError || !batchStock || !(batchStock as any).success) {
-            const errorMsg = (batchStock as any)?.error || 'Insufficient stock for one or more items.';
-            logger.error('Inventory check failed (batch)', { error: errorMsg });
-            return { error: errorMsg, status: 409 };
-        }
+        // 1.5. [PURGED] WYSHKIT 2026: Manual stock reservations are superseded by atomic place_atomic_order.
 
         // 2. FETCH PRICING FROM DB RPC
         const { calculateOrderTotalRPC } = await import('./pricing');
-        const pricingItems = payload.draft_items.map((item) => ({
-            item_id: item.item_id as string,
-            variant_id: item.variant_id || null,
-            quantity: item.quantity,
-            has_personalization: !!item.personalization?.enabled,
-            personalization_option_id: item.personalization?.option_id || null,
-            selected_addons: item.selected_addons || []
+        const pricingItems = payload.draft_items.map((product) => ({
+            product_id: product.product_id as string,
+            variant_id: product.variant_id || null,
+            quantity: product.quantity,
+            has_personalization: !!product.personalization?.enabled,
+            personalization_option_id: product.personalization?.option_id || null,
+            selected_addons: product.selected_addons || []
         }));
 
         const { data: pricingData, error: pricingErrorMsg } = await calculateOrderTotalRPC(
@@ -134,6 +117,19 @@ export async function create_payment_order(
         const { data: session } = await supabase.from('checkout_sessions').select('id').eq('user_id', user.id).single();
         const sessionId = session?.id || user.id;
 
+        // WYSHKIT 2026: Deterministic Webhook Snapshotting
+        // Save the exact cart payload to `snapshot_items` so the webhook doesn't rely on the live cart.
+        if (session?.id) {
+            const snapshotItems = payload.draft_items.map(product => ({
+                product_id: product.product_id,
+                variant_id: product.variant_id || null,
+                quantity: product.quantity,
+                personalization: product.personalization || null,
+                selected_addons: product.selected_addons || []
+            }));
+            await supabase.from('checkout_sessions').update({ snapshot_items: snapshotItems as any }).eq('id', session.id);
+        }
+
         // 5. RAZORPAY ORDER
         const receipt = `order_${Date.now()}`;
         const order = await create_razorpay_order(
@@ -146,23 +142,7 @@ export async function create_payment_order(
             }
         );
 
-        // 6. HARDENING P0: STOCK RESERVATION
-        const reservation_inserts = payload.draft_items.map((item) => ({
-            user_id: user.id,
-            payment_intent_id: order.id,
-            item_id: item.item_id,
-            variant_id: item.variant_id || null,
-            quantity: item.quantity || 1,
-            expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString()
-        }));
-
-        const { error: reserve_error } = await supabase
-            .from('stock_reservations')
-            .insert(reservation_inserts);
-
-        if (reserve_error) {
-            logger.error('Failed to reserve stock', reserve_error);
-        }
+        // 6. [PURGED] STOCK RESERVATION (Moving to Absolute Atomicity in DB)
 
         return {
             order: {
@@ -212,13 +192,12 @@ export async function verify_payment_signature(
             return { error: 'Order session expired. Please try again.', status: 404 };
         }
 
-        const { data: cart_items, error: cart_error } = await supabase
-            .from('v_active_cart_detailed')
-            .select('*')
-            .eq('user_id', user.id);
+        // WYSHKIT 2026: Deterministic Execution via Session Snapshot
+        // Bypassing the mutable `v_active_cart_detailed` to prevent race conditions during transaction settlement.
+        const cart_products = session.snapshot_items as any[];
 
-        if (cart_error || !cart_items || cart_items.length === 0) {
-            return { error: 'Your cart is empty. Cannot finalize order.', status: 400 };
+        if (!cart_products || cart_products.length === 0) {
+            return { error: 'Your checkout session expired or is invalid. Cannot finalize order.', status: 400 };
         }
 
         // 2. Verification Logic
@@ -254,19 +233,19 @@ export async function verify_payment_signature(
         }
 
         // 3. ATOMIC ORDER PLACEMENT
-        const has_pers = cart_items.some(item => (item.personalization as any)?.enabled);
+        const has_pers = cart_products.some(product => (product.personalization as any)?.enabled);
 
         const order_result = await executeCommerceIntent({
             intent: 'PLACE_ORDER',
             payload: {
                 razorpay_order_id: razorpay_order_id,
                 payment_id: razorpay_payment_id,
-                items: cart_items.map(item => ({
-                    item_id: item.item_id,
-                    variant_id: item.variant_id,
-                    quantity: item.quantity,
-                    personalization: item.personalization,
-                    selected_addons: item.selected_addons
+                products: cart_products.map(product => ({
+                    product_id: product.product_id ?? '',
+                    variant_id: product.variant_id,
+                    quantity: product.quantity,
+                    personalization: product.personalization,
+                    selected_addons: product.selected_addons
                 })) as any,
                 address_id: session.selected_address_id || undefined,
                 coupon_code: session.applied_coupon || undefined,

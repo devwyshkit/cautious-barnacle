@@ -36,10 +36,10 @@ async function getInsights() {
     supabase.from('orders').select('total').gte('created_at', `${lastWeekStr}T00:00:00`),
     // Month orders
     supabase.from('orders').select('total').gte('created_at', `${lastMonthStr}T00:00:00`),
-    // Top partners by orders
-    supabase.from('orders').select('partner_id, partners(business_name)').limit(1000),
-    // Top items
-    supabase.from('order_items').select('item_id, items(name), quantity').limit(1000),
+    // Top vendors by orders
+    supabase.from('orders').select('vendor_id, vendors(business_name)').limit(1000),
+    // Top products
+    supabase.from('order_products').select('product_id, products(name), quantity').limit(1000),
     // Orders by status
     supabase.from('orders').select('status'),
   ])
@@ -49,11 +49,11 @@ async function getInsights() {
   const weekGMV = ((weekOrders.data || []) as { total?: number }[]).reduce((sum, o) => sum + (o.total ?? 0), 0)
   const monthGMV = ((monthOrders.data || []) as { total?: number }[]).reduce((sum, o) => sum + (o.total ?? 0), 0)
 
-  // Calculate partner leaderboard
+  // Calculate vendor leaderboard
   const partnerCounts: Record<string, { name: string; count: number }> = {}
-  for (const order of (topPartners.data || []) as { partner_id?: string; partners?: { business_name?: string } }[]) {
-    const id = order.partner_id ?? ''
-    const name = order.partners?.business_name || 'Unknown'
+  for (const order of (topPartners.data || []) as { vendor_id?: string; vendors?: { business_name?: string } }[]) {
+    const id = order.vendor_id ?? ''
+    const name = order.vendors?.business_name || 'Unknown'
     if (!partnerCounts[id]) partnerCounts[id] = { name, count: 0 }
     partnerCounts[id].count++
   }
@@ -61,13 +61,13 @@ async function getInsights() {
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
-  // Calculate item leaderboard
+  // Calculate product leaderboard
   const itemCounts: Record<string, { name: string; count: number }> = {}
-  for (const item of (topItems.data || []) as { item_id?: string; quantity?: number; items?: { name?: string } }[]) {
-    const id = item.item_id ?? ''
-    const name = item.items?.name || 'Unknown'
+  for (const product of (topItems.data || []) as { product_id?: string; quantity?: number; products?: { name?: string } }[]) {
+    const id = product.product_id ?? ''
+    const name = product.products?.name || 'Unknown'
     if (!itemCounts[id]) itemCounts[id] = { name, count: 0 }
-    itemCounts[id].count += item.quantity ?? 0
+    itemCounts[id].count += product.quantity ?? 0
   }
   const topItemsList = Object.values(itemCounts)
     .sort((a, b) => b.count - a.count)
@@ -166,23 +166,23 @@ export default async function InsightsPage() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Top Partners */}
+        {/* Top Vendors */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Top partners</CardTitle>
+            <CardTitle className="text-sm font-medium">Top vendors</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {insights.topPartners.length === 0 ? (
               <p className="p-4 text-sm text-zinc-500">No data yet</p>
             ) : (
               <div className="divide-y">
-                {insights.topPartners.map((partner, i) => (
+                {insights.topPartners.map((vendor, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-zinc-400 w-4">{i + 1}</span>
-                      <span className="text-sm font-medium">{partner.name}</span>
+                      <span className="text-sm font-medium">{vendor.name}</span>
                     </div>
-                    <span className="text-sm text-zinc-500">{partner.count} orders</span>
+                    <span className="text-sm text-zinc-500">{vendor.count} orders</span>
                   </div>
                 ))}
               </div>
@@ -190,23 +190,23 @@ export default async function InsightsPage() {
           </CardContent>
         </Card>
 
-        {/* Top Items */}
+        {/* Top Products */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Top items</CardTitle>
+            <CardTitle className="text-sm font-medium">Top products</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {insights.topItems.length === 0 ? (
               <p className="p-4 text-sm text-zinc-500">No data yet</p>
             ) : (
               <div className="divide-y">
-                {insights.topItems.map((item, i) => (
+                {insights.topItems.map((product, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-zinc-400 w-4">{i + 1}</span>
-                      <span className="text-sm font-medium truncate max-w-[150px]">{item.name}</span>
+                      <span className="text-sm font-medium truncate max-w-[150px]">{product.name}</span>
                     </div>
-                    <span className="text-sm text-zinc-500">{item.count} sold</span>
+                    <span className="text-sm text-zinc-500">{product.count} sold</span>
                   </div>
                 ))}
               </div>

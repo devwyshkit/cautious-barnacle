@@ -10,15 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Package, Truck, User, Store, CreditCard, Clock, Loader2 } from 'lucide-react'
 import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import { ORDER_STATUS } from '@/lib/types/admin.types'
-import type { Tables, Json } from '@/lib/supabase/database.types'
+import type { Json } from '@/lib/supabase/database.types'
+import type { Tables } from '@/lib/supabase/types'
 
 type OrderWithRelations = Tables<'orders'> & {
-  partners: { business_name: string | null; email: string | null; phone?: string | null } | null
+  vendors: { business_name: string | null; email: string | null; phone?: string | null } | null
   users: { full_name: string | null; phone: string | null; email: string | null } | null
-  order_items: (Tables<'order_items'> & { items: { name: string; images: string[] | null } | null })[]
-  order_status_history: Pick<Tables<'order_status_history'>, 'id' | 'title' | 'description' | 'type' | 'created_at'>[]
-  deliveries: (Tables<'deliveries'> & { delivery_updates: Tables<'delivery_updates'>[] })[]
-  order_personalization: Tables<'order_personalization'>[]
+  order_products: (Tables<'order_products'> & { products: { name: string; images: string[] | null } | null })[]
+  order_status_history: Tables<'order_status_history'>[]
 }
 
 interface OrderDetailProps {
@@ -36,13 +35,14 @@ function formatDate(date: string | null) {
 
 function getStatusBadge(status: string) {
   const colors: Record<string, string> = {
-    PENDING: 'text-amber-600 border-amber-200 bg-amber-50',
+    PLACED: 'text-amber-600 border-amber-200 bg-amber-50',
     CONFIRMED: 'text-blue-600 border-blue-200 bg-blue-50',
-    PREPARING: 'text-purple-600 border-purple-200 bg-purple-50',
-    READY: 'text-cyan-600 border-cyan-200 bg-cyan-50',
-    OUT_FOR_DELIVERY: 'text-indigo-600 border-indigo-200 bg-indigo-50',
+    IN_PRODUCTION: 'text-purple-600 border-purple-200 bg-purple-50',
+    PACKED: 'text-cyan-600 border-cyan-200 bg-cyan-50',
+    DISPATCHED: 'text-indigo-600 border-indigo-200 bg-indigo-50',
     DELIVERED: 'text-emerald-600 border-emerald-200 bg-emerald-50',
     CANCELLED: 'text-red-600 border-red-200 bg-red-50',
+    REFUNDED: 'text-zinc-600 border-zinc-200 bg-zinc-50',
   }
   return <Badge variant="outline" className={colors[status] || ''}>{status.replace(/_/g, ' ').toLowerCase()}</Badge>
 }
@@ -65,7 +65,7 @@ export function OrderDetail({ order }: OrderDetailProps) {
 
   const address = order.delivery_address as { name?: string; phone?: string; address_line1?: string; city?: string; pincode?: string } | null
   const timeline = [...(order.order_status_history || [])].sort((a, b) =>
-    new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime()
+    new Date(a.changed_at || 0).getTime() - new Date(b.changed_at || 0).getTime()
   )
 
   return (
@@ -98,24 +98,24 @@ export function OrderDetail({ order }: OrderDetailProps) {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Package className="size-4" />Items
+                <Package className="size-4" />Products
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y">
-                {order.order_items.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 p-4">
-                    {item.items?.images?.[0] && (
-                      <img src={item.items.images[0]} alt={item.items?.name || ''} className="size-12 rounded object-cover" />
+                {order.order_products.map((product) => (
+                  <div key={product.id} className="flex items-center gap-4 p-4">
+                    {product.products?.images?.[0] && (
+                      <img src={product.products.images[0]} alt={product.products?.name || ''} className="size-12 rounded object-cover" />
                     )}
                     <div className="flex-1">
-                      <p className="font-medium">{item.items?.name}</p>
-                      <p className="text-sm text-zinc-500">Qty: {item.quantity} × {formatCurrency(item.unit_price ?? 0)}</p>
-                      {item.personalization_details && (
+                      <p className="font-medium">{product.products?.name}</p>
+                      <p className="text-sm text-zinc-500">Qty: {product.quantity} × {formatCurrency(product.unit_price ?? 0)}</p>
+                      {product.personalization_details && (
                         <Badge variant="secondary" className="mt-1 text-xs">Personalized</Badge>
                       )}
                     </div>
-                    <p className="font-semibold">{formatCurrency(item.total_price ?? item.unit_price * item.quantity)}</p>
+                    <p className="font-semibold">{formatCurrency(product.total_price ?? product.unit_price * product.quantity)}</p>
                   </div>
                 ))}
               </div>
@@ -137,9 +137,13 @@ export function OrderDetail({ order }: OrderDetailProps) {
                       <div className={`absolute -left-6 top-1 size-[18px] rounded-full border-2 ${i === timeline.length - 1 ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-zinc-300'
                         }`} />
                       <div>
-                        <p className="font-medium capitalize">{(entry.type ?? entry.title ?? '').toLowerCase().replace(/_/g, ' ')}</p>
-                        <p className="text-xs text-zinc-500">{formatDate(entry.created_at)}</p>
-                        {entry.description && <p className="text-sm text-zinc-600 mt-1">{entry.description}</p>}
+                        <p className="font-medium capitalize">{entry.status.toLowerCase().replace(/_/g, ' ')}</p>
+                        <p className="text-xs text-zinc-500">{formatDate(entry.changed_at)}</p>
+                        {entry.metadata && (
+                          <pre className="text-[10px] text-zinc-600 mt-1 bg-zinc-50 p-1 rounded max-w-full overflow-hidden">
+                            {JSON.stringify(entry.metadata, null, 2)}
+                          </pre>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -148,48 +152,6 @@ export function OrderDetail({ order }: OrderDetailProps) {
             </Card>
           )}
 
-          {order.order_personalization.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium">Personalization</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {order.order_personalization.map((p, idx) => {
-                  const item = order.order_items.find(oi => oi.id === p.order_item_id);
-                  return (
-                    <div key={`${p.order_id}-${p.item_index}-${idx}`} className="space-y-2 pb-4 border-b last:border-0 last:pb-0">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-zinc-900">
-                            {item?.items?.name || `Item ${p.item_index + 1}`}
-                          </p>
-                          <Badge variant={p.approved_at ? 'default' : 'secondary'}>
-                            {p.approved_at ? 'Approved' : p.status || p.preview_version != null ? 'Preview ready' : 'Pending'}
-                          </Badge>
-                        </div>
-                        <span className="text-xs text-zinc-500">
-                          {p.revision_count || 0} revision(s)
-                        </span>
-                      </div>
-
-                      {item?.personalization_details && (
-                        <div className="text-xs text-zinc-600 bg-zinc-50 p-2 rounded">
-                          <pre className="whitespace-pre-wrap">{JSON.stringify(item.personalization_details, null, 2)}</pre>
-                        </div>
-                      )}
-
-                      {p.preview_url && (
-                        <div className="mt-2">
-                          <p className="text-xs text-zinc-500 mb-1 font-bold">LATEST PREVIEW</p>
-                          <img src={p.preview_url} alt="Preview" className="max-w-[200px] rounded border shadow-sm" />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          )}
         </div>
 
         <div className="space-y-6">
@@ -209,12 +171,12 @@ export function OrderDetail({ order }: OrderDetailProps) {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Store className="size-4" />Partner
+                <Store className="size-4" />Vendor
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-1">
-              <p className="font-medium">{order.partners?.business_name || 'Unknown'}</p>
-              {order.partners?.phone && <p className="text-zinc-500 font-mono">{order.partners.phone}</p>}
+              <p className="font-medium">{order.vendors?.business_name || 'Unknown'}</p>
+              {order.vendors?.phone && <p className="text-zinc-500 font-mono">{order.vendors.phone}</p>}
             </CardContent>
           </Card>
 

@@ -38,14 +38,14 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   y += 10;
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Partner: ${order.partner?.name || 'N/A'}`, margin, y);
+  doc.text(`Vendor: ${order.vendor?.name || 'N/A'}`, margin, y);
   y += 7;
   doc.text(`Order Number: ${order.order_number}`, margin, y);
   y += 7;
   doc.text(`Date: ${new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`, margin, y);
 
   y += 15;
-  // Items Table Header
+  // Products Table Header
   doc.setFont('helvetica', 'bold');
   doc.text('Item', margin, y);
   doc.text('Qty', 140, y, { align: 'right' });
@@ -56,13 +56,13 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   doc.line(margin, y, 190, y);
   y += 10;
 
-  // Items
+  // Products
   doc.setFont('helvetica', 'normal');
-  (order.order_items || []).forEach((item: any) => {
-    doc.text((item.item_name || 'Item').substring(0, 40), margin, y);
-    doc.text((item.quantity || 1).toString(), 140, y, { align: 'right' });
-    doc.text(`Rs ${Number(item.unit_price || 0).toFixed(2)}`, 165, y, { align: 'right' });
-    doc.text(`Rs ${Number(item.total_price || 0).toFixed(2)}`, 190, y, { align: 'right' });
+  (order.order_products || []).forEach((product: any) => {
+    doc.text((product.product_name || 'Item').substring(0, 40), margin, y);
+    doc.text((product.quantity || 1).toString(), 140, y, { align: 'right' });
+    doc.text(`Rs ${Number(product.unit_price || 0).toFixed(2)}`, 165, y, { align: 'right' });
+    doc.text(`Rs ${Number(product.total_price || 0).toFixed(2)}`, 190, y, { align: 'right' });
     y += 8;
   });
 
@@ -94,7 +94,7 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   return doc.output('blob');
 }
 
-export function generateGSTINPDF(order: OrderForPDF, partner: PartnerForPDF): Blob {
+export function generateGSTINPDF(order: OrderForPDF, vendor: PartnerForPDF): Blob {
   const doc = new jsPDF();
   const margin = 20;
   let y = margin;
@@ -115,7 +115,7 @@ export function generateGSTINPDF(order: OrderForPDF, partner: PartnerForPDF): Bl
   doc.text('GST Identification Number', 105, y + 12, { align: 'center' });
   doc.setFontSize(24);
   doc.setTextColor(197, 160, 89);
-  doc.text(partner.gstin || 'APPLIED FOR', 105, y + 28, { align: 'center' });
+  doc.text(vendor.gstin || 'APPLIED FOR', 105, y + 28, { align: 'center' });
 
   y += 60;
   doc.setFontSize(12);
@@ -123,8 +123,8 @@ export function generateGSTINPDF(order: OrderForPDF, partner: PartnerForPDF): Bl
   doc.setFont('helvetica', 'normal');
 
   const details = [
-    ['Partner Name:', partner.name],
-    ['Business Type:', partner.business_type || 'N/A'],
+    ['Vendor Name:', vendor.name],
+    ['Business Type:', vendor.business_type || 'N/A'],
     ['Order Number:', order.order_number],
     ['Order Date:', new Date(order.created_at).toLocaleDateString('en-IN')],
     ['Total Amount:', `Rs ${Number(order.total || 0).toFixed(2)}`]

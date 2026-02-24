@@ -10,7 +10,7 @@ export default async function CheckoutPage() {
     const checkoutData = await getCheckoutData();
 
     // If cart is empty, send back to home
-    if (!checkoutData.items || checkoutData.items.length === 0) {
+    if (!checkoutData.products || checkoutData.products.length === 0) {
         redirect('/');
     }
 

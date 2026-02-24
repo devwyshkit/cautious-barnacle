@@ -15,7 +15,7 @@ export function SearchSkeleton() {
 
       {/* Results Skeleton */}
       <div className="flex-1 overflow-y-auto p-4 space-y-8">
-        {/* Partners Section Skeleton */}
+        {/* Vendors Section Skeleton */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <Skeleton className="h-4 w-20 rounded-full" />
@@ -35,7 +35,7 @@ export function SearchSkeleton() {
           </div>
         </div>
 
-        {/* Items Section Skeleton */}
+        {/* Products Section Skeleton */}
         <div className="space-y-4">
           <Skeleton className="h-4 w-16 rounded-full" />
           <div className="space-y-3">

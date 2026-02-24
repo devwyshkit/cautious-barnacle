@@ -8,13 +8,10 @@ async function getOrder(id: string) {
     .from('orders')
     .select(`
       *,
-      partners(business_name, email),
+      vendors(business_name, email),
       users(full_name, phone, email),
-      order_items(*, items(name, images)),
-      order_status_history(id, title, description, type, created_at),
-      deliveries(*, delivery_updates(*)),
-      order_personalization(*),
-      order_personalization(*)
+      order_products(*, products(name, images)),
+      order_status_history(id, status, changed_at, metadata, order_id)
     `)
     .eq('id', id)
     .single()

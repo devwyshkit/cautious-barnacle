@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 /**
  * WYSHKIT 2026: Lazy load Razorpay SDK only when payment slot expands
  * Section 3 Pattern 4: Progressive Disclosure
- * Section 10 Performance Budgets: Third-party scripts = 0 on item grid page
+ * Section 10 Performance Budgets: Third-party scripts = 0 on product grid page
  */
 export function useRazorpay() {
   const [isLoaded, setIsLoaded] = useState(false);

@@ -91,7 +91,7 @@ export function CategoryList({ categories }: CategoryListProps) {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add category</DialogTitle>
-              <DialogDescription>Create a new item category</DialogDescription>
+              <DialogDescription>Create a new product category</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 pt-4">
               <Input
@@ -145,7 +145,7 @@ export function CategoryList({ categories }: CategoryListProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete category?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. Items in this category will need to be reassigned.
+              This action cannot be undone. Products in this category will need to be reassigned.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -17,23 +17,36 @@ export default async function OrdersPage() {
     // WYSHKIT 2026: Direct lookup on orders table
     const { data: dbOrders, error } = await supabase
         .from('orders')
-        .select('id, order_number, status, total, created_at, delivery_address, has_personalization, personalization_status, partners(name, image_url), order_items(item_name)')
+        .select('id, order_number, status, total, created_at, delivery_address, has_personalization, vendors(name, image_url), order_products(product_name, personalization_details)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
 
     // Map DB orders to OrderListItem for the component
-    const mappedOrders = ((dbOrders as any[]) || []).map((row) => ({
-        ...row,
-        order_number: row.order_number ?? null,
-        created_at: row.created_at ?? null,
-        partner_name: row.partners?.name ?? null,
-        item_count: row.order_items?.length || 1,
-        first_item_image: row.partners?.image_url ?? null,
-        first_item_name: row.order_items?.[0]?.item_name || null,
-        has_personalization: row.has_personalization || false,
-        personalization_status: row.personalization_status || null,
-    }));
+    const mappedOrders = ((dbOrders as any[]) || []).map((row) => {
+        let p_status = null;
+        if (row.has_personalization && row.order_products) {
+            const hasSubmitted = row.order_products.some((i: any) => i.personalization_details?.text || i.personalization_details?.image_url);
+            const isPreviewReady = row.order_products.some((i: any) => i.personalization_details?.preview_ready);
+            const isApproved = row.order_products.every((i: any) => i.personalization_details?.approved || !i.personalization_details);
+
+            if (isApproved) p_status = 'approved';
+            else if (isPreviewReady) p_status = 'preview_ready';
+            else if (hasSubmitted) p_status = 'submitted';
+            else p_status = 'pending';
+        }
+
+        return {
+            ...row,
+            order_number: row.order_number ?? null,
+            created_at: row.created_at ?? null,
+            vendor_name: row.vendors?.name ?? null,
+            item_count: row.order_products?.length || 1,
+            first_product_name: row.vendors?.image_url || row.order_products?.[0]?.product_name || null,
+            has_personalization: row.has_personalization || false,
+            personalization_status: p_status,
+        };
+    });
 
 
     return (

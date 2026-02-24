@@ -1,20 +1,20 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { PartnerStorePage } from '@/components/customer/PartnerStorePage';
-import { getPartnerStoreData } from '@/lib/actions/discovery/partners';
-import { PartnerSkeleton } from '@/components/customer/PartnerSkeleton';
-import { MappedPartner } from '@/lib/types/partner';
+import { VendorStorePage } from '@/components/customer/VendorStorePage';
+import { getPartnerStoreData } from '@/lib/actions/discovery/vendors';
+import { VendorSkeleton } from '@/components/customer/VendorSkeleton';
+import { MappedPartner } from '@/lib/types/vendor';
 
 
 /**
- * WYSHKIT 2026: Partner Store Page
- * Route: /partner/[id]
- * Section 3 Pattern 1: Intercepting Routes - Base route for partner store
+ * WYSHKIT 2026: Vendor Store Page
+ * Route: /vendor/[id]
+ * Section 3 Pattern 1: Intercepting Routes - Base route for vendor store
  * 
- * When user navigates to /partner/[id], this renders the partner store.
- * Items within this store use intercepting routes to show as modals.
+ * When user navigates to /vendor/[id], this renders the vendor store.
+ * Products within this store use intercepting routes to show as modals.
  * 
- * WYSHKIT 2026: Server-First Data Fetching - Fetch partner + items in parallel
+ * WYSHKIT 2026: Server-First Data Fetching - Fetch vendor + products in parallel
  * 
  * Swiggy 2026 Pattern: Server-First Architecture
  * - Data fetched server-side in parallel before render
@@ -38,7 +38,7 @@ export default async function PartnerPage({
 
   return (
     <div className="min-h-screen">
-      <Suspense fallback={<PartnerSkeleton />}>
+      <Suspense fallback={<VendorSkeleton />}>
         <AsyncPartnerContent id={id} category={category} />
       </Suspense>
     </div>
@@ -46,17 +46,17 @@ export default async function PartnerPage({
 }
 
 async function AsyncPartnerContent({ id, category }: { id: string; category?: string }) {
-  const { partner, items, itemsGroupedByCategory, categories, error } = await getPartnerStoreData(id, category);
+  const { vendor, products, itemsGroupedByCategory, categories, error } = await getPartnerStoreData(id, category);
 
-  if (!partner || error) {
+  if (!vendor || error) {
     notFound();
   }
 
   return (
-    <PartnerStorePage
+    <VendorStorePage
       partnerId={id}
-      initialData={(partner as unknown) as MappedPartner}
-      items={items}
+      initialData={(vendor as unknown) as MappedPartner}
+      products={products}
       itemsGroupedByCategory={itemsGroupedByCategory}
       categories={categories}
     />

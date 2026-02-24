@@ -14,7 +14,7 @@ import { formatCurrency } from '@/lib/utils/pricing';
 const FALLBACK_IMAGE = '/images/logo.png';
 
 interface DraftSummaryBlockProps {
-  items: DraftLineItem[];
+  products: DraftLineItem[];
   onUpdateQuantity?: (itemId: string, variantId: string | null, quantity: number) => void;
   onRemoveItem?: (itemId: string, variantId: string | null) => void;
   editable?: boolean;
@@ -23,9 +23,9 @@ interface DraftSummaryBlockProps {
 /**
  * WYSHKIT 2026: Estimate download in Bill Summary accordion
  */
-export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, editable = true }: DraftSummaryBlockProps) {
+export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, editable = true }: DraftSummaryBlockProps) {
   const router = useRouter();
-  if (items.length === 0) return null;
+  if (products.length === 0) return null;
 
   const handleQuantityChange = (itemId: string, variantId: string | null, currentQty: number, delta: number) => {
     triggerHaptic(HapticPattern.ACTION);
@@ -37,26 +37,26 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
     }
   };
 
-  const hasPersonalized = items.some((item) => item.personalization?.enabled);
+  const hasPersonalized = products.some((product) => product.personalization?.enabled);
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <label className="text-xs font-black tracking-tight text-zinc-900 border-l-2 border-[var(--primary)] pl-2">Your order</label>
-        <span className="text-[11px] font-bold text-zinc-500 tabular-nums">{items.length} item{items.length > 1 ? 's' : ''}</span>
+        <span className="text-[11px] font-bold text-zinc-500 tabular-nums">{products.length} product{products.length > 1 ? 's' : ''}</span>
       </div>
 
       <div className="space-y-1.5">
-        {items.map((item) => {
-          const totalPrice = item.line_total;
-          const unitPrice = item.unit_price;
+        {products.map((product) => {
+          const totalPrice = product.line_total;
+          const unitPrice = product.unit_price;
 
           return (
-            <div key={`${item.item_id}-${item.variant_id}`} className="flex gap-2.5 p-2 bg-zinc-50/50 rounded-lg">
+            <div key={product.id} className="flex gap-2.5 p-2 bg-zinc-50/50 rounded-lg">
               <div className="relative size-14 bg-white rounded-lg overflow-hidden shrink-0 border border-zinc-100">
                 <Image
-                  src={item.item_image || FALLBACK_IMAGE}
-                  alt={item.item_name || ''}
+                  src={product.product_image || FALLBACK_IMAGE}
+                  alt={product.product_name || ''}
                   fill
                   className="object-cover"
                   sizes="56px"
@@ -66,10 +66,10 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <h4 className="text-[13px] font-medium text-zinc-900 truncate leading-tight">
-                      {item.item_name}
+                      {product.product_name}
                     </h4>
-                    {item.variant_name && (
-                      <p className="text-xs text-zinc-500 font-medium mt-0.5">{item.variant_name}</p>
+                    {product.variant_name && (
+                      <p className="text-xs text-zinc-500 font-medium mt-0.5">{product.variant_name}</p>
                     )}
                   </div>
                   <span className="text-[13px] font-semibold text-zinc-900 tabular-nums shrink-0">
@@ -83,21 +83,21 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                   {editable && onUpdateQuantity && onRemoveItem ? (
                     <div className="flex items-center gap-0.5">
                       <button
-                        onClick={() => handleQuantityChange(item.item_id || '', item.variant_id, item.quantity, -1)}
+                        onClick={() => handleQuantityChange(product.product_id || '', product.variant_id ?? null, product.quantity, -1)}
                         className={cn(
                           "size-6 flex items-center justify-center rounded-md transition-colors",
-                          item.quantity === 1
+                          product.quantity === 1
                             ? "bg-amber-50 text-[var(--primary)] hover:bg-amber-100"
                             : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                         )}
                       >
-                        {item.quantity === 1 ? <Trash2 className="size-3" /> : <Minus className="size-3" />}
+                        {product.quantity === 1 ? <Trash2 className="size-3" /> : <Minus className="size-3" />}
                       </button>
                       <span className="w-6 text-center text-xs font-semibold text-zinc-900 tabular-nums">
-                        {item.quantity}
+                        {product.quantity}
                       </span>
                       <button
-                        onClick={() => handleQuantityChange(item.item_id || '', item.variant_id, item.quantity, 1)}
+                        onClick={() => handleQuantityChange(product.product_id || '', product.variant_id ?? null, product.quantity, 1)}
                         className="size-6 flex items-center justify-center rounded-md bg-zinc-100 text-zinc-600 hover:bg-zinc-200 transition-colors"
                       >
                         <Plus className="size-3" />
@@ -105,35 +105,35 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
                     </div>
                   ) : (
                     <span className="text-[11px] font-bold text-zinc-950 tracking-tighter">
-                      Qty: {item.quantity}
+                      Qty: {product.quantity}
                     </span>
                   )}
                 </div>
 
                 <div className="mt-1 flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    {item.personalization?.enabled ? (
+                    {product.personalization?.enabled ? (
                       <div className="flex items-center gap-1 text-[11px] font-medium text-amber-600">
                         <ShieldAlert className="size-2.5" />
                         <span>Personalized</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1 text-[11px] font-black text-zinc-400 tracking-tighter">
-                        <span>Standard Item</span>
+                        <span>Standard Product</span>
                       </div>
                     )}
                   </div>
                   {editable && (
                     <button
                       onClick={() => {
-                        const partnerId = item.partner_id || '';
-                        const addonIds = (item.selected_addons || []).map((a: any) => a.id).join(',');
-                        router.push(`/store/${partnerId}/item/${item.item_id}?edit=true&cartItemId=${item.id}&variantId=${item.variant_id || ''}&quantity=${item.quantity}&addons=${addonIds}`);
+                        const partnerId = product.vendor_id || '';
+                        const addonIds = (product.selected_addons || []).map((a: any) => a.id).join(',');
+                        router.push(`/store/${partnerId}/product/${product.product_id}?edit=true&cartItemId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${addonIds}`);
                       }}
                       className="text-[11px] font-bold text-[var(--primary)] flex items-center gap-0.5 hover:underline"
                     >
                       <Edit3 className="size-2.5" />
-                      Edit Item
+                      Edit Product
                     </button>
                   )}
                 </div>
@@ -147,7 +147,7 @@ export function DraftSummaryBlock({ items, onUpdateQuantity, onRemoveItem, edita
         <div className="p-2 rounded-lg bg-amber-50/50 border border-amber-100/50 flex items-start gap-2">
           <ShieldAlert className="size-3.5 text-amber-600 shrink-0 mt-0.5" />
           <p className="text-xs font-medium text-amber-800 leading-normal">
-            Personalized items are non-returnable. Refunds only for damaged goods.
+            Personalized products are non-returnable. Refunds only for damaged goods.
           </p>
         </div>
       )}

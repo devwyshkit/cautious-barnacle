@@ -20,7 +20,7 @@ export function IdentitySuccessState({ onClose }: IdentitySuccessStateProps) {
             <div className="space-y-2">
                 <h2 className="text-2xl font-black text-zinc-900 tracking-tight">Mission Started!</h2>
                 <p className="text-zinc-500 text-sm max-w-[280px] font-medium leading-relaxed">
-                    Your vision is being transmitted to our partner. We'll alert you as soon as the preview is ready.
+                    Your vision is being transmitted to our vendor. We'll alert you as soon as the preview is ready.
                 </p>
             </div>
             <div className="pt-8">

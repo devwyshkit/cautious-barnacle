@@ -16,13 +16,13 @@ interface StoreHeaderProps {
         image_url?: string;
         rating?: number;
         city?: string;
-        prep_hours?: number;
+        prep_mins?: number;
     };
 }
 
 export function StoreHeader({ data }: StoreHeaderProps) {
     const router = useRouter();
-    const prepTimeText = formatPrepTime(data.prep_hours || 0.75);
+    const prepTimeText = formatPrepTime(data.prep_mins || 45);
 
     return (
         <div className="relative w-full bg-white pb-4">

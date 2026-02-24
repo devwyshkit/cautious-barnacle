@@ -12,13 +12,13 @@ import { z } from 'zod'
 
 const AdminIntentSchema = z.discriminatedUnion('entity', [
     z.object({
-        entity: z.literal('partner'),
+        entity: z.literal('vendor'),
         action: z.enum(['APPROVE_KYC', 'REJECT_KYC', 'TOGGLE_STATUS', 'UPDATE_COMMISSION']),
         id: z.string().uuid(),
         metadata: z.any().optional()
     }),
     z.object({
-        entity: z.literal('item'),
+        entity: z.literal('product'),
         action: z.enum(['APPROVE', 'REJECT', 'TOGGLE_STATUS', 'TOGGLE_SPONSORED', 'BULK_APPROVE']),
         ids: z.array(z.string().uuid()),
         metadata: z.any().optional()
@@ -47,11 +47,6 @@ const AdminIntentSchema = z.discriminatedUnion('entity', [
         action: z.enum(['ADD', 'TOGGLE_STATUS', 'DELETE']),
         id: z.string().uuid().optional(),
         metadata: z.any().optional()
-    }),
-    z.object({
-        entity: z.literal('payout'),
-        action: z.enum(['PROCESS']),
-        id: z.string().uuid()
     }),
     z.object({
         entity: z.literal('return'),
@@ -100,8 +95,8 @@ export async function executeAdminIntent(intent: AdminIntent) {
 
         // Frontend Cache Freshness
         switch (validated.entity) {
-            case 'partner': revalidatePath('/admin/partners'); break;
-            case 'item': revalidatePath('/admin/catalog'); revalidatePath('/'); break;
+            case 'vendor': revalidatePath('/admin/vendors'); break;
+            case 'product': revalidatePath('/admin/catalog'); revalidatePath('/'); break;
             case 'order': revalidatePath('/admin/orders'); break;
             case 'category': revalidatePath('/admin/categories'); break;
             case 'coupon': revalidatePath('/admin/coupons'); break;

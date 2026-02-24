@@ -71,7 +71,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
         <EmptyState
           title="No orders yet"
           description="Looks like you haven't placed any orders yet. Start browsing!"
-          actionLabel="Browse items"
+          actionLabel="Browse products"
           onAction={() => router.push("/")}
         >
           <div className="size-16 rounded-xl bg-zinc-50 flex items-center justify-center mb-4">

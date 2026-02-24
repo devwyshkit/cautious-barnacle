@@ -10,7 +10,7 @@ import { SubmittedIdentity } from './tracking/SubmittedIdentity';
 
 interface PreviewOrderItemContext {
     personalization_details: Record<string, unknown>;
-    item_name: string;
+    product_name: string;
 }
 
 interface PreviewApprovalProps {
@@ -73,7 +73,7 @@ export function PreviewApproval({
                         <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-300">
                             <SubmittedIdentity
                                 details={orderItem.personalization_details as any}
-                                itemName={orderItem.item_name}
+                                itemName={orderItem.product_name}
                             />
                         </div>
                     )}
@@ -99,7 +99,7 @@ export function PreviewApproval({
                                 <span className="text-xs">🧑‍🎨</span>
                             </div>
                             <div className="space-y-0.5">
-                                <span className="text-xs font-black tracking-tight text-zinc-400">Partner Note</span>
+                                <span className="text-xs font-black tracking-tight text-zinc-400">Vendor Note</span>
                                 <p className="text-sm font-medium text-zinc-900 leading-snug">
                                     "{preview.partner_notes}"
                                 </p>

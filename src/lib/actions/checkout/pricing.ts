@@ -13,7 +13,7 @@ import { logger } from '@/lib/logging/logger';
  */
 export async function calculateOrderTotalRPC(
   cartItems: Array<{
-    item_id: string;
+    product_id: string;
     quantity: number;
     variant_id?: string | null;
     personalization_option_id?: string | null;
@@ -31,13 +31,13 @@ export async function calculateOrderTotalRPC(
     const supabase = await createClient();
 
     const { data, error } = await supabase.rpc('calculate_order_total', {
-      p_cart_items: cartItems.map(item => ({
-        item_id: item.item_id,
-        quantity: item.quantity,
-        variant_id: item.variant_id ?? null,
-        personalization_option_id: item.personalization_option_id ?? null,
-        has_personalization: item.has_personalization ?? false,
-        selected_addons: item.selected_addons ?? []
+      p_items: cartItems.map(product => ({
+        product_id: product.product_id,
+        quantity: product.quantity,
+        variant_id: product.variant_id ?? null,
+        personalization_option_id: product.personalization_option_id ?? null,
+        has_personalization: product.has_personalization ?? false,
+        selected_addons: product.selected_addons ?? []
       })) as unknown as Json,
       p_delivery_fee_override: deliveryFeeOverride ?? undefined,
       p_address_id: addressId || undefined,

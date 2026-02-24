@@ -11,13 +11,13 @@ interface DocumentData {
     order_number?: string;
     date: string;
     cart?: Cart; // For checkout estimates
-    order_items?: OrderItemDetail[]; // For post-order documents
+    order_products?: OrderItemDetail[]; // For post-order documents
     gstin?: string;
     customer_name?: string;
     business_name?: string;
     billing_address?: Address | null;
     shipping_address?: Address | null;
-    partner: {
+    vendor: {
         name: string;
         address: string;
         gstin?: string;
@@ -54,18 +54,18 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     const col2 = pageWidth / 2 + 5;
     const startY = y;
 
-    // Left: SOLD BY (Partner)
+    // Left: SOLD BY (Vendor)
     doc.setFont('helvetica', 'bold');
     doc.text('SOLD BY:', col1, y);
     doc.setFont('helvetica', 'normal');
     y += 5;
-    doc.text(data.partner.name, col1, y);
+    doc.text(data.vendor.name, col1, y);
     y += 5;
-    const partnerAddress = doc.splitTextToSize(data.partner.address, (pageWidth / 2) - 20);
+    const partnerAddress = doc.splitTextToSize(data.vendor.address, (pageWidth / 2) - 20);
     doc.text(partnerAddress, col1, y);
     y += (partnerAddress.length * 5);
-    if (data.partner.gstin) doc.text(`GSTIN: ${data.partner.gstin}`, col1, y += 5);
-    if (data.partner.phone) doc.text(`Phone: ${data.partner.phone}`, col1, y += 5);
+    if (data.vendor.gstin) doc.text(`GSTIN: ${data.vendor.gstin}`, col1, y += 5);
+    if (data.vendor.phone) doc.text(`Phone: ${data.vendor.phone}`, col1, y += 5);
 
     // Right: BILL TO
     let y2 = startY;
@@ -104,16 +104,16 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     y += 10;
 
     // Table
-    const items = data.order_items || data.cart?.items || [];
-    const tableBody = items.map(item => {
-        const itemName = item.item_name || 'Product';
-        const quantity = item.quantity || 1;
-        const unitPrice = item.unit_price || 0;
-        const totalPrice = (item as any).total_price || (item as any).line_total || 0;
+    const products = data.order_products || data.cart?.products || [];
+    const tableBody = products.map(product => {
+        const itemName = (product as any).product_name || (product as any).product_name || 'Item';
+        const quantity = product.quantity || 1;
+        const unitPrice = product.unit_price || 0;
+        const totalPrice = (product as any).total_price || (product as any).line_total || 0;
 
         return [
             itemName,
-            (item as any).hsn_code || '6912',
+            (product as any).hsn_code || '6912',
             quantity,
             `₹${unitPrice}`,
             `₹${totalPrice}`

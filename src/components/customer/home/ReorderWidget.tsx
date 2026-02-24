@@ -15,9 +15,9 @@ import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 interface RecentOrder {
   id: string;
   order_number: string;
-  items: Array<{
-    item_id: string;
-    item_name: string;
+  products: Array<{
+    product_id: string;
+    product_name: string;
     quantity: number;
     images?: string[];
     variant_id?: string;
@@ -28,7 +28,7 @@ interface RecentOrder {
   }>;
   total: number;
   created_at: string;
-  partner_name?: string;
+  vendor_name?: string;
 }
 
 interface ReorderWidgetProps {
@@ -56,41 +56,41 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
         .from('orders')
         .select(`
           id, order_number, total, created_at,
-          partners(name),
-          order_items(item_id, item_name, quantity, variant_id, items(images))
+          vendors(name),
+          order_products(product_id, product_name, quantity, variant_id, products(images))
         `)
         .eq('user_id', user.id)
-        .in('status', ['DELIVERED', 'DISPATCHED', 'PACKED', 'APPROVED', 'IN_PRODUCTION'])
+        .in('status', ['DELIVERED', 'OUT_FOR_DELIVERY', 'PACKED', 'IN_PRODUCTION'])
         .order('created_at', { ascending: false })
         .limit(3);
 
       if (!error && data) {
         const mappedData: RecentOrder[] = data.map((row: any) => ({
           ...row,
-          partner_name: row.partners?.name,
-          items: (row.order_items || []).map((oi: any) => ({
-            item_id: oi.item_id,
-            item_name: oi.item_name,
+          vendor_name: row.vendors?.name,
+          products: (row.order_products || []).map((oi: any) => ({
+            product_id: oi.product_id,
+            product_name: oi.product_name,
             quantity: oi.quantity,
-            images: oi.items?.images || [],
+            images: oi.products?.images || [],
             variant_id: oi.variant_id
           }))
         }));
         setRecentOrders(mappedData);
 
-        // Fetch current stock for these items
-        const itemIds = Array.from(new Set(mappedData.flatMap(order => order.items.map((i: any) => i.item_id))));
+        // Fetch current stock for these products
+        const itemIds = Array.from(new Set(mappedData.flatMap(order => order.products.map((i: any) => i.product_id))));
         if (itemIds.length > 0) {
           const { data: stockData } = await supabase
-            .from('items')
+            .from('products')
             .select('id, name, stock_quantity, is_active')
             .in('id', itemIds);
 
           if (stockData) {
-            const availability = (stockData as any[]).reduce((acc, item) => {
-              acc[item.id] = {
-                inStock: item.is_active && item.stock_quantity > 0,
-                name: item.name
+            const availability = (stockData as any[]).reduce((acc, product) => {
+              acc[product.id] = {
+                inStock: product.is_active && product.stock_quantity > 0,
+                name: product.name
               };
               return acc;
             }, {});
@@ -105,7 +105,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
   }, [user]);
 
   const handleReorder = async (order: RecentOrder) => {
-    if (!order.items || order.items.length === 0) return;
+    if (!order.products || order.products.length === 0) return;
 
     // WYSHKIT 2026: Momentum Haptic
     triggerHaptic(HapticPattern.ACTION);
@@ -113,41 +113,41 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
     setReorderingId(order.id);
 
     try {
-      for (const item of order.items) {
+      for (const product of order.products) {
         const result = await addToDraftOrder(
-          item.item_id,
-          item.variant_id || null,
-          item.personalization || { enabled: false },
+          product.product_id,
+          product.variant_id || null,
+          product.personalization || { enabled: false },
           [],
-          item.quantity,
+          product.quantity,
           {
-            item_name: item.item_name,
-            item_image: item.images?.[0],
+            product_name: product.product_name,
+            product_image: product.images?.[0],
             unit_price: 0,
-            partner_name: order.partner_name,
+            vendor_name: order.vendor_name,
           }
         );
 
         if (result?.error) {
-          // Swiggy 2026: Stop early on error (like PARTNER_MISMATCH or OUT_OF_STOCK)
+          // Swiggy 2026: Stop early on error (like VENDOR_MISMATCH or OUT_OF_STOCK)
           if (result.code === 'OUT_OF_STOCK') {
             toast.error(result.error);
             return;
           }
-          if (result.code !== 'PARTNER_MISMATCH') {
-            toast.error(result.error || 'Failed to add some items');
+          if (result.code !== 'VENDOR_MISMATCH') {
+            toast.error(result.error || 'Failed to add some products');
             return;
           }
           // If mismatch, the dialog is shown by CartProvider, we should stop our loop
           return;
         }
       }
-      toast.success('Items added to cart!');
-      logger.info('Reorder successful', { orderId: order.id, itemCount: order.items.length });
+      toast.success('Products added to cart!');
+      logger.info('Reorder successful', { orderId: order.id, itemCount: order.products.length });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('Reorder failed', error, { orderId: order.id, itemCount: order.items.length });
-      toast.error('Failed to add items. Please try again.');
+      logger.error('Reorder failed', error, { orderId: order.id, itemCount: order.products.length });
+      toast.error('Failed to add products. Please try again.');
     } finally {
       setReorderingId(null);
     }
@@ -194,12 +194,12 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
 
       <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2">
         {recentOrders.map((order, index) => {
-          const firstItem = order.items?.[0];
-          const itemCount = order.items?.length || 0;
+          const firstItem = order.products?.[0];
+          const itemCount = order.products?.length || 0;
           const isReordering = reorderingId === order.id;
-          const hasPersonalization = hasAnyPersonalization(order.items || []);
+          const hasPersonalization = hasAnyPersonalization(order.products || []);
 
-          const isOrderAvailable = order.items?.every(item => itemAvailability[item.item_id]?.inStock ?? true);
+          const isOrderAvailable = order.products?.every(product => itemAvailability[product.product_id]?.inStock ?? true);
 
           return (
             <button
@@ -220,7 +220,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
                   {firstItem?.images?.[0] ? (
                     <Image
                       src={firstItem.images[0]}
-                      alt={firstItem.item_name || 'Order item'}
+                      alt={firstItem.product_name || 'Order product'}
                       fill
                       className="object-cover"
                       sizes="80px"
@@ -242,15 +242,15 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
                     <Clock className="size-3" />
                     <span>{formatDate(order.created_at)}</span>
                     <span>•</span>
-                    <span className="truncate">{order.partner_name}</span>
+                    <span className="truncate">{order.vendor_name}</span>
                   </div>
 
                   <p className="text-sm font-semibold text-zinc-900 truncate">
-                    {firstItem?.item_name || 'Order'}
+                    {firstItem?.product_name || 'Order'}
                   </p>
                   {itemCount > 1 && (
                     <p className="text-[11px] text-zinc-500">
-                      +{itemCount - 1} more item{itemCount > 2 ? 's' : ''}
+                      +{itemCount - 1} more product{itemCount > 2 ? 's' : ''}
                     </p>
                   )}
 

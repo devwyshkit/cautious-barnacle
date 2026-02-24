@@ -27,16 +27,16 @@ export function StatusCard({ order }: StatusCardProps) {
         }
 
         // If it has a specific deadline from DB, use it
-        if (order.design_deadline_at) {
-            setDeadline(order.design_deadline_at);
+        if (order.promised_delivery_at) {
+            setDeadline(order.promised_delivery_at);
             return;
         }
 
-        // Fallback to createdAt based SLA: use prep_hours if available from partner
+        // Fallback to createdAt based SLA: use prep_mins if available from vendor
         const createdAt = new Date(order.created_at || Date.now()).getTime();
-        const prepMins = ((order as any).partners?.prep_hours || (order.has_personalization ? 2 : 0.5)) * 60;
+        const prepMins = (order as any).vendors?.prep_mins || (order.has_personalization ? 120 : 30);
         setDeadline(new Date(createdAt + prepMins * 60000).toISOString());
-    }, [order?.status, order?.created_at, order?.has_personalization, order?.design_deadline_at]);
+    }, [order?.status, order?.created_at, order?.has_personalization, order?.promised_delivery_at]);
 
     const handleShare = async () => {
         if (!navigator.share) {
@@ -74,11 +74,10 @@ export function StatusCard({ order }: StatusCardProps) {
     function getStatusText(status: string) {
         const map: Record<string, string> = {
             [ORDER_STATUS.PLACED]: 'Order placed',
-            [ORDER_STATUS.CONFIRMED]: 'Partner confirmed',
+            [ORDER_STATUS.CONFIRMED]: 'Vendor accepted',
             [ORDER_STATUS.IN_PRODUCTION]: 'Crafting now',
             [ORDER_STATUS.PACKED]: 'Ready to fly',
-            [ORDER_STATUS.DISPATCHED]: 'On the way',
-            [ORDER_STATUS.OUT_FOR_DELIVERY]: 'Arriving shortly',
+            [ORDER_STATUS.OUT_FOR_DELIVERY]: 'On the way',
             [ORDER_STATUS.DELIVERED]: 'Delivered',
         };
         return map[status] || status.replace(/_/g, ' ').toLowerCase();
@@ -87,12 +86,12 @@ export function StatusCard({ order }: StatusCardProps) {
     function getNextStep(status: string, hasPersonalization: boolean = false) {
         switch (status) {
             case ORDER_STATUS.PLACED:
-                return hasPersonalization ? 'Waiting for your design details' : 'Waiting for partner to accept';
+                return hasPersonalization ? 'Waiting for your design details' : 'Waiting for vendor to accept';
             case ORDER_STATUS.CONFIRMED:
-                return hasPersonalization ? 'Share identity to start crafting' : 'Partner is securing your items';
+                return hasPersonalization ? 'Share identity to start crafting' : 'Vendor is securing your products';
             case ORDER_STATUS.IN_PRODUCTION: return 'Your gift is being masterfully prepared';
-            case ORDER_STATUS.PACKED: return 'Gift is being gift-wrapped for delivery';
-            case ORDER_STATUS.OUT_FOR_DELIVERY: return 'Valet is arriving at your location';
+            case ORDER_STATUS.PACKED: return 'Waiting for delivery partner';
+            case ORDER_STATUS.OUT_FOR_DELIVERY: return 'Partner is navigating to your address';
             case ORDER_STATUS.DELIVERED: return 'Gift successfully delivered';
             default: return 'Processing your order';
         }
@@ -144,20 +143,20 @@ export function StatusCard({ order }: StatusCardProps) {
                             "text-lg font-black tracking-tight leading-tight",
                             isBreached ? "text-rose-700" : "text-zinc-900"
                         )}>
-                            {isBreached ? 'Partner is Running Late' : getStatusText(order.status || '')}
+                            {isBreached ? 'Vendor is Running Late' : getStatusText(order.status || '')}
                         </h2>
                         {(() => {
-                            const pendingCount = (order.order_items || []).filter((item: any) => {
-                                if (!item.is_personalized) return false;
-                                const s = (item.status || 'pending').toLowerCase();
+                            const pendingCount = (order.order_products || []).filter((product: any) => {
+                                if (!product.is_personalized) return false;
+                                const s = (product.status || 'pending').toLowerCase();
                                 const blocked = ['submitted', 'details_received', 'preview_ready', 'approved', 'in_production', 'packed', 'shipped', 'delivered', 'cancelled'];
-                                return !blocked.includes(s) && !item.personalization_details;
+                                return !blocked.includes(s) && !product.personalization_details;
                             }).length;
 
                             if (order.status === ORDER_STATUS.PLACED && pendingCount > 0) {
                                 return (
                                     <span className="text-[11px] font-black bg-[var(--primary)] text-white px-2 py-0.5 rounded-full animate-pulse tracking-tight whitespace-nowrap">
-                                        Action Req: {pendingCount} {pendingCount === 1 ? 'Item' : 'Items'}
+                                        Action Req: {pendingCount} {pendingCount === 1 ? 'Item' : 'Products'}
                                     </span>
                                 );
                             }
@@ -176,7 +175,7 @@ export function StatusCard({ order }: StatusCardProps) {
                         <div className="space-y-1.5 mt-1">
                             {isBreached ? (
                                 <p className="text-xs font-bold text-rose-600 leading-tight">
-                                    Our partner missed their deadline. Our support team is intervening.
+                                    Our vendor missed their deadline. Our support team is intervening.
                                 </p>
                             ) : (
                                 <p className="text-xs font-bold text-zinc-900 leading-tight">{getNextStep(order.status || '', !!order.has_personalization)}</p>
@@ -220,7 +219,6 @@ export function StatusCard({ order }: StatusCardProps) {
                         [ORDER_STATUS.CONFIRMED]: 0,
                         [ORDER_STATUS.IN_PRODUCTION]: 1,
                         [ORDER_STATUS.PACKED]: 2,
-                        [ORDER_STATUS.DISPATCHED]: 3,
                         [ORDER_STATUS.OUT_FOR_DELIVERY]: 3,
                         [ORDER_STATUS.DELIVERED]: 4,
                     };
@@ -249,19 +247,19 @@ export function StatusCard({ order }: StatusCardProps) {
                         generateEstimatePDF({
                             order_number: order.order_number || '',
                             date: new Date(order.created_at || Date.now()).toLocaleDateString(),
-                            order_items: order.order_items,
+                            order_products: order.order_products,
                             customer_name: order.users?.full_name || 'Valued Customer',
                             billing_address: order.delivery_address as any,
                             gstin: order.gstin || undefined,
-                            partner: {
-                                name: order.partner_name || 'Partner',
+                            vendor: {
+                                name: order.vendor_name || 'Vendor',
                                 address: 'Bangalore, India'
                             },
                             totals: {
                                 item_total: Number(order.subtotal) || 0,
                                 delivery_fee: Number(order.delivery_fee) || 0,
                                 platform_fee: Number(order.platform_fee) || 0,
-                                gst_amount: Number(order.gst) || 0,
+                                gst_amount: Number(order.tax_amount) || 0,
                                 grand_total: Number(order.total) || 0
                             }
                         });
@@ -278,19 +276,19 @@ export function StatusCard({ order }: StatusCardProps) {
                             generateTaxInvoicePDF({
                                 order_number: order.order_number || '',
                                 date: new Date().toLocaleDateString(),
-                                order_items: order.order_items,
+                                order_products: order.order_products,
                                 customer_name: order.users?.full_name || 'Valued Customer',
                                 billing_address: order.delivery_address as any,
                                 gstin: order.gstin || undefined,
-                                partner: {
-                                    name: order.partner_name || 'Partner',
+                                vendor: {
+                                    name: order.vendor_name || 'Vendor',
                                     address: 'Bangalore, India'
                                 },
                                 totals: {
                                     item_total: Number(order.subtotal) || 0,
                                     delivery_fee: Number(order.delivery_fee) || 0,
                                     platform_fee: Number(order.platform_fee) || 10,
-                                    gst_amount: Number(order.gst) || 0,
+                                    gst_amount: Number(order.tax_amount) || 0,
                                     grand_total: Number(order.total) || 0
                                 }
                             });

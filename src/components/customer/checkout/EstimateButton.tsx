@@ -4,7 +4,7 @@ import { useState, useActionState } from 'react';
 import { FileText, Download, Loader2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
-import { getPartnerInfo } from '@/lib/actions/discovery/partners';
+import { getPartnerInfo } from '@/lib/actions/discovery/vendors';
 import { toast } from 'sonner';
 
 import { DraftLineItem } from '@/lib/types/personalization';
@@ -12,7 +12,7 @@ import type { PricingBreakdown } from '@/lib/types/pricing';
 import { Address } from '@/lib/types/address';
 
 interface EstimateButtonProps {
-    items: DraftLineItem[];
+    products: DraftLineItem[];
     pricing: PricingBreakdown;
     businessName?: string;
     billingAddress?: Address | null;
@@ -21,7 +21,7 @@ interface EstimateButtonProps {
 }
 
 export function EstimateButton({
-    items,
+    products,
     pricing,
     businessName,
     billingAddress,
@@ -30,15 +30,15 @@ export function EstimateButton({
 }: EstimateButtonProps) {
     const [state, dispatch, loading] = useActionState(async () => {
 
-        if (!items.length || !pricing) {
-            toast.error("No items in cart");
+        if (!products.length || !pricing) {
+            toast.error("No products in cart");
             return;
         }
 
         try {
-            const partnerId = items[0]?.partner_id;
-            if (!partnerId) throw new Error("Partner ID missing");
-            const { data: partner } = await getPartnerInfo(partnerId);
+            const partnerId = products[0]?.vendor_id;
+            if (!partnerId) throw new Error("Vendor ID missing");
+            const { data: vendor } = await getPartnerInfo(partnerId);
 
             generateEstimatePDF({
                 date: new Date().toLocaleDateString(),
@@ -46,13 +46,13 @@ export function EstimateButton({
                 business_name: businessName,
                 billing_address: billingAddress,
                 gstin,
-                partner: partner
+                vendor: vendor
                     ? {
-                        name: partner.name,
-                        address: partner.address || 'Bangalore, India',
-                        gstin: partner.gstin || undefined,
+                        name: vendor.name,
+                        address: vendor.address || 'Bangalore, India',
+                        gstin: vendor.gstin || undefined,
                     }
-                    : { name: 'Partner', address: 'Bangalore, India' },
+                    : { name: 'Vendor', address: 'Bangalore, India' },
                 totals: {
                     item_total: pricing.subtotal,
                     delivery_fee: pricing.delivery_fee,
@@ -61,16 +61,16 @@ export function EstimateButton({
                     grand_total: pricing.total,
                     discount: pricing.discount || 0
                 },
-                order_items: items.map(it => ({
-                    id: it.id || '',
-                    item_id: it.item_id || '',
-                    item_name: it.item_name || 'Product',
+                order_products: products.map(it => ({
+                    id: it.id,
+                    product_id: it.product_id,
+                    product_name: it.product_name,
                     quantity: it.quantity,
                     quantity_number: it.quantity,
                     unit_price: it.unit_price,
                     total_price: it.line_total,
-                    is_personalized: it.is_personalized || false,
-                    status: 'DRAFT'
+                    is_personalized: it.is_personalized,
+                    status: 'pending'
                 }))
             });
 

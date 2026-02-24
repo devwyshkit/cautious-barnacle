@@ -14,12 +14,12 @@ export type Database = {
   }
   public: {
     Tables: {
-      cart_items: {
+      cart_products: {
         Row: {
           created_at: string | null
           id: string
-          item_id: string
           personalization: Json | null
+          product_id: string
           quantity: number
           selected_addons: Json | null
           selected_variant_id: string | null
@@ -30,8 +30,8 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
-          item_id: string
           personalization?: Json | null
+          product_id: string
           quantity?: number
           selected_addons?: Json | null
           selected_variant_id?: string | null
@@ -42,8 +42,8 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
-          item_id?: string
           personalization?: Json | null
+          product_id?: string
           quantity?: number
           selected_addons?: Json | null
           selected_variant_id?: string | null
@@ -53,112 +53,25 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cart_items_product_id_fkey"
-            columns: ["item_id"]
+            foreignKeyName: "cart_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "items"
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_items_product_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["item_id"]
-          },
-          {
-            foreignKeyName: "cart_items_selected_variant_id_fkey"
+            foreignKeyName: "cart_products_selected_variant_id_fkey"
             columns: ["selected_variant_id"]
             isOneToOne: false
-            referencedRelation: "item_variants"
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_items_selected_variant_id_fkey"
-            columns: ["selected_variant_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["variant_id"]
-          },
-          {
-            foreignKeyName: "cart_items_user_id_fkey"
+            foreignKeyName: "cart_products_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
-        ]
-      }
-      cart_reservations: {
-        Row: {
-          cart_item_id: string
-          created_at: string | null
-          expires_at: string
-          id: string
-          item_id: string
-          quantity: number
-          variant_id: string | null
-        }
-        Insert: {
-          cart_item_id: string
-          created_at?: string | null
-          expires_at: string
-          id?: string
-          item_id: string
-          quantity: number
-          variant_id?: string | null
-        }
-        Update: {
-          cart_item_id?: string
-          created_at?: string | null
-          expires_at?: string
-          id?: string
-          item_id?: string
-          quantity?: number
-          variant_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cart_reservations_cart_item_id_fkey"
-            columns: ["cart_item_id"]
-            isOneToOne: false
-            referencedRelation: "cart_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_reservations_cart_item_id_fkey"
-            columns: ["cart_item_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["cart_item_id"]
-          },
-          {
-            foreignKeyName: "cart_reservations_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_reservations_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["item_id"]
-          },
-          {
-            foreignKeyName: "cart_reservations_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "item_variants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_reservations_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["variant_id"]
           },
         ]
       }
@@ -206,6 +119,7 @@ export type Database = {
           id: string
           selected_address_id: string | null
           session_id: string | null
+          snapshot_items: Json | null
           updated_at: string | null
           use_wallet: boolean | null
           user_id: string | null
@@ -220,6 +134,7 @@ export type Database = {
           id?: string
           selected_address_id?: string | null
           session_id?: string | null
+          snapshot_items?: Json | null
           updated_at?: string | null
           use_wallet?: boolean | null
           user_id?: string | null
@@ -234,6 +149,7 @@ export type Database = {
           id?: string
           selected_address_id?: string | null
           session_id?: string | null
+          snapshot_items?: Json | null
           updated_at?: string | null
           use_wallet?: boolean | null
           user_id?: string | null
@@ -266,7 +182,7 @@ export type Database = {
         Row: {
           code: string
           created_at: string | null
-          created_by_partner_id: string | null
+          created_by_vendor_id: string | null
           description: string | null
           discount_type: string
           discount_value: number
@@ -283,7 +199,7 @@ export type Database = {
         Insert: {
           code: string
           created_at?: string | null
-          created_by_partner_id?: string | null
+          created_by_vendor_id?: string | null
           description?: string | null
           discount_type: string
           discount_value: number
@@ -300,7 +216,7 @@ export type Database = {
         Update: {
           code?: string
           created_at?: string | null
-          created_by_partner_id?: string | null
+          created_by_vendor_id?: string | null
           description?: string | null
           discount_type?: string
           discount_value?: number
@@ -316,117 +232,450 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "coupons_created_by_partner_id_fkey"
-            columns: ["created_by_partner_id"]
-            isOneToOne: false
-            referencedRelation: "partners"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "coupons_created_by_partner_id_fkey"
-            columns: ["created_by_partner_id"]
+            foreignKeyName: "coupons_created_by_vendor_id_fkey"
+            columns: ["created_by_vendor_id"]
             isOneToOne: false
             referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["partner_id"]
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "coupons_created_by_vendor_id_fkey"
+            columns: ["created_by_vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
           },
         ]
       }
-      favorites: {
+      order_products: {
         Row: {
           created_at: string | null
+          gst_percentage: number | null
+          height_cm: number | null
+          hsn_code: string | null
           id: string
-          item_id: string
-          user_id: string
+          is_personalized: boolean | null
+          length_cm: number | null
+          liability_shifted_at: string | null
+          order_id: string
+          personalization_details: Json | null
+          personalization_revision_count: number | null
+          personalization_schema: Json | null
+          product_id: string
+          product_image_url: string | null
+          product_name: string
+          quantity: number
+          selected_addons: Json | null
+          selected_variant_id: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          stock_deducted: boolean | null
+          total_price: number
+          unit_price: number
+          weight_kg: number | null
+          width_cm: number | null
         }
         Insert: {
           created_at?: string | null
+          gst_percentage?: number | null
+          height_cm?: number | null
+          hsn_code?: string | null
           id?: string
-          item_id: string
-          user_id: string
+          is_personalized?: boolean | null
+          length_cm?: number | null
+          liability_shifted_at?: string | null
+          order_id: string
+          personalization_details?: Json | null
+          personalization_revision_count?: number | null
+          personalization_schema?: Json | null
+          product_id: string
+          product_image_url?: string | null
+          product_name: string
+          quantity: number
+          selected_addons?: Json | null
+          selected_variant_id?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          stock_deducted?: boolean | null
+          total_price: number
+          unit_price: number
+          weight_kg?: number | null
+          width_cm?: number | null
         }
         Update: {
           created_at?: string | null
+          gst_percentage?: number | null
+          height_cm?: number | null
+          hsn_code?: string | null
           id?: string
-          item_id?: string
-          user_id?: string
+          is_personalized?: boolean | null
+          length_cm?: number | null
+          liability_shifted_at?: string | null
+          order_id?: string
+          personalization_details?: Json | null
+          personalization_revision_count?: number | null
+          personalization_schema?: Json | null
+          product_id?: string
+          product_image_url?: string | null
+          product_name?: string
+          quantity?: number
+          selected_addons?: Json | null
+          selected_variant_id?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          stock_deducted?: boolean | null
+          total_price?: number
+          unit_price?: number
+          weight_kg?: number | null
+          width_cm?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "favorites_item_id_fkey"
-            columns: ["item_id"]
+            foreignKeyName: "order_products_order_id_fkey"
+            columns: ["order_id"]
             isOneToOne: false
-            referencedRelation: "items"
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "favorites_item_id_fkey"
-            columns: ["item_id"]
+            foreignKeyName: "order_products_order_id_fkey"
+            columns: ["order_id"]
             isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["item_id"]
+            referencedRelation: "v_order_tracking"
+            referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "favorites_user_id_fkey"
+            foreignKeyName: "order_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_products_selected_variant_id_fkey"
+            columns: ["selected_variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_status_history: {
+        Row: {
+          changed_at: string | null
+          id: string
+          metadata: Json | null
+          order_id: string
+          status: Database["public"]["Enums"]["order_status"]
+        }
+        Insert: {
+          changed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          order_id: string
+          status?: Database["public"]["Enums"]["order_status"]
+        }
+        Update: {
+          changed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          order_id?: string
+          status?: Database["public"]["Enums"]["order_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "v_order_tracking"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_valid_transitions: {
+        Row: {
+          created_at: string | null
+          from_status: Database["public"]["Enums"]["order_status"]
+          id: string
+          required_personalization_approval: boolean | null
+          to_status: Database["public"]["Enums"]["order_status"]
+        }
+        Insert: {
+          created_at?: string | null
+          from_status?: Database["public"]["Enums"]["order_status"]
+          id?: string
+          required_personalization_approval?: boolean | null
+          to_status?: Database["public"]["Enums"]["order_status"]
+        }
+        Update: {
+          created_at?: string | null
+          from_status?: Database["public"]["Enums"]["order_status"]
+          id?: string
+          required_personalization_approval?: boolean | null
+          to_status?: Database["public"]["Enums"]["order_status"]
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          address_id: string | null
+          awb_number: string | null
+          billing_address: Json | null
+          cancellation_reason: string | null
+          cancelled_by: string | null
+          cashback_amount: number | null
+          cashback_credited: boolean | null
+          change_request_count: number | null
+          commission_amount: number | null
+          courier_vendor: string | null
+          created_at: string | null
+          delivery_address: Json | null
+          delivery_fee: number | null
+          delivery_instructions: string | null
+          discount: number | null
+          distance_km: number | null
+          estimate_downloaded: boolean | null
+          gstin: string | null
+          gstin_verified: boolean | null
+          has_personalization: boolean | null
+          id: string
+          idempotency_key: string | null
+          max_change_requests: number | null
+          net_settlement_amount: number | null
+          order_number: string
+          payment_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          payout_id: string | null
+          payout_status: string | null
+          personalization_charges: number | null
+          platform_fee: number | null
+          price_locked_until: string | null
+          promised_delivery_at: string | null
+          razorpay_order_id: string | null
+          refunded_amount: number | null
+          return_deadline: string | null
+          return_status: string | null
+          shadowfax_shipment_id: string | null
+          shadowfax_tracking_url: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          tax_amount: number | null
+          total: number
+          updated_at: string | null
+          user_id: string
+          vendor_id: string
+        }
+        Insert: {
+          address_id?: string | null
+          awb_number?: string | null
+          billing_address?: Json | null
+          cancellation_reason?: string | null
+          cancelled_by?: string | null
+          cashback_amount?: number | null
+          cashback_credited?: boolean | null
+          change_request_count?: number | null
+          commission_amount?: number | null
+          courier_vendor?: string | null
+          created_at?: string | null
+          delivery_address?: Json | null
+          delivery_fee?: number | null
+          delivery_instructions?: string | null
+          discount?: number | null
+          distance_km?: number | null
+          estimate_downloaded?: boolean | null
+          gstin?: string | null
+          gstin_verified?: boolean | null
+          has_personalization?: boolean | null
+          id?: string
+          idempotency_key?: string | null
+          max_change_requests?: number | null
+          net_settlement_amount?: number | null
+          order_number: string
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          payout_id?: string | null
+          payout_status?: string | null
+          personalization_charges?: number | null
+          platform_fee?: number | null
+          price_locked_until?: string | null
+          promised_delivery_at?: string | null
+          razorpay_order_id?: string | null
+          refunded_amount?: number | null
+          return_deadline?: string | null
+          return_status?: string | null
+          shadowfax_shipment_id?: string | null
+          shadowfax_tracking_url?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          tax_amount?: number | null
+          total: number
+          updated_at?: string | null
+          user_id: string
+          vendor_id: string
+        }
+        Update: {
+          address_id?: string | null
+          awb_number?: string | null
+          billing_address?: Json | null
+          cancellation_reason?: string | null
+          cancelled_by?: string | null
+          cashback_amount?: number | null
+          cashback_credited?: boolean | null
+          change_request_count?: number | null
+          commission_amount?: number | null
+          courier_vendor?: string | null
+          created_at?: string | null
+          delivery_address?: Json | null
+          delivery_fee?: number | null
+          delivery_instructions?: string | null
+          discount?: number | null
+          distance_km?: number | null
+          estimate_downloaded?: boolean | null
+          gstin?: string | null
+          gstin_verified?: boolean | null
+          has_personalization?: boolean | null
+          id?: string
+          idempotency_key?: string | null
+          max_change_requests?: number | null
+          net_settlement_amount?: number | null
+          order_number?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          payout_id?: string | null
+          payout_status?: string | null
+          personalization_charges?: number | null
+          platform_fee?: number | null
+          price_locked_until?: string | null
+          promised_delivery_at?: string | null
+          razorpay_order_id?: string | null
+          refunded_amount?: number | null
+          return_deadline?: string | null
+          return_status?: string | null
+          shadowfax_shipment_id?: string | null
+          shadowfax_tracking_url?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          tax_amount?: number | null
+          total?: number
+          updated_at?: string | null
+          user_id?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_address_id_fkey"
+            columns: ["address_id"]
+            isOneToOne: false
+            referencedRelation: "user_addresses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
         ]
       }
-      item_addons: {
+      platform_settings: {
         Row: {
-          addon_name: string
-          created_at: string | null
-          id: string
-          is_active: boolean | null
-          item_id: string
-          price: number
+          key: string
+          updated_at: string | null
+          value: Json
         }
         Insert: {
-          addon_name: string
-          created_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          item_id: string
-          price?: number
+          key: string
+          updated_at?: string | null
+          value: Json
         }
         Update: {
-          addon_name?: string
+          key?: string
+          updated_at?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      product_submissions: {
+        Row: {
+          base_price: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          status: string | null
+          updated_at: string | null
+          vendor_id: string | null
+        }
+        Insert: {
+          base_price?: number | null
           created_at?: string | null
+          description?: string | null
           id?: string
-          is_active?: boolean | null
-          item_id?: string
-          price?: number
+          name: string
+          status?: string | null
+          updated_at?: string | null
+          vendor_id?: string | null
+        }
+        Update: {
+          base_price?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          status?: string | null
+          updated_at?: string | null
+          vendor_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "item_addons_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "item_addons_item_id_fkey"
-            columns: ["item_id"]
+            foreignKeyName: "product_submissions_vendor_id_fkey"
+            columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["item_id"]
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "product_submissions_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
           },
         ]
       }
-      item_variants: {
+      product_variants: {
         Row: {
           attributes: Json | null
           created_at: string | null
           id: string
           images: string[] | null
           is_active: boolean | null
-          item_id: string | null
           mrp: number | null
           name: string | null
           price: number | null
+          product_id: string | null
           sku: string | null
           stock_quantity: number | null
           updated_at: string | null
@@ -438,10 +687,10 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_active?: boolean | null
-          item_id?: string | null
           mrp?: number | null
           name?: string | null
           price?: number | null
+          product_id?: string | null
           sku?: string | null
           stock_quantity?: number | null
           updated_at?: string | null
@@ -453,10 +702,10 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_active?: boolean | null
-          item_id?: string | null
           mrp?: number | null
           name?: string | null
           price?: number | null
+          product_id?: string | null
           sku?: string | null
           stock_quantity?: number | null
           updated_at?: string | null
@@ -464,24 +713,16 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "variants_item_id_fkey"
-            columns: ["item_id"]
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "items"
+            referencedRelation: "products"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "variants_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["item_id"]
           },
         ]
       }
-      items: {
+      products: {
         Row: {
-          approval_status: string
           base_price: number
           brand: string | null
           capacity: string | null
@@ -511,7 +752,6 @@ export type Database = {
           name: string
           net_weight: string | null
           packaging_type: string | null
-          partner_id: string
           personalization_fee: number | null
           personalization_options: Json | null
           personalization_schema: Json | null
@@ -519,22 +759,18 @@ export type Database = {
           production_hours: number | null
           production_time_minutes: number | null
           rating: number | null
-          return_eligible: boolean | null
-          return_policy: string | null
-          return_policy_type: string | null
           shelf_life_hours: number | null
           slug: string
           specifications: Json | null
           stock_quantity: number | null
-          stock_status: string | null
           tags: string[] | null
           total_ratings: number | null
           updated_at: string | null
+          vendor_id: string
           video_url: string | null
           weight_kg: number | null
         }
         Insert: {
-          approval_status?: string
           base_price: number
           brand?: string | null
           capacity?: string | null
@@ -564,7 +800,6 @@ export type Database = {
           name: string
           net_weight?: string | null
           packaging_type?: string | null
-          partner_id: string
           personalization_fee?: number | null
           personalization_options?: Json | null
           personalization_schema?: Json | null
@@ -572,22 +807,18 @@ export type Database = {
           production_hours?: number | null
           production_time_minutes?: number | null
           rating?: number | null
-          return_eligible?: boolean | null
-          return_policy?: string | null
-          return_policy_type?: string | null
           shelf_life_hours?: number | null
           slug: string
           specifications?: Json | null
           stock_quantity?: number | null
-          stock_status?: string | null
           tags?: string[] | null
           total_ratings?: number | null
           updated_at?: string | null
+          vendor_id: string
           video_url?: string | null
           weight_kg?: number | null
         }
         Update: {
-          approval_status?: string
           base_price?: number
           brand?: string | null
           capacity?: string | null
@@ -617,7 +848,6 @@ export type Database = {
           name?: string
           net_weight?: string | null
           packaging_type?: string | null
-          partner_id?: string
           personalization_fee?: number | null
           personalization_options?: Json | null
           personalization_schema?: Json | null
@@ -625,711 +855,41 @@ export type Database = {
           production_hours?: number | null
           production_time_minutes?: number | null
           rating?: number | null
-          return_eligible?: boolean | null
-          return_policy?: string | null
-          return_policy_type?: string | null
           shelf_life_hours?: number | null
           slug?: string
           specifications?: Json | null
           stock_quantity?: number | null
-          stock_status?: string | null
           tags?: string[] | null
           total_ratings?: number | null
           updated_at?: string | null
+          vendor_id?: string
           video_url?: string | null
           weight_kg?: number | null
         }
         Relationships: [
           {
             foreignKeyName: "products_vendor_id_fkey"
-            columns: ["partner_id"]
+            columns: ["vendor_id"]
             isOneToOne: false
-            referencedRelation: "partners"
-            referencedColumns: ["id"]
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["vendor_id"]
           },
           {
             foreignKeyName: "products_vendor_id_fkey"
-            columns: ["partner_id"]
+            columns: ["vendor_id"]
             isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["partner_id"]
-          },
-        ]
-      }
-      order_items: {
-        Row: {
-          created_at: string | null
-          gst_percentage: number | null
-          height_cm: number | null
-          hsn_code: string | null
-          id: string
-          is_personalized: boolean | null
-          item_id: string
-          item_image_url: string | null
-          item_name: string
-          length_cm: number | null
-          liability_shifted_at: string | null
-          order_id: string
-          personalization_config: Json | null
-          personalization_details: Json | null
-          personalization_schema: Json | null
-          quantity: number
-          selected_addons: Json | null
-          selected_variant_id: string | null
-          selected_variant_options: Json | null
-          status: string | null
-          total_price: number
-          unit_price: number
-          weight_kg: number | null
-          width_cm: number | null
-        }
-        Insert: {
-          created_at?: string | null
-          gst_percentage?: number | null
-          height_cm?: number | null
-          hsn_code?: string | null
-          id?: string
-          is_personalized?: boolean | null
-          item_id: string
-          item_image_url?: string | null
-          item_name: string
-          length_cm?: number | null
-          liability_shifted_at?: string | null
-          order_id: string
-          personalization_config?: Json | null
-          personalization_details?: Json | null
-          personalization_schema?: Json | null
-          quantity: number
-          selected_addons?: Json | null
-          selected_variant_id?: string | null
-          selected_variant_options?: Json | null
-          status?: string | null
-          total_price: number
-          unit_price: number
-          weight_kg?: number | null
-          width_cm?: number | null
-        }
-        Update: {
-          created_at?: string | null
-          gst_percentage?: number | null
-          height_cm?: number | null
-          hsn_code?: string | null
-          id?: string
-          is_personalized?: boolean | null
-          item_id?: string
-          item_image_url?: string | null
-          item_name?: string
-          length_cm?: number | null
-          liability_shifted_at?: string | null
-          order_id?: string
-          personalization_config?: Json | null
-          personalization_details?: Json | null
-          personalization_schema?: Json | null
-          quantity?: number
-          selected_addons?: Json | null
-          selected_variant_id?: string | null
-          selected_variant_options?: Json | null
-          status?: string | null
-          total_price?: number
-          unit_price?: number
-          weight_kg?: number | null
-          width_cm?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "order_items_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_items_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "v_order_tracking"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_items_product_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_items_product_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["item_id"]
-          },
-          {
-            foreignKeyName: "order_items_selected_variant_id_fkey"
-            columns: ["selected_variant_id"]
-            isOneToOne: false
-            referencedRelation: "item_variants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_items_selected_variant_id_fkey"
-            columns: ["selected_variant_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["variant_id"]
-          },
-        ]
-      }
-      order_personalization: {
-        Row: {
-          approved_at: string | null
-          customer_feedback: string | null
-          instructions: string | null
-          item_index: number
-          max_revisions: number
-          order_id: string
-          order_item_id: string | null
-          partner_notes: string | null
-          preview_uploaded_at: string | null
-          preview_url: string | null
-          preview_version: number | null
-          revision_count: number | null
-          status: string | null
-          submitted_at: string | null
-          text_input: string | null
-          uploaded_files: string[] | null
-        }
-        Insert: {
-          approved_at?: string | null
-          customer_feedback?: string | null
-          instructions?: string | null
-          item_index?: number
-          max_revisions?: number
-          order_id: string
-          order_item_id?: string | null
-          partner_notes?: string | null
-          preview_uploaded_at?: string | null
-          preview_url?: string | null
-          preview_version?: number | null
-          revision_count?: number | null
-          status?: string | null
-          submitted_at?: string | null
-          text_input?: string | null
-          uploaded_files?: string[] | null
-        }
-        Update: {
-          approved_at?: string | null
-          customer_feedback?: string | null
-          instructions?: string | null
-          item_index?: number
-          max_revisions?: number
-          order_id?: string
-          order_item_id?: string | null
-          partner_notes?: string | null
-          preview_uploaded_at?: string | null
-          preview_url?: string | null
-          preview_version?: number | null
-          revision_count?: number | null
-          status?: string | null
-          submitted_at?: string | null
-          text_input?: string | null
-          uploaded_files?: string[] | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "order_personalization_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_personalization_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "v_order_tracking"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_personalization_order_item_id_fkey"
-            columns: ["order_item_id"]
-            isOneToOne: true
-            referencedRelation: "order_items"
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
-      }
-      order_status_history: {
-        Row: {
-          changed_at: string | null
-          id: string
-          metadata: Json | null
-          order_id: string
-          status: Database["public"]["Enums"]["order_status"]
-        }
-        Insert: {
-          changed_at?: string | null
-          id?: string
-          metadata?: Json | null
-          order_id: string
-          status: Database["public"]["Enums"]["order_status"]
-        }
-        Update: {
-          changed_at?: string | null
-          id?: string
-          metadata?: Json | null
-          order_id?: string
-          status?: Database["public"]["Enums"]["order_status"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "order_status_history_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_status_history_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "v_order_tracking"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      orders: {
-        Row: {
-          addon_ids: Json | null
-          address_id: string | null
-          awb_number: string | null
-          billing_address: Json | null
-          cancellation_reason: string | null
-          cancelled_by: string | null
-          cashback_amount: number | null
-          cashback_credited: boolean | null
-          change_request_count: number | null
-          commission_amount: number | null
-          courier_partner: string | null
-          created_at: string | null
-          delivery_address: Json | null
-          delivery_fee: number | null
-          delivery_instructions: string | null
-          discount: number | null
-          distance_km: number | null
-          estimate_downloaded: boolean | null
-          expected_delivery_date: string | null
-          gstin: string | null
-          gstin_verified: boolean | null
-          has_personalization: boolean | null
-          id: string
-          max_change_requests: number | null
-          net_settlement_amount: number | null
-          order_number: string
-          partner_id: string
-          payment_id: string | null
-          payment_method: string | null
-          payment_status: string | null
-          payout_id: string | null
-          payout_status: string | null
-          personalization_charges: number | null
-          platform_fee: number | null
-          price_locked_until: string | null
-          promised_delivery_at: string | null
-          razorpay_order_id: string | null
-          refunded_amount: number | null
-          return_deadline: string | null
-          return_status: string | null
-          status: Database["public"]["Enums"]["order_status"]
-          subtotal: number
-          tax_amount: number | null
-          total: number
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          addon_ids?: Json | null
-          address_id?: string | null
-          awb_number?: string | null
-          billing_address?: Json | null
-          cancellation_reason?: string | null
-          cancelled_by?: string | null
-          cashback_amount?: number | null
-          cashback_credited?: boolean | null
-          change_request_count?: number | null
-          commission_amount?: number | null
-          courier_partner?: string | null
-          created_at?: string | null
-          delivery_address?: Json | null
-          delivery_fee?: number | null
-          delivery_instructions?: string | null
-          discount?: number | null
-          distance_km?: number | null
-          estimate_downloaded?: boolean | null
-          expected_delivery_date?: string | null
-          gstin?: string | null
-          gstin_verified?: boolean | null
-          has_personalization?: boolean | null
-          id?: string
-          max_change_requests?: number | null
-          net_settlement_amount?: number | null
-          order_number: string
-          partner_id: string
-          payment_id?: string | null
-          payment_method?: string | null
-          payment_status?: string | null
-          payout_id?: string | null
-          payout_status?: string | null
-          personalization_charges?: number | null
-          platform_fee?: number | null
-          price_locked_until?: string | null
-          promised_delivery_at?: string | null
-          razorpay_order_id?: string | null
-          refunded_amount?: number | null
-          return_deadline?: string | null
-          return_status?: string | null
-          status?: Database["public"]["Enums"]["order_status"]
-          subtotal: number
-          tax_amount?: number | null
-          total: number
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          addon_ids?: Json | null
-          address_id?: string | null
-          awb_number?: string | null
-          billing_address?: Json | null
-          cancellation_reason?: string | null
-          cancelled_by?: string | null
-          cashback_amount?: number | null
-          cashback_credited?: boolean | null
-          change_request_count?: number | null
-          commission_amount?: number | null
-          courier_partner?: string | null
-          created_at?: string | null
-          delivery_address?: Json | null
-          delivery_fee?: number | null
-          delivery_instructions?: string | null
-          discount?: number | null
-          distance_km?: number | null
-          estimate_downloaded?: boolean | null
-          expected_delivery_date?: string | null
-          gstin?: string | null
-          gstin_verified?: boolean | null
-          has_personalization?: boolean | null
-          id?: string
-          max_change_requests?: number | null
-          net_settlement_amount?: number | null
-          order_number?: string
-          partner_id?: string
-          payment_id?: string | null
-          payment_method?: string | null
-          payment_status?: string | null
-          payout_id?: string | null
-          payout_status?: string | null
-          personalization_charges?: number | null
-          platform_fee?: number | null
-          price_locked_until?: string | null
-          promised_delivery_at?: string | null
-          razorpay_order_id?: string | null
-          refunded_amount?: number | null
-          return_deadline?: string | null
-          return_status?: string | null
-          status?: Database["public"]["Enums"]["order_status"]
-          subtotal?: number
-          tax_amount?: number | null
-          total?: number
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "orders_address_id_fkey"
-            columns: ["address_id"]
-            isOneToOne: false
-            referencedRelation: "user_addresses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "partners"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["partner_id"]
-          },
-          {
-            foreignKeyName: "orders_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      partner_users: {
-        Row: {
-          created_at: string | null
-          id: string
-          partner_id: string | null
-          role: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          partner_id?: string | null
-          role?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          partner_id?: string | null
-          role?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "partner_users_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "partners"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "partner_users_partner_id_fkey"
-            columns: ["partner_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["partner_id"]
-          },
-        ]
-      }
-      partners: {
-        Row: {
-          agreed_to_contract: boolean | null
-          avg_prep_time_mins: number | null
-          badge: string | null
-          bank_details: Json | null
-          base_delivery_charge: number | null
-          business_name: string | null
-          business_type: string | null
-          city: string | null
-          closing_time: string | null
-          commission_percentage: number | null
-          created_at: string | null
-          description: string | null
-          email: string | null
-          fixed_packaging_charge: number | null
-          fssai_license: string | null
-          fts: unknown
-          gstin: string | null
-          has_outlet: boolean | null
-          id: string
-          idfy_verification_id: string | null
-          image_url: string | null
-          is_active: boolean | null
-          is_online: boolean | null
-          is_promoted: boolean | null
-          kyc_status: string | null
-          latitude: number | null
-          location: unknown
-          longitude: number | null
-          minimum_order_amount: number | null
-          name: string
-          onboarding_fee_paid: boolean | null
-          onboarding_status: string | null
-          opening_time: string | null
-          outlet_type: string | null
-          packaging_charge_type: string | null
-          pan_number: string | null
-          partner_external_id: string | null
-          partner_tier: string | null
-          partner_type: string | null
-          payout_contact_id: string | null
-          payout_fund_account_id: string | null
-          personalization_commission_percentage: number | null
-          pincode: string | null
-          prep_hours: number | null
-          promotion_rank: number | null
-          rating: number | null
-          razorpay_account_id: string | null
-          registered_name: string | null
-          response_time_hours: number | null
-          serviceability_radius_km: number | null
-          serviceable_pincodes: string[] | null
-          settlement_days: number | null
-          slug: string
-          state: string | null
-          total_orders: number | null
-          total_ratings: number | null
-          updated_at: string | null
-          whatsapp_number: string | null
-          working_days: string[] | null
-        }
-        Insert: {
-          agreed_to_contract?: boolean | null
-          avg_prep_time_mins?: number | null
-          badge?: string | null
-          bank_details?: Json | null
-          base_delivery_charge?: number | null
-          business_name?: string | null
-          business_type?: string | null
-          city?: string | null
-          closing_time?: string | null
-          commission_percentage?: number | null
-          created_at?: string | null
-          description?: string | null
-          email?: string | null
-          fixed_packaging_charge?: number | null
-          fssai_license?: string | null
-          fts?: unknown
-          gstin?: string | null
-          has_outlet?: boolean | null
-          id?: string
-          idfy_verification_id?: string | null
-          image_url?: string | null
-          is_active?: boolean | null
-          is_online?: boolean | null
-          is_promoted?: boolean | null
-          kyc_status?: string | null
-          latitude?: number | null
-          location?: unknown
-          longitude?: number | null
-          minimum_order_amount?: number | null
-          name: string
-          onboarding_fee_paid?: boolean | null
-          onboarding_status?: string | null
-          opening_time?: string | null
-          outlet_type?: string | null
-          packaging_charge_type?: string | null
-          pan_number?: string | null
-          partner_external_id?: string | null
-          partner_tier?: string | null
-          partner_type?: string | null
-          payout_contact_id?: string | null
-          payout_fund_account_id?: string | null
-          personalization_commission_percentage?: number | null
-          pincode?: string | null
-          prep_hours?: number | null
-          promotion_rank?: number | null
-          rating?: number | null
-          razorpay_account_id?: string | null
-          registered_name?: string | null
-          response_time_hours?: number | null
-          serviceability_radius_km?: number | null
-          serviceable_pincodes?: string[] | null
-          settlement_days?: number | null
-          slug: string
-          state?: string | null
-          total_orders?: number | null
-          total_ratings?: number | null
-          updated_at?: string | null
-          whatsapp_number?: string | null
-          working_days?: string[] | null
-        }
-        Update: {
-          agreed_to_contract?: boolean | null
-          avg_prep_time_mins?: number | null
-          badge?: string | null
-          bank_details?: Json | null
-          base_delivery_charge?: number | null
-          business_name?: string | null
-          business_type?: string | null
-          city?: string | null
-          closing_time?: string | null
-          commission_percentage?: number | null
-          created_at?: string | null
-          description?: string | null
-          email?: string | null
-          fixed_packaging_charge?: number | null
-          fssai_license?: string | null
-          fts?: unknown
-          gstin?: string | null
-          has_outlet?: boolean | null
-          id?: string
-          idfy_verification_id?: string | null
-          image_url?: string | null
-          is_active?: boolean | null
-          is_online?: boolean | null
-          is_promoted?: boolean | null
-          kyc_status?: string | null
-          latitude?: number | null
-          location?: unknown
-          longitude?: number | null
-          minimum_order_amount?: number | null
-          name?: string
-          onboarding_fee_paid?: boolean | null
-          onboarding_status?: string | null
-          opening_time?: string | null
-          outlet_type?: string | null
-          packaging_charge_type?: string | null
-          pan_number?: string | null
-          partner_external_id?: string | null
-          partner_tier?: string | null
-          partner_type?: string | null
-          payout_contact_id?: string | null
-          payout_fund_account_id?: string | null
-          personalization_commission_percentage?: number | null
-          pincode?: string | null
-          prep_hours?: number | null
-          promotion_rank?: number | null
-          rating?: number | null
-          razorpay_account_id?: string | null
-          registered_name?: string | null
-          response_time_hours?: number | null
-          serviceability_radius_km?: number | null
-          serviceable_pincodes?: string[] | null
-          settlement_days?: number | null
-          slug?: string
-          state?: string | null
-          total_orders?: number | null
-          total_ratings?: number | null
-          updated_at?: string | null
-          whatsapp_number?: string | null
-          working_days?: string[] | null
-        }
-        Relationships: []
-      }
-      platform_settings: {
-        Row: {
-          key: string
-          updated_at: string | null
-          value: Json
-        }
-        Insert: {
-          key: string
-          updated_at?: string | null
-          value: Json
-        }
-        Update: {
-          key?: string
-          updated_at?: string | null
-          value?: Json
-        }
-        Relationships: []
       }
       returns: {
         Row: {
-          admin_notes: string | null
           created_at: string | null
           description: string | null
           id: string
           images: string[] | null
           order_id: string
-          order_item_id: string | null
-          processed_at: string | null
           reason: string
           refund_amount: number | null
           return_delivery_fee: number | null
@@ -1338,14 +898,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          admin_notes?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
           images?: string[] | null
           order_id: string
-          order_item_id?: string | null
-          processed_at?: string | null
           reason: string
           refund_amount?: number | null
           return_delivery_fee?: number | null
@@ -1354,14 +911,11 @@ export type Database = {
           user_id: string
         }
         Update: {
-          admin_notes?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
           images?: string[] | null
           order_id?: string
-          order_item_id?: string | null
-          processed_at?: string | null
           reason?: string
           refund_amount?: number | null
           return_delivery_fee?: number | null
@@ -1382,13 +936,6 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "v_order_tracking"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "returns_order_item_id_fkey"
-            columns: ["order_item_id"]
-            isOneToOne: false
-            referencedRelation: "order_items"
             referencedColumns: ["id"]
           },
           {
@@ -1423,68 +970,6 @@ export type Database = {
           srtext?: string | null
         }
         Relationships: []
-      }
-      stock_reservations: {
-        Row: {
-          created_at: string | null
-          expires_at: string
-          id: string
-          item_id: string
-          payment_intent_id: string | null
-          quantity: number
-          user_id: string | null
-          variant_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          expires_at: string
-          id?: string
-          item_id: string
-          payment_intent_id?: string | null
-          quantity: number
-          user_id?: string | null
-          variant_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          expires_at?: string
-          id?: string
-          item_id?: string
-          payment_intent_id?: string | null
-          quantity?: number
-          user_id?: string | null
-          variant_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "stock_reservations_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "stock_reservations_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["item_id"]
-          },
-          {
-            foreignKeyName: "stock_reservations_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "item_variants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "stock_reservations_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["variant_id"]
-          },
-        ]
       }
       user_addresses: {
         Row: {
@@ -1550,6 +1035,35 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "addresses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -1628,6 +1142,225 @@ export type Database = {
         }
         Relationships: []
       }
+      vendor_applications: {
+        Row: {
+          business_name: string
+          category: string | null
+          city: string | null
+          contact_name: string
+          created_at: string | null
+          email: string | null
+          id: string
+          phone: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          business_name: string
+          category?: string | null
+          city?: string | null
+          contact_name: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          phone: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          business_name?: string
+          category?: string | null
+          city?: string | null
+          contact_name?: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          phone?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      vendors: {
+        Row: {
+          agreed_to_contract: boolean | null
+          avg_prep_time_mins: number | null
+          badge: string | null
+          bank_details: Json | null
+          base_delivery_charge: number | null
+          business_name: string | null
+          business_type: string | null
+          city: string | null
+          closing_time: string | null
+          commission_percentage: number | null
+          created_at: string | null
+          description: string | null
+          email: string | null
+          fixed_packaging_charge: number | null
+          fssai_license: string | null
+          fts: unknown
+          gstin: string | null
+          has_outlet: boolean | null
+          id: string
+          idfy_verification_id: string | null
+          image_url: string | null
+          is_active: boolean | null
+          is_online: boolean | null
+          is_promoted: boolean | null
+          latitude: number | null
+          location: unknown
+          longitude: number | null
+          minimum_order_amount: number | null
+          name: string
+          onboarding_fee_paid: boolean | null
+          opening_time: string | null
+          outlet_type: string | null
+          packaging_charge_type: string | null
+          pan_number: string | null
+          payout_contact_id: string | null
+          payout_fund_account_id: string | null
+          personalization_commission_percentage: number | null
+          pincode: string | null
+          prep_hours: number | null
+          promotion_rank: number | null
+          rating: number | null
+          razorpay_account_id: string | null
+          registered_name: string | null
+          response_time_hours: number | null
+          serviceability_radius_km: number | null
+          serviceable_pincodes: string[] | null
+          settlement_days: number | null
+          slug: string
+          state: string | null
+          total_orders: number | null
+          total_ratings: number | null
+          updated_at: string | null
+          vendor_external_id: string | null
+          vendor_tier: string | null
+          vendor_type: string | null
+          whatsapp_number: string | null
+          working_days: string[] | null
+        }
+        Insert: {
+          agreed_to_contract?: boolean | null
+          avg_prep_time_mins?: number | null
+          badge?: string | null
+          bank_details?: Json | null
+          base_delivery_charge?: number | null
+          business_name?: string | null
+          business_type?: string | null
+          city?: string | null
+          closing_time?: string | null
+          commission_percentage?: number | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          fixed_packaging_charge?: number | null
+          fssai_license?: string | null
+          fts?: unknown
+          gstin?: string | null
+          has_outlet?: boolean | null
+          id?: string
+          idfy_verification_id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_online?: boolean | null
+          is_promoted?: boolean | null
+          latitude?: number | null
+          location?: unknown
+          longitude?: number | null
+          minimum_order_amount?: number | null
+          name: string
+          onboarding_fee_paid?: boolean | null
+          opening_time?: string | null
+          outlet_type?: string | null
+          packaging_charge_type?: string | null
+          pan_number?: string | null
+          payout_contact_id?: string | null
+          payout_fund_account_id?: string | null
+          personalization_commission_percentage?: number | null
+          pincode?: string | null
+          prep_hours?: number | null
+          promotion_rank?: number | null
+          rating?: number | null
+          razorpay_account_id?: string | null
+          registered_name?: string | null
+          response_time_hours?: number | null
+          serviceability_radius_km?: number | null
+          serviceable_pincodes?: string[] | null
+          settlement_days?: number | null
+          slug: string
+          state?: string | null
+          total_orders?: number | null
+          total_ratings?: number | null
+          updated_at?: string | null
+          vendor_external_id?: string | null
+          vendor_tier?: string | null
+          vendor_type?: string | null
+          whatsapp_number?: string | null
+          working_days?: string[] | null
+        }
+        Update: {
+          agreed_to_contract?: boolean | null
+          avg_prep_time_mins?: number | null
+          badge?: string | null
+          bank_details?: Json | null
+          base_delivery_charge?: number | null
+          business_name?: string | null
+          business_type?: string | null
+          city?: string | null
+          closing_time?: string | null
+          commission_percentage?: number | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          fixed_packaging_charge?: number | null
+          fssai_license?: string | null
+          fts?: unknown
+          gstin?: string | null
+          has_outlet?: boolean | null
+          id?: string
+          idfy_verification_id?: string | null
+          image_url?: string | null
+          is_active?: boolean | null
+          is_online?: boolean | null
+          is_promoted?: boolean | null
+          latitude?: number | null
+          location?: unknown
+          longitude?: number | null
+          minimum_order_amount?: number | null
+          name?: string
+          onboarding_fee_paid?: boolean | null
+          opening_time?: string | null
+          outlet_type?: string | null
+          packaging_charge_type?: string | null
+          pan_number?: string | null
+          payout_contact_id?: string | null
+          payout_fund_account_id?: string | null
+          personalization_commission_percentage?: number | null
+          pincode?: string | null
+          prep_hours?: number | null
+          promotion_rank?: number | null
+          rating?: number | null
+          razorpay_account_id?: string | null
+          registered_name?: string | null
+          response_time_hours?: number | null
+          serviceability_radius_km?: number | null
+          serviceable_pincodes?: string[] | null
+          settlement_days?: number | null
+          slug?: string
+          state?: string | null
+          total_orders?: number | null
+          total_ratings?: number | null
+          updated_at?: string | null
+          vendor_external_id?: string | null
+          vendor_tier?: string | null
+          vendor_type?: string | null
+          whatsapp_number?: string | null
+          working_days?: string[] | null
+        }
+        Relationships: []
+      }
       wallet_transactions: {
         Row: {
           amount: number
@@ -1683,6 +1416,33 @@ export type Database = {
           },
         ]
       }
+      webhook_logs: {
+        Row: {
+          created_at: string | null
+          external_id: string | null
+          id: string
+          payload: Json | null
+          processed_at: string | null
+          source: string
+        }
+        Insert: {
+          created_at?: string | null
+          external_id?: string | null
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          source: string
+        }
+        Update: {
+          created_at?: string | null
+          external_id?: string | null
+          id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          source?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       geography_columns: {
@@ -1729,52 +1489,45 @@ export type Database = {
       }
       v_active_cart_detailed: {
         Row: {
-          addons_total_price: number | null
-          base_price: number | null
-          cart_item_id: string | null
-          category: string | null
           has_personalization: boolean | null
-          images: string[] | null
-          item_id: string | null
-          item_name: string | null
-          line_subtotal: number | null
+          id: string | null
+          is_personalized: boolean | null
           line_total: number | null
-          partner_city: string | null
-          partner_id: string | null
-          partner_latitude: number | null
-          partner_longitude: number | null
-          partner_name: string | null
-          partner_prep_hours: number | null
           personalization: Json | null
           personalization_fee: number | null
+          product_addons: Json | null
+          product_id: string | null
+          product_image: string | null
+          product_name: string | null
           quantity: number | null
           selected_addons: Json | null
           session_id: string | null
+          unit_price: number | null
           user_id: string | null
           variant_id: string | null
           variant_name: string | null
-          variant_price: number | null
+          vendor_city: string | null
+          vendor_id: string | null
+          vendor_name: string | null
+          vendor_prep_mins: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "cart_items_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "cart_products_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
-        ]
-      }
-      v_active_cart_totals: {
-        Row: {
-          cart_owner_id: string | null
-          pricing: Json | null
-          session_id: string | null
-          user_id: string | null
-        }
-        Relationships: [
           {
-            foreignKeyName: "cart_items_user_id_fkey"
+            foreignKeyName: "cart_products_selected_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_products_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -1785,18 +1538,23 @@ export type Database = {
       v_order_tracking: {
         Row: {
           created_at: string | null
-          first_item_image: string | null
-          first_item_name: string | null
+          delivery_fee: number | null
+          distance_km: number | null
+          first_product_name: string | null
           has_personalization: boolean | null
           id: string | null
-          item_count: number | null
           order_number: string | null
-          partner_city: string | null
-          partner_image: string | null
-          partner_name: string | null
+          product_count: number | null
+          promised_delivery_at: string | null
           status: Database["public"]["Enums"]["order_status"] | null
+          subtotal: number | null
           total: number | null
           user_id: string | null
+          vendor_city: string | null
+          vendor_id: string | null
+          vendor_image: string | null
+          vendor_location: unknown
+          vendor_name: string | null
         }
         Relationships: [
           {
@@ -1804,6 +1562,20 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -1940,10 +1712,10 @@ export type Database = {
       calculate_order_total: {
         Args: {
           p_address_id?: string
-          p_cart_items: Json
           p_coupon_code?: string
           p_delivery_fee_override?: number
           p_distance_km?: number
+          p_items: Json
           p_session_id?: string
           p_use_wallet?: boolean
           p_user_id?: string
@@ -2007,9 +1779,9 @@ export type Database = {
       execute_admin_intent: { Args: { p_intent: Json }; Returns: Json }
       execute_cart_mutation: {
         Args: {
-          p_item_id: string
           p_mode?: string
           p_personalization?: Json
+          p_product_id: string
           p_quantity: number
           p_selected_addons?: Json
           p_session_id?: string
@@ -2120,7 +1892,7 @@ export type Database = {
         Args: {
           p_exclude_session_id?: string
           p_exclude_user_id?: string
-          p_item_id?: string
+          p_product_id: string
           p_variant_id?: string
         }
         Returns: number
@@ -2142,56 +1914,45 @@ export type Database = {
         Returns: Json
       }
       get_home_surface: {
-        Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
+        Args: {
+          p_lat?: number
+          p_lng?: number
+          p_session_id?: string
+          p_user_id?: string
+        }
         Returns: Json
       }
-      get_nearby_items: {
+      get_nearby_products: {
         Args: {
           include_out_of_stock?: boolean
           radius_km?: number
           user_lat: number
           user_lng: number
         }
-        Returns: {
-          base_price: number
-          distance_km: number
-          has_personalization: boolean
-          id: string
-          images: string[]
-          is_online: boolean
-          name: string
-          partner_id: string
-          partner_name: string
-          production_time_minutes: number
-          rating: number
-          stock_quantity: number
-          stock_status: string
-        }[]
-      }
-      get_partner_dashboard_stats: {
-        Args: { p_partner_id: string }
         Returns: Json
-      }
-      get_partner_stats: {
-        Args: { p_partner_id: string }
-        Returns: {
-          active_orders: number
-          pending_requirements: number
-          total_orders: number
-          total_revenue: number
-        }[]
       }
       gettransactionid: { Args: never; Returns: unknown }
-      log_order_status_history: {
-        Args: {
-          p_description: string
-          p_metadata?: Json
-          p_order_id: string
-          p_title: string
-          p_type: string
-        }
-        Returns: Json
-      }
+      log_order_status_history:
+        | {
+            Args: {
+              p_description?: string
+              p_metadata?: Json
+              p_order_id: string
+              p_status: Database["public"]["Enums"]["order_status"]
+              p_title?: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_description: string
+              p_metadata?: Json
+              p_order_id: string
+              p_title: string
+              p_type: string
+            }
+            Returns: Json
+          }
       longtransactionsenabled: { Args: never; Returns: boolean }
       merge_guest_to_user: {
         Args: { p_session_id: string; p_user_id: string }
@@ -2255,6 +2016,15 @@ export type Database = {
       }
       postgis_version: { Args: never; Returns: string }
       postgis_wagyu_version: { Args: never; Returns: string }
+      process_order_return: {
+        Args: {
+          p_order_id: string
+          p_payment_id?: string
+          p_reason: string
+          p_refund_amount: number
+        }
+        Returns: Json
+      }
       recalculate_order_total: {
         Args: { p_order_id: string }
         Returns: undefined
@@ -2850,14 +2620,6 @@ export type Database = {
         }
         Returns: Json
       }
-      transition_order_status: {
-        Args: {
-          p_metadata?: Json
-          p_new_status: Database["public"]["Enums"]["order_status"]
-          p_order_id: string
-        }
-        Returns: Json
-      }
       unlockrows: { Args: { "": string }; Returns: number }
       update_checkout_session: {
         Args: {
@@ -2865,6 +2627,7 @@ export type Database = {
           p_gstin?: string
           p_guest_lat?: number
           p_guest_lng?: number
+          p_guest_location_name?: string
           p_selected_address_id?: string
           p_session_id?: string
           p_use_wallet?: boolean
@@ -2882,42 +2645,20 @@ export type Database = {
         }
         Returns: string
       }
-      verify_and_update_payment: {
-        Args: {
-          p_new_status: string
-          p_order_id: string
-          p_payment_id: string
-          p_payment_method: string
-          p_razorpay_order_id: string
-          p_requirement_status: string
-          p_timeline_description: string
-          p_timeline_metadata: Json
-          p_timeline_title: string
-          p_user_id: string
-        }
-        Returns: undefined
-      }
     }
     Enums: {
       order_status:
         | "PLACED"
         | "CONFIRMED"
-        | "DETAILS_RECEIVED"
-        | "PREVIEW_READY"
-        | "CHANGE_REQUESTED"
-        | "APPROVED"
         | "IN_PRODUCTION"
         | "PACKED"
-        | "DISPATCHED"
+        | "RIDER_ASSIGNED"
+        | "ARRIVED_PICKUP"
+        | "OUT_FOR_DELIVERY"
+        | "ARRIVED_DROP"
         | "DELIVERED"
         | "CANCELLED"
         | "REFUNDED"
-        | "INPUT_RECEIVED"
-        | "REVISION_REQUESTED"
-        | "OUT_FOR_DELIVERY"
-        | "PREPARING"
-        | "READY"
-        | "SHIPPED"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -3056,22 +2797,15 @@ export const Constants = {
       order_status: [
         "PLACED",
         "CONFIRMED",
-        "DETAILS_RECEIVED",
-        "PREVIEW_READY",
-        "CHANGE_REQUESTED",
-        "APPROVED",
         "IN_PRODUCTION",
         "PACKED",
-        "DISPATCHED",
+        "RIDER_ASSIGNED",
+        "ARRIVED_PICKUP",
+        "OUT_FOR_DELIVERY",
+        "ARRIVED_DROP",
         "DELIVERED",
         "CANCELLED",
         "REFUNDED",
-        "INPUT_RECEIVED",
-        "REVISION_REQUESTED",
-        "OUT_FOR_DELIVERY",
-        "PREPARING",
-        "READY",
-        "SHIPPED",
       ],
     },
   },

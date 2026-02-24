@@ -24,7 +24,7 @@ interface HistoryTrailProps {
  * WYSHKIT 2026: The "Creative Journey" History Trail
  * Visualizes the 3-layer trust engine:
  * 1. What You Sent (Brief)
- * 2. What Partner Sent (Preview)
+ * 2. What Vendor Sent (Preview)
  * 3. What Changed (Revisions)
  */
 export function HistoryTrail({ orderItems, previews, timeline }: HistoryTrailProps) {
@@ -49,27 +49,27 @@ export function HistoryTrail({ orderItems, previews, timeline }: HistoryTrailPro
                 <div className="absolute left-[11px] top-2 bottom-2 w-px bg-zinc-100" />
 
                 {/* Layer 1: The Briefing */}
-                {personalizedItems.map(item => (
-                    <div key={item.id} className="relative">
+                {personalizedItems.map(product => (
+                    <div key={product.id} className="relative">
                         <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-zinc-900 ring-4 ring-white shadow-sm" />
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <h4 className="text-xs font-black text-zinc-900 tracking-tight leading-none">Layer 1: The Briefing</h4>
                                 <span className="text-[8px] font-bold text-zinc-400 tabular-nums">
-                                    {item.details_submitted_at ? format(new Date(item.details_submitted_at), 'h:mm a') : 'Pending'}
+                                    {product.details_submitted_at ? format(new Date(product.details_submitted_at), 'h:mm a') : 'Pending'}
                                 </span>
                             </div>
                             <div className="bg-white p-4 rounded-xl border border-zinc-100 shadow-sm space-y-3">
                                 <div className="flex items-center gap-2">
                                     <FileText className="size-3.5 text-zinc-400" />
-                                    <p className="text-[11px] font-bold text-zinc-900">{item.item_name}</p>
+                                    <p className="text-[11px] font-bold text-zinc-900">{product.product_name}</p>
                                 </div>
-                                {item.personalization_details?.text && (
-                                    <p className="text-xs text-zinc-500 italic leading-relaxed">"{item.personalization_details.text}"</p>
+                                {product.personalization_details?.text && (
+                                    <p className="text-xs text-zinc-500 italic leading-relaxed">"{product.personalization_details.text}"</p>
                                 )}
-                                {item.personalization_details?.image_url && (
+                                {product.personalization_details?.image_url && (
                                     <div className="aspect-video rounded-xl overflow-hidden border border-zinc-100">
-                                        <img src={item.personalization_details.image_url} alt="Brief Reference" className="size-full object-cover" />
+                                        <img src={product.personalization_details.image_url} alt="Brief Reference" className="size-full object-cover" />
                                     </div>
                                 )}
                             </div>

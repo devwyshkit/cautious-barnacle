@@ -24,8 +24,8 @@ interface InitiateReturnParams {
 /**
  * Initiate a return for an order
  * Enforces business rules:
- * - No refund for personalized items (unless wrong/damaged)
- * - For personalized items: images REQUIRED as proof
+ * - No refund for personalized products (unless wrong/damaged)
+ * - For personalized products: images REQUIRED as proof
  * - Flat ₹60 delivery charge for non-personalized returns
  * - 100% advance payment (already enforced, verify)
  */
@@ -38,10 +38,10 @@ export async function initiateReturn({ orderId, reason, description, images }: I
       return { error: 'Unauthorized' };
     }
 
-    // Fetch order with items
+    // Fetch order with products
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .select('*, order_items(*)')
+      .select('*, order_products(*)')
       .eq('id', orderId)
       .eq('user_id', user.id)
       .maybeSingle();
@@ -61,18 +61,18 @@ export async function initiateReturn({ orderId, reason, description, images }: I
 
     const isPersonalized = orderHasPersonalizedItems(order as Order);
 
-    // Enforce return policy: No refund for personalized items unless wrong or damaged
+    // Enforce return policy: No refund for personalized products unless wrong or damaged
     if (isPersonalized && !['wrong_item', 'damaged'].includes(reason)) {
       return {
-        error: 'Personalized items cannot be returned unless wrong or damaged',
+        error: 'Personalized products cannot be returned unless wrong or damaged',
         code: 'PERSONALIZED_RETURN_RESTRICTION'
       };
     }
 
-    // For personalized items, images are REQUIRED as proof
+    // For personalized products, images are REQUIRED as proof
     if (isPersonalized && (!images || images.length === 0)) {
       return {
-        error: 'Please upload photos showing the issue with your personalized item',
+        error: 'Please upload photos showing the issue with your personalized product',
         code: 'IMAGES_REQUIRED'
       };
     }

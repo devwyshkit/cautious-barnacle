@@ -6,18 +6,18 @@ import Image from 'next/image';
 import { Search, X, Loader2, ArrowLeft, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import type { Tables } from "@/lib/supabase/database.types";
+import type { Tables } from "@/lib/supabase/types";
 import { cn } from "@/lib/utils";
 import { logger } from '@/lib/logging/logger';
-import { PartnerCard } from "@/components/ui/PartnerCard";
-import { ItemCard } from "@/components/ui/ItemCard";
+import { VendorCard } from "@/components/ui/VendorCard";
+import { ProductCard } from "@/components/ui/ProductCard";
 import Link from 'next/link';
 
 interface SearchPageClientProps {
   searchParams: Promise<{ q?: string; category?: string }>;
   initialResults: {
-    items: any[];
-    partners: any[];
+    products: any[];
+    vendors: any[];
     total: number;
   };
 }
@@ -76,10 +76,10 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
   }, [inputValue, currentQ]);
 
   const results = initialResults;
-  const hasResults = results.items.length > 0 || results.partners.length > 0;
+  const hasResults = results.products.length > 0 || results.vendors.length > 0;
   const hasActiveFilters = currentQ || currentCategory;
 
-  // No local state for item selection - URL takes precedence
+  // No local state for product selection - URL takes precedence
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -97,7 +97,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
           <Input
             ref={inputRef}
             type="text"
-            placeholder="Search items, stores..."
+            placeholder="Search products, stores..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             className="pl-9 h-10 bg-zinc-50 border-zinc-100 text-sm rounded-lg focus-visible:ring-zinc-200"
@@ -138,7 +138,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
         ) : !hasActiveFilters ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Search className="size-10 text-zinc-200 mb-4" />
-            <p className="text-sm font-semibold text-zinc-400">Search for items or stores</p>
+            <p className="text-sm font-semibold text-zinc-400">Search for products or stores</p>
           </div>
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -161,14 +161,14 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
         ) : (
           <div className={cn("space-y-6 transition-opacity", isPending ? "opacity-50" : "opacity-100")}>
             <div className="space-y-8">
-              {results.partners.length > 0 && (
+              {results.vendors.length > 0 && (
                 <div>
                   <h3 className="text-xs font-black text-zinc-400 tracking-tight mb-4 px-1">Top stores</h3>
                   <div className="space-y-4">
-                    {results.partners.map((partner) => (
-                      <PartnerCard
-                        key={partner.id}
-                        data={partner}
+                    {results.vendors.map((vendor) => (
+                      <VendorCard
+                        key={vendor.id}
+                        data={vendor}
                         className="bg-zinc-50/50 p-2"
                       />
                     ))}
@@ -176,15 +176,15 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                 </div>
               )}
 
-              {results.items.length > 0 && (
+              {results.products.length > 0 && (
                 <div className="pb-safe">
-                  <h3 className="text-xs font-black text-zinc-400 tracking-tight mb-4 px-1">Items from stores</h3>
+                  <h3 className="text-xs font-black text-zinc-400 tracking-tight mb-4 px-1">Products from stores</h3>
                   <div className="space-y-6">
                     {Object.entries(
-                      results.items.reduce((acc: Record<string, { partnerName: string, items: any[] }>, item: any) => {
-                        const pId = item.partner_id || '';
-                        if (!acc[pId]) acc[pId] = { partnerName: item.partner_name || 'Partner', items: [] };
-                        acc[pId].items.push(item);
+                      results.products.reduce((acc: Record<string, { partnerName: string, products: any[] }>, product: any) => {
+                        const pId = product.vendor_id || '';
+                        if (!acc[pId]) acc[pId] = { partnerName: product.vendor_name || 'Vendor', products: [] };
+                        acc[pId].products.push(product);
                         return acc;
                       }, {})
                     ).map(([pId, group]) => (
@@ -193,14 +193,14 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                           <Link href={`/store/${pId}`} className="text-xs font-black text-zinc-900 tracking-tight hover:text-[var(--primary)] transition-colors">
                             {group.partnerName}
                           </Link>
-                          <span className="text-[11px] font-bold text-zinc-400 tracking-tight">{group.items.length} Match{group.items.length > 1 ? 'es' : ''}</span>
+                          <span className="text-[11px] font-bold text-zinc-400 tracking-tight">{group.products.length} Match{group.products.length > 1 ? 'es' : ''}</span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-x-3 gap-y-6">
-                          {group.items.map((item) => (
-                            <ItemCard
-                              key={item.id}
-                              data={item}
+                          {group.products.map((product) => (
+                            <ProductCard
+                              key={product.id}
+                              data={product}
                             />
                           ))}
                         </div>

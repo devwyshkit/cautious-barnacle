@@ -7,10 +7,10 @@ import { Search, X, Loader2, ArrowLeft, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSearch } from "@/hooks/useSearch";
-import type { Tables } from "@/lib/supabase/database.types";
+import type { Tables } from "@/lib/supabase/types";
 import { ActionSlider } from "@/components/ui/ActionSlider";
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-import { PartnerCard } from "@/components/ui/PartnerCard";
+import { VendorCard } from "@/components/ui/VendorCard";
 
 type EntityItem = any;
 type EntityPartner = any;
@@ -42,11 +42,11 @@ export function GlobalSearch() {
   // WYSHKIT 2026: React 19 Compiler handles memoization automatically
   // No manual useMemo needed - React Compiler optimizes this calculation
   const results = {
-    items: (searchResults?.items || []) as EntityItem[],
-    partners: (searchResults?.partners || []) as EntityPartner[],
+    products: (searchResults?.products || []) as EntityItem[],
+    vendors: (searchResults?.vendors || []) as EntityPartner[],
   };
 
-  const hasResults = results.items.length > 0 || results.partners.length > 0;
+  const hasResults = results.products.length > 0 || results.vendors.length > 0;
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -59,7 +59,7 @@ export function GlobalSearch() {
           <Input
             ref={inputRef}
             type="text"
-            placeholder="Search items, stores..."
+            placeholder="Search products, stores..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-9 h-10 bg-zinc-50 border-zinc-100 text-sm rounded-lg"
@@ -84,7 +84,7 @@ export function GlobalSearch() {
         ) : !query ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Search className="size-10 text-zinc-200 mb-4" />
-            <p className="text-sm font-semibold text-zinc-400">Search for items or stores</p>
+            <p className="text-sm font-semibold text-zinc-400">Search for products or stores</p>
           </div>
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -93,17 +93,17 @@ export function GlobalSearch() {
           </div>
         ) : (
           <div className="space-y-6">
-            {results.partners.length > 0 && (
+            {results.vendors.length > 0 && (
               <div>
                 <p className="text-xs font-medium text-zinc-400 mb-3">Stores</p>
                 <div className="space-y-2">
-                  {results.partners.map((partner) => (
+                  {results.vendors.map((vendor) => (
                     <div
-                      key={partner.id as any}
+                      key={vendor.id as any}
                       onClick={() => triggerHaptic(HapticPattern.ACTION)}
                     >
-                      <PartnerCard
-                        data={partner}
+                      <VendorCard
+                        data={vendor}
                       />
                     </div>
                   ))}
@@ -111,34 +111,34 @@ export function GlobalSearch() {
               </div>
             )}
 
-            {results.items.length > 0 && (
+            {results.products.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-zinc-400 mb-3">Items</p>
+                <p className="text-xs font-medium text-zinc-400 mb-3">Products</p>
                 <div className="space-y-2">
-                  {results.items.map((item) => (
+                  {results.products.map((product) => (
                     <button
-                      key={item.id || 'new'}
+                      key={product.id || 'new'}
                       onClick={() => {
                         // WYSHKIT 2026: Momentum Haptic
                         triggerHaptic(HapticPattern.ACTION);
 
-                        // WYSHKIT 2026: Navigate to item via partner route
-                        const partnerId = item.partner_id || (item as any).partnerId;
+                        // WYSHKIT 2026: Navigate to product via vendor route
+                        const partnerId = product.vendor_id || (product as any).partnerId;
                         if (partnerId) {
-                          router.push(`/partner/${partnerId}?item=${item.id}`);
+                          router.push(`/vendor/${partnerId}?product=${product.id}`);
                         } else {
-                          // No partner context — navigate to search with item ID for intent resolution
-                          router.push(`/search?q=${encodeURIComponent(item.name || '')}&item=${item.id}`);
+                          // No vendor context — navigate to search with product ID for intent resolution
+                          router.push(`/search?q=${encodeURIComponent(product.name || '')}&product=${product.id}`);
                         }
                       }}
                       className="w-full flex items-center gap-3 p-3 bg-zinc-50 rounded-xl hover:bg-zinc-100 transition-colors text-left"
                     >
                       <div className="size-12 rounded-lg overflow-hidden shrink-0 bg-zinc-50 relative border border-zinc-100">
-                        <Image src={(item as any).image_url || ((item as any).images?.[0]) || '/images/logo.png'} alt={item.name || 'Item'} fill className="object-cover" sizes="48px" />
+                        <Image src={(product as any).image_url || ((product as any).images?.[0]) || '/images/logo.png'} alt={product.name || 'Item'} fill className="object-cover" sizes="48px" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-zinc-900 truncate">{item.name}</p>
-                        <p className="text-xs text-zinc-500">{(item.partner_name || 'Store')} · ₹{item.base_price}</p>
+                        <p className="text-sm font-semibold text-zinc-900 truncate">{product.name}</p>
+                        <p className="text-xs text-zinc-500">{(product.vendor_name || 'Store')} · ₹{product.base_price}</p>
                       </div>
                     </button>
                   ))}

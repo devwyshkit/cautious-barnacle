@@ -42,7 +42,7 @@ async function AsyncSearchContent({ params }: { params: { q?: string; category?:
 
   const initialResults = (q && q.length >= 2) || category
     ? await searchFiltered({ q, category, limit: 20 })
-    : { items: [], partners: [], total: 0 };
+    : { products: [], vendors: [], total: 0 };
 
   return (
     <SearchPageClient

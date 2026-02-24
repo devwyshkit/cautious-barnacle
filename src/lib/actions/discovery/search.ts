@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
-import { WyshkitItem } from '@/lib/types/item';
+import { WyshkitItem } from '@/lib/types/product';
 import {
     SearchResultsSchema,
     WyshkitItemSchema,
@@ -26,14 +26,16 @@ export async function searchFiltered(options: {
     const supabase = await createClient();
     const { q, category, limit = 20, lat, lng } = options;
 
-    // Combined query for items
+    // Combined query for products
     let itemsQuery = supabase
-        .from('v_item_listings_search')
-        .select('*')
+        .from('products')
+        .select('*, vendors!inner(name, slug, city, is_active)')
+        .eq('is_active', true)
+        .eq('vendors.is_active', true)
         .limit(limit);
 
     if (q && q.length >= 2) {
-        itemsQuery = itemsQuery.textSearch('fts_vector', q, {
+        itemsQuery = itemsQuery.textSearch('fts', q, {
             type: 'websearch',
             config: 'english'
         });
@@ -50,10 +52,11 @@ export async function searchFiltered(options: {
         // if we updated it, but let's keep it functional.
     }
 
-    // Combined query for partners
+    // Combined query for vendors
     let partnersQuery = supabase
-        .from('v_partner_listings')
+        .from('vendors')
         .select('*')
+        .eq('is_active', true)
         .limit(Math.floor(limit / 2));
 
     if (q && q.length >= 2) {
@@ -66,11 +69,11 @@ export async function searchFiltered(options: {
     ]);
 
     const rawResults = {
-        items: (itemsResponse.data || []).map(item => ({
-            ...item,
-            image_url: (item as any).images?.[0] || (item as any).image_url
+        products: (itemsResponse.data || []).map(product => ({
+            ...product,
+            image_url: (product as any).images?.[0] || (product as any).image_url
         })),
-        partners: partnersResponse.data || [],
+        vendors: partnersResponse.data || [],
         total: (itemsResponse.data?.length || 0) + (partnersResponse.data?.length || 0)
     };
 
@@ -84,7 +87,7 @@ export async function searchFiltered(options: {
 }
 
 /**
- * Discovery Items Fetcher (Purified)
+ * Discovery Products Fetcher (Purified)
  * Handles infinite pagination and category filters.
  */
 export async function getFilteredItems(options: {
@@ -96,7 +99,7 @@ export async function getFilteredItems(options: {
     maxPrice?: number;
     lat?: number;
     lng?: number;
-} = {}): Promise<{ data?: { items: WyshkitItem[]; total: number }; error?: string }> {
+} = {}): Promise<{ data?: { products: WyshkitItem[]; total: number }; error?: string }> {
     try {
         const supabase = await createClient();
         const { limit = 12, offset = 0, category, search, minPrice, maxPrice, lat, lng } = options;
@@ -106,8 +109,8 @@ export async function getFilteredItems(options: {
         // SWIGGY 2026: Never filter client-side.
 
         let query = supabase
-            .from('v_item_listings_search')
-            .select('*', { count: 'exact' });
+            .from('products')
+            .select('*, vendors!inner(name, slug, city, is_active)', { count: 'exact' });
 
         if (lat && lng) {
             // Ideally we'd use a postgres function that takes lat/lng/radius/category/search
@@ -122,7 +125,7 @@ export async function getFilteredItems(options: {
             query = query.ilike('category', category);
         }
         if (search) {
-            // v_item_listings_search uses 'name' for item name based on previous view definition check
+            // v_item_listings_search uses 'name' for product name based on previous view definition check
             query = query.ilike('name', `%${search}%`);
         }
         if (minPrice !== undefined) {
@@ -141,12 +144,12 @@ export async function getFilteredItems(options: {
         const validated = z.array(WyshkitItemSchema).safeParse(data);
         if (!validated.success) {
             logger.error('Zod Validation Failed: getFilteredItems', validated.error);
-            return { data: { items: (data || []) as any, total: count || 0 } };
+            return { data: { products: (data || []) as any, total: count || 0 } };
         }
 
-        return { data: { items: validated.data as unknown as WyshkitItem[], total: count || 0 } };
+        return { data: { products: validated.data as unknown as WyshkitItem[], total: count || 0 } };
     } catch (error) {
-        logger.error('Failed to fetch filtered items in Discovery', error, { options });
-        return { error: 'Failed to fetch items' };
+        logger.error('Failed to fetch filtered products in Discovery', error, { options });
+        return { error: 'Failed to fetch products' };
     }
 }

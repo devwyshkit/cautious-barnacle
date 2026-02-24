@@ -32,7 +32,7 @@ interface CreativeBriefProps {
  */
 export function CreativeBrief({ order, previews, timeline, onOpenPersonalization, isOptimisticSubmitted }: CreativeBriefProps) {
     const latestPreview = previews[0];
-    const personalizedItems = order.order_items?.filter(i => i.is_personalized) || [];
+    const personalizedItems = order.order_products?.filter(i => i.is_personalized) || [];
 
     // WYSHKIT 2026: Align with single status truth
     const hasSubmittedBrief = isOptimisticSubmitted ||
@@ -117,7 +117,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                     <>
                                         <p className="text-[11px] font-black text-zinc-950 tracking-tight leading-none">Brief Received</p>
                                         <p className="text-xs font-bold text-zinc-400 mt-2 max-w-[220px] mx-auto leading-relaxed">
-                                            Partner is reviewing your vision. First preview expected shortly.
+                                            Vendor is reviewing your vision. First preview expected shortly.
                                         </p>
                                     </>
                                 ) : (
@@ -152,7 +152,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
 
             {/* The 3-Layer History Trail */}
             <HistoryTrail
-                orderItems={order.order_items || []}
+                orderItems={order.order_products || []}
                 previews={previews}
                 timeline={timeline}
             />

@@ -104,18 +104,15 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ received: true, message: 'Session not found or expired' });
         }
 
-        // Fetch current cart items for atomic placement
-        const { data: cart_items } = await supabase
-          .from('v_active_cart_detailed')
-          .select('*')
-          .eq('user_id', userId);
+        // Fetch snapshot_items from session for true determinism
+        const cart_products = session.snapshot_items as any[];
 
-        if (!cart_items || cart_items.length === 0) {
-          log.error('[webhooks/razorpay] Cart empty for user', { userId });
-          return NextResponse.json({ received: true, message: 'Cart empty' });
+        if (!cart_products || !Array.isArray(cart_products) || cart_products.length === 0) {
+          log.error('[webhooks/razorpay] Cart snapshot empty for session', { sessionId: draftId });
+          return NextResponse.json({ received: true, message: 'Cart snapshot empty' });
         }
 
-        // Check if order already exists (Idempotency)
+        // Check if order already exists (Idempotency - Layer 1: Orders Table)
         const { data: existingOrder } = await supabase
           .from('orders')
           .select('id')
@@ -123,8 +120,22 @@ export async function POST(req: NextRequest) {
           .maybeSingle();
 
         if (existingOrder) {
-          log.info('[webhooks/razorpay] Idempotency hit: Order already processed by client/browser', { orderId: existingOrder.id, razorpayOrderId });
+          log.info('[webhooks/razorpay] Idempotency hit: Order already processed', { orderId: existingOrder.id, razorpayOrderId });
           return NextResponse.json({ received: true, message: 'Order already processed' });
+        }
+
+        // Idempotency - Layer 2: Webhook Logs (Elite Pattern)
+        const { error: logError } = await supabase
+          .from('webhook_logs')
+          .upsert({
+            source: 'razorpay',
+            external_id: razorpayPaymentId,
+            payload: body as unknown as Json
+          }, { onConflict: 'external_id' });
+
+        if (logError && 'code' in logError && logError.code === '23505') {
+          log.info('[webhooks/razorpay] Idempotency hit: Payment already logged', { razorpayPaymentId });
+          return NextResponse.json({ received: true, message: 'Payment already processed' });
         }
 
         // Place order using session data and current cart
@@ -133,13 +144,13 @@ export async function POST(req: NextRequest) {
           payload: {
             razorpay_order_id: razorpayOrderId,
             payment_id: razorpayPaymentId,
-            items: cart_items.map(item => ({
-              item_id: item.item_id,
-              variant_id: item.variant_id,
-              quantity: item.quantity,
-              personalization: item.personalization,
-              selected_addons: item.selected_addons
-            })) as any,
+            products: cart_products.map(product => ({
+              product_id: product.product_id!,
+              variant_id: product.variant_id ?? null,
+              quantity: product.quantity!,
+              personalization: (product.personalization as Record<string, any>) ?? null,
+              selected_addons: (product.selected_addons as any[]) ?? null
+            })),
             address_id: session.selected_address_id || undefined,
             coupon_code: session.applied_coupon || undefined,
             use_wallet: session.use_wallet || false,
@@ -210,7 +221,7 @@ export async function POST(req: NextRequest) {
 
         await supabase.rpc('log_order_status_history', {
           p_order_id: order.id,
-          p_type: 'refund',
+          p_status: 'REFUNDED',
           p_title: 'Refund Processed',
           p_description: `Payment refund (ID: ${refundId}) has been successfully processed.`,
           p_metadata: { paymentId, refundId } as unknown as Json

@@ -15,7 +15,7 @@ import type { Database } from '@/lib/supabase/database.types'
 type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
 
 type OrderWithRelations = Tables<'orders'> & {
-  partners: { business_name: string | null } | null
+  vendors: { business_name: string | null } | null
   users: { full_name: string | null; phone: string | null } | null
 }
 
@@ -42,13 +42,14 @@ function formatDate(date: string) {
 
 function getStatusBadge(status: string) {
   const colors: Record<string, string> = {
-    PENDING: 'text-amber-600 border-amber-200',
+    PLACED: 'text-amber-600 border-amber-200',
     CONFIRMED: 'text-blue-600 border-blue-200',
-    PREPARING: 'text-purple-600 border-purple-200',
-    READY: 'text-cyan-600 border-cyan-200',
-    OUT_FOR_DELIVERY: 'text-indigo-600 border-indigo-200',
+    IN_PRODUCTION: 'text-purple-600 border-purple-200',
+    PACKED: 'text-cyan-600 border-cyan-200',
+    DISPATCHED: 'text-indigo-600 border-indigo-200',
     DELIVERED: 'text-emerald-600 border-emerald-200',
     CANCELLED: 'text-red-600 border-red-200',
+    REFUNDED: 'text-zinc-600 border-zinc-200',
   }
   return <Badge variant="outline" className={colors[status] || ''}>{status.replace(/_/g, ' ').toLowerCase()}</Badge>
 }
@@ -60,7 +61,7 @@ export function OrderTable({ orders, currentStatus, totalCount, currentPage, pag
 
   const filtered = orders.filter((o) =>
     o.order_number?.toLowerCase().includes(search.toLowerCase()) ||
-    o.partners?.business_name?.toLowerCase().includes(search.toLowerCase())
+    o.vendors?.business_name?.toLowerCase().includes(search.toLowerCase())
   )
 
   const handleStatusFilter = (value: string) => {
@@ -105,7 +106,7 @@ export function OrderTable({ orders, currentStatus, totalCount, currentPage, pag
           <TableHeader>
             <TableRow>
               <TableHead>Order</TableHead>
-              <TableHead className="hidden md:table-cell">Partner</TableHead>
+              <TableHead className="hidden md:table-cell">Vendor</TableHead>
               <TableHead className="hidden lg:table-cell">Customer</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Amount</TableHead>
@@ -120,7 +121,7 @@ export function OrderTable({ orders, currentStatus, totalCount, currentPage, pag
               filtered.map((order) => (
                 <TableRow key={order.id} className={updating === order.id ? 'opacity-50' : ''}>
                   <TableCell className="font-medium">#{order.order_number}</TableCell>
-                  <TableCell className="hidden md:table-cell">{order.partners?.business_name || '-'}</TableCell>
+                  <TableCell className="hidden md:table-cell">{order.vendors?.business_name || '-'}</TableCell>
                   <TableCell className="hidden lg:table-cell">
                     <div className="text-sm">{order.users?.full_name || 'Guest'}</div>
                     <div className="text-xs text-zinc-500">{order.users?.phone}</div>

@@ -10,7 +10,7 @@ import { logger } from '@/lib/logging/logger';
 
 interface RoleGuardProps {
   children: React.ReactNode;
-  allowedRoles: ('admin' | 'partner' | 'customer')[];
+  allowedRoles: ('admin' | 'vendor' | 'customer')[];
   fallbackPath?: string;
 }
 
@@ -39,11 +39,11 @@ export function RoleGuard({
         const permissions = await resolveUserPermissionsClient(user.id);
 
         if (mounted) {
-          // Wyshkit 2026: Admins can access everything (Partner/Admin dashboards)
+          // Wyshkit 2026: Admins can access everything (Vendor/Admin dashboards)
           // We check the specific permission flags
           const isAuthorized =
             (allowedRoles.includes('admin') && permissions.isAdmin) ||
-            (allowedRoles.includes('partner') && (permissions.isPartner || permissions.isAdmin)) ||
+            (allowedRoles.includes('vendor') && (permissions.isPartner || permissions.isAdmin)) ||
             (allowedRoles.includes('customer') && permissions.isCustomer);
 
           if (isAuthorized) {

@@ -79,7 +79,7 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
               className="w-full flex items-center gap-3 h-11 px-4 bg-zinc-100/50 rounded-xl hover:bg-zinc-100 transition-all group"
             >
               <Search className="size-4 text-zinc-400 group-hover:text-zinc-600" />
-              <span className="text-[14px] text-zinc-500 font-medium">Search for items, stores...</span>
+              <span className="text-[14px] text-zinc-500 font-medium">Search for products, stores...</span>
             </button>
           </div>
 

@@ -14,28 +14,28 @@ export interface UpsellItem {
 }
 
 interface UpsellGridProps {
-  items: UpsellItem[];
+  products: UpsellItem[];
   title?: string;
-  onAdd?: (item: UpsellItem) => Promise<void> | void;
+  onAdd?: (product: UpsellItem) => Promise<void> | void;
 }
 
 export const UpsellGrid: React.FC<UpsellGridProps> = ({
-  items,
+  products,
   title = "Pairs well with",
   onAdd
 }) => {
   const [addingId, setAddingId] = useState<string | null>(null);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
-  if (!items || items.length === 0) return null;
+  if (!products || products.length === 0) return null;
 
-  const handleAdd = async (item: UpsellItem) => {
-    if (addingId || addedIds.has(item.id)) return;
+  const handleAdd = async (product: UpsellItem) => {
+    if (addingId || addedIds.has(product.id)) return;
 
-    setAddingId(item.id);
+    setAddingId(product.id);
     try {
-      await onAdd?.(item);
-      setAddedIds(prev => new Set(prev).add(item.id));
+      await onAdd?.(product);
+      setAddedIds(prev => new Set(prev).add(product.id));
     } finally {
       setAddingId(null);
     }
@@ -48,22 +48,22 @@ export const UpsellGrid: React.FC<UpsellGridProps> = ({
       </h3>
       <ScrollArea className="w-full">
         <div className="flex gap-3 px-4 pb-4">
-          {items.map((item) => {
-            const isAdding = addingId === item.id;
-            const isAdded = addedIds.has(item.id);
+          {products.map((product) => {
+            const isAdding = addingId === product.id;
+            const isAdded = addedIds.has(product.id);
 
             return (
-              <div key={item.id} className="shrink-0 w-[140px] flex flex-col gap-2">
+              <div key={product.id} className="shrink-0 w-[140px] flex flex-col gap-2">
                 <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-100">
                   <Image
-                    src={item.image_url || '/images/logo.png'}
-                    alt={item.name}
+                    src={product.image_url || '/images/logo.png'}
+                    alt={product.name}
                     fill
                     className="object-cover"
                     sizes="140px"
                   />
                   <button
-                    onClick={() => handleAdd(item)}
+                    onClick={() => handleAdd(product)}
                     disabled={isAdding || isAdded}
                     className={cn(
                       "absolute bottom-2 right-2 size-9 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-all",
@@ -83,10 +83,10 @@ export const UpsellGrid: React.FC<UpsellGridProps> = ({
                 </div>
                 <div className="px-0.5 space-y-0.5">
                   <p className="text-[13px] font-semibold text-zinc-900 truncate leading-tight">
-                    {item.name}
+                    {product.name}
                   </p>
                   <p className="text-xs font-bold text-zinc-500">
-                    ₹{item.price}
+                    ₹{product.price}
                   </p>
                 </div>
               </div>

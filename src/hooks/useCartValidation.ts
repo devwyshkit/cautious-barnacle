@@ -5,21 +5,21 @@ import { useMemo } from "react";
 
 /**
  * WYSHKIT 2026: Proactive Cart Validation
- * Helps detect if the user is browsing a partner different from their current cart.
+ * Helps detect if the user is browsing a vendor different from their current cart.
  */
 export function useCartValidation(targetPartnerId?: string | null) {
     const { draftOrder } = useCart();
 
     const isMismatch = useMemo(() => {
-        if (!draftOrder.partner_id || !targetPartnerId) return false;
-        return draftOrder.partner_id !== targetPartnerId;
-    }, [draftOrder.partner_id, targetPartnerId]);
+        if (!draftOrder.vendor_id || !targetPartnerId) return false;
+        return draftOrder.vendor_id !== targetPartnerId;
+    }, [draftOrder.vendor_id, targetPartnerId]);
 
-    const hasItemsInCart = draftOrder.items.length > 0;
+    const hasItemsInCart = draftOrder.products.length > 0;
 
     return {
         isMismatch: isMismatch && hasItemsInCart,
-        currentCartPartnerId: draftOrder.partner_id,
+        currentCartPartnerId: draftOrder.vendor_id,
         hasItemsInCart
     };
 }

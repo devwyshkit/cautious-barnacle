@@ -43,7 +43,7 @@ import { hasItemPersonalization } from '@/lib/utils/personalization';
 import { StatusCard } from './tracking/StatusCard';
 import { OrderTimeline } from './tracking/OrderTimeline';
 import { DeliveryInfo } from './tracking/DeliveryInfo';
-import { OrderItemsList } from './tracking/OrderItemsList';
+import { OrderProductsList } from './tracking/OrderProductsList';
 import { BillSummary } from './tracking/BillSummary';
 import { CreativeBrief } from './tracking/CreativeBrief';
 
@@ -68,13 +68,13 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   const [isIdentitySubmittedOptimistic, setIsIdentitySubmittedOptimistic] = useState(false);
 
   const personalizedItemsPending = useMemo(() => {
-    return (order?.order_items || []).filter((item: any) => {
-      if (!item.is_personalized) return false;
-      const s = (item.status || 'pending').toLowerCase();
+    return (order?.order_products || []).filter((product: any) => {
+      if (!product.is_personalized) return false;
+      const s = (product.status || 'pending').toLowerCase();
       const blocked = ['submitted', 'details_received', 'preview_ready', 'approved', 'in_production', 'packed', 'shipped', 'delivered', 'cancelled'];
-      return !blocked.includes(s) && !item.personalization_details;
+      return !blocked.includes(s) && !product.personalization_details;
     });
-  }, [order?.order_items]);
+  }, [order?.order_products]);
 
   useEffect(() => {
     if (order && showSuccess && personalizedItemsPending.length > 0 && !hasAutoOpened) {
@@ -92,7 +92,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   }, [showSuccess]);
 
   const handlePersonalizationSubmitted = () => {
-    toast.success("Details shared with partner!");
+    toast.success("Details shared with vendor!");
     setIsIdentitySubmittedOptimistic(true);
     setProactivePersonalizationOpen(false);
     // WYSHKIT 2026: Force a local refetch if channel is slow, 
@@ -109,8 +109,8 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   })), [timelineEvents]);
 
   const itemPreviews = useMemo(() => (previews || []).reduce((acc: any, p: any) => {
-    if (p.order_item_id && !acc[p.order_item_id]) {
-      acc[p.order_item_id] = p;
+    if (p.order_product_id && !acc[p.order_product_id]) {
+      acc[p.order_product_id] = p;
     }
     return acc;
   }, {}), [previews]);
@@ -200,7 +200,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                       </div>
                       <div>
                         <h3 className="text-base font-black tracking-tight text-zinc-900">Add personalisation details</h3>
-                        <p className="text-xs font-bold text-zinc-400 tracking-tight">We need a few details to personalise your item</p>
+                        <p className="text-xs font-bold text-zinc-400 tracking-tight">We need a few details to personalise your product</p>
                       </div>
                     </div>
                     <button
@@ -216,7 +216,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                   <div className="p-4 pt-2">
                     <IdentityForm
                       orderId={order?.id || orderId}
-                      items={personalizedItemsPending.length > 0 ? personalizedItemsPending : (order ? [] : [{ id: 'pending', item_name: 'Order Loading...', is_personalized: true }])}
+                      products={personalizedItemsPending.length > 0 ? personalizedItemsPending : (order ? [] : [{ id: 'pending', product_name: 'Order Loading...', is_personalized: true }])}
                       designDeadline={order ? (order as any).design_deadline_at : undefined}
                       isAutoOpenedForSuccess={showSuccess || showIdentityParam}
                       onSubmitted={handlePersonalizationSubmitted}
@@ -243,8 +243,8 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
             </SurfaceErrorBoundaryWithRouter>
           )}
 
-          <SurfaceErrorBoundaryWithRouter surfaceName="Items List">
-            <OrderItemsList
+          <SurfaceErrorBoundaryWithRouter surfaceName="Products List">
+            <OrderProductsList
               order={order as OrderDetail}
               itemPreviews={itemPreviews}
               onPersonalizationSubmitted={handlePersonalizationSubmitted}
@@ -254,9 +254,9 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
           {order.status === ORDER_STATUS.DELIVERED && (
             <FeedbackStep
               orderId={orderId}
-              items={order.order_items?.map((item: any) => ({
-                id: item.item_id,
-                name: item.item_name
+              products={order.order_products?.map((product: any) => ({
+                id: product.product_id,
+                name: product.product_name
               })) || []}
               onComplete={() => { }}
             />

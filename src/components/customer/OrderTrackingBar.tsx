@@ -89,7 +89,7 @@ export function OrderTrackingBar() {
                             "text-sm font-black truncate leading-none",
                             isUrgent ? "text-rose-950" : "text-white"
                         )}>
-                            {isUrgent ? "Add Identity Now" : (orderToShow.partner_name || config.label)}
+                            {isUrgent ? "Add Identity Now" : (orderToShow.vendor_name || config.label)}
                         </h4>
                         <p className={cn(
                             "text-xs truncate font-medium mt-1 leading-none",

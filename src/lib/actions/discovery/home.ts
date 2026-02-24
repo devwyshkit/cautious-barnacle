@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
 import { logError } from '@/lib/utils/error-handler';
-import { WyshkitItem } from '@/lib/types/item';
+import { WyshkitItem } from '@/lib/types/product';
 import {
     WyshkitItemSchema,
 } from '@/lib/validations/discovery';
@@ -18,7 +18,7 @@ import {
 export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusKm: number = 5) => {
     const supabase = await createClient();
 
-    const { data: nearbyItems, error } = await supabase.rpc('get_nearby_items', {
+    const { data: nearbyItems, error } = await supabase.rpc('get_nearby_products', {
         user_lat: lat,
         user_lng: lng,
         radius_km: radiusKm,
@@ -26,18 +26,18 @@ export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusK
     });
 
     if (error) {
-        logger.error('Failed to get nearby items in getNearbyDiscovery', error);
-        return { items: [], error: error.message };
+        logger.error('Failed to get nearby products in getNearbyDiscovery', error);
+        return { products: [], error: error.message };
     }
 
     const validated = z.array(WyshkitItemSchema).safeParse(nearbyItems);
     if (!validated.success) {
-        logger.error('Validation failed for nearby items', validated.error);
-        return { items: nearbyItems as any, error: null };
+        logger.error('Validation failed for nearby products', validated.error);
+        return { products: nearbyItems as any, error: null };
     }
 
     return {
-        items: validated.data as unknown as WyshkitItem[],
+        products: validated.data as unknown as WyshkitItem[],
         error: null
     };
 });
@@ -61,13 +61,28 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
             return {
                 sections: [],
                 categories: [],
-                trendingItems: [],
-                featuredPartners: [],
+                trendingProducts: [],
+                featuredVendors: [],
+                activeOrders: [],
+                error: error.message
+            };
+        }
+
+        // SWIGGY 2026 Pattern: Robust Unwrapping
+        // Supabase RPC can return data directly or nested in an array depending on call context
+        const raw = Array.isArray(data) ? (data[0]?.get_home_surface || data[0]) : data;
+
+        if (!raw) {
+            logger.warn('GetHomeSurface: Received empty or malformed data');
+            return {
+                sections: [],
+                categories: [],
+                trendingProducts: [],
+                featuredVendors: [],
                 activeOrders: []
             };
         }
 
-        const raw = data as any;
 
         // WYSHKIT 2026: Deterministic Category Resolution
         let resolvedCategories = raw?.categories || [];
@@ -90,24 +105,25 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
         const system_status = (hour >= 22 || hour < 6) ? 'delayed' : (hour >= 18 && hour < 21) ? 'capacity' : 'normal';
 
         return {
-            sections,
-            categories: resolvedCategories,
-            trendingItems: raw.trendingItems || [],
-            featuredPartners: raw.featuredPartners || [],
+            sections: raw.sections || [],
+            categories: raw.categories || [],
+            trendingProducts: raw.trendingProducts || [],
+            featuredVendors: raw.featuredVendors || [],
             activeOrders: raw.activeOrders || [],
             metadata: {
                 system_status,
                 orders: raw.activeOrders || []
             }
         };
-    } catch (error) {
+    } catch (error: any) {
         logError(error, 'GetHomeSurfaceContextCatch');
         return {
             sections: [],
             categories: [],
-            trendingItems: [],
-            featuredPartners: [],
-            activeOrders: []
+            trendingProducts: [],
+            featuredVendors: [],
+            activeOrders: [],
+            error: error.message || 'An unexpected error occurred while fetching home surface'
         };
     }
 });
@@ -121,7 +137,7 @@ export async function getCategories() {
 export async function getFeaturedPartners(limit: number = 8) {
     const supabase = await createClient();
     const { data, error } = await supabase
-        .from('partners')
+        .from('vendors')
         .select(`
             id, name, image_url, rating, city, 
             avg_prep_time_mins, base_delivery_charge, 
@@ -135,19 +151,19 @@ export async function getFeaturedPartners(limit: number = 8) {
     // Map to UI-friendly structure
     const mappedPartners = (data || []).map(p => ({
         ...p,
-        prep_hours: p.avg_prep_time_mins ? (p.avg_prep_time_mins / 60) : 0.75,
+        prep_mins: p.avg_prep_time_mins || 45,
         delivery_fee: Number(p.base_delivery_charge || 0)
     }));
 
     return { data: mappedPartners, error: null };
 }
 
-export async function getFeaturedItems(limit: number = 3) {
+export async function getTrendingProducts(limit: number = 3) {
     try {
         const supabase = await createClient();
         const { data, error } = await supabase
-            .from('items')
-            .select('*, partners(name, city)')
+            .from('products')
+            .select('*, vendors(name, city)')
             .eq('is_active', true)
             .limit(limit);
 

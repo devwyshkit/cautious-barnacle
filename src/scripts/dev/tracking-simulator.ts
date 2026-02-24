@@ -32,22 +32,19 @@ export const TrackingSimulator = {
         const currentTracking = (order as any).tracking_status;
 
         if (order.status === ORDER_STATUS.PACKED) {
-            nextStatus = ORDER_STATUS.DISPATCHED;
+            nextStatus = ORDER_STATUS.OUT_FOR_DELIVERY;
             nextTrackingStatus = 'picked_up';
-        } else if (order.status === ORDER_STATUS.DISPATCHED) {
+        } else if (order.status === ORDER_STATUS.OUT_FOR_DELIVERY) {
             if (currentTracking === 'picked_up') {
-                nextStatus = ORDER_STATUS.DISPATCHED;
+                nextStatus = ORDER_STATUS.OUT_FOR_DELIVERY;
                 nextTrackingStatus = 'in_transit';
             } else if (currentTracking === 'in_transit') {
-                nextStatus = 'OUT_FOR_DELIVERY'; // Map to enum if available
-                nextTrackingStatus = 'out_for_delivery';
+                nextStatus = ORDER_STATUS.DELIVERED;
+                nextTrackingStatus = 'delivered';
             } else {
-                nextStatus = 'OUT_FOR_DELIVERY';
-                nextTrackingStatus = 'out_for_delivery';
+                nextStatus = ORDER_STATUS.DELIVERED;
+                nextTrackingStatus = 'delivered';
             }
-        } else if (order.status === 'OUT_FOR_DELIVERY') {
-            nextStatus = ORDER_STATUS.DELIVERED;
-            nextTrackingStatus = 'delivered';
         } else if (order.status === ORDER_STATUS.DELIVERED) {
             return { success: true, message: 'Already delivered' };
         }
@@ -60,7 +57,7 @@ export const TrackingSimulator = {
                 status: nextStatus as any,
                 tracking_status: nextTrackingStatus,
                 updated_at: new Date().toISOString(),
-                dispatched_at: nextStatus === ORDER_STATUS.DISPATCHED && nextTrackingStatus === 'picked_up' ? new Date().toISOString() : undefined,
+                dispatched_at: nextStatus === ORDER_STATUS.OUT_FOR_DELIVERY && nextTrackingStatus === 'picked_up' ? new Date().toISOString() : undefined,
                 delivered_at: nextStatus === ORDER_STATUS.DELIVERED ? new Date().toISOString() : undefined,
             })
             .eq('id', orderId);

@@ -16,11 +16,11 @@ async function getMetrics(): Promise<DashboardMetrics> {
       .gte('created_at', `${today}T00:00:00`)
       .lt('created_at', `${today}T23:59:59`),
     supabase
-      .from('partners')
+      .from('vendors')
       .select('id', { count: 'exact' })
       .eq('kyc_status', 'ACTIVE'),
     supabase
-      .from('partners')
+      .from('vendors')
       .select('id', { count: 'exact' })
       .eq('kyc_status', 'SUBMITTED'),
   ])
@@ -39,7 +39,7 @@ async function getRecentOrders() {
   const supabase = await createClient()
   const { data } = await supabase
     .from('orders')
-    .select('id, order_number, status, total, created_at, partners(business_name)')
+    .select('id, order_number, status, total, created_at, vendors(business_name)')
     .order('created_at', { ascending: false })
     .limit(5)
 
@@ -50,14 +50,14 @@ async function getRecentOrders() {
     status: string;
     total: number;
     created_at: string;
-    partners: { business_name: string } | null;
+    vendors: { business_name: string } | null;
   }>;
 }
 
 async function getPendingKYC() {
   const supabase = await createClient()
   const { data } = await supabase
-    .from('partners')
+    .from('vendors')
     .select('id, business_name, created_at')
     .eq('kyc_status', 'SUBMITTED')
     .order('created_at', { ascending: true })
@@ -119,7 +119,7 @@ export default async function AdminDashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Active partners</CardTitle>
+            <CardTitle className="text-sm font-medium text-zinc-500">Active vendors</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">{metrics.active_partners}</p>
@@ -131,7 +131,7 @@ export default async function AdminDashboard() {
             <CardTitle className="text-sm font-medium text-zinc-500">Pending KYC</CardTitle>
           </CardHeader>
           <CardContent>
-            <Link href="/admin/partners?status=SUBMITTED" className="flex items-center gap-2">
+            <Link href="/admin/vendors?status=SUBMITTED" className="flex items-center gap-2">
               <p className="text-2xl font-semibold text-amber-600">{metrics.pending_kyc}</p>
               {metrics.pending_kyc > 0 && <ArrowRight className="size-4 text-amber-600" />}
             </Link>
@@ -158,7 +158,7 @@ export default async function AdminDashboard() {
                     <div>
                       <p className="text-sm font-medium">#{order.order_number}</p>
                       <p className="text-xs text-zinc-500">
-                        {order.partners?.business_name || 'Unknown partner'}
+                        {order.vendors?.business_name || 'Unknown vendor'}
                       </p>
                     </div>
                     <div className="text-right">
@@ -176,7 +176,7 @@ export default async function AdminDashboard() {
         <Card>
           <CardHeader className="flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">KYC queue</CardTitle>
-            <Link href="/admin/partners?status=SUBMITTED" className="text-xs text-zinc-500 hover:text-zinc-900">
+            <Link href="/admin/vendors?status=SUBMITTED" className="text-xs text-zinc-500 hover:text-zinc-900">
               View all
             </Link>
           </CardHeader>
@@ -185,15 +185,15 @@ export default async function AdminDashboard() {
               <p className="p-4 text-sm text-zinc-500">No pending applications</p>
             ) : (
               <div className="divide-y divide-zinc-100">
-                {pendingKYC.map((partner) => (
+                {pendingKYC.map((vendor) => (
                   <Link
-                    key={partner.id}
-                    href={`/admin/partners/${partner.id}`}
+                    key={vendor.id}
+                    href={`/admin/vendors/${vendor.id}`}
                     className="flex items-center justify-between px-4 py-3 hover:bg-zinc-50"
                   >
                     <div>
-                      <p className="text-sm font-medium">{partner.business_name}</p>
-                      <p className="text-xs text-zinc-500">Applied {formatDate(partner.created_at!)}</p>
+                      <p className="text-sm font-medium">{vendor.business_name}</p>
+                      <p className="text-xs text-zinc-500">Applied {formatDate(vendor.created_at!)}</p>
                     </div>
                     <Badge variant="outline" className="text-amber-600 border-amber-200">Review</Badge>
                   </Link>

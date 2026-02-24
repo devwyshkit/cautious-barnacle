@@ -17,7 +17,7 @@ import type { UpsellItem } from '@/components/customer/checkout/UpsellGrid'
 
 
 export interface CheckoutData {
-    items: DraftLineItem[]
+    products: DraftLineItem[]
     addresses: Address[]
     wallet_info: WalletInfo | null
     pricing: PricingBreakdown | null
@@ -33,9 +33,9 @@ export interface CheckoutData {
         email?: string
         name?: string
     } | null
-    partner_name?: string
-    partner_city?: string
-    partner_prep_mins?: number
+    vendor_name?: string
+    vendor_city?: string
+    vendor_prep_mins?: number
     distance_km?: number | null
     error?: string
 }
@@ -57,7 +57,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         // 1. Resolve Session State
         if (!user && !guestSessionId) {
             return {
-                items: [],
+                products: [],
                 addresses: [],
                 wallet_info: null,
                 pricing: null,
@@ -102,14 +102,14 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         }
 
         const typedContext = context as unknown as CheckoutContext; // Typed from JSONB RPC
-        const items = (typedContext.items || []) as DraftLineItem[];
+        const products = (typedContext.products || []) as DraftLineItem[];
         const addresses = (typedContext.addresses || []) as Address[];
         const pricing = typedContext.pricing as PricingBreakdown | null;
         const distanceKm = typedContext.distance_km ? Number(typedContext.distance_km) : null;
 
-        if (items.length === 0) {
+        if (products.length === 0) {
             return {
-                items: [],
+                products: [],
                 addresses: addresses,
                 wallet_info: typedContext.wallet_info,
                 pricing: null,
@@ -130,7 +130,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         }
 
         return {
-            items: items,
+            products: products,
             addresses: addresses,
             wallet_info: typedContext.wallet_info,
             pricing: pricing,
@@ -139,9 +139,9 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
             selected_address_id: selectedAddressId,
             gstin: gstin || null,
             user: user ? { id: user.id, email: user.email } : null,
-            partner_name: items[0]?.partner_name || undefined,
-            partner_city: items[0]?.partner_city || 'Bangalore',
-            partner_prep_mins: items[0]?.partner_prep_hours ? items[0].partner_prep_hours * 60 : 30,
+            vendor_name: products[0]?.vendor_name || undefined,
+            vendor_city: products[0]?.vendor_city || 'Bangalore',
+            vendor_prep_mins: products[0]?.vendor_prep_mins || 30,
             distance_km: distanceKm,
         }
 
@@ -149,7 +149,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         const errorMessage = error instanceof Error ? error.message : 'Failed to fetch checkout data';
         logError(error, 'GetCheckoutData');
         return {
-            items: [],
+            products: [],
             addresses: [],
             wallet_info: null,
             pricing: null,

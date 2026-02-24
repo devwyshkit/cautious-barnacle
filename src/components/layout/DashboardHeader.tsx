@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { User, Bell, Search } from 'lucide-react';
 
 interface DashboardHeaderProps {
-  type: 'admin' | 'partner';
+  type: 'admin' | 'vendor';
 }
 
 export function DashboardHeader({ type }: DashboardHeaderProps) {
@@ -23,7 +23,7 @@ export function DashboardHeader({ type }: DashboardHeaderProps) {
               priority
             />
             <span className="text-xs font-black tracking-tight text-primary block -mt-1">
-                {type === 'admin' ? 'Control Center' : 'Partner Manager'}
+                {type === 'admin' ? 'Control Center' : 'Vendor Manager'}
               </span>
           </Link>
         </div>

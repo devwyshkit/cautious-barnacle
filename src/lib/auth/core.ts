@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-export type UserRole = 'admin' | 'partner' | 'customer';
+export type UserRole = 'admin' | 'vendor' | 'customer';
 
 export interface UserPermissions {
   isAdmin: boolean;
@@ -24,9 +24,9 @@ export function getRedirectPath(permissions: UserPermissions, returnUrl?: string
   if (permissions.isPartner) {
     // If they have multiple outlets, they must select one
     if (permissions.partnerIds.length > 1) {
-      return '/partner/select-outlet';
+      return '/vendor/select-outlet';
     }
-    return '/partner';
+    return '/vendor';
   }
 
   if (permissions.isAdmin) return '/admin';
@@ -61,7 +61,7 @@ export async function resolveUserPermissions(
 
   return {
     isAdmin: roles.includes('admin'),
-    isPartner: roles.includes('partner') || partnerIds.length > 0,
+    isPartner: roles.includes('vendor') || partnerIds.length > 0,
     isCustomer: true,
     partnerIds,
   };

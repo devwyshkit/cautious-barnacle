@@ -32,12 +32,11 @@ const NAV_ITEMS = [
   { label: 'Insights', href: '/admin/insights', icon: BarChart3 },
   { label: 'Orders', href: '/admin/orders', icon: ShoppingCart },
   { label: 'Deliveries', href: '/admin/deliveries', icon: Truck },
-  { label: 'Partners', href: '/admin/partners', icon: Store },
+  { label: 'Vendors', href: '/admin/vendors', icon: Store },
   { label: 'Catalog', href: '/admin/catalog', icon: Package },
   { label: 'Categories', href: '/admin/categories', icon: Layers },
   { label: 'Customers', href: '/admin/customers', icon: Users },
   { label: 'Wyshkit money', href: '/admin/wallet', icon: Wallet },
-  { label: 'Payouts', href: '/admin/payouts', icon: Wallet },
   { label: 'Returns', href: '/admin/returns', icon: RotateCcw },
   { label: 'Coupons', href: '/admin/coupons', icon: Tag },
   { label: 'Serviceability', href: '/admin/serviceability', icon: MapPin },
@@ -73,8 +72,8 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: typeof Layou
 function Sidebar() {
   return (
     <nav className="flex flex-col gap-1 p-3 overflow-y-auto max-h-[calc(100vh-56px)]">
-      {NAV_ITEMS.map((item) => (
-        <NavLink key={item.href} {...item} />
+      {NAV_ITEMS.map((product) => (
+        <NavLink key={product.href} {...product} />
       ))}
     </nav>
   )

@@ -5,8 +5,7 @@ import { getHomeSurfaceContext } from "@/lib/actions/discovery/home";
 import { getFilteredItems } from "@/lib/actions/discovery/search";
 import { getServerLocation } from "@/lib/actions/discovery/location";
 import { HomeSkeleton } from "@/components/customer/home/HomeSkeleton";
-import { WyshkitItem } from '@/lib/types/item';
-import { BlocksEngine } from "@/components/ui/BlocksEngine";
+import { WyshkitItem } from '@/lib/types/product';
 import { Masthead } from "@/components/customer/home/Masthead";
 import { ReorderWidget } from "@/components/customer/home/ReorderWidget";
 import { cn } from "@/lib/utils";
@@ -25,149 +24,128 @@ interface HomePageProps {
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const { category = null } = await searchParams;
-  const location = await getServerLocation();
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    const { category = null } = await searchParams;
+    const location = await getServerLocation();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-  const discovery = await getHomeSurfaceContext(
-    location.lat || undefined,
-    location.lng || undefined,
-    user?.id
-  );
+    const discovery = await getHomeSurfaceContext(
+      location.lat || undefined,
+      location.lng || undefined,
+      user?.id
+    );
 
-  return (
-    <div className="min-h-screen max-w-[1440px] mx-auto animate-in font-sans selection:bg-[#D91B24]/10 bg-white">
-      <main className="pb-24">
-        <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
-
-        <Masthead
-          status={discovery.metadata?.system_status as 'normal' | 'delayed' | 'capacity'}
-          locationName={location.name || 'Your Area'}
-        />
-
-        {!category && discovery.activeOrders?.length > 0 && (
-          <ReorderWidget initialOrders={discovery.metadata?.orders} />
-        )}
-
-        <div className="mt-2 flex flex-col gap-8">
-          {/* Categories */}
-          <section className="px-4 md:px-8">
-            <CircleRail data={discovery.categories} context={{ selected_category: category }} />
-          </section>
-
-          {/* Trending Items */}
-          {discovery.trendingItems?.length > 0 && (
-            <section className="px-4 md:px-8">
-              <div className="flex flex-col gap-4">
-                <h2 className="text-xl font-black text-zinc-950 tracking-tighter">Trending Around You</h2>
-                <CardRail data={discovery.trendingItems} />
-              </div>
-            </section>
-          )}
-
-          {/* Featured Stores */}
-          {discovery.featuredPartners?.length > 0 && (
-            <section className="px-4 md:px-8">
-              <div className="flex flex-col gap-4">
-                <h2 className="text-xl font-black text-zinc-950 tracking-tighter">Top Stores Near You</h2>
-                <Grid data={discovery.featuredPartners} />
-              </div>
-            </section>
-          )}
-        </div>
-      </main>
-    </div>
-  );
-}
-
-/**
- * WYSHKIT 2026: Surface Components
- * These handle rendering slices of the pre-fetched "Surface Context".
- */
-
-async function AsyncDiscoveryGrid({
-  category,
-  categories,
-  metadata
-}: {
-  category: string | null;
-  categories: any[];
-  metadata?: any;
-}) {
-  const selectedCategoryName = category
-    ? (categories.find((c: any) => c.slug === category) as any)?.name
-    : null;
-
-  const itemsRes = await getFilteredItems({ limit: 24, category: category || undefined });
-  const initialItems = itemsRes.data?.items || [];
-  const totalCount = itemsRes.data?.total;
-
-  const blocks = [
-    {
-      id: 'categories_rail',
-      type: 'CIRCLE_RAIL' as const,
-      title: "What's on your mind?",
-      data: categories,
-      metadata: { selected_category: category }
-    },
-    ...(initialItems.length > 0 ? [{
-      id: 'discovery_grid',
-      type: 'PARTNER_GROUPED_GRID' as const,
-      title: selectedCategoryName || 'Discover',
-      data: initialItems
-    }] : []),
-    {
-      id: 'infinite_discovery',
-      type: 'INFINITE_GRID' as const,
-      data: [],
-      metadata: {
-        category: category,
-        totalCount: totalCount
-      }
-    }
-  ];
-
-  if (initialItems.length === 0 && category) {
     return (
-      <div className="flex flex-col gap-6">
-        <BlocksEngine blocks={[blocks[0]]} context={metadata} />
-        <div className="flex flex-col items-center justify-center py-24 px-8 text-center bg-zinc-50 rounded-[32px] border border-dashed border-zinc-200 mx-4">
-          <span className="text-3xl mb-4 grayscale">🧺</span>
-          <p className="text-sm font-black text-zinc-950 uppercase tracking-widest">No items found</p>
-          <p className="text-[11px] text-zinc-400 mt-1 font-bold uppercase tracking-tighter">Try another category</p>
-        </div>
+      <div className="min-h-screen animate-in font-sans selection:bg-[#D91B24]/10 bg-white">
+        <main className="pb-24">
+          <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
+
+          <Masthead
+            status={discovery.metadata?.system_status as 'normal' | 'delayed' | 'capacity'}
+            locationName={location.name || 'Your Area'}
+          />
+
+          {/* SWIGGY 2026: Diagnostic Dump (Temporary) */}
+          {process.env.NODE_ENV === 'development' && (
+            <details className="mx-4 md:mx-8 mb-4 p-2 bg-zinc-900 text-zinc-400 rounded-lg text-[8px] font-mono">
+              <summary className="cursor-pointer hover:text-white">Debug: Home Surface Data ({discovery.featuredVendors?.length} vendors, {discovery.trendingProducts?.length} products)</summary>
+              <pre className="mt-2 max-h-40 overflow-auto">
+                {JSON.stringify({
+                  vendors: discovery.featuredVendors?.length,
+                  products: discovery.trendingProducts?.length,
+                  categories: discovery.categories?.length,
+                  hasError: !!(discovery as any).error,
+                  location: { lat: location.lat, lng: location.lng, name: location.name }
+                }, null, 2)}
+              </pre>
+            </details>
+          )}
+
+          {(discovery as any).error && (
+            <div className="mx-4 md:mx-8 mb-8 p-6 bg-rose-50 border border-rose-100 rounded-3xl text-rose-950 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
+              <div className="flex items-center gap-3 font-black tracking-tight">
+                <div className="size-8 rounded-full bg-rose-500 flex items-center justify-center">
+                  <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                </div>
+                Discovery Engine Offline
+              </div>
+              <p className="text-sm font-medium opacity-80 leading-relaxed max-w-lg">
+                We are having trouble connecting to the Supabase API. This is common in certain regions (especially India) due to ISP-level DNS blocks on `.supabase.co` domains.
+              </p>
+              <div className="flex flex-col gap-2 mt-2">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-rose-900/40">Technical Details</p>
+                <pre className="text-[10px] bg-white/60 p-4 rounded-xl font-mono overflow-auto border border-rose-100/50">
+                  {String((discovery as any).error)}
+                </pre>
+              </div>
+              <div className="pt-4 flex flex-col gap-2">
+                <p className="text-xs font-bold text-rose-900">Recommended Fixes:</p>
+                <ul className="text-xs space-y-1 opacity-70 list-disc ml-4">
+                  <li>Use a VPN or set your DNS to 8.8.8.8</li>
+                  <li>Verify your <code className="bg-rose-100 px-1 rounded">/etc/hosts</code> mapping for the Supabase URL is correct.</li>
+                  <li>Check if <code className="bg-rose-100 px-1 rounded">NEXT_PUBLIC_SUPABASE_URL</code> in your <code className="bg-rose-100 px-1 rounded">.env</code> matches your host entry.</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          <div className="max-w-[1440px] mx-auto">
+            {!category && discovery.activeOrders?.length > 0 && (
+              <div className="px-4 md:px-8">
+                <ReorderWidget initialOrders={discovery.metadata?.orders} />
+              </div>
+            )}
+
+            <div className="mt-2 flex flex-col gap-8">
+              {/* Categories */}
+              <section className="px-4 md:px-8">
+                <CircleRail data={discovery.categories} context={{ selected_category: category }} />
+              </section>
+
+              {/* Trending Products */}
+              {discovery.trendingProducts?.length > 0 && (
+                <section className="px-4 md:px-8">
+                  <div className="flex flex-col gap-4">
+                    <h2 className="text-xl font-black text-zinc-950 tracking-tighter">Trending Around You</h2>
+                    <CardRail data={discovery.trendingProducts} />
+                  </div>
+                </section>
+              )}
+
+              {/* Featured Stores */}
+              {discovery.featuredVendors?.length > 0 ? (
+                <section className="px-4 md:px-8">
+                  <div className="flex flex-col gap-4">
+                    <h2 className="text-xl font-black text-zinc-950 tracking-tighter">Top Stores Near You</h2>
+                    <Grid data={discovery.featuredVendors} />
+                  </div>
+                </section>
+              ) : !(discovery as any).error && (
+                <section className="px-4 md:px-8 py-20 text-center border-2 border-dashed border-zinc-100 rounded-3xl mx-4">
+                  <div className="max-w-xs mx-auto flex flex-col gap-2">
+                    <p className="font-bold text-zinc-900">No stores found nearby</p>
+                    <p className="text-sm text-zinc-500 italic">"Coming soon to {location.name}..."</p>
+                  </div>
+                </section>
+              )}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  } catch (err: any) {
+    return (
+      <div className="p-10 text-red-600 bg-red-50 min-h-screen font-mono">
+        <h1 className="text-xl font-bold mb-4">Server Error (Debug)</h1>
+        <pre className="whitespace-pre-wrap text-xs bg-white p-4 rounded border border-red-100 shadow-sm">
+          {err.stack || err.message || String(err)}
+        </pre>
       </div>
     );
   }
+}
 
-  return (
-    <div className="max-w-[1440px] mx-auto pb-24">
-      <BlocksEngine
-        blocks={blocks}
-        context={{ ...metadata, selected_category: category }}
-      />
-    </div>
-  );
-}
-/**
- * WYSHKIT 2026: Discovery Failure Fallback
- */
-function DiscoveryErrorFallback() {
-  return (
-    <section className="px-4 py-12 md:px-8">
-      <div className="flex flex-col items-center justify-center py-12 px-8 text-center bg-amber-50 rounded-[40px] border border-amber-100">
-        <div className="size-16 rounded-full bg-white flex items-center justify-center mb-6 shadow-sm">
-          <span className="text-2xl text-amber-600">⚠️</span>
-        </div>
-        <p className="text-sm font-black text-amber-900 tracking-tighter">Connection Interrupted</p>
-        <p className="text-[11px] text-amber-800/70 mt-2 font-medium max-w-[200px]">
-          We're having trouble reaching our catalogs. Please refresh or try again later.
-        </p>
-      </div>
-    </section>
-  );
-}
 
 
 

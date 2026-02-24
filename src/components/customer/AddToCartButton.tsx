@@ -8,12 +8,12 @@ import { Button } from '@/components/ui/button';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 interface AddToCartButtonProps {
-    item_id: string;
-    item_name: string;
-    item_image?: string | null;
+    product_id: string;
+    product_name: string;
+    product_image?: string | null;
     unit_price: number;
-    partner_id: string;
-    partner_name: string;
+    vendor_id: string;
+    vendor_name: string;
     className?: string;
 }
 
@@ -22,12 +22,12 @@ interface AddToCartButtonProps {
  * Minimalist interaction focusing on the "Add" intent.
  */
 export function AddToCartButton({
-    item_id,
-    item_name,
-    item_image,
+    product_id,
+    product_name,
+    product_image,
     unit_price,
-    partner_id,
-    partner_name,
+    vendor_id,
+    vendor_name,
     className,
 }: AddToCartButtonProps) {
     const { addToDraftOrder, isPending } = useCart();
@@ -44,15 +44,15 @@ export function AddToCartButton({
 
         setLocalPending(true);
         const optimistic_data = {
-            item_name,
-            item_image: item_image || '/images/logo.png',
+            product_name,
+            product_image: product_image || '/images/logo.png',
             unit_price,
-            partner_id,
-            partner_name
+            vendor_id: vendor_id || '',
+            vendor_name: vendor_name || 'Store'
         };
 
         const result = await addToDraftOrder(
-            item_id,
+            product_id,
             null,
             { enabled: false },
             [],
@@ -66,7 +66,7 @@ export function AddToCartButton({
             triggerHaptic(HapticPattern.SUCCESS);
             setJustAdded(true);
         } else {
-            if (result?.error !== 'PARTNER_MISMATCH') {
+            if (result?.error !== 'VENDOR_MISMATCH') {
                 triggerHaptic(HapticPattern.ERROR);
             }
         }

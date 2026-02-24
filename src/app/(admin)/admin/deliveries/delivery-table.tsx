@@ -11,17 +11,13 @@ import type { Database } from '@/lib/supabase/database.types'
 
 type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
 
-type DeliveryWithOrder = Tables<'deliveries'> & {
-  orders: {
-    order_number: string
-    total: number
-    partners: { name?: string | null; business_name: string | null } | null
-    users: { name?: string | null; full_name?: string | null; phone: string | null } | null
-  } | null
+type OrderRecord = Tables<'orders'> & {
+  vendors: { name?: string | null; business_name: string | null } | null
+  users: { name?: string | null; full_name?: string | null; phone: string | null } | null
 }
 
 interface DeliveryTableProps {
-  deliveries: DeliveryWithOrder[]
+  deliveries: OrderRecord[]
   currentStatus?: string
 }
 
@@ -41,15 +37,20 @@ function formatDate(date: string | null) {
 
 function getStatusBadge(status: string | null) {
   if (!status) return <Badge variant="outline">Unknown</Badge>
+
+  // Map Order statuses to Delivery colors
   const colors: Record<string, string> = {
-    pending: 'text-amber-600 border-amber-200',
-    picked_up: 'text-blue-600 border-blue-200',
-    in_transit: 'text-purple-600 border-purple-200',
-    delivered: 'text-emerald-600 border-emerald-200',
-    failed: 'text-red-600 border-red-200',
+    PLACED: 'text-zinc-500 border-zinc-200',
+    CONFIRMED: 'text-amber-600 border-amber-200',
+    IN_PRODUCTION: 'text-amber-600 border-amber-200',
+    PACKED: 'text-blue-600 border-blue-200',
+    DISPATCHED: 'text-purple-600 border-purple-200',
+    DELIVERED: 'text-emerald-600 border-emerald-200',
+    CANCELLED: 'text-red-600 border-red-200',
+    REFUNDED: 'text-red-600 border-red-200',
   }
-  const normalizedStatus = status.toLowerCase().replace(/ /g, '_')
-  return <Badge variant="outline" className={colors[normalizedStatus] || ''}>{status.replace(/_/g, ' ')}</Badge>
+
+  return <Badge variant="outline" className={colors[status] || ''}>{status.replace(/_/g, ' ')}</Badge>
 }
 
 export function DeliveryTable({ deliveries, currentStatus }: DeliveryTableProps) {
@@ -57,10 +58,10 @@ export function DeliveryTable({ deliveries, currentStatus }: DeliveryTableProps)
   const router = useRouter()
 
   const filtered = deliveries.filter((d) =>
-    d.orders?.order_number?.toLowerCase().includes(search.toLowerCase()) ||
+    d.order_number?.toLowerCase().includes(search.toLowerCase()) ||
     d.awb_number?.toLowerCase().includes(search.toLowerCase()) ||
-    (d.orders?.partners?.name ?? d.orders?.partners?.business_name)?.toLowerCase().includes(search.toLowerCase()) ||
-    d.orders?.partners?.business_name?.toLowerCase().includes(search.toLowerCase())
+    (d.vendors?.name ?? d.vendors?.business_name)?.toLowerCase().includes(search.toLowerCase()) ||
+    d.vendors?.business_name?.toLowerCase().includes(search.toLowerCase())
   )
 
   const handleStatusFilter = (value: string) => {
@@ -93,7 +94,7 @@ export function DeliveryTable({ deliveries, currentStatus }: DeliveryTableProps)
           <TableHeader>
             <TableRow>
               <TableHead>Order</TableHead>
-              <TableHead className="hidden md:table-cell">Partner</TableHead>
+              <TableHead className="hidden md:table-cell">Vendor</TableHead>
               <TableHead>AWB / Courier</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="hidden lg:table-cell">ETA</TableHead>
@@ -107,26 +108,26 @@ export function DeliveryTable({ deliveries, currentStatus }: DeliveryTableProps)
                 <TableRow key={delivery.id}>
                   <TableCell>
                     <div>
-                      <span className="font-medium">#{delivery.orders?.order_number}</span>
+                      <span className="font-medium">#{delivery.order_number}</span>
                       <span className="block text-xs text-zinc-500">
-                        {delivery.orders?.users?.name ?? delivery.orders?.users?.full_name ?? delivery.orders?.users?.phone ?? '-'}
+                        {delivery.users?.name ?? delivery.users?.full_name ?? delivery.users?.phone ?? '-'}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-zinc-500">
-                    {delivery.orders?.partners?.business_name || delivery.orders?.partners?.name || '-'}
+                    {delivery.vendors?.business_name || delivery.vendors?.name || '-'}
                   </TableCell>
                   <TableCell>
                     <div>
                       <span className="font-mono text-sm">{delivery.awb_number || 'Not assigned'}</span>
-                      {delivery.courier_partner && (
-                        <span className="block text-xs text-zinc-500">{delivery.courier_partner}</span>
+                      {delivery.courier_vendor && (
+                        <span className="block text-xs text-zinc-500">{delivery.courier_vendor}</span>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>{getStatusBadge(delivery.status)}</TableCell>
                   <TableCell className="hidden lg:table-cell text-zinc-500">
-                    {formatDate(delivery.estimated_delivery_at)}
+                    {formatDate(delivery.promised_delivery_at)}
                   </TableCell>
                 </TableRow>
               ))

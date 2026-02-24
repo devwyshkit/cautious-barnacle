@@ -31,11 +31,11 @@ export function SignOutButton({
       // WYSHKIT 2026: Use centralized auth hook for consistent state cleanup
       await signOut();
 
-      // Clear partner cookie manually (specific to this button context)
-      document.cookie = 'wyshkit_partner_id=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      // Clear vendor cookie manually (specific to this button context)
+      document.cookie = 'wyshkit_vendor_id=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
-      if (pathname.startsWith('/partner')) {
-        router.push('/partner/login');
+      if (pathname.startsWith('/vendor')) {
+        router.push('/vendor/login');
       } else {
         router.push('/');
       }

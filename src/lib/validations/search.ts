@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const searchQuerySchema = z.object({
   q: z.string().max(200).optional(),
-  type: z.enum(["all", "partners", "items"]).optional().default("all"),
+  type: z.enum(["all", "vendors", "products"]).optional().default("all"),
   category: z.string().max(100).optional(),
   tag: z.string().max(100).optional(),
   city: z.string().max(100).optional(),

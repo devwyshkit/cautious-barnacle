@@ -20,7 +20,7 @@ export function ActionBanner({ personalizedItemsCount, deadline }: ActionBannerP
                 <h3 className="text-xs font-black text-amber-900 tracking-tight">Input Needed</h3>
             </div>
             <p className="text-[11px] text-amber-700 font-medium">
-                You have {personalizedItemsCount} item{personalizedItemsCount > 1 ? 's' : ''} that require design details. Please scroll to the items below to submit.
+                You have {personalizedItemsCount} product{personalizedItemsCount > 1 ? 's' : ''} that require design details. Please scroll to the products below to submit.
             </p>
             <div className="mt-3">
                 <HyperlocalTimer deadline={deadline} />

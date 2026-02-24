@@ -89,7 +89,7 @@ export function usePaymentFlow({
                 'INR',
                 {
                     address_id: selectedAddressId || '',
-                    draft_items: data.items,
+                    draft_items: data.products,
                     pricing: data.pricing,
                     applied_coupon: data.applied_coupon || undefined,
                     use_wallet: data.use_wallet,
@@ -123,7 +123,7 @@ export function usePaymentFlow({
                     amount: orderData.amount,
                     currency: orderData.currency,
                     name: 'Wyshkit',
-                    description: `Order from ${data.partner_name || 'Local Store'}`,
+                    description: `Order from ${data.vendor_name || 'Local Store'}`,
                     order_id: orderData.id,
                     handler: async (razorpayResponse: any) => {
                         try {

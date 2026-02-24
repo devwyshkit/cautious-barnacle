@@ -47,7 +47,7 @@ export const getServerLocation = cache(async function getServerLocation(): Promi
         // 2. Fetch from Supabase for authenticated users (Fallback 1)
         if (user) {
             const { data: addresses } = await supabase
-                .from('addresses')
+                .from('user_addresses')
                 .select('name, type, city, address_line1, pincode, is_default, latitude, longitude')
                 .eq('user_id', user.id)
                 .order('is_default', { ascending: false })

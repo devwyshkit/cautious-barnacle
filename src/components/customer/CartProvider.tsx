@@ -33,7 +33,7 @@ interface CartContextType {
     isPending: boolean;
     isGuest: boolean;
     addToDraftOrder: (
-        item_id: string,
+        product_id: string,
         variant_id: string | null,
         personalization: SelectedPersonalization,
         selected_addons?: SelectedAddon[],
@@ -91,8 +91,8 @@ export function CartProvider({
                     // The server revalidation will flow back the authoritative totals.
                     return {
                         ...state,
-                        items: [...state.items, {
-                            cart_item_id: 'temp-' + Math.random(),
+                        products: [...state.products, {
+                            id: 'temp-' + Math.random(),
                             ...update.payload,
                             quantity: update.payload.quantity || 1
                         } as DraftLineItem],
@@ -100,12 +100,12 @@ export function CartProvider({
                 case 'remove':
                     return {
                         ...state,
-                        items: state.items.filter((i: DraftLineItem) => i.cart_item_id !== update.payload)
+                        products: state.products.filter((i: DraftLineItem) => i.id !== update.payload)
                     };
                 case 'update':
                     return {
                         ...state,
-                        items: state.items.map((i: DraftLineItem) => i.cart_item_id === update.payload.cart_item_id ? { ...i, quantity: update.payload.quantity } : i)
+                        products: state.products.map((i: DraftLineItem) => i.id === update.payload.id ? { ...i, quantity: update.payload.quantity } : i)
                     };
                 case 'clear':
                     return EMPTY_CART;
@@ -119,7 +119,7 @@ export function CartProvider({
     const [pendingItem, setPendingItem] = useState<any>(null);
 
     const addToDraftOrder = async (
-        item_id: string,
+        product_id: string,
         variant_id: string | null,
         personalization: SelectedPersonalization,
         selected_addons?: SelectedAddon[],
@@ -131,14 +131,14 @@ export function CartProvider({
                 // Optimistic UI update
                 setOptimisticCart({
                     type: 'add',
-                    payload: { item_id, variant_id: variant_id, ...optimistic_data }
+                    payload: { product_id, variant_id: variant_id, ...optimistic_data }
                 });
 
                 try {
                     const result = await executeCommerceIntent({
                         intent: 'ADD_TO_CART',
                         payload: {
-                            item_id,
+                            product_id,
                             variant_id: variant_id ?? undefined,
                             personalization,
                             selected_addons,
@@ -146,11 +146,11 @@ export function CartProvider({
                         }
                     });
 
-                    if (result && (result as any).data?.error === 'PARTNER_MISMATCH') {
+                    if (result && (result as any).data?.error === 'VENDOR_MISMATCH') {
                         triggerHaptic(HapticPattern.ERROR);
-                        setPendingItem({ item_id, variant_id, personalization, selected_addons, quantity, optimistic_data });
+                        setPendingItem({ product_id, variant_id, personalization, selected_addons, quantity, optimistic_data });
                         setShowReplaceCartDialog(true);
-                        resolve({ success: false, error: 'PARTNER_MISMATCH' });
+                        resolve({ success: false, error: 'VENDOR_MISMATCH' });
                         return;
                     }
 
@@ -169,18 +169,18 @@ export function CartProvider({
 
     const removeFromDraftOrder = async (itemId: string, variantId?: string | null) => {
         const normalizedVariantId = variantId ?? null;
-        const cartItem = optimisticCart.items.find(
-            (i: DraftLineItem) => i.item_id === itemId && (i.variant_id ?? null) === normalizedVariantId
+        const cartItem = optimisticCart.products.find(
+            (i: DraftLineItem) => i.product_id === itemId && (i.variant_id ?? null) === normalizedVariantId
         );
         if (!cartItem) return;
 
         startTransition(async () => {
-            setOptimisticCart({ type: 'remove', payload: cartItem.cart_item_id });
+            setOptimisticCart({ type: 'remove', payload: cartItem.id });
             try {
                 await executeCommerceIntent({
                     intent: 'UPDATE_CART_QUANTITY',
                     payload: {
-                        item_id: cartItem.item_id,
+                        product_id: cartItem.product_id,
                         variant_id: (cartItem.variant_id ?? undefined) as string | undefined,
                         quantity: 0
                     }
@@ -193,18 +193,18 @@ export function CartProvider({
 
     const updateQuantity = async (itemId: string, variantId: string | null, quantity: number) => {
         const normalizedVariantId = variantId ?? null;
-        const cartItem = optimisticCart.items.find(
-            (i: DraftLineItem) => i.item_id === itemId && (i.variant_id ?? null) === normalizedVariantId
+        const cartItem = optimisticCart.products.find(
+            (i: DraftLineItem) => i.product_id === itemId && (i.variant_id ?? null) === normalizedVariantId
         );
         if (!cartItem) return;
 
         startTransition(async () => {
-            setOptimisticCart({ type: 'update', payload: { cart_item_id: cartItem.cart_item_id, quantity } });
+            setOptimisticCart({ type: 'update', payload: { id: cartItem.id, quantity } });
             try {
                 await executeCommerceIntent({
                     intent: 'UPDATE_CART_QUANTITY',
                     payload: {
-                        item_id: cartItem.item_id,
+                        product_id: cartItem.product_id,
                         variant_id: (cartItem.variant_id ?? undefined) as string | undefined,
                         quantity: quantity
                     }
@@ -231,7 +231,7 @@ export function CartProvider({
         setShowReplaceCartDialog(false);
         await clearCart();
         await addToDraftOrder(
-            pendingItem.item_id,
+            pendingItem.product_id,
             pendingItem.variant_id,
             pendingItem.personalization,
             pendingItem.selected_addons,
@@ -260,7 +260,7 @@ export function CartProvider({
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-xl font-black text-zinc-950 tracking-tight">Replace cart?</AlertDialogTitle>
                         <AlertDialogDescription className="text-sm font-medium text-zinc-600 leading-relaxed">
-                            Your cart contains items from a different store. Adding this item will clear your current cart.
+                            Your cart contains products from a different store. Adding this product will clear your current cart.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="flex-row gap-2 mt-4">

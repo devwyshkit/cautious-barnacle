@@ -27,9 +27,9 @@ export function BillSummary({ order }: BillSummaryProps) {
             const data = {
                 order_number: order.order_number || '',
                 date: new Date(order.created_at || Date.now()).toLocaleDateString(),
-                order_items: order.order_items,
-                partner: {
-                    name: order.partner_name || 'WyshKit Partner',
+                order_products: order.order_products,
+                vendor: {
+                    name: order.vendor_name || 'WyshKit Vendor',
                     address: 'Bangalore, India', // Placeholder if address missing
                     gstin: order.gstin || undefined
                 },
@@ -93,7 +93,7 @@ export function BillSummary({ order }: BillSummaryProps) {
                     <div className="p-5 space-y-3">
 
                         <div className="flex justify-between text-[11px] font-bold text-zinc-600">
-                            <span>Item Total</span>
+                            <span>Product Total</span>
                             <span className="text-zinc-900">{formatCurrency(order.subtotal || 0)}</span>
                         </div>
 

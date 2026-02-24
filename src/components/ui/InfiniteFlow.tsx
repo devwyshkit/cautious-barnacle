@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 
 interface InfiniteFlowProps<T> {
     initialData: T[];
-    fetchAction: (options: { limit: number; offset: number }) => Promise<{ data?: { items: T[]; total: number }; error?: string }>;
-    renderItem: (item: T, index: number) => React.ReactNode;
+    fetchAction: (options: { limit: number; offset: number }) => Promise<{ data?: { products: T[]; total: number }; error?: string }>;
+    renderItem: (product: T, index: number) => React.ReactNode;
     limit?: number;
     startOffset?: number;
     totalCount?: number;
@@ -22,7 +22,7 @@ interface InfiniteFlowProps<T> {
  * WYSHKIT 2026: InfiniteFlow (Elite Primitive)
  * Pattern: Polymorphic Workflow
  * - Handles all infinite scrolling logic in a single, reusable boundary.
- * - Accepts a generic `renderItem` to support Items, Partners, or anything else.
+ * - Accepts a generic `renderItem` to support Products, Vendors, or anything else.
  * - Zero Shadow State: Syncs internal offset with startOffset prop.
  */
 export function InfiniteFlow<T extends { id: string | number }>({
@@ -37,7 +37,7 @@ export function InfiniteFlow<T extends { id: string | number }>({
     gridClassName = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
     renderContainer,
 }: InfiniteFlowProps<T>) {
-    const [items, setItems] = useState<T[]>(initialData);
+    const [products, setItems] = useState<T[]>(initialData);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(() => {
         if (totalCount !== undefined) return initialData.length + startOffset < totalCount;
@@ -66,20 +66,20 @@ export function InfiniteFlow<T extends { id: string | number }>({
         try {
             const res = await fetchAction({ limit, offset: currentOffset });
 
-            if (res.data?.items && res.data.items.length > 0) {
+            if (res.data?.products && res.data.products.length > 0) {
                 setItems(prev => {
                     // Prevent duplicates by checking IDs
                     const existingIds = new Set(prev.map(i => i.id));
-                    const newItems = res.data!.items.filter(i => !existingIds.has(i.id));
+                    const newItems = res.data!.products.filter(i => !existingIds.has(i.id));
                     return [...prev, ...newItems];
                 });
 
-                offsetRef.current += res.data.items.length;
+                offsetRef.current += res.data.products.length;
 
                 if (res.data.total !== undefined) {
                     setHasMore(offsetRef.current < res.data.total);
                 } else {
-                    setHasMore(res.data.items.length === limit);
+                    setHasMore(res.data.products.length === limit);
                 }
             } else {
                 setHasMore(false);
@@ -109,7 +109,7 @@ export function InfiniteFlow<T extends { id: string | number }>({
         return () => observer.disconnect();
     }, [hasMore, isLoadingMore, loadMore]);
 
-    if (items.length === 0 && !isLoadingMore && emptyState) {
+    if (products.length === 0 && !isLoadingMore && emptyState) {
         return <>{emptyState}</>;
     }
 
@@ -117,11 +117,11 @@ export function InfiniteFlow<T extends { id: string | number }>({
         <div className={cn("space-y-8", className)}>
             {renderContainer ? (
                 renderContainer({
-                    children: items.map((item, index) => renderItem(item, index))
+                    children: products.map((product, index) => renderItem(product, index))
                 })
             ) : (
                 <div className={gridClassName}>
-                    {items.map((item, index) => renderItem(item, index))}
+                    {products.map((product, index) => renderItem(product, index))}
                 </div>
             )}
 
@@ -131,7 +131,7 @@ export function InfiniteFlow<T extends { id: string | number }>({
                         <Loader2 className="size-6 text-[var(--primary)] animate-spin" />
                         <p className="text-xs font-black text-zinc-400 tracking-tight">Hydrating Flow...</p>
                     </div>
-                ) : !hasMore && items.length > 0 ? (
+                ) : !hasMore && products.length > 0 ? (
                     <div className="flex flex-col items-center gap-3 opacity-30">
                         <Sparkles className="size-5 text-zinc-400" />
                         <p className="text-xs font-black text-zinc-400 tracking-tight">End of Discovery</p>

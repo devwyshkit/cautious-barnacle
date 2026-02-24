@@ -22,8 +22,8 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
             .select(`
                 *,
                 delivery_address:addresses(*),
-                partner:partners(*),
-                order_items(*)
+                vendor:vendors(*),
+                order_products(*)
             `)
             .eq('id', payload.order_id)
             .single();
@@ -37,22 +37,22 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
 
         // 2. Resolve Logistics (Swiggy 2026: Flow Completeness)
         const address = (order as any).delivery_address as Record<string, any>;
-        const partner = (order as any).partner as Record<string, any>;
-        const order_items = (order as any).order_items as any[] || [];
+        const vendor = (order as any).vendor as Record<string, any>;
+        const order_products = (order as any).order_products as any[] || [];
 
 
         let total_weight = 0;
         let missing_weight_count = 0;
 
-        order_items.forEach((item: any) => {
-            if (!item.weight_kg) {
+        order_products.forEach((product: any) => {
+            if (!product.weight_kg) {
                 missing_weight_count++;
             }
-            total_weight += (Number(item.weight_kg) || 0.1) * (item.quantity || 1);
+            total_weight += (Number(product.weight_kg) || 0.1) * (product.quantity || 1);
         });
 
         if (missing_weight_count > 0) {
-            logger.warn(`DispatchService: ${missing_weight_count} items missing weight_kg for order ${order.order_number}. Using default 0.1kg per item.`);
+            logger.warn(`DispatchService: ${missing_weight_count} products missing weight_kg for order ${order.order_number}. Using default 0.1kg per product.`);
         }
 
         const shadowfax_payload = {
@@ -65,11 +65,11 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
                 pincode: address?.pincode || '',
             },
             pickup: {
-                name: partner?.business_name || partner?.name || 'Partner',
-                phone: String(partner?.whatsapp_number || ''),
-                address: `${partner?.address || ''}`.trim(),
-                city: partner?.city || '',
-                pincode: partner?.pincode || '',
+                name: vendor?.business_name || vendor?.name || 'Vendor',
+                phone: String(vendor?.whatsapp_number || ''),
+                address: `${vendor?.address || ''}`.trim(),
+                city: vendor?.city || '',
+                pincode: vendor?.pincode || '',
             },
             order_details: {
                 total_weight_kg: total_weight > 0 ? total_weight : 0.5,
@@ -77,21 +77,9 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
         };
 
         // 3. Persist Intent (Swiggy 2026: Absolute Persistence)
-        const { data: attempt, error: attempt_error } = await supabase
-            .from('dispatch_attempts')
-            .insert({
-                order_id: order.id,
-                payload: shadowfax_payload,
-                status: 'PROCESSING',
-                attempts: 1
-            })
-            .select()
-            .single();
-
-        if (attempt_error) {
-            logger.error('DispatchService: Failed to persist intent', attempt_error);
-            return { success: false, error: 'Database persistence error' };
-        }
+        // Table 'dispatch_attempts' purged in favor of direct order status metadata in Swiggy 2026 lean model.
+        // We bypass the outbox for now and go direct to provider.
+        const attempt = { id: payload.order_id };
 
         // 4. Perform First Attempt
         logger.info(`[Dispatch] Initial attempt for order ${order.order_number}`);
@@ -100,11 +88,8 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
         // 5. Update Intent Status
         if (dispatch_result.success) {
             await Promise.all([
-                supabase.from('dispatch_attempts').update({
-                    status: 'SUCCESS',
-                    updated_at: new Date().toISOString()
-                }).eq('id', attempt.id),
                 supabase.from('orders').update({
+                    status: 'OUT_FOR_DELIVERY', // Swiggy 2026: Auto-transition on success
                     awb_number: dispatch_result.awbNumber,
                     courier_partner: 'Shadowfax',
                     tracking_url: dispatch_result.trackingUrl,
@@ -115,12 +100,7 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
             return { success: true };
         } else {
             const error_msg = dispatch_result.error || 'Shadowfax API Error';
-            await supabase.from('dispatch_attempts').update({
-                status: 'FAILED',
-                last_error: error_msg,
-                next_attempt_at: new Date(Date.now() + 60000).toISOString(), // 1 min retry boundary
-                updated_at: new Date().toISOString()
-            }).eq('id', attempt.id);
+            logger.error(`[Dispatch] Initial attempt failed for ${order.id}: ${error_msg}`);
 
             logger.warn(`[Dispatch] Initial attempt failed for ${order.id}. Intent preserved for retry worker.`);
             return { success: true, error: `Initial dispatch failed but persistent intent created: ${error_msg}` };

@@ -10,10 +10,10 @@ WyshKit is to personalised gifts what Swiggy is to food.
 
 ```
 Swiggy Food   = Restaurant → Cooks food → 3PL Delivery
-WyshKit       = Local partner → Personalises product → 3PL Delivery
+WyshKit       = Local vendor → Personalises product → 3PL Delivery
 ```
 
-One local partner. One cart. One delivery. Always.
+One local vendor. One cart. One delivery. Always.
 
 We are **not** a gifting marketplace. We are **not** quick commerce. We are **not** a design tool.
 
@@ -27,17 +27,17 @@ We are a **hyperlocal product marketplace** where local partners sell physical g
 Traditional e-commerce captures design upfront. The result: high friction, ghost orders, and wasted partner time.
 
 **The WyshKit Way**:
-1. Browse items from a local partner.
+1. Browse products from a local vendor.
 2. Toggle "Add personalisation" (+₹X) — just like an add-on.
 3. Pay 100% in advance via Razorpay.
 4. *Then* submit your personalisation details. *Then* see a preview.
 
-Payment is the commitment signal. Only committed users enter the preview flow. Partners never design for maybes. Inventory is never blocked for ghost orders.
+Payment is the commitment signal. Only committed users enter the preview flow. Vendors never design for maybes. Inventory is never blocked for ghost orders.
 
 ### 2. Hyperlocal Time > Distance
 We do not show distance in km. We show **when it arrives**.
 
-Users don't care if a partner is 2km or 5km away. They care: *"Will this arrive by 5 PM?"*
+Users don't care if a vendor is 2km or 5km away. They care: *"Will this arrive by 5 PM?"*
 
 **What this means**:
 - "Arriving by 5:15 PM" — always. "2.4 km away" — never.
@@ -49,8 +49,8 @@ Users don't care if a partner is 2km or 5km away. They care: *"Will this arrive 
 Personalised goods carry emotional weight. When it goes wrong, returns destroy margins.
 
 **The WyshKit Moat**:
-- Post-payment, partner uploads a **digital mockup** — a template overlay showing how the item looks with the personalisation. Not a photo of the actual item. Think: Apple's engraving preview.
-- Customer has free revisions (partner-defined, default: 2) to request changes.
+- Post-payment, vendor uploads a **digital mockup** — a template overlay showing how the product looks with the personalisation. Not a photo of the actual product. Think: Apple's engraving preview.
+- Customer has free revisions (vendor-defined, default: 2) to request changes.
 - If they definitively reject it: **instant refund**. Physical item untouched. Inventory saved.
 - Once customer slides to approve: **liability shifts**. Non-refundable. Engraving starts.
 
@@ -109,8 +109,8 @@ The app will be available at `http://localhost:3000`.
 **Partial Fulfillment** (mixed personalised + non-personalised order):
 - Non-personalised items fast-track: `CONFIRMED → IN_PRODUCTION → PACKED`.
 - Personalised items go through the preview loop independently.
-- If a personalised item is rejected: line-item cancelled + partial Razorpay refund. Other items proceed.
-- We never cancel an entire order because one item failed.
+- If a personalised product is rejected: line-item cancelled + partial Razorpay refund. Other products proceed.
+- We never cancel an entire order because one product failed.
 
 **Delivery Fee**:
 - **Flat distance-based fee only** (e.g., ₹40-60). 
@@ -134,9 +134,9 @@ The app will be available at `http://localhost:3000`.
 
 **We sell**: *"Get a personalised gift delivered before the party starts."*
 
-We do **not** say: "hyperlocal", "B2B2C", "quick commerce", "customization", "e-commerce", "vendor", "seller."
+We use: "hyperlocal", "B2B2C", "vendor", "product", "personalisation", "delivered in minutes."
 
-We say: "partner", "local shop", "personalisation", "delivered in minutes", "last-minute", "preview before production."
+We say: "vendor", "local store", "personalisation", "delivered in minutes", "last-minute", "preview before production."
 
 ---
 
@@ -144,8 +144,7 @@ We say: "partner", "local shop", "personalisation", "delivered in minutes", "las
 
 | Concept | UI (Customer-facing) | Database / Code |
 |---|---|---|
-| Local shop | "Partner" or shop name | `partners` table |
-| Item / product | "item" or product name | `items` table |
-| Customisation | Never used | — |
+| Local store | "Store" or "Vendor" | `vendors` table |
+| Product | "Product" | `products` table |
 | Personalisation | "personalisation" | `personalization_details` |
-| Vendor/seller | Never used | — |
+| Vendor/seller | Use "Vendor" | — |

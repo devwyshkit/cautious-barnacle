@@ -14,8 +14,8 @@ export interface ActiveOrder {
     has_personalization: boolean;
     personalization_status?: string;
     total: number;
-    partner_name?: string;
-    items?: { name: string }[];
+    vendor_name?: string;
+    products?: { name: string }[];
 }
 
 /**
@@ -32,7 +32,7 @@ export function useActiveOrders() {
     const fetchActiveOrders = async (uid: string) => {
         const { data, error } = await supabase
             .from('orders')
-            .select('id,order_number,status,has_personalization,personalization_status,total,partners(name),order_items(item_name)')
+            .select('id,order_number,status,has_personalization,total,vendors(name),order_products(product_name,personalization_details)')
             .eq('user_id', uid)
             .not('status', 'in', `(${[ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED, ORDER_STATUS.REFUNDED].join(',')})`)
             .order('created_at', { ascending: false });
@@ -40,16 +40,32 @@ export function useActiveOrders() {
         if (error) {
             logger.error('Error fetching active orders', error);
         } else {
-            setActiveOrders(data.map((o: any) => ({
-                id: o.id,
-                order_number: o.order_number,
-                status: o.status as OrderStatus,
-                has_personalization: o.has_personalization,
-                personalization_status: o.personalization_status,
-                total: o.total,
-                partner_name: o.partners?.name,
-                items: Array.isArray(o.order_items) ? o.order_items.map((i: any) => ({ name: i.item_name })) : []
-            })));
+            setActiveOrders(data.map((o: any) => {
+                const products = Array.isArray(o.order_products) ? o.order_products : [];
+                // Find personalization status from products metadata
+                let p_status = undefined;
+                if (o.has_personalization) {
+                    const hasSubmitted = products.some((i: any) => i.personalization_details?.text || i.personalization_details?.image_url);
+                    const isPreviewReady = products.some((i: any) => i.personalization_details?.preview_ready);
+                    const isApproved = products.every((i: any) => i.personalization_details?.approved || !i.personalization_details);
+
+                    if (isApproved) p_status = 'approved';
+                    else if (isPreviewReady) p_status = 'preview_ready';
+                    else if (hasSubmitted) p_status = 'submitted';
+                    else p_status = 'pending';
+                }
+
+                return {
+                    id: o.id,
+                    order_number: o.order_number,
+                    status: o.status as OrderStatus,
+                    has_personalization: o.has_personalization,
+                    personalization_status: p_status,
+                    total: o.total,
+                    vendor_name: o.vendors?.name,
+                    products: products.map((i: any) => ({ name: i.product_name }))
+                };
+            }));
         }
         setLoading(false);
     };

@@ -7,7 +7,7 @@ import { HERO_SLIDES } from '@/lib/constants/home-config';
 
 /**
  * WYSHKIT 2026: Hero carousel - Swiggy-style promo banners
- * Fallback when no trending items (prevents empty space above Featured Stores)
+ * Fallback when no trending products (prevents empty space above Featured Stores)
  */
 export function HeroCarousel() {
   return (

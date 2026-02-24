@@ -10,50 +10,49 @@ export interface PersonalizationCheckItem {
 }
 
 /**
- * Universal check to see if an item requires personalization input.
+ * Universal check to see if an product requires personalization input.
  * Supports both Legacy (is_personalized flag) and New (Add-ons with requires_preview).
  */
 /**
- * Checks if an item has active personalization requirements.
+ * Checks if an product has active personalization requirements.
  * Swiggy 2026: Narrowed to prevent over-triggering badges.
  */
-export function hasItemPersonalization(item: any): boolean {
-  if (!item) return false;
+export function hasItemPersonalization(product: any): boolean {
+  if (!product) return false;
 
-  // 1. Explicit Personalization Options (JSONB array from DB - Items table)
-  const persOptions = item.personalization_options || [];
+  // 1. Explicit Personalization Options (JSONB array from DB - Products table)
+  const persOptions = product.personalization_options || [];
   if (Array.isArray(persOptions) && persOptions.length > 0) return true;
 
-  // 2. Order Items Schema (Post-Payment Success JSON)
-  // Check for explicit flags used in order_items table
-  if (item.is_personalized === true) return true;
-  if (item.personalization_config && Object.keys(item.personalization_config).length > 0) return true;
+  // 2. Order Products Schema (Post-Payment Success JSON)
+  // Check for explicit flags used in order_products table
+  if (product.is_personalized === true) return true;
 
   // 3. Addons that require a preview (implies a design/approval step)
-  const addons = item.item_addons || item.selected_addons || item.selectedAddons || [];
+  const addons = product.item_addons || product.selected_addons || product.selectedAddons || [];
   if (Array.isArray(addons) && addons.some((a: any) => !!a.requires_preview)) return true;
 
   // 4. Legacy check for specific metadata
-  const pers = item.personalization || {};
+  const pers = product.personalization || {};
   if (pers.enabled && (pers.option_id || pers.fields)) return true;
 
   return false;
 }
 
 /**
- * Checks if a list of items contains any that require personalization.
+ * Checks if a list of products contains any that require personalization.
  */
-export function hasAnyPersonalization(items: PersonalizationCheckItem[]): boolean {
-  return items.some(hasItemPersonalization);
+export function hasAnyPersonalization(products: PersonalizationCheckItem[]): boolean {
+  return products.some(hasItemPersonalization);
 }
 
 /**
- * Checks if an order or a list of items has any personalized components.
- * Supports both order object (direct flag) and item list (iterative check).
+ * Checks if an order or a list of products has any personalized components.
+ * Supports both order object (direct flag) and product list (iterative check).
  */
 export function orderHasPersonalizedItems(input: { has_personalization?: boolean | null } | Array<{ has_personalization?: boolean | null }>): boolean {
   if (Array.isArray(input)) {
-    return input.some(item => !!item.has_personalization);
+    return input.some(product => !!product.has_personalization);
   }
   return !!input.has_personalization;
 }

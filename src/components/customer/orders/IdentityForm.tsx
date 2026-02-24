@@ -12,12 +12,12 @@ import imageCompression from 'browser-image-compression';
 
 import { PersonalizationConfig, SelectedPersonalization, SelectedAddon } from '@/lib/types/personalization';
 import { IdentityFormHeader } from './IdentityFormHeader';
-import { IdentityItemField } from './IdentityItemField';
+import { IdentityProductField } from './IdentityProductField';
 import { IdentitySuccessState } from './IdentitySuccessState';
 
 interface OrderItem {
     id: string;
-    item_name: string;
+    product_name: string;
     is_personalized?: boolean;
     personalization_config?: PersonalizationConfig;
     personalization?: SelectedPersonalization;
@@ -28,7 +28,7 @@ interface OrderItem {
 
 interface IdentityFormProps {
     orderId: string;
-    items: OrderItem[];
+    products: OrderItem[];
     onSubmitted: () => void;
     onSkip?: () => void;
     designDeadline?: string | null;
@@ -37,7 +37,7 @@ interface IdentityFormProps {
 
 export function IdentityForm({
     orderId,
-    items,
+    products,
     onSubmitted,
     onSkip,
     designDeadline,
@@ -67,9 +67,9 @@ export function IdentityForm({
         }
     }, [formData, orderId]);
 
-    const personalizedItems = items;
-    const allOptional = personalizedItems.every(item => {
-        const config = item.personalization_config || {};
+    const personalizedItems = products;
+    const allOptional = personalizedItems.every(product => {
+        const config = product.personalization_config || {};
         return !config.text_required && !config.image_required;
     });
 
@@ -132,11 +132,11 @@ export function IdentityForm({
 
     const handleSubmit = async () => {
         // Validation logic
-        for (const item of personalizedItems) {
-            const config = (item.personalization_config || {}) as PersonalizationConfig;
-            const input = formData[item.id] || {};
+        for (const product of personalizedItems) {
+            const config = (product.personalization_config || {}) as PersonalizationConfig;
+            const input = formData[product.id] || {};
             if (config.text_required && !input.text?.trim()) {
-                toast.error(`Please provide details for ${item.item_name}`);
+                toast.error(`Please provide details for ${product.product_name}`);
                 return;
             }
         }
@@ -146,12 +146,12 @@ export function IdentityForm({
         triggerHaptic(HapticPattern.SUCCESS);
 
         try {
-            const personalizationData = personalizedItems.reduce((acc: Record<string, any>, item: any) => {
-                const itemFormData = formData[item.id] || {};
-                acc[item.id] = {
+            const personalizationData = personalizedItems.reduce((acc: Record<string, any>, product: any) => {
+                const itemFormData = formData[product.id] || {};
+                acc[product.id] = {
                     text: itemFormData.text || null,
                     image_url: itemFormData.image_url || null,
-                    addons: (item.selected_addons || []).filter((a: any) => a.requires_preview).map((a: any) => a.name)
+                    addons: (product.selected_addons || []).filter((a: any) => a.requires_preview).map((a: any) => a.name)
                 };
                 return acc;
             }, {});
@@ -181,9 +181,9 @@ export function IdentityForm({
             {isAutoOpenedForSuccess && <IdentityFormHeader orderId={orderId} designDeadline={designDeadline} />}
 
             <div className="space-y-6">
-                {personalizedItems.map((item, idx) => {
-                    const legacyConfig = item.personalization_config || (item.personalization as any) || {};
-                    const addons = (item.selected_addons || []).filter(a => a.requires_preview);
+                {personalizedItems.map((product, idx) => {
+                    const legacyConfig = product.personalization_config || (product.personalization as any) || {};
+                    const addons = (product.selected_addons || []).filter(a => a.requires_preview);
                     const config: PersonalizationConfig = addons.length > 0 ? {
                         text_required: true,
                         allow_text: true,
@@ -198,17 +198,17 @@ export function IdentityForm({
                     };
 
                     return (
-                        <IdentityItemField
-                            key={item.id}
-                            item={item}
+                        <IdentityProductField
+                            key={product.id}
+                            product={product}
                             itemIndex={idx}
                             totalItems={personalizedItems.length}
                             config={config}
-                            schema={item.personalization_schema}
-                            input={formData[item.id] || {}}
-                            uploadingProgress={uploadingItems[item.id]}
-                            onInputChange={(field, value) => handleInputChange(item.id, field, value)}
-                            onFileUpload={(file) => handleFileUpload(item.id, file)}
+                            schema={product.personalization_schema}
+                            input={formData[product.id] || {}}
+                            uploadingProgress={uploadingItems[product.id]}
+                            onInputChange={(field, value) => handleInputChange(product.id, field, value)}
+                            onFileUpload={(file) => handleFileUpload(product.id, file)}
                         />
                     );
                 })}

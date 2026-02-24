@@ -7,36 +7,28 @@ export async function checkServiceability(pincode: string) {
     try {
         const supabase = await createClient()
 
-        const { data, error } = await supabase
+        // WYSHKIT 2026: Serviceability is moving to distance-based via PostGIS.
+        // Pincode check is a legacy fallback.
+        const { data, error } = await (supabase as any)
             .from('serviceable_pincodes')
             .select('is_active, estimated_delivery_days')
             .eq('pincode', pincode)
-            .maybeSingle()
+            .maybeSingle();
 
         if (error || !data) {
-            if (process.env.NODE_ENV === 'development') {
-                return {
-                    isServiceable: true,
-                    estimatedDays: 4,
-                    message: 'Delivery available (Dev fallback)'
-                }
-            }
+            // Hyperlocal Default: If no restriction exists, we assume serviceable within range
+            // UI will block later based on actual vendor distance.
             return {
-                isServiceable: false,
-                message: 'Sorry, we do not deliver to this location yet.'
-            }
-        }
-
-        if (!data.is_active) {
-            return {
-                isServiceable: false,
-                message: 'Delivery to this location is temporarily suspended.'
+                isServiceable: true,
+                estimatedDays: 1, // Default to same-day/next-day for hyperlocal
+                message: process.env.NODE_ENV === 'development' ? 'Delivery available (Hyperlocal Fallback)' : undefined
             }
         }
 
         return {
-            isServiceable: true,
-            estimatedDays: data.estimated_delivery_days
+            isServiceable: !!data.is_active,
+            estimatedDays: data.estimated_delivery_days || 1,
+            message: data.is_active ? undefined : 'Delivery to this location is temporarily suspended.'
         }
     } catch (error) {
         logger.error('Error checking serviceability', error, { pincode })

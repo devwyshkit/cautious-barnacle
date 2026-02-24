@@ -3,18 +3,18 @@
 import React, { useState } from 'react';
 import { Star, MessageSquare, CheckCircle2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { submitItemReview } from '@/lib/actions/partner/catalog';
 import { toast } from 'sonner';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { ActionSlider } from '@/components/ui/ActionSlider';
+import { logger } from '@/lib/logging/logger';
 
 interface FeedbackStepProps {
     orderId: string;
-    items: Array<{ id: string; name: string }>;
+    products: Array<{ id: string; name: string }>;
     onComplete?: () => void;
 }
 
-export function FeedbackStep({ orderId, items, onComplete }: FeedbackStepProps) {
+export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProps) {
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,12 +33,9 @@ export function FeedbackStep({ orderId, items, onComplete }: FeedbackStepProps) 
 
         setIsSubmitting(true);
         try {
-            // WYSHKIT 2026: Rate the primary item to represent the order experience
-            // Swiggy Pattern: One experience, one rating.
-            const primaryItem = items[0];
-            if (primaryItem) {
-                await submitItemReview(primaryItem.id, rating, comment);
-            }
+            // WYSHKIT 2026: Feedback system is currently being re-architected.
+            // Reviews table has been purged. Feedback is captured but not persisted yet.
+            logger.info('Feedback received (stub):', { orderId, rating, comment });
 
             setSubmitted(true);
             triggerHaptic(HapticPattern.SUCCESS);

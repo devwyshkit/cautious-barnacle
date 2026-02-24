@@ -2,17 +2,22 @@
  * Admin types derived from Supabase database types
  */
 
-import type { Tables } from '@/lib/supabase/database.types'
+import type { Tables } from '@/lib/supabase/types'
 
 // Base table types from Supabase
-export type Partner = Tables<'partners'>
+export type Vendor = Tables<'vendors'> & {
+  kyc_status?: string | null; // UI Alias
+  onboarding_status?: string | null; // UI Alias
+  name?: string | null; // UI Alias
+  whatsapp_number?: string | null; // UI Alias
+  whatsapp_phoneNumber?: string | null; // UI Alias
+}
 export type Order = Tables<'orders'>
-export type Item = Tables<'items'>
+export type Product = Tables<'products'>
 export type Category = Tables<'categories'>
 export type Coupon = Tables<'coupons'>
 export type User = Tables<'users'>
-export type ServiceablePincode = Tables<'serviceable_pincodes'>
-export type PartnerPayout = Tables<'partner_payouts'>
+export type ServiceablePincode = any
 
 // Admin session
 export interface AdminSession {
@@ -31,8 +36,8 @@ export interface DashboardMetrics {
   pending_kyc: number
 }
 
-// Partner with joined data for lists
-export interface PartnerWithStats extends Omit<Partner, 'total_orders'> {
+// Vendor with joined data for lists
+export interface PartnerWithStats extends Omit<Vendor, 'total_orders'> {
   total_orders?: number | null
   total_gmv?: number
   total_items?: number
@@ -40,13 +45,13 @@ export interface PartnerWithStats extends Omit<Partner, 'total_orders'> {
 
 // Order with joined data for lists
 export interface OrderWithRelations extends Order {
-  partner: Pick<Partner, 'id' | 'name' | 'business_name'> | null
+  vendor: Pick<Vendor, 'id' | 'name' | 'business_name'> | null
   user: Pick<User, 'id' | 'full_name' | 'phone'> | null
 }
 
-// Item with joined data for catalog
-export interface ItemWithRelations extends Item {
-  partner: Pick<Partner, 'id' | 'name' | 'business_name'> | null
+// Product with joined data for catalog
+export interface ItemWithRelations extends Product {
+  vendor: Pick<Vendor, 'id' | 'name' | 'business_name'> | null
 }
 
 // KYC status values
@@ -61,13 +66,14 @@ export type KYCStatus = (typeof KYC_STATUS)[keyof typeof KYC_STATUS]
 
 // Order status values
 export const ORDER_STATUS = {
-  PENDING: 'PENDING',
+  PLACED: 'PLACED',
   CONFIRMED: 'CONFIRMED',
-  PREPARING: 'PREPARING',
-  READY: 'READY',
-  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
+  IN_PRODUCTION: 'IN_PRODUCTION',
+  PACKED: 'PACKED',
+  DISPATCHED: 'OUT_FOR_DELIVERY',
   DELIVERED: 'DELIVERED',
   CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED',
 } as const
 
 export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS]

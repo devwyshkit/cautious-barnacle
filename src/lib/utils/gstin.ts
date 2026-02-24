@@ -3,16 +3,16 @@ export function validateGSTIN(gstin: string): boolean {
   return gstinRegex.test(gstin);
 }
 
-export function downloadGSTIN(order: any, partner: any) {
+export function downloadGSTIN(order: any, vendor: any) {
   // Mock function for downloading GSTIN certificate as a JSON/text file for now
   // In a real app, this would generate a PDF or fetch a signed URL
   const data = {
     orderNumber: order.orderNumber,
     customer: order.users?.full_name || 'Guest',
-    partner: partner.name,
-    gstin: partner.gstin || 'Applied For',
-    businessType: partner.businessType,
-    panNumber: partner.panNumber,
+    vendor: vendor.name,
+    gstin: vendor.gstin || 'Applied For',
+    businessType: vendor.businessType,
+    panNumber: vendor.panNumber,
     timestamp: new Date().toISOString(),
   };
 

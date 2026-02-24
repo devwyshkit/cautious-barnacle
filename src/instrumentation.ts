@@ -16,7 +16,6 @@ export async function register() {
         });
 
         sdk.start();
-
-        console.log('OTel Instrumentation started for Wyshkit');
+        // logger.info('OTel Instrumentation initialized');
     }
 }

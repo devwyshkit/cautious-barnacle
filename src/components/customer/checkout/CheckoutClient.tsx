@@ -92,30 +92,30 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                         <span className="text-[11px] font-black text-zinc-500 tracking-widest">Bill</span>
                     </div>
 
-                    {/* Items */}
+                    {/* Products */}
                     <div className="px-4 py-3 space-y-3 border-b border-zinc-50">
-                        {checkoutData.items.map((item: any) => (
-                            <div key={item.id} className="flex items-center gap-3">
+                        {checkoutData.products.map((product: any) => (
+                            <div key={product.id} className="flex items-center gap-3">
                                 <div className="relative size-12 rounded-xl bg-zinc-100 overflow-hidden shrink-0">
                                     <Image
-                                        src={item.item_image || '/images/logo.png'}
-                                        alt={item.item_name}
+                                        src={product.product_image || '/images/logo.png'}
+                                        alt={product.product_name}
                                         fill
                                         className="object-cover"
                                     />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-black text-zinc-900 truncate">{item.item_name}</p>
+                                    <p className="text-sm font-black text-zinc-900 truncate">{product.product_name}</p>
                                     <div className="flex items-center gap-1.5 mt-0.5">
-                                        <span className="text-xs text-zinc-500">Qty {item.quantity}</span>
-                                        {item.is_personalized && (
+                                        <span className="text-xs text-zinc-500">Qty {product.quantity}</span>
+                                        {product.is_personalized && (
                                             <span className="flex items-center gap-0.5 text-[9px] font-black text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">
                                                 <Sparkles className="size-2" /> Personalized
                                             </span>
                                         )}
                                     </div>
                                 </div>
-                                <span className="text-sm font-black text-zinc-900">{formatCurrency(item.line_total)}</span>
+                                <span className="text-sm font-black text-zinc-900">{formatCurrency(product.line_total)}</span>
                             </div>
                         ))}
                     </div>
@@ -124,7 +124,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                     {checkoutData.pricing && (
                         <div className="px-4 py-3 space-y-2">
                             <div className="flex justify-between text-xs font-bold text-zinc-500">
-                                <span>Items</span>
+                                <span>Products</span>
                                 <span>{formatCurrency(checkoutData.pricing.subtotal)}</span>
                             </div>
                             {checkoutData.pricing.delivery_fee > 0 && (
@@ -191,7 +191,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                         />
                         {checkoutData.pricing && checkoutData.gstin && (
                             <EstimateButton
-                                items={checkoutData.items}
+                                products={checkoutData.products}
                                 pricing={checkoutData.pricing}
                                 gstin={checkoutData.gstin}
                                 businessName={businessName || undefined}
@@ -202,7 +202,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
 
                 {/* Disclaimer */}
                 <p className="text-[11px] text-zinc-400 text-center px-4 leading-relaxed">
-                    100% advance payment. Personalized items cannot be returned once production starts.
+                    100% advance payment. Personalized products cannot be returned once production starts.
                 </p>
             </div>
 

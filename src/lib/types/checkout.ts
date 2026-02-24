@@ -8,7 +8,7 @@ import type { WalletInfo } from '@/lib/actions/user/wallet';
  * Representing the JSONB payload returned from get_checkout_context RPC.
  */
 export interface CheckoutContext {
-    items: DraftLineItem[];
+    products: DraftLineItem[];
     addresses: Address[];
     pricing: PricingBreakdown | null;
     wallet_info: WalletInfo | null;

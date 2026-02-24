@@ -33,8 +33,8 @@ export function FloatingCartBar() {
     router.push('/checkout');
   };
 
-  const firstItemImage = displayCart?.items?.[0]?.item_image;
-  const hasPersonalization = hasAnyPersonalization(displayCart?.items || []);
+  const firstItemImage = displayCart?.products?.[0]?.product_image;
+  const hasPersonalization = hasAnyPersonalization((displayCart?.products || []) as any[]);
   const displayCount = displayCart?.item_count || 0;
   const displayTotal = displayCart?.total || 0;
   const isLoading = loading;
@@ -84,7 +84,7 @@ export function FloatingCartBar() {
         )}
       >
         <div className="flex items-center justify-between px-4 py-3 min-h-[56px]">
-          {/* Left: Standardized slim cart item summary */}
+          {/* Left: Standardized slim cart product summary */}
           <div className="flex items-center gap-3">
             <div className="relative">
               <ShoppingBag className="size-5 text-emerald-100" />
@@ -95,11 +95,11 @@ export function FloatingCartBar() {
 
             <div className="flex flex-col">
               <span className="text-sm font-black text-white leading-none">
-                {visualCount} {visualCount === 1 ? 'item' : 'items'}
+                {visualCount} {visualCount === 1 ? 'product' : 'products'}
               </span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="text-xs font-medium text-emerald-100/90 truncate max-w-[120px]">
-                  {displayCart?.items?.[0]?.partner_name || 'Local store'}
+                  {displayCart?.products?.[0]?.vendor_name || 'Local store'}
                 </span>
                 {hasPersonalization && (
                   <div className="flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-white/20">

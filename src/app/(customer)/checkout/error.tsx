@@ -29,7 +29,7 @@ export default function CheckoutError({
                 <div className="space-y-2">
                     <h2 className="text-xl font-black text-zinc-950 tracking-tighter">Checkout Interrupted</h2>
                     <p className="text-sm text-zinc-500 font-medium">
-                        We encountered a hitch while preparing your order. Your items are safe in the bag.
+                        We encountered a hitch while preparing your order. Your products are safe in the bag.
                     </p>
                 </div>
 

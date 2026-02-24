@@ -22,7 +22,7 @@ export const EliteSignalsSchema = z.object({
         text: z.string(),
         variant: z.enum(["default", "fast", "scarcity", "elite"])
     })).nullable().optional(),
-    // Partner specific
+    // Vendor specific
     city_short: z.string().nullable().optional(),
     estimate: z.object({
         min: z.number(),
@@ -53,17 +53,16 @@ export const WyshkitItemSchema = z.object({
     base_price: z.number(),
     images: z.array(z.string()).nullable().optional(),
     image_url: z.string().nullable().optional(), // Synthetic field
-    partner_id: z.string(),
+    vendor_id: z.string(),
     category: z.string().nullable(),
-    stock_status: z.string().nullable(),
     stock_quantity: z.number().nullable(),
     is_active: z.boolean().default(true),
     has_personalization: z.boolean().default(false),
     elite_signals: EliteSignalsSchema.optional(),
 
     // Joins
-    partner_name: z.string().nullable().optional(),
-    partners: PartnerSchema.nullable().optional(),
+    vendor_name: z.string().nullable().optional(),
+    vendors: PartnerSchema.nullable().optional(),
     variants: z.array(z.any()).nullable().optional(), // Will refine later
     item_addons: z.array(z.any()).nullable().optional(),
     personalization_options: z.array(z.any()).nullable().optional(),
@@ -80,7 +79,7 @@ export const SurfaceSectionSchema = z.object({
     type: SectionTypeSchema,
     title: z.string().optional(),
     subtitle: z.string().optional(),
-    data: z.array(z.any()), // Items, Partners, or Categories
+    data: z.array(z.any()), // Products, Vendors, or Categories
     metadata: z.record(z.string(), z.any()).optional(),
 });
 
@@ -91,8 +90,8 @@ export const HomeSurfaceSchema = z.object({
 });
 
 export const SearchResultsSchema = z.object({
-    items: z.array(WyshkitItemSchema),
-    partners: z.array(PartnerSchema),
+    products: z.array(WyshkitItemSchema),
+    vendors: z.array(PartnerSchema),
     total: z.number(),
 });
 
