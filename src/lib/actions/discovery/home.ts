@@ -122,12 +122,24 @@ export async function getFeaturedPartners(limit: number = 8) {
     const supabase = await createClient();
     const { data, error } = await supabase
         .from('partners')
-        .select('*')
+        .select(`
+            id, name, image_url, rating, city, 
+            avg_prep_time_mins, base_delivery_charge, 
+            slug, business_type, is_online, description
+        `)
         .eq('is_active', true)
         .limit(limit);
 
     if (error) return { data: [], error: error.message };
-    return { data: data as any, error: null };
+
+    // Map to UI-friendly structure
+    const mappedPartners = (data || []).map(p => ({
+        ...p,
+        prep_hours: p.avg_prep_time_mins ? (p.avg_prep_time_mins / 60) : 0.75,
+        delivery_fee: Number(p.base_delivery_charge || 0)
+    }));
+
+    return { data: mappedPartners, error: null };
 }
 
 export async function getFeaturedItems(limit: number = 3) {

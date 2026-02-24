@@ -47,7 +47,7 @@ export async function get_user_cashback_balance(user_id: string) {
     const supabase = await createClient();
 
     const { data, error } = await supabase
-      .from('wyshkit_money')
+      .from('user_wallets')
       .select('balance, total_earned, total_withdrawn')
       .eq('user_id', user_id)
       .maybeSingle();
@@ -73,7 +73,7 @@ export async function get_cashback_transactions(user_id: string, limit: number =
     const supabase = await createClient();
 
     const { data, error } = await supabase
-      .from('wyshkit_money_transactions')
+      .from('wallet_transactions')
       .select('*, orders(order_number)')
       .eq('user_id', user_id)
       .order('created_at', { ascending: false })

@@ -16,7 +16,7 @@ export async function getWalletInfo(): Promise<{ data: WalletInfo | null; error?
         if (!user) return { data: null, error: 'Not authenticated' };
 
         const { data, error } = await supabase
-            .from('wyshkit_money')
+            .from('user_wallets')
             .select('balance, total_earned')
             .eq('user_id', user.id)
             .single();
@@ -40,7 +40,7 @@ export async function getWalletTransactions(): Promise<{ data: any[] | null; err
         if (!user) return { data: null, error: 'Not authenticated' };
 
         const { data, error } = await supabase
-            .from('wyshkit_money_transactions')
+            .from('wallet_transactions')
             .select('*')
             .eq('user_id', user.id)
             .order('created_at', { ascending: false });

@@ -29,7 +29,11 @@ export const getPartnerStoreData = cache(async (partnerId: string, category?: st
         // 1. Fetch Partner Basic Info
         const { data: partnerData, error: partnerError } = await supabase
             .from('partners')
-            .select('id, name, image_url, rating, city, prep_hours, delivery_fee, slug, business_type, is_online, description, fssai_license, gstin')
+            .select(`
+                id, name, image_url, rating, city, 
+                avg_prep_time_mins, base_delivery_charge, 
+                slug, business_type, is_online, description, gstin
+            `)
             .eq('id', partnerId)
             .maybeSingle();
 
@@ -38,7 +42,21 @@ export const getPartnerStoreData = cache(async (partnerId: string, category?: st
             return { partner: null, items: [], blocks: [], error: partnerError?.message || 'Partner not found' };
         }
 
-        const partner = partnerData as MappedPartner;
+        // Map database columns to UI-friendly MappedPartner interface
+        const partner: MappedPartner = {
+            id: partnerData.id,
+            name: partnerData.name,
+            image_url: partnerData.image_url,
+            rating: partnerData.rating ? Number(partnerData.rating) : null,
+            city: partnerData.city,
+            prep_hours: partnerData.avg_prep_time_mins ? (partnerData.avg_prep_time_mins / 60) : 0.75,
+            delivery_fee: Number(partnerData.base_delivery_charge || 0),
+            slug: partnerData.slug,
+            business_type: partnerData.business_type,
+            is_online: partnerData.is_online ?? true,
+            description: partnerData.description,
+            gstin: partnerData.gstin
+        };
 
         // 2. Fetch Partner Items (Filtered by Category if provided)
         let query = supabase

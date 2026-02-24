@@ -18,11 +18,10 @@ export type OrderStatus = Database['public']['Enums']['order_status'];
 // No Circular States allowed. Revisions change personalization_status, but NOT order.status.
 const VALID_TRANSITIONS: Record<string, string[]> = {
   PLACED: ['CONFIRMED', 'CANCELLED'],
-  CONFIRMED: ['IN_PRODUCTION', 'CANCELLED'],
-  IN_PRODUCTION: ['PACKED', 'CANCELLED'],
-  PACKED: ['DISPATCHED', 'CANCELLED'],
-  DISPATCHED: ['OUT_FOR_DELIVERY', 'DELIVERED'],
-  OUT_FOR_DELIVERY: ['DELIVERED'],
+  CONFIRMED: ['PREPARING', 'CANCELLED'],
+  PREPARING: ['READY', 'CANCELLED'],
+  READY: ['SHIPPED', 'CANCELLED'],
+  SHIPPED: ['DELIVERED'],
   DELIVERED: ['REFUNDED'], // Returns flow
   CANCELLED: [],
   REFUNDED: [],
@@ -33,9 +32,9 @@ export async function validate_status_transition(
   to: string,
   has_personalization: boolean
 ): Promise<string | null> {
-  // Universal Rule: Can't skip "Preparing" (IN_PRODUCTION)
-  if (from === ORDER_STATUS.CONFIRMED && to === ORDER_STATUS.PACKED) {
-    return 'Orders must be marked as "Preparing" (IN_PRODUCTION) before they can be marked as Ready (PACKED).';
+  // Universal Rule: Can't skip "Preparing"
+  if (from === ORDER_STATUS.CONFIRMED && to === ORDER_STATUS.READY) {
+    return 'Orders must be marked as "Preparing" before they can be marked as Ready.';
   }
 
   const valid_next_statuses = VALID_TRANSITIONS[from];
@@ -84,38 +83,26 @@ export async function update_order_status(
   }
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const supabase = await createClient();
+    const supabase = await createAdminClient();
 
-    const { data: raw_order_data, error: order_error } = await supabase
+    // 1. Fetch current order for side-effect context (e.g., payment ID for refund)
+    const { data: order, error: order_error } = await supabase
       .from('orders')
-      .select(`
-        *,
-        delivery_address:addresses(*),
-        partner:partners(*)
-      `)
+      .select('*, partner:partners(*)')
       .eq('id', order_id)
       .single();
 
-    if (order_error || !raw_order_data) throw new Error('Order not found');
-
-    const order = (raw_order_data as unknown) as PartnerOrder;
-    const current_status = order.status as OrderStatus;
-    const has_personalization = order.has_personalization === true;
-
-    // 1. Validation
-    const validation_error = await validate_status_transition(current_status, status, has_personalization);
-    if (validation_error) {
-      return { success: false, error: validation_error };
-    }
+    if (order_error || !order) throw new Error('Order not found');
 
     // 2. Side Effect: Auto-Dispatch
-    if (status === 'PACKED') {
+    let target_status = status;
+    if (status === ORDER_STATUS.READY) {
       try {
         const { dispatch_order } = await import('@/lib/services/dispatch');
         const dispatch_result = await dispatch_order({ order_id: order_id });
         if (dispatch_result.success) {
-          logger.info(`[update_order_status] Auto-dispatch successful for ${order_id}, moving to DISPATCHED.`);
-          status = ORDER_STATUS.DISPATCHED;
+          logger.info(`[update_order_status] Auto-dispatch successful for ${order_id}, moving to SHIPPED.`);
+          target_status = ORDER_STATUS.SHIPPED;
         }
       } catch (dispatch_error) {
         logger.error('Dispatch trigger failed', dispatch_error, { order_id });
@@ -123,19 +110,13 @@ export async function update_order_status(
     }
 
     // 3. Side Effect: Auto-Refund
-    let payment_status_update: Database['public']['Tables']['orders']['Update'] = {};
-    if (status === 'CANCELLED' || status === 'REFUNDED') {
+    if (target_status === 'CANCELLED' || target_status === 'REFUNDED') {
       if (order.payment_status === 'paid' || order.payment_status === 'captured') {
         const payment_id = order.payment_id;
         if (payment_id) {
           try {
             const { refund_payment } = await import('@/lib/services/razorpay');
             await refund_payment(payment_id);
-            payment_status_update = {
-              payment_status: 'refunded',
-              return_status: 'auto_refunded'
-            };
-            logger.info('Auto-refund successful', { order_id, payment_id });
           } catch (refund_error) {
             logger.error('Auto-refund failed', refund_error, { order_id, payment_id });
           }
@@ -143,40 +124,27 @@ export async function update_order_status(
       }
     }
 
-    // 4. Build Final Update
-    const status_updates: Database['public']['Tables']['orders']['Update'] = {
-      status: status as OrderStatus,
-      ...payment_status_update,
-      updated_at: new Date().toISOString()
-    };
-
-    if (metadata?.reason) status_updates.cancellation_reason = metadata.reason;
-    if (metadata?.cancelled_by) status_updates.cancelled_by = metadata.cancelled_by;
-
-    if (status === 'CONFIRMED' && has_personalization) {
-      const deadline = new Date();
-      deadline.setHours(deadline.getHours() + 24);
-      status_updates.design_deadline_at = deadline.toISOString();
-    }
-
-    const { error: update_error } = await supabase
-      .from('orders')
-      .update(status_updates)
-      .eq('id', order_id);
-
-    if (update_error) throw update_error;
-
-    // 6. Audit & Persistence
-    await supabase.rpc('log_order_status_history', {
+    // 4. WYSHKIT 2026: Atomic Transition via RPC
+    // This handles validation, status update, and history logging in one transaction.
+    const { data: result, error: rpc_error } = await supabase.rpc('transition_order_status', {
       p_order_id: order_id,
-      p_type: 'status_update',
-      p_title: `Status: ${status}`,
-      p_description: metadata?.reason ? `Order ${status}. Reason: ${metadata.reason}` : `Order status updated to ${status}.`,
-      p_metadata: ({ source: metadata?.cancelled_by || 'system', status, ...metadata }) as unknown as Json
+      p_new_status: target_status as OrderStatus,
+      p_metadata: {
+        ...metadata,
+        source: metadata?.cancelled_by || 'system',
+        updated_at_server: new Date().toISOString()
+      } as unknown as Json
     });
 
-    // 7. Side Effect: Cashback
-    if (status === 'DELIVERED') {
+    if (rpc_error) throw rpc_error;
+
+    const transition_result = result as any;
+    if (!transition_result.success) {
+      return { success: false, error: transition_result.error };
+    }
+
+    // 5. Side Effect: Cashback
+    if (target_status === 'DELIVERED') {
       try {
         const { credit_cashback_on_delivery } = await import('@/lib/actions/user/cashback');
         await credit_cashback_on_delivery(order_id, order.user_id, Number(order.total));
@@ -193,6 +161,7 @@ export async function update_order_status(
     return { success: false, error: 'Failed to update order status' };
   }
 }
+
 
 import { PERSONALIZATION_STATUS } from '@/lib/types/order-status';
 
@@ -284,7 +253,7 @@ export async function mark_order_as_packed(order_id: string) {
     if (!order_id || order_id.trim() === '') {
       return { success: false, error: 'Invalid Order ID' };
     }
-    const result = await update_order_status(order_id, ORDER_STATUS.PACKED);
+    const result = await update_order_status(order_id, ORDER_STATUS.READY);
 
     if (!result.success) {
       throw new Error(result.error);
@@ -332,7 +301,7 @@ export async function approve_preview(preview_submission_id: string, order_id: s
     // Update specific item status
     if (preview.order_item_id) {
       await admin_supabase.from('order_items').update({
-        status: ORDER_STATUS.IN_PRODUCTION,
+        status: ORDER_STATUS.PREPARING,
         liability_shifted_at: new Date().toISOString()
       }).eq('id', preview.order_item_id);
     }
@@ -340,11 +309,11 @@ export async function approve_preview(preview_submission_id: string, order_id: s
     // Final check for order-wide status
     const { data: items } = await admin_supabase.from('order_items').select('id, status').eq('order_id', order_id);
     const personalized_items = (items || []).filter(i => i.status !== ORDER_STATUS.CANCELLED);
-    const all_approved = personalized_items.every(i => i.status === ORDER_STATUS.IN_PRODUCTION);
+    const all_approved = personalized_items.every(i => i.status === ORDER_STATUS.PREPARING);
 
     if (all_approved) {
       await admin_supabase.from('orders').update({
-        status: ORDER_STATUS.IN_PRODUCTION
+        status: ORDER_STATUS.PREPARING
       }).eq('id', order_id);
     }
 

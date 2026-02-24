@@ -14,7 +14,7 @@ import type { Database } from '@/lib/supabase/database.types'
 
 type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
 
-type WalletWithUser = Tables<'wyshkit_money'> & { users: { full_name: string | null; phone: string | null } | null }
+type WalletWithUser = Tables<'user_wallets'> & { users: { full_name: string | null; phone: string | null } | null }
 
 interface WalletTableProps {
   wallets: WalletWithUser[]

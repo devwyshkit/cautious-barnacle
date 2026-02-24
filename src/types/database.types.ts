@@ -503,6 +503,7 @@ export type Database = {
           images: string[] | null
           is_active: boolean | null
           is_perishable: boolean | null
+          is_promoted: boolean | null
           low_stock_threshold: number | null
           manufacturer_info: string | null
           material: string | null
@@ -518,6 +519,7 @@ export type Database = {
           preview_time_minutes: number | null
           production_hours: number | null
           production_time_minutes: number | null
+          promotion_rank: number | null
           rating: number | null
           return_eligible: boolean | null
           return_policy: string | null
@@ -556,6 +558,7 @@ export type Database = {
           images?: string[] | null
           is_active?: boolean | null
           is_perishable?: boolean | null
+          is_promoted?: boolean | null
           low_stock_threshold?: number | null
           manufacturer_info?: string | null
           material?: string | null
@@ -571,6 +574,7 @@ export type Database = {
           preview_time_minutes?: number | null
           production_hours?: number | null
           production_time_minutes?: number | null
+          promotion_rank?: number | null
           rating?: number | null
           return_eligible?: boolean | null
           return_policy?: string | null
@@ -609,6 +613,7 @@ export type Database = {
           images?: string[] | null
           is_active?: boolean | null
           is_perishable?: boolean | null
+          is_promoted?: boolean | null
           low_stock_threshold?: number | null
           manufacturer_info?: string | null
           material?: string | null
@@ -624,6 +629,7 @@ export type Database = {
           preview_time_minutes?: number | null
           production_hours?: number | null
           production_time_minutes?: number | null
+          promotion_rank?: number | null
           rating?: number | null
           return_eligible?: boolean | null
           return_policy?: string | null
@@ -900,8 +906,11 @@ export type Database = {
       }
       orders: {
         Row: {
+          accept_deadline: string | null
+          accepted_at: string | null
           addon_ids: Json | null
           address_id: string | null
+          approved_at: string | null
           awb_number: string | null
           billing_address: Json | null
           cancellation_reason: string | null
@@ -912,10 +921,12 @@ export type Database = {
           commission_amount: number | null
           courier_partner: string | null
           created_at: string | null
+          delivered_at: string | null
           delivery_address: Json | null
           delivery_fee: number | null
           delivery_instructions: string | null
           discount: number | null
+          dispatched_at: string | null
           distance_km: number | null
           estimate_downloaded: boolean | null
           expected_delivery_date: string | null
@@ -923,9 +934,12 @@ export type Database = {
           gstin_verified: boolean | null
           has_personalization: boolean | null
           id: string
+          in_production_at: string | null
+          input_received_at: string | null
           max_change_requests: number | null
           net_settlement_amount: number | null
           order_number: string
+          packed_at: string | null
           partner_id: string
           payment_id: string | null
           payment_method: string | null
@@ -933,9 +947,11 @@ export type Database = {
           payout_id: string | null
           payout_status: string | null
           personalization_charges: number | null
+          personalization_status: string | null
           platform_fee: number | null
+          preview_ready_at: string | null
           price_locked_until: string | null
-          promised_delivery_at: string | null
+          production_started_at: string | null
           razorpay_order_id: string | null
           refunded_amount: number | null
           return_deadline: string | null
@@ -948,8 +964,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          accept_deadline?: string | null
+          accepted_at?: string | null
           addon_ids?: Json | null
           address_id?: string | null
+          approved_at?: string | null
           awb_number?: string | null
           billing_address?: Json | null
           cancellation_reason?: string | null
@@ -960,10 +979,12 @@ export type Database = {
           commission_amount?: number | null
           courier_partner?: string | null
           created_at?: string | null
+          delivered_at?: string | null
           delivery_address?: Json | null
           delivery_fee?: number | null
           delivery_instructions?: string | null
           discount?: number | null
+          dispatched_at?: string | null
           distance_km?: number | null
           estimate_downloaded?: boolean | null
           expected_delivery_date?: string | null
@@ -971,9 +992,12 @@ export type Database = {
           gstin_verified?: boolean | null
           has_personalization?: boolean | null
           id?: string
+          in_production_at?: string | null
+          input_received_at?: string | null
           max_change_requests?: number | null
           net_settlement_amount?: number | null
           order_number: string
+          packed_at?: string | null
           partner_id: string
           payment_id?: string | null
           payment_method?: string | null
@@ -981,9 +1005,11 @@ export type Database = {
           payout_id?: string | null
           payout_status?: string | null
           personalization_charges?: number | null
+          personalization_status?: string | null
           platform_fee?: number | null
+          preview_ready_at?: string | null
           price_locked_until?: string | null
-          promised_delivery_at?: string | null
+          production_started_at?: string | null
           razorpay_order_id?: string | null
           refunded_amount?: number | null
           return_deadline?: string | null
@@ -996,8 +1022,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          accept_deadline?: string | null
+          accepted_at?: string | null
           addon_ids?: Json | null
           address_id?: string | null
+          approved_at?: string | null
           awb_number?: string | null
           billing_address?: Json | null
           cancellation_reason?: string | null
@@ -1008,10 +1037,12 @@ export type Database = {
           commission_amount?: number | null
           courier_partner?: string | null
           created_at?: string | null
+          delivered_at?: string | null
           delivery_address?: Json | null
           delivery_fee?: number | null
           delivery_instructions?: string | null
           discount?: number | null
+          dispatched_at?: string | null
           distance_km?: number | null
           estimate_downloaded?: boolean | null
           expected_delivery_date?: string | null
@@ -1019,9 +1050,12 @@ export type Database = {
           gstin_verified?: boolean | null
           has_personalization?: boolean | null
           id?: string
+          in_production_at?: string | null
+          input_received_at?: string | null
           max_change_requests?: number | null
           net_settlement_amount?: number | null
           order_number?: string
+          packed_at?: string | null
           partner_id?: string
           payment_id?: string | null
           payment_method?: string | null
@@ -1029,9 +1063,11 @@ export type Database = {
           payout_id?: string | null
           payout_status?: string | null
           personalization_charges?: number | null
+          personalization_status?: string | null
           platform_fee?: number | null
+          preview_ready_at?: string | null
           price_locked_until?: string | null
-          promised_delivery_at?: string | null
+          production_started_at?: string | null
           razorpay_order_id?: string | null
           refunded_amount?: number | null
           return_deadline?: string | null
@@ -1301,6 +1337,48 @@ export type Database = {
           working_days?: string[] | null
         }
         Relationships: []
+      }
+      personalization_services: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          partner_id: string
+          price: number
+          service_name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          partner_id: string
+          price?: number
+          service_name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          partner_id?: string
+          price?: number
+          service_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personalization_services_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personalization_services_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["partner_id"]
+          },
+        ]
       }
       platform_settings: {
         Row: {
@@ -1794,6 +1872,7 @@ export type Database = {
           partner_city: string | null
           partner_image: string | null
           partner_name: string | null
+          personalization_status: string | null
           status: Database["public"]["Enums"]["order_status"] | null
           total: number | null
           user_id: string | null
@@ -1949,10 +2028,6 @@ export type Database = {
           p_user_id?: string
         }
         Returns: Json
-      }
-      calculate_promised_delivery_time: {
-        Args: { p_order_id: string }
-        Returns: string
       }
       calculate_return_refund: {
         Args: { p_order_id: string; p_reason: string }
@@ -2847,14 +2922,6 @@ export type Database = {
           p_order_id: string
           p_target_status: Database["public"]["Enums"]["order_status"]
           p_user_id?: string
-        }
-        Returns: Json
-      }
-      transition_order_status: {
-        Args: {
-          p_metadata?: Json
-          p_new_status: Database["public"]["Enums"]["order_status"]
-          p_order_id: string
         }
         Returns: Json
       }

@@ -46,6 +46,12 @@ const SetGuestLocationSchema = z.object({
     name: z.string().optional(),
 });
 
+const TransitionOrderSchema = z.object({
+    order_id: z.string().uuid(),
+    target_status: z.string(), // Validated by DB enum
+    metadata: z.any().optional(),
+});
+
 const PlaceOrderSchema = z.object({
     razorpay_order_id: z.string(),
     items: z.array(z.any()).optional(), // Optional: can be refetched by RPC
@@ -67,6 +73,7 @@ const CommerceIntentSchema = z.discriminatedUnion('intent', [
     z.object({ intent: z.literal('SET_ADDRESS'), payload: SetAddressSchema }),
     z.object({ intent: z.literal('SET_GSTIN'), payload: SetGSTINSchema }),
     z.object({ intent: z.literal('SET_GUEST_LOCATION'), payload: SetGuestLocationSchema }),
+    z.object({ intent: z.literal('TRANSITION_ORDER'), payload: TransitionOrderSchema }),
     z.object({ intent: z.literal('PLACE_ORDER'), payload: PlaceOrderSchema }),
     z.object({ intent: z.literal('CLEAR_CART'), payload: z.object({}).optional() }),
 ]);
@@ -184,12 +191,10 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                 }
 
                 case 'PLACE_ORDER': {
-                    const { data, error } = await supabase.rpc('place_secure_order', {
+                    const { data, error } = await supabase.rpc('place_atomic_order', {
                         p_items: validated.payload.items as any,
                         p_razorpay_order_id: validated.payload.razorpay_order_id,
-                        p_user_id: user?.id,
-                        p_session_id: sessionId,
-                        p_address_id: validated.payload.address_id ?? undefined,
+                        p_address_id: validated.payload.address_id!, // Non-null assertion as it's required by RPC
                         p_payment_id: validated.payload.payment_id ?? undefined,
                         p_coupon_code: validated.payload.coupon_code ?? undefined,
                         p_use_wallet: validated.payload.use_wallet ?? undefined,
@@ -226,6 +231,20 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         throw new Error((data as any).error || 'Failed to update item');
                     }
                     break;
+                }
+
+                case 'TRANSITION_ORDER': {
+                    const { data, error } = await supabase.rpc('transition_order', {
+                        p_order_id: validated.payload.order_id,
+                        p_target_status: validated.payload.target_status as any,
+                        p_metadata: validated.payload.metadata || {}
+                    });
+                    if (error) throw error;
+                    if (data && !(data as any).success) {
+                        throw new Error((data as any).error || 'Failed to transition order');
+                    }
+                    revalidateTag('orders');
+                    return { success: true, data };
                 }
 
                 case 'CLEAR_CART': {

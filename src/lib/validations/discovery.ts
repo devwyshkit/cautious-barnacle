@@ -36,14 +36,13 @@ export const PartnerSchema = z.object({
     image_url: z.string().nullable().optional(),
     rating: z.number().nullable().optional(),
     city: z.string().nullable().optional(),
-    prep_hours: z.number().nullable().optional(),
-    delivery_fee: z.number().nullable().optional().default(0),
+    avg_prep_time_mins: z.number().nullable().optional(),
+    base_delivery_charge: z.number().nullable().optional().default(0),
     slug: z.string().nullable().optional(),
     business_type: z.string().nullable().optional(),
     is_online: z.boolean().optional().default(true),
     description: z.string().nullable().optional(),
     elite_signals: EliteSignalsSchema.optional(),
-    fssai_license: z.string().nullable().optional(),
     gstin: z.string().nullable().optional(),
 }).passthrough();
 

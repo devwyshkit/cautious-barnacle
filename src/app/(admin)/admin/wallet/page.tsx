@@ -4,7 +4,7 @@ import { WalletTable } from './wallet-table'
 async function getWalletData() {
   const supabase = await createClient()
   const { data } = await supabase
-    .from('wyshkit_money')
+    .from('user_wallets')
     .select('*, users(full_name, phone)')
     .order('balance', { ascending: false })
     .limit(100)
@@ -24,8 +24,8 @@ async function getWalletData() {
 async function getWalletStats() {
   const supabase = await createClient()
   const [walletsResult, transactionsResult] = await Promise.all([
-    supabase.from('wyshkit_money').select('balance'),
-    supabase.from('wyshkit_money_transactions').select('amount, type'),
+    supabase.from('user_wallets').select('balance'),
+    supabase.from('wallet_transactions').select('amount, type'),
   ])
 
   const wallets = (walletsResult.data || []) as Array<{ balance: number }>;

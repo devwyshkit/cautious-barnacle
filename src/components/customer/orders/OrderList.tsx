@@ -27,32 +27,17 @@ export function OrderList({ initialOrders }: OrderListProps) {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const query = supabase
-        .from("orders")
-        .select("id, order_number, status, total, created_at, has_personalization, personalization_status, partners(name, image_url), order_items(item_name)")
+      // WYSHKIT 2026: Authority from View
+      const { data, error } = await supabase
+        .from("v_order_tracking")
+        .select("*")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
-      const { data, error } = await query;
+      if (error) throw error;
 
-      if (error) {
-        // The instruction had a <p> tag here, which is not valid in this context.
-        // Reverting to original error handling or throwing the error.
-        throw error;
-      }
-
-      const mapped: OrderListItem[] = (data || []).map((row: any) => ({
-        ...row,
-        order_number: row.order_number,
-        created_at: row.created_at,
-        partner_name: row.partners?.name || null,
-        // UI-only computed fields
-        item_count: row.order_items?.length || 1,
-        first_item_image: row.partners?.image_url || null,
-        first_item_name: row.order_items?.[0]?.item_name || null,
-        items: row.order_items || [],
-      }));
-      setOrders(mapped);
+      // ELITE: Mapping is now zero because the view is shaped for the UI
+      setOrders(data || []);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch orders";
       setError(errorMessage);

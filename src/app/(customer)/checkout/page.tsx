@@ -7,13 +7,6 @@ import { Suspense } from 'react';
 export const dynamic = 'force-dynamic';
 
 export default async function CheckoutPage() {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        redirect('/auth?returnUrl=/checkout');
-    }
-
     const checkoutData = await getCheckoutData();
 
     // If cart is empty, send back to home
