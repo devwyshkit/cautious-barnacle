@@ -92,9 +92,23 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
         const { data: { user } } = await supabase.auth.getUser();
 
         // Resolve Session Identity
-        const isReadOnly = ['PLACE_ORDER', 'CLEAR_CART'].includes(intentAction.intent) === false;
+        // WYSHKIT 2026: Mutations MUST have an identity (User or Session)
+        // Transitions/Place Order/Clear Cart/Add/Update all need session creation if guest.
+        const isMutation = [
+            'ADD_TO_CART',
+            'UPDATE_CART_QUANTITY',
+            'UPDATE_CART_ITEM',
+            'APPLY_COUPON',
+            'TOGGLE_WALLET',
+            'SET_ADDRESS',
+            'SET_GSTIN',
+            'SET_GUEST_LOCATION',
+            'PLACE_ORDER',
+            'CLEAR_CART'
+        ].includes(intentAction.intent);
+
         const guestSessionRaw = !user
-            ? (isReadOnly ? await getGuestSessionIdReadOnly() : await getGuestSessionId())
+            ? (isMutation ? await getGuestSessionId() : await getGuestSessionIdReadOnly())
             : undefined;
         const sessionId = guestSessionRaw || undefined;
 

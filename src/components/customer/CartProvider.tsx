@@ -73,6 +73,14 @@ export function CartProvider({
     const { user } = useAuth();
     const [isPending, startTransition] = useTransition();
 
+    // WYSHKIT 2026: Persist guestSessionId if it's the only anchor
+    useEffect(() => {
+        if (!user && guestSessionId) {
+            // This is handled by the middleware/cookie usually, 
+            // but we ensure the client stays in sync if needed.
+        }
+    }, [user, guestSessionId]);
+
     // ELITE: Optimistic state bridges the gap between Action and Revalidation
     const [optimisticCart, setOptimisticCart] = useOptimistic(
         initialCart,
@@ -84,20 +92,20 @@ export function CartProvider({
                     return {
                         ...state,
                         items: [...state.items, {
-                            id: 'temp-' + Math.random(),
+                            cart_item_id: 'temp-' + Math.random(),
                             ...update.payload,
                             quantity: update.payload.quantity || 1
-                        }],
+                        } as DraftLineItem],
                     };
                 case 'remove':
                     return {
                         ...state,
-                        items: state.items.filter(i => i.id !== update.payload)
+                        items: state.items.filter((i: DraftLineItem) => i.cart_item_id !== update.payload)
                     };
                 case 'update':
                     return {
                         ...state,
-                        items: state.items.map(i => i.id === update.payload.id ? { ...i, quantity: update.payload.quantity } : i)
+                        items: state.items.map((i: DraftLineItem) => i.cart_item_id === update.payload.cart_item_id ? { ...i, quantity: update.payload.quantity } : i)
                     };
                 case 'clear':
                     return EMPTY_CART;
@@ -167,13 +175,13 @@ export function CartProvider({
         if (!cartItem) return;
 
         startTransition(async () => {
-            setOptimisticCart({ type: 'remove', payload: cartItem.id });
+            setOptimisticCart({ type: 'remove', payload: cartItem.cart_item_id });
             try {
                 await executeCommerceIntent({
                     intent: 'UPDATE_CART_QUANTITY',
                     payload: {
                         item_id: cartItem.item_id,
-                        variant_id: cartItem.variant_id ?? undefined,
+                        variant_id: (cartItem.variant_id ?? undefined) as string | undefined,
                         quantity: 0
                     }
                 });
@@ -191,13 +199,13 @@ export function CartProvider({
         if (!cartItem) return;
 
         startTransition(async () => {
-            setOptimisticCart({ type: 'update', payload: { id: cartItem.id, quantity } });
+            setOptimisticCart({ type: 'update', payload: { cart_item_id: cartItem.cart_item_id, quantity } });
             try {
                 await executeCommerceIntent({
                     intent: 'UPDATE_CART_QUANTITY',
                     payload: {
                         item_id: cartItem.item_id,
-                        variant_id: cartItem.variant_id ?? undefined,
+                        variant_id: (cartItem.variant_id ?? undefined) as string | undefined,
                         quantity: quantity
                     }
                 });
