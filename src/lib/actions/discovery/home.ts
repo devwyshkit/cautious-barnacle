@@ -100,16 +100,19 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
         }
 
         const sections = raw.sections || [];
+        const sectionsData = raw.sections_data || {};
 
         const hour = new Date().getHours();
         const system_status = (hour >= 22 || hour < 6) ? 'delayed' : (hour >= 18 && hour < 21) ? 'capacity' : 'normal';
 
         return {
-            sections: raw.sections || [],
-            categories: raw.categories || [],
-            trendingProducts: raw.trendingProducts || [],
-            featuredVendors: raw.featuredVendors || [],
+            sections,
+            categories: sectionsData.categories || [],
+            trendingProducts: sectionsData.best_sellers || raw.trendingProducts || [],
+            newArrivals: sectionsData.new_arrivals || [],
+            featuredVendors: sectionsData.vendors || [],
             activeOrders: raw.activeOrders || [],
+            cartCount: raw.cartCount || 0,
             metadata: {
                 system_status,
                 orders: raw.activeOrders || []

@@ -13,22 +13,11 @@ import { withTrace } from '@/lib/observability/tracer';
 
 export type OrderStatus = Database['public']['Enums']['order_status'];
 
-// WYSHKIT 2026: Order State Machine - Valid Transitions (STRICT)
-// Enforces "Commitment Before Creativity" and "One-Trip" Principles
-// No Circular States allowed. Revisions change personalization_status, but NOT order.status.
+// WYSHKIT 2026: Order State Machine is strictly table-driven in Postgres.
 // Validations are enforced ATOMICALLY in the database via the `transition_order` RPC.
-export const VALID_TRANSITIONS: Record<string, string[]> = {
-  PLACED: ['CONFIRMED', 'CANCELLED'],
-  CONFIRMED: ['IN_PRODUCTION', 'CANCELLED'],
-  IN_PRODUCTION: ['PACKED', 'CANCELLED'],
-  PACKED: ['OUT_FOR_DELIVERY', 'CANCELLED'],
-  DISPATCHED: ['DELIVERED'],
-  DELIVERED: ['REFUNDED'], // Returns flow
-  CANCELLED: [],
-  REFUNDED: [],
-};
+// No hardcoded FSM logic allowed in TypeScript.
 
-export type PartnerOrder = Omit<Order, 'delivery_address' | 'vendor'> & {
+export type VendorOrder = Omit<Order, 'delivery_address' | 'vendor'> & {
   order_products: (OrderItem & {
     product?: Tables<'products'> | null;
     variant?: { stock_quantity: number } | null;
@@ -38,9 +27,6 @@ export type PartnerOrder = Omit<Order, 'delivery_address' | 'vendor'> & {
   vendor?: Vendor | Vendor[] | null;
   personalization_status?: string | null; // Mapped for UI
   latest_preview?: any; // Mapped for UI
-  personalization_input?: any; // Legacy compatibility
-  design_deadline_at?: string | null; // Legacy compatibility
-  accept_deadline?: string | null; // Legacy compatibility
 };
 
 async function log_order_status_history(order_id: string, type: string, title: string, description: string, metadata: Record<string, unknown> = {}) {
@@ -70,30 +56,24 @@ export async function update_order_status(
     // 1. Fetch current order for side-effect context
     const { data: order, error: order_error } = await supabase
       .from('orders')
-      .select('*, vendor:vendors(*)')
+      .select('*, vendors(name, image_url)')
       .eq('id', order_id)
       .single();
 
     if (order_error || !order) throw new Error('Order not found');
 
-    // 2. Side Effect: Auto-Dispatch (Trigger on PACKED)
     let target_status = status;
-    if (status === ORDER_STATUS.PACKED) {
-      try {
-        const { dispatch_order } = await import('@/lib/services/dispatch');
-        const dispatch_result = await dispatch_order({ order_id: order_id });
-        if (dispatch_result.success) {
-          logger.info(`[update_order_status] Auto-dispatch successful for ${order_id}, moving to DISPATCHED.`);
-          target_status = ORDER_STATUS.OUT_FOR_DELIVERY;
-        }
-      } catch (dispatch_error) {
-        logger.error('Dispatch trigger failed', dispatch_error, { order_id });
-      }
+
+    // 2. Side Effect: Auto-Dispatch (Trigger on RIDER_ASSIGNED)
+    // Swiggy 2026: PACKED -> RIDER_ASSIGNED (via dispatch_order)
+    if (status === 'RIDER_ASSIGNED' || status === 'PACKED') {
+      // Note: dispatch_order logic will be moved to its own service or handled in the UI trigger.
+      // For now, we keep the auto-transition logic in transition_order if possible.
     }
 
     // 3. Side Effect: Auto-Refund (Trigger on CANCELLED/REFUNDED)
     if (target_status === 'CANCELLED' || target_status === 'REFUNDED') {
-      if (order.payment_status === 'PAID' || order.payment_status === 'captured') {
+      if (['paid', 'PAID', 'captured', 'CAPTURED'].includes(order.payment_status || '')) {
         const payment_id = order.payment_id;
         if (payment_id) {
           try {
@@ -106,15 +86,13 @@ export async function update_order_status(
       }
     }
 
-    // 4. WYSHKIT 2026: Atomic Transition via DB RPC (SINGLE SOURCE OF TRUTH)
-    // This RPC handles transition validation, RLS, status update, and history logging.
+    // 4. ATOMIC Transition via DB RPC (SINGLE SOURCE OF TRUTH)
     const { data: result, error: rpc_error } = await supabase.rpc('transition_order', {
       p_order_id: order_id,
       p_target_status: target_status as OrderStatus,
       p_metadata: {
         ...metadata,
-        source: metadata?.cancelled_by || 'system',
-        updated_at_server: new Date().toISOString()
+        source: metadata?.cancelled_by || 'system'
       } as unknown as Json
     });
 
@@ -125,7 +103,7 @@ export async function update_order_status(
       return { success: false, error: transition_result.error };
     }
 
-    // 5. Side Effect: Post-Fulfillment (e.g. Cashback)
+    // 5. Side Effect: Cashback
     if (target_status === 'DELIVERED') {
       try {
         const { credit_cashback_on_delivery } = await import('@/lib/actions/user/cashback');
@@ -155,63 +133,20 @@ export async function submit_order_personalization(order_id: string, personaliza
       }
       span.setAttribute('order_id', order_id);
 
-      logger.info(`[submitOrderPersonalization] Starting for order: ${order_id}`, {
-        order_id,
-        personalization_input: Object.keys(personalization_input),
-        has_details: Object.values(personalization_input).some((v: any) => v.text || v.image_url)
+      const supabase = await createClient();
+
+      // WYSHKIT 2026: Atomic Submission via RPC (Single Trip)
+      const { data, error: rpc_error } = await supabase.rpc('submit_order_personalization', {
+        p_order_id: order_id,
+        p_personalization_input: personalization_input as any
       });
 
-      // 1. Verify Ownership & Fetch Current State
-      const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      if (rpc_error) throw rpc_error;
 
-      if (!user) {
-        return { success: false, error: "Unauthorized" };
+      const result = data as any;
+      if (!result.success) {
+        return { success: false, error: result.error };
       }
-      span.setAttribute('user_id', user.id);
-
-      const { data: order, error: fetch_error } = await supabase
-        .from('orders')
-        .select('id, user_id, status')
-        .eq('id', order_id)
-        .single();
-
-      if (fetch_error || !order) {
-        return { success: false, error: "Order not found" };
-      }
-
-      // Strict ownership check
-      if (order.user_id !== user.id) {
-        logger.error(`[submitOrderPersonalization] Unauthorized attempt by ${user.id} for order ${order_id}`);
-        return { success: false, error: "Unauthorized" };
-      }
-
-      // 2. Validate Current State
-      // WYSHKIT 2026: "Momentum First" - Allow upload during PLACED, but only move status for CONFIRMED.
-      const can_submit = ([ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED] as string[]).includes(order.status);
-
-      if (!can_submit) {
-        return { success: false, error: `Cannot submit details in ${order.status} state.` };
-      }
-
-      // 3. WYSHKIT 2026: Atomic Submission (Metadata-Driven)
-      const admin_supabase = await createAdminClient();
-
-      // Update metadata on all products that have personalization input
-      const { error: update_error } = await admin_supabase
-        .from('order_products')
-        .update({
-          personalization_details: personalization_input as unknown as Json,
-          is_personalized: true
-        })
-        .eq('order_id', order_id);
-
-      if (update_error) throw update_error;
-
-      // Update flag on order
-      await admin_supabase.from('orders').update({ has_personalization: true }).eq('id', order_id);
-
-      await log_order_status_history(order_id, 'personalization_submitted', 'Details Shared', 'You have shared the personalization details with the vendor.', { personalization: personalization_input });
 
       revalidateTag(`order-${order_id}`);
       revalidateTag('orders');
@@ -253,31 +188,19 @@ export async function mark_order_as_packed(order_id: string) {
 
 export async function approve_preview(preview_submission_id: string, order_id: string) {
   try {
-    const admin_supabase = await createAdminClient();
+    const supabase = await createClient();
 
-    // Swiggy 2026: Metadata-Driven Loop
-    // 1. Update the specific product metadata to reflect approval
-    await admin_supabase.from('order_products').update({
-      status: ORDER_STATUS.IN_PRODUCTION,
-      liability_shifted_at: new Date().toISOString(),
-      personalization_details: { approved: true, approved_at: new Date().toISOString() } as any
-    }).eq('order_id', order_id); // In this lean model, we might approve order-wide or per product. 
-    // For simplicity, let's assume order-wide approval for now if product_id is not passed.
-
-    // Final check for order-wide status
-    const { data: products } = await admin_supabase.from('order_products').select('id, status').eq('order_id', order_id);
-    const personalized_items = (products || []).filter(i => i.status !== ORDER_STATUS.CANCELLED);
-    const all_approved = personalized_items.every(i => i.status === ORDER_STATUS.IN_PRODUCTION);
-
-    if (all_approved) {
-      await admin_supabase.from('orders').update({
-        status: ORDER_STATUS.IN_PRODUCTION
-      }).eq('id', order_id);
-    }
-
-    await log_order_status_history(order_id, 'preview_approved', 'Preview Approved', `You have approved the preview. Engraving has begun (Liability Shifted).`, {
-      order_id: order_id
+    // WYSHKIT 2026: Atomic Preview Approval via RPC
+    const { data, error: rpc_error } = await supabase.rpc('approve_order_preview', {
+      p_order_id: order_id
     });
+
+    if (rpc_error) throw rpc_error;
+
+    const result = data as any;
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
 
     revalidateTag(`order-${order_id}`);
     revalidateTag('orders');

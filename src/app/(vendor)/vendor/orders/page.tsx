@@ -2,8 +2,9 @@ import { getPartnerFromSession } from '@/lib/auth/server';
 import { get_partner_orders } from '@/lib/actions/vendor/vendor-actions';
 import { OrderQueue } from '@/components/vendor/orders/OrderQueue';
 import { redirect } from 'next/navigation';
+import type { VendorOrder } from '@/lib/actions/commerce/orders';
 
-export default async function PartnerOrdersPage() {
+export default async function VendorOrdersPage() {
   const vendor = await getPartnerFromSession();
   if (!vendor) redirect('/vendor/login');
 

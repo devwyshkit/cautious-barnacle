@@ -21,6 +21,28 @@ We are a **hyperlocal product marketplace** where local partners sell physical g
 
 ---
 
+## 🦉 The Swiggy 2026 Mental Model for Wyshkit
+
+Wyshkit is fundamentally a fusion of two battle-tested operational models with one unique twist.
+
+**Equation:**
+`Wyshkit = [Swiggy Food Logistics] + [Instamart Product Catalog] + [Personalization Workflow]`
+
+### Like Swiggy Food (Logistics):
+- **One Vendor, One Order, One Delivery**: You do not order from two restaurants in one cart. Wyshkit correctly enforces this.
+- **Time > Distance**: SLA is calculated based on Preparation Time + Transit Time.
+- **No CapEx**: Fleet is 3PL (Shadowfax/Porter). Wyshkit owns zero riders.
+
+### Like Instamart (Catalog):
+- **Physical Goods**: You sell physical, sometimes perishable items (cakes, flowers) and hard goods (electronics, apparel).
+- **Hard Metrics**: Products require exact dimensions, weight, and shelf-life metrics.
+
+### The Unique Wyshkit Twist (Personalization):
+- **Production Time vs Cooking Time**: Food Prep Time is replaced by *Personalization Production Time*. It uses the same SLA mathematical model as cooking.
+- **Preview Trust Moat**: The digital mockup is the commitment signal.
+
+---
+
 ## The Three Core Beliefs
 
 ### 1. Commitment Before Creativity

@@ -5,12 +5,12 @@ import { createClient } from '@/lib/supabase/client';
 import { useRealtime } from '@/providers/RealtimeProvider';
 import { logger } from '@/lib/logging/logger';
 import { toast } from 'sonner';
-import type { PartnerOrder } from '@/lib/actions/commerce/orders';
+import type { VendorOrder } from '@/lib/actions/commerce/orders';
 
-interface UsePartnerRealtimeOptions {
+interface UseVendorRealtimeOptions {
     partnerId: string;
-    initialOrders: PartnerOrder[];
-    onNewOrder?: (order: PartnerOrder) => void;
+    initialOrders: VendorOrder[];
+    onNewOrder?: (order: VendorOrder) => void;
 }
 
 /**
@@ -22,9 +22,9 @@ export function useVendorRealtime({
     partnerId,
     initialOrders,
     onNewOrder
-}: UsePartnerRealtimeOptions) {
+}: UseVendorRealtimeOptions) {
     const { isConnected } = useRealtime();
-    const [orders, setOrders] = useState<PartnerOrder[]>(initialOrders);
+    const [orders, setOrders] = useState<VendorOrder[]>(initialOrders);
     const [isInitialMount, setIsInitialMount] = useState(true);
 
     const playNotification = useCallback(() => {
@@ -59,7 +59,7 @@ export function useVendorRealtime({
         const enrichedOrder = {
             ...row,
             latest_preview: (row.order_products as any[])?.find((i: any) => i.personalization_details?.preview_url)?.personalization_details || null
-        } as unknown as PartnerOrder;
+        } as unknown as VendorOrder;
 
         return enrichedOrder;
     }, []);

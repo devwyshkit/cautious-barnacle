@@ -14,8 +14,8 @@ describe('Swiggy 2026: RLS Certification Suite', () => {
             expect(data || []).toHaveLength(0);
         });
 
-        it('DENY: Anon cannot read draft_order_items', async () => {
-            const { data } = await anon.from('draft_order_items').select('*');
+        it('DENY: Anon cannot read order_products', async () => {
+            const { data } = await anon.from('order_products').select('*');
             expect(data || []).toHaveLength(0);
         });
 
@@ -25,8 +25,8 @@ describe('Swiggy 2026: RLS Certification Suite', () => {
             expect(data || []).toHaveLength(0);
         });
 
-        it('ALLOW: Anon can read active items (Public Gifting Platform)', async () => {
-            const { data } = await anon.from('items').select('id').limit(1);
+        it('ALLOW: Anon can read active products (Public Storefront)', async () => {
+            const { data } = await anon.from('products').select('id').limit(1);
             // This is allowed in a public storefront
             expect(data).toBeDefined();
         });
@@ -39,8 +39,8 @@ describe('Swiggy 2026: RLS Certification Suite', () => {
             expect(true).toBe(true); // Placeholder for logic assertion
         });
 
-        it('DENY: Partner cannot read platform_config secret keys', async () => {
-            const { data } = await anon.from('platform_config').select('secret_value');
+        it('DENY: Partner cannot read platform_settings secret keys', async () => {
+            const { data } = await anon.from('platform_settings').select('value');
             expect(data || []).toHaveLength(0);
         });
     });
@@ -52,7 +52,7 @@ describe('Swiggy 2026: RLS Certification Suite', () => {
         });
 
         it('DENY: Anon cannot update hsn_code or gst_percentage', async () => {
-            const { error } = await anon.from('items').update({ gst_percentage: 0 }).eq('id', 'any-id');
+            const { error } = await anon.from('products').update({ gst_percentage: 0 }).eq('id', 'any-id');
             expect(error).toBeDefined();
         });
     });

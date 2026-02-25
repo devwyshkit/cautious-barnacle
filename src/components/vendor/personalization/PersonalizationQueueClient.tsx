@@ -8,14 +8,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PreviewUploader } from './PreviewUploader';
-import type { PartnerOrder } from '@/lib/actions/commerce/orders';
+import type { VendorOrder } from '@/lib/actions/commerce/orders';
 import { ORDER_STATUS, getOrderStatusDisplay } from '@/lib/types/order-status';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 
 interface PersonalizationQueueClientProps {
-  initialOrders: PartnerOrder[];
+  initialOrders: VendorOrder[];
 }
 
 type PersonalizationInput = {
@@ -109,7 +109,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
     );
   };
 
-  const OrderQueueCard = ({ order, showUpload = false }: { order: PartnerOrder; showUpload?: boolean }) => {
+  const OrderQueueCard = ({ order, showUpload = false }: { order: VendorOrder; showUpload?: boolean }) => {
     const [showHistory, setShowHistory] = useState(false);
     // Note: order.previews is provided via realtime/initial state
     const designHistory = (order as any).previews || [];
@@ -268,7 +268,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
               else if (isPreviewReady) p_status = 'preview_ready';
               else if (hasSubmitted) p_status = 'submitted';
 
-              const freshOrder: PartnerOrder = {
+              const freshOrder: VendorOrder = {
                 ...freshOrderData,
                 status: freshOrderData.status as any,
                 delivery_address: freshOrderData.delivery_address as any,

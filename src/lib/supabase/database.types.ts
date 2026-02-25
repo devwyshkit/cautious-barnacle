@@ -17,6 +17,7 @@ export type Database = {
       cart_products: {
         Row: {
           created_at: string | null
+          expires_at: string | null
           id: string
           personalization: Json | null
           product_id: string
@@ -29,6 +30,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           personalization?: Json | null
           product_id: string
@@ -41,6 +43,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           personalization?: Json | null
           product_id?: string
@@ -112,6 +115,7 @@ export type Database = {
         Row: {
           applied_coupon: string | null
           created_at: string | null
+          expires_at: string | null
           gstin: string | null
           guest_lat: number | null
           guest_lng: number | null
@@ -127,6 +131,7 @@ export type Database = {
         Insert: {
           applied_coupon?: string | null
           created_at?: string | null
+          expires_at?: string | null
           gstin?: string | null
           guest_lat?: number | null
           guest_lng?: number | null
@@ -142,6 +147,7 @@ export type Database = {
         Update: {
           applied_coupon?: string | null
           created_at?: string | null
+          expires_at?: string | null
           gstin?: string | null
           guest_lat?: number | null
           guest_lng?: number | null
@@ -399,21 +405,21 @@ export type Database = {
       order_valid_transitions: {
         Row: {
           created_at: string | null
-          from_status: Database["public"]["Enums"]["order_status"]
+          from_status: Database["public"]["Enums"]["order_status"] | null
           id: string
           required_personalization_approval: boolean | null
           to_status: Database["public"]["Enums"]["order_status"]
         }
         Insert: {
           created_at?: string | null
-          from_status?: Database["public"]["Enums"]["order_status"]
+          from_status?: Database["public"]["Enums"]["order_status"] | null
           id?: string
           required_personalization_approval?: boolean | null
           to_status?: Database["public"]["Enums"]["order_status"]
         }
         Update: {
           created_at?: string | null
-          from_status?: Database["public"]["Enums"]["order_status"]
+          from_status?: Database["public"]["Enums"]["order_status"] | null
           id?: string
           required_personalization_approval?: boolean | null
           to_status?: Database["public"]["Enums"]["order_status"]
@@ -431,7 +437,8 @@ export type Database = {
           cashback_credited: boolean | null
           change_request_count: number | null
           commission_amount: number | null
-          courier_vendor: string | null
+          courier_partner: string | null
+          courier_tracking_id: string | null
           created_at: string | null
           delivery_address: Json | null
           delivery_fee: number | null
@@ -460,7 +467,6 @@ export type Database = {
           refunded_amount: number | null
           return_deadline: string | null
           return_status: string | null
-          shadowfax_shipment_id: string | null
           shadowfax_tracking_url: string | null
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
@@ -480,7 +486,8 @@ export type Database = {
           cashback_credited?: boolean | null
           change_request_count?: number | null
           commission_amount?: number | null
-          courier_vendor?: string | null
+          courier_partner?: string | null
+          courier_tracking_id?: string | null
           created_at?: string | null
           delivery_address?: Json | null
           delivery_fee?: number | null
@@ -509,7 +516,6 @@ export type Database = {
           refunded_amount?: number | null
           return_deadline?: string | null
           return_status?: string | null
-          shadowfax_shipment_id?: string | null
           shadowfax_tracking_url?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal: number
@@ -529,7 +535,8 @@ export type Database = {
           cashback_credited?: boolean | null
           change_request_count?: number | null
           commission_amount?: number | null
-          courier_vendor?: string | null
+          courier_partner?: string | null
+          courier_tracking_id?: string | null
           created_at?: string | null
           delivery_address?: Json | null
           delivery_fee?: number | null
@@ -558,7 +565,6 @@ export type Database = {
           refunded_amount?: number | null
           return_deadline?: string | null
           return_status?: string | null
-          shadowfax_shipment_id?: string | null
           shadowfax_tracking_url?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
@@ -723,18 +729,15 @@ export type Database = {
       }
       products: {
         Row: {
+          available_for_order: boolean | null
           base_price: number
           brand: string | null
-          capacity: string | null
           care_instructions: string | null
-          category: string | null
+          category_id: string | null
           country_of_origin: string | null
           created_at: string | null
-          delivery_time_max: number | null
-          delivery_time_min: number | null
           description: string | null
           dimensions: Json | null
-          expiry_date: string | null
           fragile: boolean | null
           fts: unknown
           gst_percentage: number | null
@@ -748,20 +751,21 @@ export type Database = {
           manufacturer_info: string | null
           material: string | null
           max_change_requests: number | null
+          max_order_quantity: number | null
+          min_order_quantity: number | null
           mrp: number | null
           name: string
-          net_weight: string | null
           packaging_type: string | null
           personalization_fee: number | null
           personalization_options: Json | null
           personalization_schema: Json | null
           preview_time_minutes: number | null
-          production_hours: number | null
           production_time_minutes: number | null
           rating: number | null
           shelf_life_hours: number | null
+          sku: string | null
           slug: string
-          specifications: Json | null
+          sort_order: number | null
           stock_quantity: number | null
           tags: string[] | null
           total_ratings: number | null
@@ -771,18 +775,15 @@ export type Database = {
           weight_kg: number | null
         }
         Insert: {
+          available_for_order?: boolean | null
           base_price: number
           brand?: string | null
-          capacity?: string | null
           care_instructions?: string | null
-          category?: string | null
+          category_id?: string | null
           country_of_origin?: string | null
           created_at?: string | null
-          delivery_time_max?: number | null
-          delivery_time_min?: number | null
           description?: string | null
           dimensions?: Json | null
-          expiry_date?: string | null
           fragile?: boolean | null
           fts?: unknown
           gst_percentage?: number | null
@@ -796,20 +797,21 @@ export type Database = {
           manufacturer_info?: string | null
           material?: string | null
           max_change_requests?: number | null
+          max_order_quantity?: number | null
+          min_order_quantity?: number | null
           mrp?: number | null
           name: string
-          net_weight?: string | null
           packaging_type?: string | null
           personalization_fee?: number | null
           personalization_options?: Json | null
           personalization_schema?: Json | null
           preview_time_minutes?: number | null
-          production_hours?: number | null
           production_time_minutes?: number | null
           rating?: number | null
           shelf_life_hours?: number | null
+          sku?: string | null
           slug: string
-          specifications?: Json | null
+          sort_order?: number | null
           stock_quantity?: number | null
           tags?: string[] | null
           total_ratings?: number | null
@@ -819,18 +821,15 @@ export type Database = {
           weight_kg?: number | null
         }
         Update: {
+          available_for_order?: boolean | null
           base_price?: number
           brand?: string | null
-          capacity?: string | null
           care_instructions?: string | null
-          category?: string | null
+          category_id?: string | null
           country_of_origin?: string | null
           created_at?: string | null
-          delivery_time_max?: number | null
-          delivery_time_min?: number | null
           description?: string | null
           dimensions?: Json | null
-          expiry_date?: string | null
           fragile?: boolean | null
           fts?: unknown
           gst_percentage?: number | null
@@ -844,20 +843,21 @@ export type Database = {
           manufacturer_info?: string | null
           material?: string | null
           max_change_requests?: number | null
+          max_order_quantity?: number | null
+          min_order_quantity?: number | null
           mrp?: number | null
           name?: string
-          net_weight?: string | null
           packaging_type?: string | null
           personalization_fee?: number | null
           personalization_options?: Json | null
           personalization_schema?: Json | null
           preview_time_minutes?: number | null
-          production_hours?: number | null
           production_time_minutes?: number | null
           rating?: number | null
           shelf_life_hours?: number | null
+          sku?: string | null
           slug?: string
-          specifications?: Json | null
+          sort_order?: number | null
           stock_quantity?: number | null
           tags?: string[] | null
           total_ratings?: number | null
@@ -867,6 +867,13 @@ export type Database = {
           weight_kg?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_vendor_id_fkey"
             columns: ["vendor_id"]
@@ -943,6 +950,100 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          created_at: string | null
+          delivery_rating: number | null
+          id: string
+          images: string[] | null
+          is_anonymous: boolean | null
+          order_id: string
+          product_id: string | null
+          rating: number
+          review_text: string | null
+          tags: string[] | null
+          user_id: string
+          vendor_id: string
+          vendor_replied_at: string | null
+          vendor_reply: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          delivery_rating?: number | null
+          id?: string
+          images?: string[] | null
+          is_anonymous?: boolean | null
+          order_id: string
+          product_id?: string | null
+          rating: number
+          review_text?: string | null
+          tags?: string[] | null
+          user_id: string
+          vendor_id: string
+          vendor_replied_at?: string | null
+          vendor_reply?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          delivery_rating?: number | null
+          id?: string
+          images?: string[] | null
+          is_anonymous?: boolean | null
+          order_id?: string
+          product_id?: string | null
+          rating?: number
+          review_text?: string | null
+          tags?: string[] | null
+          user_id?: string
+          vendor_id?: string
+          vendor_replied_at?: string | null
+          vendor_reply?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "v_order_tracking"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "reviews_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
         ]
@@ -1183,10 +1284,13 @@ export type Database = {
       }
       vendors: {
         Row: {
+          address_line1: string | null
+          address_line2: string | null
           agreed_to_contract: boolean | null
           avg_prep_time_mins: number | null
           badge: string | null
           bank_details: Json | null
+          banner_url: string | null
           base_delivery_charge: number | null
           business_name: string | null
           business_type: string | null
@@ -1197,7 +1301,6 @@ export type Database = {
           description: string | null
           email: string | null
           fixed_packaging_charge: number | null
-          fssai_license: string | null
           fts: unknown
           gstin: string | null
           has_outlet: boolean | null
@@ -1214,24 +1317,22 @@ export type Database = {
           name: string
           onboarding_fee_paid: boolean | null
           opening_time: string | null
-          outlet_type: string | null
           packaging_charge_type: string | null
           pan_number: string | null
           payout_contact_id: string | null
           payout_fund_account_id: string | null
           personalization_commission_percentage: number | null
           pincode: string | null
-          prep_hours: number | null
           promotion_rank: number | null
           rating: number | null
           razorpay_account_id: string | null
           registered_name: string | null
-          response_time_hours: number | null
           serviceability_radius_km: number | null
           serviceable_pincodes: string[] | null
           settlement_days: number | null
           slug: string
           state: string | null
+          tagline: string | null
           total_orders: number | null
           total_ratings: number | null
           updated_at: string | null
@@ -1242,10 +1343,13 @@ export type Database = {
           working_days: string[] | null
         }
         Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
           agreed_to_contract?: boolean | null
           avg_prep_time_mins?: number | null
           badge?: string | null
           bank_details?: Json | null
+          banner_url?: string | null
           base_delivery_charge?: number | null
           business_name?: string | null
           business_type?: string | null
@@ -1256,7 +1360,6 @@ export type Database = {
           description?: string | null
           email?: string | null
           fixed_packaging_charge?: number | null
-          fssai_license?: string | null
           fts?: unknown
           gstin?: string | null
           has_outlet?: boolean | null
@@ -1273,24 +1376,22 @@ export type Database = {
           name: string
           onboarding_fee_paid?: boolean | null
           opening_time?: string | null
-          outlet_type?: string | null
           packaging_charge_type?: string | null
           pan_number?: string | null
           payout_contact_id?: string | null
           payout_fund_account_id?: string | null
           personalization_commission_percentage?: number | null
           pincode?: string | null
-          prep_hours?: number | null
           promotion_rank?: number | null
           rating?: number | null
           razorpay_account_id?: string | null
           registered_name?: string | null
-          response_time_hours?: number | null
           serviceability_radius_km?: number | null
           serviceable_pincodes?: string[] | null
           settlement_days?: number | null
           slug: string
           state?: string | null
+          tagline?: string | null
           total_orders?: number | null
           total_ratings?: number | null
           updated_at?: string | null
@@ -1301,10 +1402,13 @@ export type Database = {
           working_days?: string[] | null
         }
         Update: {
+          address_line1?: string | null
+          address_line2?: string | null
           agreed_to_contract?: boolean | null
           avg_prep_time_mins?: number | null
           badge?: string | null
           bank_details?: Json | null
+          banner_url?: string | null
           base_delivery_charge?: number | null
           business_name?: string | null
           business_type?: string | null
@@ -1315,7 +1419,6 @@ export type Database = {
           description?: string | null
           email?: string | null
           fixed_packaging_charge?: number | null
-          fssai_license?: string | null
           fts?: unknown
           gstin?: string | null
           has_outlet?: boolean | null
@@ -1332,24 +1435,22 @@ export type Database = {
           name?: string
           onboarding_fee_paid?: boolean | null
           opening_time?: string | null
-          outlet_type?: string | null
           packaging_charge_type?: string | null
           pan_number?: string | null
           payout_contact_id?: string | null
           payout_fund_account_id?: string | null
           personalization_commission_percentage?: number | null
           pincode?: string | null
-          prep_hours?: number | null
           promotion_rank?: number | null
           rating?: number | null
           razorpay_account_id?: string | null
           registered_name?: string | null
-          response_time_hours?: number | null
           serviceability_radius_km?: number | null
           serviceable_pincodes?: string[] | null
           settlement_days?: number | null
           slug?: string
           state?: string | null
+          tagline?: string | null
           total_orders?: number | null
           total_ratings?: number | null
           updated_at?: string | null
@@ -1777,19 +1878,34 @@ export type Database = {
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       execute_admin_intent: { Args: { p_intent: Json }; Returns: Json }
-      execute_cart_mutation: {
-        Args: {
-          p_mode?: string
-          p_personalization?: Json
-          p_product_id: string
-          p_quantity: number
-          p_selected_addons?: Json
-          p_session_id?: string
-          p_user_id?: string
-          p_variant_id?: string
-        }
-        Returns: Json
-      }
+      execute_cart_mutation:
+        | {
+            Args: {
+              p_mode?: string
+              p_personalization?: Json
+              p_product_id: string
+              p_quantity: number
+              p_selected_addons?: Json
+              p_session_id?: string
+              p_user_id?: string
+              p_variant_id?: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_clear_other_vendors?: boolean
+              p_mode?: string
+              p_personalization?: Json
+              p_product_id: string
+              p_quantity: number
+              p_selected_addons?: Json
+              p_session_id?: string
+              p_user_id?: string
+              p_variant_id?: string
+            }
+            Returns: Json
+          }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
         Args: { geom1: unknown; geom2: unknown }
@@ -1929,6 +2045,10 @@ export type Database = {
           user_lat: number
           user_lng: number
         }
+        Returns: Json
+      }
+      get_partner_from_session: {
+        Args: { p_app_metadata?: Json; p_email?: string; p_user_id: string }
         Returns: Json
       }
       gettransactionid: { Args: never; Returns: unknown }
@@ -2810,4 +2930,3 @@ export const Constants = {
     },
   },
 } as const
-

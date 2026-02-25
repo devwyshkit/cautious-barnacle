@@ -68,7 +68,7 @@ type Addon = {
 };
 
 interface ProductFormProps {
-  partnerId: string;
+  vendorId: string;
   product?: Product & {
     variants?: Variant[];
     personalization_options?: any;
@@ -92,7 +92,7 @@ const CATEGORIES = [
   'Other',
 ];
 
-export function ProductForm({ partnerId, product, open, onOpenChange, onSuccess }: ProductFormProps) {
+export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }: ProductFormProps) {
   const router = useRouter();
   const isEdit = !!product;
 
@@ -104,16 +104,15 @@ export function ProductForm({ partnerId, product, open, onOpenChange, onSuccess 
     description: product?.description || '',
     base_price: product?.base_price ? Number(product.base_price) : 0,
     mrp: product?.mrp ? Number(product.mrp) : undefined,
-    category: product?.category || '',
+    category_id: product?.category_id || '',
     images: product?.images || [],
     has_personalization: product?.has_personalization || false,
     is_active: product?.is_active ?? true,
     production_time_minutes: product?.production_time_minutes || 120,
     preview_time_minutes: product?.preview_time_minutes || 60,
     material: product?.material || '',
-    capacity: product?.capacity || '',
-    weight_grams: product?.net_weight ? parseInt((product.net_weight as string).replace(/\D/g, ''), 10) || 0 : 0,
-    dimensions_cm: typeof product?.dimensions === 'object' && product?.dimensions !== null ? (product.dimensions as any) : { length: 0, width: 0, height: 0 },
+    weight_kg: product?.weight_kg ? Number(product.weight_kg) : 0,
+    dimensions: typeof product?.dimensions === 'object' && product?.dimensions !== null ? (product.dimensions as any) : { length: 0, width: 0, height: 0 },
     hsn_code: product?.hsn_code || '',
     gst_percentage: product?.gst_percentage ? Number(product.gst_percentage) : 18.00,
   });
@@ -218,7 +217,7 @@ export function ProductForm({ partnerId, product, open, onOpenChange, onSuccess 
 
         toast.success('Product updated');
       } else {
-        const result = await createItem(partnerId, fullInput);
+        const result = await createItem(vendorId, fullInput);
         if (result.error) {
           toast.error(result.error);
           return;
@@ -414,16 +413,19 @@ export function ProductForm({ partnerId, product, open, onOpenChange, onSuccess 
           <div className="space-y-1.5">
             <Label className="text-sm text-zinc-600">Category</Label>
             <Select
-              value={formData.category || ''}
-              onValueChange={(value) => setFormData({ ...formData, category: value })}
+              value={formData.category_id || ''}
+              onValueChange={(value) => setFormData({ ...formData, category_id: value })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
+                {/* Anniversary: 091aeba8-ea35-4393-bb74-53cb5eed7e35 */}
+                <SelectItem value="091aeba8-ea35-4393-bb74-53cb5eed7e35">Anniversary</SelectItem>
+                <SelectItem value="32a09069-0bf0-4734-a98b-f4b4420539dd">Birthday</SelectItem>
+                <SelectItem value="145751b2-9260-4b4b-97df-b8289252a792">Cakes</SelectItem>
+                <SelectItem value="9d04c388-e01c-41c2-8fc1-9e965bd4302a">Personalized Cups</SelectItem>
+                <SelectItem value="eaa504a7-5611-4400-8d58-5e9afcd3c721">Custom T-Shirts</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -775,25 +777,16 @@ export function ProductForm({ partnerId, product, open, onOpenChange, onSuccess 
                 placeholder="e.g. Ceramic, Cotton"
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="capacity" className="text-sm text-zinc-600">Capacity</Label>
-              <Input
-                id="capacity"
-                value={formData.capacity || ''}
-                onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                placeholder="e.g. 500ml, 1kg"
-              />
-            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="weight" className="text-sm text-zinc-600">Weight (grams)</Label>
+              <Label htmlFor="weight" className="text-sm text-zinc-600">Weight (kg)</Label>
               <Input
                 id="weight"
                 type="number"
-                value={formData.weight_grams || ''}
-                onChange={(e) => setFormData({ ...formData, weight_grams: Number(e.target.value) })}
+                value={formData.weight_kg || ''}
+                onChange={(e) => setFormData({ ...formData, weight_kg: Number(e.target.value) })}
                 placeholder="0"
               />
             </div>
@@ -815,10 +808,10 @@ export function ProductForm({ partnerId, product, open, onOpenChange, onSuccess 
                 <span className="text-xs text-zinc-400">Length</span>
                 <Input
                   type="number"
-                  value={formData.dimensions_cm?.length || ''}
+                  value={formData.dimensions?.length || ''}
                   onChange={(e) => setFormData({
                     ...formData,
-                    dimensions_cm: { ...formData.dimensions_cm!, length: Number(e.target.value) }
+                    dimensions: { ...formData.dimensions!, length: Number(e.target.value) }
                   })}
                   placeholder="L"
                 />
@@ -827,10 +820,10 @@ export function ProductForm({ partnerId, product, open, onOpenChange, onSuccess 
                 <span className="text-xs text-zinc-400">Width</span>
                 <Input
                   type="number"
-                  value={formData.dimensions_cm?.width || ''}
+                  value={formData.dimensions?.width || ''}
                   onChange={(e) => setFormData({
                     ...formData,
-                    dimensions_cm: { ...formData.dimensions_cm!, width: Number(e.target.value) }
+                    dimensions: { ...formData.dimensions!, width: Number(e.target.value) }
                   })}
                   placeholder="W"
                 />
@@ -839,10 +832,10 @@ export function ProductForm({ partnerId, product, open, onOpenChange, onSuccess 
                 <span className="text-xs text-zinc-400">Height</span>
                 <Input
                   type="number"
-                  value={formData.dimensions_cm?.height || ''}
+                  value={formData.dimensions?.height || ''}
                   onChange={(e) => setFormData({
                     ...formData,
-                    dimensions_cm: { ...formData.dimensions_cm!, height: Number(e.target.value) }
+                    dimensions: { ...formData.dimensions!, height: Number(e.target.value) }
                   })}
                   placeholder="H"
                 />

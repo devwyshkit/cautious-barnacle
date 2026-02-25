@@ -36,6 +36,14 @@ vi.mock('@/lib/actions/commerce/orders', () => ({
     get_order_with_history: vi.fn().mockResolvedValue({ order: { id: 'test-order-id-123' } })
 }));
 
+// Mock Commerce Intent Engine
+vi.mock('@/lib/actions/commerce/intent-engine', () => ({
+    executeCommerceIntent: vi.fn().mockResolvedValue({
+        success: true,
+        data: { order_id: 'test-order-id-123', order_number: 'WSH-260221-XXXX' }
+    })
+}));
+
 // Mock Supabase Server Client
 vi.mock('@/lib/supabase/server', () => ({
     createClient: vi.fn(),
@@ -54,17 +62,20 @@ describe('Checkout Intent Flow Automation', () => {
                 select: vi.fn().mockImplementation(() => builder),
                 eq: vi.fn().mockImplementation(() => builder),
                 insert: vi.fn().mockImplementation(() => builder),
+                update: vi.fn().mockImplementation(() => builder),
                 delete: vi.fn().mockImplementation(() => builder),
-                single: vi.fn().mockImplementation(() => Promise.resolve({ data: { id: 'draft_123' }, error: null })),
-                maybeSingle: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null }))
+                single: vi.fn().mockImplementation(() => Promise.resolve({ data: { id: 'session_123', snapshot_items: [] }, error: null })),
+                maybeSingle: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
+                match: vi.fn().mockImplementation(() => builder),
+                or: vi.fn().mockImplementation(() => builder),
             };
             return builder;
         };
 
         builders = {
-            draft_orders: createMockBuilder('draft_orders'),
-            stock_reservations: createMockBuilder('stock_reservations'),
+            checkout_sessions: createMockBuilder('checkout_sessions'),
             orders: createMockBuilder('orders'),
+            cart_products: createMockBuilder('cart_products'),
         };
 
         mockSupabase = {
@@ -73,7 +84,7 @@ describe('Checkout Intent Flow Automation', () => {
             },
             from: vi.fn().mockImplementation((table: string) => builders[table]),
             rpc: vi.fn().mockImplementation((rpcName: string) => {
-                if (rpcName === 'get_available_stock') return Promise.resolve({ data: 10, error: null });
+                if (rpcName === 'update_checkout_session') return Promise.resolve({ data: null, error: null });
                 return Promise.resolve({ data: null, error: null });
             }),
         };
@@ -86,7 +97,7 @@ describe('Checkout Intent Flow Automation', () => {
             address_id: 'address-123',
             draft_items: [
                 {
-                    item_id: 'item-123',
+                    product_id: 'product-123',
                     selected_variant_id: 'variant-123',
                     quantity: 1,
                     personalization: { enabled: true, option_id: 'opt1' },
@@ -110,19 +121,19 @@ describe('Checkout Intent Flow Automation', () => {
 
         expect(result.error).toBeNull();
         expect(result.order?.id).toBe('order_rzp_123');
-        expect(builders.draft_orders.insert).toHaveBeenCalled();
-        expect(builders.stock_reservations.insert).toHaveBeenCalled();
-        expect(mockSupabase.rpc).toHaveBeenCalledWith('get_available_stock', expect.any(Object));
+        expect(builders.checkout_sessions.update).toHaveBeenCalled();
+        expect(mockSupabase.rpc).toHaveBeenCalledWith('update_checkout_session', expect.any(Object));
     });
 
     it('verifies intent and deterministically creates the final order without overengineering', async () => {
-        // Assume Draft gets fetched by single()
-        builders.draft_orders.single.mockResolvedValue({
+        // Assume Session gets fetched by single()
+        builders.checkout_sessions.single.mockResolvedValue({
             data: {
-                id: 'draft_123',
-                address_id: 'address-123',
-                items: [{ item_id: 'item-123', quantity: 1, selected_variant_id: 'variant-123' }],
-                metadata: { coupon_code: null, use_wallet: false }
+                id: 'session_123',
+                selected_address_id: 'address-123',
+                snapshot_items: [{ product_id: 'product-123', quantity: 1, variant_id: 'variant-123' }],
+                applied_coupon: null,
+                use_wallet: false
             },
             error: null
         });
@@ -132,20 +143,22 @@ describe('Checkout Intent Flow Automation', () => {
             'order_rzp_123',
             'pay_123',
             'valid_signature',
-            { draft_id: 'draft_123' }
+            { draft_id: 'session_123' }
         );
 
         expect(response.success).toBe(true);
         expect(response.order_id).toBe('test-order-id-123');
         // Confirms cleanup happened
-        expect(builders.draft_orders.delete).toHaveBeenCalled();
+        expect(builders.checkout_sessions.delete).toHaveBeenCalled();
 
-        // Ensure create_order was triggered properly passing the baton
+        // Ensure executeCommerceIntent was triggered properly
         const { executeCommerceIntent } = await import('@/lib/actions/commerce/intent-engine');
         expect(executeCommerceIntent).toHaveBeenCalledWith(expect.objectContaining({
-            razorpay_order_id: 'order_rzp_123',
-            user_id: 'user-123',
-            items: expect.any(Array)
+            intent: 'PLACE_ORDER',
+            payload: expect.objectContaining({
+                razorpay_order_id: 'order_rzp_123',
+                products: expect.any(Array)
+            })
         }));
     });
 });

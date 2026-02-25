@@ -52,12 +52,20 @@ export async function POST(req: NextRequest) {
       logger.error('Shadowfax Webhook: Failed to log payload', logError);
     }
 
-    // 2. Map Shadowfax status to WyshKit ORDER_STATUS
+    // 2. Map Shadowfax status to WyshKit ORDER_STATUS (11-State FSM)
     let targetStatus: string | null = null;
-    switch (status?.toLowerCase()) {
+    const sfxStatus = status?.toLowerCase();
+
+    switch (sfxStatus) {
+      case 'reached_for_pickup':
+        targetStatus = ORDER_STATUS.ARRIVED_PICKUP;
+        break;
       case 'picked_up':
       case 'in_transit':
         targetStatus = ORDER_STATUS.OUT_FOR_DELIVERY;
+        break;
+      case 'reached_for_delivery':
+        targetStatus = ORDER_STATUS.ARRIVED_DROP;
         break;
       case 'delivered':
         targetStatus = ORDER_STATUS.DELIVERED;
@@ -68,8 +76,8 @@ export async function POST(req: NextRequest) {
         targetStatus = ORDER_STATUS.CANCELLED;
         break;
       default:
-        logger.info('Shadowfax Webhook: Unmapped status ignored', { status, client_order_id });
-        return NextResponse.json({ message: 'Status unmapped' });
+        logger.info('Shadowfax Webhook: Intermediate status or unmapped ignored', { status: sfxStatus, client_order_id });
+        return NextResponse.json({ message: 'Status skipped or unmapped' });
     }
 
     // 3. Perform Idempotent Transition via RPC

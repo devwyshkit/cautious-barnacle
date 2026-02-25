@@ -16,16 +16,15 @@ export type ItemInput = {
     description?: string;
     base_price: number;
     mrp?: number;
-    category?: string;
+    category_id?: string;
     images?: string[];
     has_personalization?: boolean;
     is_active?: boolean;
     production_time_minutes?: number;
     preview_time_minutes?: number;
     material?: string;
-    capacity?: string;
-    weight_grams?: number;
-    dimensions_cm?: { length: number; width: number; height: number };
+    weight_kg?: number;
+    dimensions?: { length: number; width: number; height: number };
     hsn_code?: string;
     gst_percentage?: number;
     personalization_options?: any;
@@ -53,15 +52,15 @@ const CATEGORY_TAX_MAP: Record<string, { hsn: string; gst: number }> = {
 /**
  * Create product mutation
  */
-export async function createItem(partnerId: string, input: ItemInput) {
+export async function createItem(vendorId: string, input: ItemInput) {
     try {
-        if (!partnerId) return { error: 'Invalid Vendor ID' };
+        if (!vendorId) return { error: 'Invalid Vendor ID' };
         const supabase = await createClient();
 
         const { data: vendor } = await supabase
             .from('vendors')
             .select('is_active')
-            .eq('id', partnerId)
+            .eq('id', vendorId)
             .maybeSingle();
 
         const slug = input.name
@@ -72,33 +71,32 @@ export async function createItem(partnerId: string, input: ItemInput) {
         const { data, error } = await supabase
             .from('products')
             .insert({
-                vendor_id: partnerId,
+                vendor_id: vendorId,
                 name: input.name,
                 slug,
                 description: input.description || null,
                 base_price: input.base_price,
                 mrp: input.mrp || null,
-                category: input.category || null,
+                category_id: input.category_id || null,
                 images: input.images || [],
                 has_personalization: input.has_personalization || false,
                 is_active: input.is_active ?? true,
                 production_time_minutes: input.production_time_minutes || null,
                 preview_time_minutes: input.preview_time_minutes || null,
                 material: input.material || null,
-                capacity: input.capacity || null,
-                weight_kg: input.weight_grams ? input.weight_grams / 1000 : null,
-                hsn_code: input.hsn_code || CATEGORY_TAX_MAP[input.category?.toLowerCase() || '']?.hsn || '9983',
-                gst_percentage: input.gst_percentage || CATEGORY_TAX_MAP[input.category?.toLowerCase() || '']?.gst || 5.00,
+                weight_kg: input.weight_kg || null,
+                dimensions: input.dimensions || null,
+                hsn_code: input.hsn_code || '9983',
+                gst_percentage: input.gst_percentage || 5.00,
                 personalization_options: input.personalization_options || [],
-                specifications: input.item_addons ? { addons: input.item_addons } : null,
-            } as Database['public']['Tables']['products']['Insert'])
+            } as any)
             .select('id')
             .single();
 
         if (error) throw error;
 
         revalidatePath('/vendor/catalog');
-        revalidatePath(`/vendor/${partnerId}`);
+        revalidatePath(`/vendor/${vendorId}`);
         revalidatePath('/');
         return { data: { id: data.id } };
     } catch (error) {
@@ -125,11 +123,9 @@ export async function updateItem(itemId: string, input: Partial<ItemInput>) {
             .from('products')
             .update({
                 ...input,
-                dimensions_cm: input.dimensions_cm ? `${input.dimensions_cm.length}x${input.dimensions_cm.width}x${input.dimensions_cm.height}` : undefined,
                 updated_at: new Date().toISOString(),
                 personalization_options: input.personalization_options !== undefined ? input.personalization_options : undefined,
-                item_addons: input.item_addons !== undefined ? input.item_addons : undefined,
-            } as Database['public']['Tables']['products']['Update'])
+            } as any)
             .eq('id', itemId);
 
         if (error) throw error;

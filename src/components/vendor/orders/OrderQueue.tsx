@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { OrderCard } from './OrderCard';
 import { executePartnerIntent } from '@/lib/actions/vendor/engine';
-import type { PartnerOrder } from '@/lib/actions/commerce/orders';
+import type { VendorOrder } from '@/lib/actions/commerce/orders';
 import { useVendorRealtime } from '@/hooks/useVendorRealtime';
 import { toast } from 'sonner';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/types/order-status';
@@ -37,7 +37,7 @@ const STATUS_TABS: { id: StatusTab; label: string; statuses: OrderStatus[] }[] =
 ];
 
 interface OrderQueueProps {
-  initialOrders: PartnerOrder[];
+  initialOrders: VendorOrder[];
   partnerId: string;
 }
 

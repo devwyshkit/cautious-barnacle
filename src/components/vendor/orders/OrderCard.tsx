@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ORDER_STATUS, getOrderStatusDisplay, type OrderStatus } from '@/lib/types/order-status';
-import type { PartnerOrder } from '@/lib/actions/commerce/orders';
+import type { VendorOrder } from '@/lib/actions/commerce/orders';
 import { cn } from '@/lib/utils';
 
 import { PreviewUploader } from '../personalization/PreviewUploader';
@@ -24,7 +24,7 @@ const ACCEPT_SLA_MINUTES = 5;
 const DESIGN_DEADLINE_HOURS = 24;
 
 interface OrderCardProps {
-  order: PartnerOrder;
+  order: VendorOrder;
   onAccept: (orderId: string) => void;
   onReject: (orderId: string, reason: string) => void;
   onStatusUpdate: (orderId: string, status: OrderStatus) => void;
@@ -41,7 +41,7 @@ const REJECT_REASONS = [
 
 // WYSHKIT 2026: Status actions - Enforce "Preparing" phase for ALL orders
 // Use a function to determine actions dynamically
-const getAvailableAction = (order: PartnerOrder) => {
+const getAvailableAction = (order: VendorOrder) => {
   if (order.status === ORDER_STATUS.PLACED) return null;
 
   if (order.status === ORDER_STATUS.CONFIRMED) {
@@ -66,7 +66,7 @@ const getAvailableAction = (order: PartnerOrder) => {
   }
 
   if (order.status === ORDER_STATUS.PACKED) {
-    return { label: 'Mark Dispatched', nextStatus: ORDER_STATUS.OUT_FOR_DELIVERY };
+    return { label: 'Mark Dispatched', nextStatus: ORDER_STATUS.RIDER_ASSIGNED };
   }
 
   return null;
@@ -260,7 +260,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                   <span className="text-[11px] font-medium opacity-70 ml-auto">No personalization needed</span>
                 </div>
               )}
-              {order.order_products?.map((product, idx) => (
+              {order.order_products?.map((product: any, idx: number) => (
                 <div key={idx} className="flex items-start justify-between">
                   <div className="flex-1">
                     <p className="text-sm text-zinc-900">
@@ -299,11 +299,11 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
           </div>
 
           {/* WYSHKIT 2026: Personalization Details Section (Canonical Product-Level) */}
-          {order.order_products?.some(i => i.personalization_entry || i.personalization_details) && (
+          {order.order_products?.some((i: any) => i.personalization_entry || i.personalization_details) && (
             <div className="mx-4 mb-4 p-4 rounded-xl bg-amber-50 border border-amber-100 space-y-3">
               <p className="text-xs font-black text-amber-900 tracking-tight">Customer Design Details</p>
               <div className="space-y-4">
-                {order.order_products.filter(i => i.is_personalized).map((product, idx) => {
+                {order.order_products.filter((i: any) => i.is_personalized).map((product: any, idx: number) => {
                   const data = (product.personalization_entry || product.personalization_details || {}) as any;
                   if (Object.keys(data).length === 0) return null;
 

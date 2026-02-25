@@ -14,7 +14,7 @@ import {
 import { ShadowfaxService } from '@/lib/services/shadowfax';
 import { ORDER_STATUS } from '@/lib/types/order-status';
 import { logger } from '@/lib/logging/logger';
-import { update_order_status, type OrderStatus, type PartnerOrder } from '@/lib/actions/commerce/orders';
+import { update_order_status, type OrderStatus, type VendorOrder } from '@/lib/actions/commerce/orders';
 
 export type PartnerStats = {
   today_orders: number;
@@ -35,7 +35,7 @@ function logError(error: unknown, context: string) {
 export async function get_partner_orders(
   vendor_id: string,
   status?: OrderStatus[]
-): Promise<{ data?: PartnerOrder[]; error?: string }> {
+): Promise<{ data?: VendorOrder[]; error?: string }> {
   try {
     const supabase = await createClient();
     let query = supabase
@@ -78,7 +78,7 @@ export async function get_partner_orders(
         latest_preview,
         personalization_status
       };
-    }) as unknown as PartnerOrder[];
+    }) as unknown as VendorOrder[];
 
     return { data: mapped_data };
   } catch (error) {
@@ -228,7 +228,7 @@ export async function update_partner_online_status(
 }
 
 export async function get_personalization_queue(vendor_id: string): Promise<{
-  data?: PartnerOrder[];
+  data?: VendorOrder[];
   error?: string;
 }> {
   try {
@@ -249,7 +249,7 @@ export async function get_personalization_queue(vendor_id: string): Promise<{
 
     if (!orders || orders.length === 0) return { data: [] };
 
-    const enriched_orders: PartnerOrder[] = (orders as unknown as PartnerOrder[]).map(order => {
+    const enriched_orders: VendorOrder[] = (orders as unknown as VendorOrder[]).map(order => {
       const order_products = (order.order_products || []).map(product => {
         const pDetails = (product.personalization_details as any) || {};
         return {
