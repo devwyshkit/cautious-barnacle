@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -H localhost -p 3000",
+    "dev": "NODE_OPTIONS='--dns-result-order=ipv4first' next dev --turbopack -H localhost -p 3000",
     "dev:clean": "rm -rf .next .turbo && npm run dev",
     "build": "next build",
     "build:clean": "rm -rf .next .turbo && npm run build",

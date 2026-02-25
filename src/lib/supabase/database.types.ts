@@ -14,8 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      addon_groups: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_required: boolean | null
+          max_select: number | null
+          min_select: number | null
+          name: string
+          vendor_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_required?: boolean | null
+          max_select?: number | null
+          min_select?: number | null
+          name: string
+          vendor_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_required?: boolean | null
+          max_select?: number | null
+          min_select?: number | null
+          name?: string
+          vendor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "addon_groups_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "addon_groups_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cart_items: {
         Row: {
+          cart_id: string | null
           created_at: string | null
           expires_at: string | null
           id: string
@@ -29,6 +78,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          cart_id?: string | null
           created_at?: string | null
           expires_at?: string | null
           id?: string
@@ -42,6 +92,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          cart_id?: string | null
           created_at?: string | null
           expires_at?: string | null
           id?: string
@@ -55,6 +106,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "cart_items_cart_id_fkey"
+            columns: ["cart_id"]
+            isOneToOne: false
+            referencedRelation: "carts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "cart_items_product_id_fkey"
             columns: ["product_id"]
@@ -78,6 +136,30 @@ export type Database = {
           },
         ]
       }
+      carts: {
+        Row: {
+          created_at: string | null
+          id: string
+          session_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          session_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          session_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -86,6 +168,7 @@ export type Database = {
           image_url: string | null
           is_active: boolean | null
           name: string
+          parent_id: string | null
           slug: string
           updated_at: string | null
         }
@@ -96,6 +179,7 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           name: string
+          parent_id?: string | null
           slug: string
           updated_at?: string | null
         }
@@ -106,10 +190,19 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           name?: string
+          parent_id?: string | null
           slug?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       checkout_sessions: {
         Row: {
@@ -253,9 +346,51 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          metadata: Json | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          metadata?: Json | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          metadata?: Json | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_products: {
         Row: {
           created_at: string | null
+          final_approved_mockup_url: string | null
           gst_percentage: number | null
           height_cm: number | null
           hsn_code: string | null
@@ -277,11 +412,13 @@ export type Database = {
           stock_deducted: boolean | null
           total_price: number
           unit_price: number
+          vendor_production_notes: string | null
           weight_kg: number | null
           width_cm: number | null
         }
         Insert: {
           created_at?: string | null
+          final_approved_mockup_url?: string | null
           gst_percentage?: number | null
           height_cm?: number | null
           hsn_code?: string | null
@@ -303,11 +440,13 @@ export type Database = {
           stock_deducted?: boolean | null
           total_price: number
           unit_price: number
+          vendor_production_notes?: string | null
           weight_kg?: number | null
           width_cm?: number | null
         }
         Update: {
           created_at?: string | null
+          final_approved_mockup_url?: string | null
           gst_percentage?: number | null
           height_cm?: number | null
           hsn_code?: string | null
@@ -329,6 +468,7 @@ export type Database = {
           stock_deducted?: boolean | null
           total_price?: number
           unit_price?: number
+          vendor_production_notes?: string | null
           weight_kg?: number | null
           width_cm?: number | null
         }
@@ -436,9 +576,8 @@ export type Database = {
           cashback_amount: number | null
           cashback_credited: boolean | null
           change_request_count: number | null
-          commission_amount: number | null
-          courier_vendor: string | null
           courier_tracking_id: string | null
+          courier_vendor: string | null
           created_at: string | null
           delivery_address: Json | null
           delivery_fee: number | null
@@ -452,13 +591,11 @@ export type Database = {
           id: string
           idempotency_key: string | null
           max_change_requests: number | null
-          net_settlement_amount: number | null
           order_number: string
           payment_id: string | null
           payment_method: string | null
           payment_status: string | null
           payout_id: string | null
-          payout_status: string | null
           personalization_charges: number | null
           platform_fee: number | null
           price_locked_until: string | null
@@ -466,7 +603,6 @@ export type Database = {
           razorpay_order_id: string | null
           refunded_amount: number | null
           return_deadline: string | null
-          return_status: string | null
           shadowfax_tracking_url: string | null
           status: Database["public"]["Enums"]["order_status"]
           subtotal: number
@@ -485,9 +621,8 @@ export type Database = {
           cashback_amount?: number | null
           cashback_credited?: boolean | null
           change_request_count?: number | null
-          commission_amount?: number | null
-          courier_vendor?: string | null
           courier_tracking_id?: string | null
+          courier_vendor?: string | null
           created_at?: string | null
           delivery_address?: Json | null
           delivery_fee?: number | null
@@ -501,13 +636,11 @@ export type Database = {
           id?: string
           idempotency_key?: string | null
           max_change_requests?: number | null
-          net_settlement_amount?: number | null
           order_number: string
           payment_id?: string | null
           payment_method?: string | null
           payment_status?: string | null
           payout_id?: string | null
-          payout_status?: string | null
           personalization_charges?: number | null
           platform_fee?: number | null
           price_locked_until?: string | null
@@ -515,7 +648,6 @@ export type Database = {
           razorpay_order_id?: string | null
           refunded_amount?: number | null
           return_deadline?: string | null
-          return_status?: string | null
           shadowfax_tracking_url?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal: number
@@ -534,9 +666,8 @@ export type Database = {
           cashback_amount?: number | null
           cashback_credited?: boolean | null
           change_request_count?: number | null
-          commission_amount?: number | null
-          courier_vendor?: string | null
           courier_tracking_id?: string | null
+          courier_vendor?: string | null
           created_at?: string | null
           delivery_address?: Json | null
           delivery_fee?: number | null
@@ -550,13 +681,11 @@ export type Database = {
           id?: string
           idempotency_key?: string | null
           max_change_requests?: number | null
-          net_settlement_amount?: number | null
           order_number?: string
           payment_id?: string | null
           payment_method?: string | null
           payment_status?: string | null
           payout_id?: string | null
-          payout_status?: string | null
           personalization_charges?: number | null
           platform_fee?: number | null
           price_locked_until?: string | null
@@ -564,7 +693,6 @@ export type Database = {
           razorpay_order_id?: string | null
           refunded_amount?: number | null
           return_deadline?: string | null
-          return_status?: string | null
           shadowfax_tracking_url?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           subtotal?: number
@@ -580,6 +708,13 @@ export type Database = {
             columns: ["address_id"]
             isOneToOne: false
             referencedRelation: "user_addresses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_payouts"
             referencedColumns: ["id"]
           },
           {
@@ -623,38 +758,140 @@ export type Database = {
         }
         Relationships: []
       }
+      product_addon_groups: {
+        Row: {
+          addon_group_id: string
+          display_order: number | null
+          product_id: string
+        }
+        Insert: {
+          addon_group_id: string
+          display_order?: number | null
+          product_id: string
+        }
+        Update: {
+          addon_group_id?: string
+          display_order?: number | null
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_addon_groups_addon_group_id_fkey"
+            columns: ["addon_group_id"]
+            isOneToOne: false
+            referencedRelation: "addon_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_addon_groups_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_addons: {
+        Row: {
+          created_at: string | null
+          group_id: string | null
+          id: string
+          is_available: boolean | null
+          name: string
+          price: number
+        }
+        Insert: {
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          is_available?: boolean | null
+          name: string
+          price?: number
+        }
+        Update: {
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          is_available?: boolean | null
+          name?: string
+          price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_addons_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "addon_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_submissions: {
         Row: {
           base_price: number | null
+          category_id: string | null
           created_at: string | null
           description: string | null
+          gst_percentage: number | null
+          has_personalization: boolean | null
+          hsn_code: string | null
           id: string
+          images: string[] | null
+          is_perishable: boolean | null
+          material: string | null
+          mrp: number | null
           name: string
+          personalization_schema: Json | null
           status: string | null
           updated_at: string | null
           vendor_id: string | null
         }
         Insert: {
           base_price?: number | null
+          category_id?: string | null
           created_at?: string | null
           description?: string | null
+          gst_percentage?: number | null
+          has_personalization?: boolean | null
+          hsn_code?: string | null
           id?: string
+          images?: string[] | null
+          is_perishable?: boolean | null
+          material?: string | null
+          mrp?: number | null
           name: string
+          personalization_schema?: Json | null
           status?: string | null
           updated_at?: string | null
           vendor_id?: string | null
         }
         Update: {
           base_price?: number | null
+          category_id?: string | null
           created_at?: string | null
           description?: string | null
+          gst_percentage?: number | null
+          has_personalization?: boolean | null
+          hsn_code?: string | null
           id?: string
+          images?: string[] | null
+          is_perishable?: boolean | null
+          material?: string | null
+          mrp?: number | null
           name?: string
+          personalization_schema?: Json | null
           status?: string | null
           updated_at?: string | null
           vendor_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "product_submissions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "product_submissions_vendor_id_fkey"
             columns: ["vendor_id"]
@@ -683,6 +920,7 @@ export type Database = {
           price: number | null
           product_id: string | null
           sku: string | null
+          sort_order: number | null
           stock_quantity: number | null
           updated_at: string | null
           video_url: string | null
@@ -698,6 +936,7 @@ export type Database = {
           price?: number | null
           product_id?: string | null
           sku?: string | null
+          sort_order?: number | null
           stock_quantity?: number | null
           updated_at?: string | null
           video_url?: string | null
@@ -713,6 +952,7 @@ export type Database = {
           price?: number | null
           product_id?: string | null
           sku?: string | null
+          sort_order?: number | null
           stock_quantity?: number | null
           updated_at?: string | null
           video_url?: string | null
@@ -767,6 +1007,7 @@ export type Database = {
           slug: string
           sort_order: number | null
           stock_quantity: number | null
+          stock_status: string | null
           tags: string[] | null
           total_ratings: number | null
           updated_at: string | null
@@ -813,6 +1054,7 @@ export type Database = {
           slug: string
           sort_order?: number | null
           stock_quantity?: number | null
+          stock_status?: string | null
           tags?: string[] | null
           total_ratings?: number | null
           updated_at?: string | null
@@ -859,6 +1101,7 @@ export type Database = {
           slug?: string
           sort_order?: number | null
           stock_quantity?: number | null
+          stock_status?: string | null
           tags?: string[] | null
           total_ratings?: number | null
           updated_at?: string | null
@@ -956,52 +1199,79 @@ export type Database = {
       }
       reviews: {
         Row: {
+          approved_mockup_url: string | null
           created_at: string | null
+          delivered_photo_url: string | null
           delivery_rating: number | null
+          fidelity_rating: number | null
+          fidelity_tags: string[] | null
           id: string
           images: string[] | null
           is_anonymous: boolean | null
+          is_personalised_review: boolean | null
           order_id: string
+          order_item_id: string | null
+          personalization_rating: number | null
           product_id: string | null
           rating: number
           review_text: string | null
+          revision_count: number | null
           tags: string[] | null
           user_id: string
           vendor_id: string
           vendor_replied_at: string | null
           vendor_reply: string | null
+          vendor_response_time_rating: number | null
         }
         Insert: {
+          approved_mockup_url?: string | null
           created_at?: string | null
+          delivered_photo_url?: string | null
           delivery_rating?: number | null
+          fidelity_rating?: number | null
+          fidelity_tags?: string[] | null
           id?: string
           images?: string[] | null
           is_anonymous?: boolean | null
+          is_personalised_review?: boolean | null
           order_id: string
+          order_item_id?: string | null
+          personalization_rating?: number | null
           product_id?: string | null
           rating: number
           review_text?: string | null
+          revision_count?: number | null
           tags?: string[] | null
           user_id: string
           vendor_id: string
           vendor_replied_at?: string | null
           vendor_reply?: string | null
+          vendor_response_time_rating?: number | null
         }
         Update: {
+          approved_mockup_url?: string | null
           created_at?: string | null
+          delivered_photo_url?: string | null
           delivery_rating?: number | null
+          fidelity_rating?: number | null
+          fidelity_tags?: string[] | null
           id?: string
           images?: string[] | null
           is_anonymous?: boolean | null
+          is_personalised_review?: boolean | null
           order_id?: string
+          order_item_id?: string | null
+          personalization_rating?: number | null
           product_id?: string | null
           rating?: number
           review_text?: string | null
+          revision_count?: number | null
           tags?: string[] | null
           user_id?: string
           vendor_id?: string
           vendor_replied_at?: string | null
           vendor_reply?: string | null
+          vendor_response_time_rating?: number | null
         }
         Relationships: [
           {
@@ -1016,6 +1286,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "v_order_tracking"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_products"
             referencedColumns: ["id"]
           },
           {
@@ -1211,9 +1488,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
-          is_admin: boolean | null
           phone: string | null
-          role: string | null
           status: string | null
           updated_at: string | null
         }
@@ -1223,9 +1498,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
-          is_admin?: boolean | null
           phone?: string | null
-          role?: string | null
           status?: string | null
           updated_at?: string | null
         }
@@ -1235,9 +1508,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
-          is_admin?: boolean | null
           phone?: string | null
-          role?: string | null
           status?: string | null
           updated_at?: string | null
         }
@@ -1245,42 +1516,108 @@ export type Database = {
       }
       vendor_applications: {
         Row: {
+          address_line1: string | null
+          bank_details: Json | null
           business_name: string
           category: string | null
           city: string | null
           contact_name: string
           created_at: string | null
           email: string | null
+          gstin: string | null
           id: string
+          pan_number: string | null
           phone: string
+          pincode: string | null
           status: string | null
           updated_at: string | null
         }
         Insert: {
+          address_line1?: string | null
+          bank_details?: Json | null
           business_name: string
           category?: string | null
           city?: string | null
           contact_name: string
           created_at?: string | null
           email?: string | null
+          gstin?: string | null
           id?: string
+          pan_number?: string | null
           phone: string
+          pincode?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Update: {
+          address_line1?: string | null
+          bank_details?: Json | null
           business_name?: string
           category?: string | null
           city?: string | null
           contact_name?: string
           created_at?: string | null
           email?: string | null
+          gstin?: string | null
           id?: string
+          pan_number?: string | null
           phone?: string
+          pincode?: string | null
           status?: string | null
           updated_at?: string | null
         }
         Relationships: []
+      }
+      vendor_payouts: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          razorpay_payout_id: string | null
+          settlement_period_end: string | null
+          settlement_period_start: string | null
+          status: string
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          razorpay_payout_id?: string | null
+          settlement_period_end?: string | null
+          settlement_period_start?: string | null
+          status?: string
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          razorpay_payout_id?: string | null
+          settlement_period_end?: string | null
+          settlement_period_start?: string | null
+          status?: string
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_payouts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "v_active_cart_detailed"
+            referencedColumns: ["vendor_id"]
+          },
+          {
+            foreignKeyName: "vendor_payouts_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vendors: {
         Row: {
@@ -1305,14 +1642,11 @@ export type Database = {
           gstin: string | null
           has_outlet: boolean | null
           id: string
-          idfy_verification_id: string | null
           image_url: string | null
           is_active: boolean | null
           is_online: boolean | null
           is_promoted: boolean | null
-          latitude: number | null
           location: unknown
-          longitude: number | null
           minimum_order_amount: number | null
           name: string
           onboarding_fee_paid: boolean | null
@@ -1328,7 +1662,6 @@ export type Database = {
           razorpay_account_id: string | null
           registered_name: string | null
           serviceability_radius_km: number | null
-          serviceable_pincodes: string[] | null
           settlement_days: number | null
           slug: string
           state: string | null
@@ -1364,14 +1697,11 @@ export type Database = {
           gstin?: string | null
           has_outlet?: boolean | null
           id?: string
-          idfy_verification_id?: string | null
           image_url?: string | null
           is_active?: boolean | null
           is_online?: boolean | null
           is_promoted?: boolean | null
-          latitude?: number | null
           location?: unknown
-          longitude?: number | null
           minimum_order_amount?: number | null
           name: string
           onboarding_fee_paid?: boolean | null
@@ -1387,7 +1717,6 @@ export type Database = {
           razorpay_account_id?: string | null
           registered_name?: string | null
           serviceability_radius_km?: number | null
-          serviceable_pincodes?: string[] | null
           settlement_days?: number | null
           slug: string
           state?: string | null
@@ -1423,14 +1752,11 @@ export type Database = {
           gstin?: string | null
           has_outlet?: boolean | null
           id?: string
-          idfy_verification_id?: string | null
           image_url?: string | null
           is_active?: boolean | null
           is_online?: boolean | null
           is_promoted?: boolean | null
-          latitude?: number | null
           location?: unknown
-          longitude?: number | null
           minimum_order_amount?: number | null
           name?: string
           onboarding_fee_paid?: boolean | null
@@ -1446,7 +1772,6 @@ export type Database = {
           razorpay_account_id?: string | null
           registered_name?: string | null
           serviceability_radius_km?: number | null
-          serviceable_pincodes?: string[] | null
           settlement_days?: number | null
           slug?: string
           state?: string | null
@@ -1590,23 +1915,20 @@ export type Database = {
       }
       v_active_cart_detailed: {
         Row: {
-          has_personalization: boolean | null
+          base_price: number | null
           id: string | null
-          is_personalized: boolean | null
           line_total: number | null
           personalization: Json | null
           personalization_fee: number | null
-          product_addons: Json | null
           product_id: string | null
-          product_image: string | null
+          product_images: string[] | null
           product_name: string | null
           quantity: number | null
           selected_addons: Json | null
           session_id: string | null
-          unit_price: number | null
           user_id: string | null
-          variant_id: string | null
           variant_name: string | null
+          variant_price: number | null
           vendor_city: string | null
           vendor_id: string | null
           vendor_name: string | null
@@ -1618,13 +1940,6 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cart_items_selected_variant_id_fkey"
-            columns: ["variant_id"]
-            isOneToOne: false
-            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
           {
@@ -1714,11 +2029,11 @@ export type Database = {
         Returns: boolean
       }
       _st_coveredby:
-      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       _st_covers:
-      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       _st_crosses: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: boolean
@@ -1772,44 +2087,58 @@ export type Database = {
         Returns: unknown
       }
       _st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      add_item_review: {
+        Args: {
+          p_approved_mockup_url?: string
+          p_comment: string
+          p_fidelity_tags?: string[]
+          p_order_id: string
+          p_order_item_id: string
+          p_personalization_rating?: number
+          p_product_id: string
+          p_rating: number
+        }
+        Returns: Json
+      }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
-      | {
-        Args: {
-          catalog_name: string
-          column_name: string
-          new_dim: number
-          new_srid_in: number
-          new_type: string
-          schema_name: string
-          table_name: string
-          use_typmod?: boolean
-        }
-        Returns: string
-      }
-      | {
-        Args: {
-          column_name: string
-          new_dim: number
-          new_srid: number
-          new_type: string
-          schema_name: string
-          table_name: string
-          use_typmod?: boolean
-        }
-        Returns: string
-      }
-      | {
-        Args: {
-          column_name: string
-          new_dim: number
-          new_srid: number
-          new_type: string
-          table_name: string
-          use_typmod?: boolean
-        }
-        Returns: string
-      }
+        | {
+            Args: {
+              catalog_name: string
+              column_name: string
+              new_dim: number
+              new_srid_in: number
+              new_type: string
+              schema_name: string
+              table_name: string
+              use_typmod?: boolean
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              column_name: string
+              new_dim: number
+              new_srid: number
+              new_type: string
+              schema_name: string
+              table_name: string
+              use_typmod?: boolean
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              column_name: string
+              new_dim: number
+              new_srid: number
+              new_type: string
+              table_name: string
+              use_typmod?: boolean
+            }
+            Returns: string
+          }
+      approve_order_preview: { Args: { p_order_id: string }; Returns: Json }
       calculate_order_total: {
         Args: {
           p_address_id?: string
@@ -1846,53 +2175,39 @@ export type Database = {
       }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
-      | {
-        Args: {
-          catalog_name: string
-          column_name: string
-          schema_name: string
-          table_name: string
-        }
-        Returns: string
-      }
-      | {
-        Args: {
-          column_name: string
-          schema_name: string
-          table_name: string
-        }
-        Returns: string
-      }
-      | { Args: { column_name: string; table_name: string }; Returns: string }
+        | {
+            Args: {
+              catalog_name: string
+              column_name: string
+              schema_name: string
+              table_name: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              column_name: string
+              schema_name: string
+              table_name: string
+            }
+            Returns: string
+          }
+        | { Args: { column_name: string; table_name: string }; Returns: string }
       dropgeometrytable:
-      | {
-        Args: {
-          catalog_name: string
-          schema_name: string
-          table_name: string
-        }
-        Returns: string
-      }
-      | { Args: { schema_name: string; table_name: string }; Returns: string }
-      | { Args: { table_name: string }; Returns: string }
+        | {
+            Args: {
+              catalog_name: string
+              schema_name: string
+              table_name: string
+            }
+            Returns: string
+          }
+        | { Args: { schema_name: string; table_name: string }; Returns: string }
+        | { Args: { table_name: string }; Returns: string }
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       execute_admin_intent: { Args: { p_intent: Json }; Returns: Json }
-      execute_cart_mutation:
-      | {
-        Args: {
-          p_mode?: string
-          p_personalization?: Json
-          p_product_id: string
-          p_quantity: number
-          p_selected_addons?: Json
-          p_session_id?: string
-          p_user_id?: string
-          p_variant_id?: string
-        }
-        Returns: Json
-      }
-      | {
+      execute_cart_mutation: {
         Args: {
           p_clear_other_vendors?: boolean
           p_mode?: string
@@ -2030,12 +2345,7 @@ export type Database = {
         Returns: Json
       }
       get_home_surface: {
-        Args: {
-          p_lat?: number
-          p_lng?: number
-          p_session_id?: string
-          p_user_id?: string
-        }
+        Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
         Returns: Json
       }
       get_nearby_products: {
@@ -2047,40 +2357,33 @@ export type Database = {
         }
         Returns: Json
       }
-      get_partner_from_session: {
-        Args: { p_app_metadata?: Json; p_email?: string; p_user_id: string }
-        Returns: Json
-      }
+      get_vendor_financials_v2: { Args: { p_vendor_id: string }; Returns: Json }
       gettransactionid: { Args: never; Returns: unknown }
       log_order_status_history:
-      | {
-        Args: {
-          p_description?: string
-          p_metadata?: Json
-          p_order_id: string
-          p_status: Database["public"]["Enums"]["order_status"]
-          p_title?: string
-        }
-        Returns: undefined
-      }
-      | {
-        Args: {
-          p_description: string
-          p_metadata?: Json
-          p_order_id: string
-          p_title: string
-          p_type: string
-        }
-        Returns: Json
-      }
+        | {
+            Args: {
+              p_description?: string
+              p_metadata?: Json
+              p_order_id: string
+              p_status: Database["public"]["Enums"]["order_status"]
+              p_title?: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_description: string
+              p_metadata?: Json
+              p_order_id: string
+              p_title: string
+              p_type: string
+            }
+            Returns: Json
+          }
       longtransactionsenabled: { Args: never; Returns: boolean }
       merge_guest_to_user: {
         Args: { p_session_id: string; p_user_id: string }
         Returns: Json
-      }
-      migrate_guest_cart: {
-        Args: { p_session_id: string; p_user_id: string }
-        Returns: undefined
       }
       place_atomic_order: {
         Args: {
@@ -2097,8 +2400,8 @@ export type Database = {
         Returns: Json
       }
       populate_geometry_columns:
-      | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
-      | { Args: { use_typmod?: boolean }; Returns: string }
+        | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
+        | { Args: { use_typmod?: boolean }; Returns: string }
       postgis_constraint_dims: {
         Args: { geomcolumn: string; geomschema: string; geomtable: string }
         Returns: number
@@ -2183,86 +2486,86 @@ export type Database = {
         Returns: unknown
       }
       st_angle:
-      | { Args: { line1: unknown; line2: unknown }; Returns: number }
-      | {
-        Args: { pt1: unknown; pt2: unknown; pt3: unknown; pt4?: unknown }
-        Returns: number
-      }
+        | { Args: { line1: unknown; line2: unknown }; Returns: number }
+        | {
+            Args: { pt1: unknown; pt2: unknown; pt3: unknown; pt4?: unknown }
+            Returns: number
+          }
       st_area:
-      | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
-      | { Args: { "": string }; Returns: number }
+        | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
+        | { Args: { "": string }; Returns: number }
       st_asencodedpolyline: {
         Args: { geom: unknown; nprecision?: number }
         Returns: string
       }
       st_asewkt: { Args: { "": string }; Returns: string }
       st_asgeojson:
-      | {
-        Args: { geog: unknown; maxdecimaldigits?: number; options?: number }
-        Returns: string
-      }
-      | {
-        Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
-        Returns: string
-      }
-      | {
-        Args: {
-          geom_column?: string
-          maxdecimaldigits?: number
-          pretty_bool?: boolean
-          r: Record<string, unknown>
-        }
-        Returns: string
-      }
-      | { Args: { "": string }; Returns: string }
+        | {
+            Args: { geog: unknown; maxdecimaldigits?: number; options?: number }
+            Returns: string
+          }
+        | {
+            Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
+            Returns: string
+          }
+        | {
+            Args: {
+              geom_column?: string
+              maxdecimaldigits?: number
+              pretty_bool?: boolean
+              r: Record<string, unknown>
+            }
+            Returns: string
+          }
+        | { Args: { "": string }; Returns: string }
       st_asgml:
-      | {
-        Args: {
-          geog: unknown
-          id?: string
-          maxdecimaldigits?: number
-          nprefix?: string
-          options?: number
-        }
-        Returns: string
-      }
-      | {
-        Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
-        Returns: string
-      }
-      | { Args: { "": string }; Returns: string }
-      | {
-        Args: {
-          geog: unknown
-          id?: string
-          maxdecimaldigits?: number
-          nprefix?: string
-          options?: number
-          version: number
-        }
-        Returns: string
-      }
-      | {
-        Args: {
-          geom: unknown
-          id?: string
-          maxdecimaldigits?: number
-          nprefix?: string
-          options?: number
-          version: number
-        }
-        Returns: string
-      }
+        | {
+            Args: {
+              geog: unknown
+              id?: string
+              maxdecimaldigits?: number
+              nprefix?: string
+              options?: number
+            }
+            Returns: string
+          }
+        | {
+            Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
+            Returns: string
+          }
+        | { Args: { "": string }; Returns: string }
+        | {
+            Args: {
+              geog: unknown
+              id?: string
+              maxdecimaldigits?: number
+              nprefix?: string
+              options?: number
+              version: number
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              geom: unknown
+              id?: string
+              maxdecimaldigits?: number
+              nprefix?: string
+              options?: number
+              version: number
+            }
+            Returns: string
+          }
       st_askml:
-      | {
-        Args: { geog: unknown; maxdecimaldigits?: number; nprefix?: string }
-        Returns: string
-      }
-      | {
-        Args: { geom: unknown; maxdecimaldigits?: number; nprefix?: string }
-        Returns: string
-      }
-      | { Args: { "": string }; Returns: string }
+        | {
+            Args: { geog: unknown; maxdecimaldigits?: number; nprefix?: string }
+            Returns: string
+          }
+        | {
+            Args: { geom: unknown; maxdecimaldigits?: number; nprefix?: string }
+            Returns: string
+          }
+        | { Args: { "": string }; Returns: string }
       st_aslatlontext: {
         Args: { geom: unknown; tmpl?: string }
         Returns: string
@@ -2279,60 +2582,60 @@ export type Database = {
         Returns: unknown
       }
       st_assvg:
-      | {
-        Args: { geog: unknown; maxdecimaldigits?: number; rel?: number }
-        Returns: string
-      }
-      | {
-        Args: { geom: unknown; maxdecimaldigits?: number; rel?: number }
-        Returns: string
-      }
-      | { Args: { "": string }; Returns: string }
+        | {
+            Args: { geog: unknown; maxdecimaldigits?: number; rel?: number }
+            Returns: string
+          }
+        | {
+            Args: { geom: unknown; maxdecimaldigits?: number; rel?: number }
+            Returns: string
+          }
+        | { Args: { "": string }; Returns: string }
       st_astext: { Args: { "": string }; Returns: string }
       st_astwkb:
-      | {
-        Args: {
-          geom: unknown
-          prec?: number
-          prec_m?: number
-          prec_z?: number
-          with_boxes?: boolean
-          with_sizes?: boolean
-        }
-        Returns: string
-      }
-      | {
-        Args: {
-          geom: unknown[]
-          ids: number[]
-          prec?: number
-          prec_m?: number
-          prec_z?: number
-          with_boxes?: boolean
-          with_sizes?: boolean
-        }
-        Returns: string
-      }
+        | {
+            Args: {
+              geom: unknown
+              prec?: number
+              prec_m?: number
+              prec_z?: number
+              with_boxes?: boolean
+              with_sizes?: boolean
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              geom: unknown[]
+              ids: number[]
+              prec?: number
+              prec_m?: number
+              prec_z?: number
+              with_boxes?: boolean
+              with_sizes?: boolean
+            }
+            Returns: string
+          }
       st_asx3d: {
         Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
         Returns: string
       }
       st_azimuth:
-      | { Args: { geog1: unknown; geog2: unknown }; Returns: number }
-      | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
+        | { Args: { geog1: unknown; geog2: unknown }; Returns: number }
+        | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
       st_boundingdiagonal: {
         Args: { fits?: boolean; geom: unknown }
         Returns: unknown
       }
       st_buffer:
-      | {
-        Args: { geom: unknown; options?: string; radius: number }
-        Returns: unknown
-      }
-      | {
-        Args: { geom: unknown; quadsegs: number; radius: number }
-        Returns: unknown
-      }
+        | {
+            Args: { geom: unknown; options?: string; radius: number }
+            Returns: unknown
+          }
+        | {
+            Args: { geom: unknown; quadsegs: number; radius: number }
+            Returns: unknown
+          }
       st_centroid: { Args: { "": string }; Returns: unknown }
       st_clipbybox2d: {
         Args: { box: unknown; geom: unknown }
@@ -2361,11 +2664,11 @@ export type Database = {
       }
       st_coorddim: { Args: { geometry: unknown }; Returns: number }
       st_coveredby:
-      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_covers:
-      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_crosses: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_curvetoline: {
         Args: { flags?: number; geom: unknown; tol?: number; toltype?: number }
@@ -2384,17 +2687,17 @@ export type Database = {
         Returns: boolean
       }
       st_distance:
-      | {
-        Args: { geog1: unknown; geog2: unknown; use_spheroid?: boolean }
-        Returns: number
-      }
-      | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
+        | {
+            Args: { geog1: unknown; geog2: unknown; use_spheroid?: boolean }
+            Returns: number
+          }
+        | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
       st_distancesphere:
-      | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
-      | {
-        Args: { geom1: unknown; geom2: unknown; radius: number }
-        Returns: number
-      }
+        | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
+        | {
+            Args: { geom1: unknown; geom2: unknown; radius: number }
+            Returns: number
+          }
       st_distancespheroid: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: number
@@ -2410,21 +2713,21 @@ export type Database = {
       }
       st_equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_expand:
-      | { Args: { box: unknown; dx: number; dy: number }; Returns: unknown }
-      | {
-        Args: { box: unknown; dx: number; dy: number; dz?: number }
-        Returns: unknown
-      }
-      | {
-        Args: {
-          dm?: number
-          dx: number
-          dy: number
-          dz?: number
-          geom: unknown
-        }
-        Returns: unknown
-      }
+        | { Args: { box: unknown; dx: number; dy: number }; Returns: unknown }
+        | {
+            Args: { box: unknown; dx: number; dy: number; dz?: number }
+            Returns: unknown
+          }
+        | {
+            Args: {
+              dm?: number
+              dx: number
+              dy: number
+              dz?: number
+              geom: unknown
+            }
+            Returns: unknown
+          }
       st_force3d: { Args: { geom: unknown; zvalue?: number }; Returns: unknown }
       st_force3dm: {
         Args: { geom: unknown; mvalue?: number }
@@ -2439,16 +2742,16 @@ export type Database = {
         Returns: unknown
       }
       st_generatepoints:
-      | { Args: { area: unknown; npoints: number }; Returns: unknown }
-      | {
-        Args: { area: unknown; npoints: number; seed: number }
-        Returns: unknown
-      }
+        | { Args: { area: unknown; npoints: number }; Returns: unknown }
+        | {
+            Args: { area: unknown; npoints: number; seed: number }
+            Returns: unknown
+          }
       st_geogfromtext: { Args: { "": string }; Returns: unknown }
       st_geographyfromtext: { Args: { "": string }; Returns: unknown }
       st_geohash:
-      | { Args: { geog: unknown; maxchars?: number }; Returns: string }
-      | { Args: { geom: unknown; maxchars?: number }; Returns: string }
+        | { Args: { geog: unknown; maxchars?: number }; Returns: string }
+        | { Args: { geom: unknown; maxchars?: number }; Returns: string }
       st_geomcollfromtext: { Args: { "": string }; Returns: unknown }
       st_geometricmedian: {
         Args: {
@@ -2462,9 +2765,9 @@ export type Database = {
       st_geometryfromtext: { Args: { "": string }; Returns: unknown }
       st_geomfromewkt: { Args: { "": string }; Returns: unknown }
       st_geomfromgeojson:
-      | { Args: { "": Json }; Returns: unknown }
-      | { Args: { "": Json }; Returns: unknown }
-      | { Args: { "": string }; Returns: unknown }
+        | { Args: { "": Json }; Returns: unknown }
+        | { Args: { "": Json }; Returns: unknown }
+        | { Args: { "": string }; Returns: unknown }
       st_geomfromgml: { Args: { "": string }; Returns: unknown }
       st_geomfromkml: { Args: { "": string }; Returns: unknown }
       st_geomfrommarc21: { Args: { marc21xml: string }; Returns: unknown }
@@ -2492,8 +2795,8 @@ export type Database = {
         Returns: unknown
       }
       st_intersects:
-      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_isvaliddetail: {
         Args: { flags?: number; geom: unknown }
         Returns: Database["public"]["CompositeTypes"]["valid_detail"]
@@ -2505,8 +2808,8 @@ export type Database = {
         }
       }
       st_length:
-      | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
-      | { Args: { "": string }; Returns: number }
+        | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
+        | { Args: { "": string }; Returns: number }
       st_letters: { Args: { font?: Json; letters: string }; Returns: unknown }
       st_linecrossingdirection: {
         Args: { line1: unknown; line2: unknown }
@@ -2646,8 +2949,8 @@ export type Database = {
         Returns: unknown
       }
       st_setsrid:
-      | { Args: { geog: unknown; srid: number }; Returns: unknown }
-      | { Args: { geom: unknown; srid: number }; Returns: unknown }
+        | { Args: { geog: unknown; srid: number }; Returns: unknown }
+        | { Args: { geom: unknown; srid: number }; Returns: unknown }
       st_sharedpaths: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown
@@ -2670,8 +2973,8 @@ export type Database = {
         Returns: Record<string, unknown>[]
       }
       st_srid:
-      | { Args: { geog: unknown }; Returns: number }
-      | { Args: { geom: unknown }; Returns: number }
+        | { Args: { geog: unknown }; Returns: number }
+        | { Args: { geom: unknown }; Returns: number }
       st_subdivide: {
         Args: { geom: unknown; gridsize?: number; maxvertices?: number }
         Returns: unknown[]
@@ -2700,22 +3003,22 @@ export type Database = {
       }
       st_touches: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_transform:
-      | {
-        Args: { from_proj: string; geom: unknown; to_proj: string }
-        Returns: unknown
-      }
-      | {
-        Args: { from_proj: string; geom: unknown; to_srid: number }
-        Returns: unknown
-      }
-      | { Args: { geom: unknown; to_proj: string }; Returns: unknown }
+        | {
+            Args: { from_proj: string; geom: unknown; to_proj: string }
+            Returns: unknown
+          }
+        | {
+            Args: { from_proj: string; geom: unknown; to_srid: number }
+            Returns: unknown
+          }
+        | { Args: { geom: unknown; to_proj: string }; Returns: unknown }
       st_triangulatepolygon: { Args: { g1: unknown }; Returns: unknown }
       st_union:
-      | { Args: { geom1: unknown; geom2: unknown }; Returns: unknown }
-      | {
-        Args: { geom1: unknown; geom2: unknown; gridsize: number }
-        Returns: unknown
-      }
+        | { Args: { geom1: unknown; geom2: unknown }; Returns: unknown }
+        | {
+            Args: { geom1: unknown; geom2: unknown; gridsize: number }
+            Returns: unknown
+          }
       st_voronoilines: {
         Args: { extend_to?: unknown; g1: unknown; tolerance?: number }
         Returns: unknown
@@ -2730,6 +3033,10 @@ export type Database = {
       st_wrapx: {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
+      }
+      submit_order_personalization: {
+        Args: { p_order_id: string; p_personalization_input: Json }
+        Returns: Json
       }
       transition_order: {
         Args: {
@@ -2768,17 +3075,17 @@ export type Database = {
     }
     Enums: {
       order_status:
-      | "PLACED"
-      | "CONFIRMED"
-      | "IN_PRODUCTION"
-      | "PACKED"
-      | "RIDER_ASSIGNED"
-      | "ARRIVED_PICKUP"
-      | "OUT_FOR_DELIVERY"
-      | "ARRIVED_DROP"
-      | "DELIVERED"
-      | "CANCELLED"
-      | "REFUNDED"
+        | "PLACED"
+        | "CONFIRMED"
+        | "IN_PRODUCTION"
+        | "PACKED"
+        | "RIDER_ASSIGNED"
+        | "ARRIVED_PICKUP"
+        | "OUT_FOR_DELIVERY"
+        | "ARRIVED_DROP"
+        | "DELIVERED"
+        | "CANCELLED"
+        | "REFUNDED"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -2800,116 +3107,116 @@ type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-  | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-  : never = never,
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-  ? R
-  : never
+    ? R
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R
-    }
-  ? R
-  : never
-  : never
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
+      Insert: infer I
+    }
+    ? I
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Update: infer U
-  }
-  ? U
-  : never
+      Update: infer U
+    }
+    ? U
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Update: infer U
-  }
-  ? U
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-  | keyof DefaultSchema["Enums"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-  | keyof DefaultSchema["CompositeTypes"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {
