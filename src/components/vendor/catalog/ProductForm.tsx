@@ -27,13 +27,13 @@ import {
 } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
-  createItem,
-  updateItem,
-  deleteItem,
+  createProduct,
+  updateProduct,
+  deleteProduct,
   createVariant,
   updateVariant,
   deleteVariant,
-  type ItemInput,
+  type ProductInput,
   type VariantInput,
 } from '@/lib/actions/vendor/catalog';
 import type { Database } from '@/lib/supabase/database.types';
@@ -73,7 +73,7 @@ interface ProductFormProps {
     variants?: Variant[];
     personalization_options?: any;
     addons?: any;
-    item_addons?: any;
+    product_addons?: any;
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -99,7 +99,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
 
-  const [formData, setFormData] = useState<ItemInput>({
+  const [formData, setFormData] = useState<ProductInput>({
     name: product?.name || '',
     description: product?.description || '',
     base_price: product?.base_price ? Number(product.base_price) : 0,
@@ -131,7 +131,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
   );
 
   const [addons, setAddons] = useState<Addon[]>(
-    (product?.item_addons || product?.addons || []) as Addon[]
+    (product?.product_addons || product?.addons || []) as Addon[]
   );
 
   const [newVariant, setNewVariant] = useState<Variant>({
@@ -172,7 +172,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
 
     setSaving(true);
     try {
-      const fullInput: ItemInput = {
+      const fullInput: ProductInput = {
         ...formData,
         personalization_options: personalizationOptions.map(p => ({
           name: p.name,
@@ -181,14 +181,14 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
           char_limit: p.char_limit || null,
           instructions: p.instructions || null
         })),
-        item_addons: addons.map(a => ({
+        product_addons: addons.map(a => ({
           name: a.name,
           price: a.price || 0
         }))
       };
 
       if (isEdit && product) {
-        const result = await updateItem(product.id, fullInput);
+        const result = await updateProduct(product.id, fullInput);
         if (result.error) {
           toast.error(result.error);
           return;
@@ -217,7 +217,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
 
         toast.success('Product updated');
       } else {
-        const result = await createItem(vendorId, fullInput);
+        const result = await createProduct(vendorId, fullInput);
         if (result.error) {
           toast.error(result.error);
           return;

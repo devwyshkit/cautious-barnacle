@@ -17,22 +17,22 @@ export function HeaderCart() {
 
     // WYSHKIT 2026: Single source of truth
     const displayCart = draftOrder;
-    const hasItems = displayCart && displayCart.item_count > 0;
+    const hasItems = displayCart && displayCart.product_count > 0;
     const isCheckoutOpen = pathname.startsWith('/checkout');
 
-    const itemCount = displayCart?.item_count || 0;
+    const productCount = displayCart?.product_count || 0;
     const displayTotal = displayCart?.total || 0;
 
-    const [visualCount, setVisualCount] = useState(itemCount);
+    const [visualCount, setVisualCount] = useState(productCount);
     const [shouldBounce, setShouldBounce] = useState(false);
-    const prevCount = useRef(itemCount);
+    const prevCount = useRef(productCount);
 
     // WYSHKIT 2026: Animation Sync Logic
     useEffect(() => {
-        if (itemCount > prevCount.current) {
+        if (productCount > prevCount.current) {
             // Increment: Wait for fly animation (approx 800ms)
             const timer = setTimeout(() => {
-                setVisualCount(itemCount);
+                setVisualCount(productCount);
                 setShouldBounce(true);
                 triggerHaptic(HapticPattern.SUCCESS);
                 setTimeout(() => setShouldBounce(false), 300);
@@ -40,10 +40,10 @@ export function HeaderCart() {
             return () => clearTimeout(timer);
         } else {
             // Decrement/Initial: Update instantly
-            setVisualCount(itemCount);
+            setVisualCount(productCount);
         }
-        prevCount.current = itemCount;
-    }, [itemCount]);
+        prevCount.current = productCount;
+    }, [productCount]);
 
     const handleCheckout = () => {
         triggerHaptic(HapticPattern.ACTION);

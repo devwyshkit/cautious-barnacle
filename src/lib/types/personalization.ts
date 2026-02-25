@@ -29,11 +29,11 @@ export interface SelectedAddon {
 }
 
 /**
- * DraftLineItem: Maps directly to output columns from v_active_cart_detailed view.
+ * DraftProductItem: Maps directly to output columns from v_active_cart_detailed view.
  * Eliminates manual type-drift and shadow data.
  * NOTE: We no longer extend the view type directly to avoid optional/non-optional conflicts.
  */
-export interface DraftLineItem {
+export interface DraftProductItem {
   // Cart item identity
   id: string;
   product_id: string;
@@ -67,19 +67,19 @@ export interface DraftLineItem {
   vendor_prep_mins?: number | null;
 
   // UI-only computed extensions
-  item_addons: any[];
+  product_addons: any[];
   addons_price?: number | null;
   base_price?: number;
   variant_price?: number | null;
-  product_addons?: any;
+  product_addons_meta?: any;
   personalization_options?: any[];
 }
 
 
 export interface DraftTransaction extends PricingBreakdown {
-  products: DraftLineItem[];
+  products: DraftProductItem[];
   vendor_id: string | null;
-  item_count: number;
+  product_count: number;
   // Session fields
   applied_coupon?: string | null;
   use_wallet?: boolean;

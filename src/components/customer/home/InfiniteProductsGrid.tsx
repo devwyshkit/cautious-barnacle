@@ -2,13 +2,13 @@
 
 import { useCallback } from 'react';
 import { ProductCard } from '@/components/ui/ProductCard';
-import { getFilteredItems } from '@/lib/actions/discovery/search';
-import { WyshkitItem } from '@/lib/types/product';
+import { getFilteredProducts } from '@/lib/actions/discovery/search';
+import { WyshkitProduct } from '@/lib/types/product';
 import { InfiniteFlow } from '@/components/ui/InfiniteFlow';
 import { LayoutGrid } from '@/components/ui/LayoutGrid';
 
-interface InfiniteItemsGridProps {
-    initialItems: WyshkitItem[];
+interface InfiniteProductsGridProps {
+    initialProducts: WyshkitProduct[];
     category: string | null;
     categoryName?: string | null;
     startOffset?: number;
@@ -16,20 +16,20 @@ interface InfiniteItemsGridProps {
 }
 
 /**
- * WYSHKIT 2026: InfiniteItemsGrid (Refactored)
+ * WYSHKIT 2026: InfiniteProductsGrid (Renamed)
  * Pattern: Elite Composition
  * - Uses InfiniteFlow primitive for high-performance pagination.
- * - Simply provides the specialized 'getFilteredItems' action and 'ProductCard' renderer.
+ * - Simply provides the specialized 'getFilteredProducts' action and 'ProductCard' renderer.
  */
-export function InfiniteItemsGrid({
-    initialItems,
+export function InfiniteProductsGrid({
+    initialProducts,
     category,
     startOffset = 0,
     totalCount
-}: InfiniteItemsGridProps) {
+}: InfiniteProductsGridProps) {
 
     const fetchMore = useCallback(async ({ limit, offset }: { limit: number; offset: number }) => {
-        return getFilteredItems({
+        return getFilteredProducts({
             limit,
             offset,
             category: category || undefined
@@ -37,8 +37,8 @@ export function InfiniteItemsGrid({
     }, [category]);
 
     return (
-        <InfiniteFlow<WyshkitItem>
-            initialData={initialItems}
+        <InfiniteFlow<WyshkitProduct>
+            initialData={initialProducts}
             fetchAction={fetchMore}
             renderItem={(product) => (
                 <ProductCard

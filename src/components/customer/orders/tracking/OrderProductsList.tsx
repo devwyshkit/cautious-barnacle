@@ -13,20 +13,20 @@ import { PreviewApproval } from '../PreviewApproval';
 import { approve_preview, request_change } from '@/lib/actions/commerce/orders';
 import { toast } from 'sonner';
 
-interface OrderItemsListProps {
+interface OrderProductsListProps {
     order: any;
-    itemPreviews: Record<string, any>;
+    productPreviews: Record<string, any>;
     onPersonalizationSubmitted: () => void;
 }
 
-export function OrderProductsList({ order, itemPreviews, onPersonalizationSubmitted }: OrderItemsListProps) {
-    const [selectedPreviewItem, setSelectedPreviewItem] = useState<any | null>(null);
+export function OrderProductsList({ order, productPreviews, onPersonalizationSubmitted }: OrderProductsListProps) {
+    const [selectedPreviewProduct, setSelectedPreviewProduct] = useState<any | null>(null);
     const [isApproving, setIsApproving] = useState(false);
     const [isRequestingChange, setIsRequestingChange] = useState(false);
 
-    const renderItemStatus = (product: any) => {
-        const itemStatus = product.status || order.status;
-        const config = getItemStatusConfig(itemStatus);
+    const renderProductStatus = (product: any) => {
+        const productStatus = product.status || order.status;
+        const config = getItemStatusConfig(productStatus);
         const Icon = config.icon as any;
 
         return (
@@ -50,7 +50,7 @@ export function OrderProductsList({ order, itemPreviews, onPersonalizationSubmit
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setSelectedPreviewItem(product);
+                                    setSelectedPreviewProduct(product);
                                 }}
                                 className="w-full p-4 flex gap-4 text-left hover:bg-zinc-50 active:scale-[0.99] transition-all outline-none relative z-10"
                             >
@@ -75,7 +75,7 @@ export function OrderProductsList({ order, itemPreviews, onPersonalizationSubmit
                                     </div>
 
                                     <div className="flex items-center justify-between mt-2">
-                                        {renderItemStatus(product)}
+                                        {renderProductStatus(product)}
                                         <span className="text-xs font-bold text-zinc-900">{formatCurrency(product.total_price)}</span>
                                     </div>
 
@@ -97,29 +97,29 @@ export function OrderProductsList({ order, itemPreviews, onPersonalizationSubmit
 
             {/* WYSHKIT 2026: Preview Surface */}
             <ResponsiveSurface
-                open={!!selectedPreviewItem}
-                onOpenChange={(open) => !open && setSelectedPreviewItem(null)}
+                open={!!selectedPreviewProduct}
+                onOpenChange={(open) => !open && setSelectedPreviewProduct(null)}
                 className="p-0 sm:max-w-xl h-[85dvh] sm:h-[90dvh] bg-zinc-50 border-none"
             >
-                {selectedPreviewItem && itemPreviews[selectedPreviewItem.id] && (
+                {selectedPreviewProduct && productPreviews[selectedPreviewProduct.id] && (
                     <div className="h-full overflow-y-auto overscroll-contain pb-safe scrollbar-hide">
                         <div className="p-4 sticky top-0 bg-white/80 backdrop-blur-md z-10 border-b border-zinc-100 flex items-center justify-between">
                             <h3 className="text-lg font-black text-zinc-900 tracking-tight">
-                                {selectedPreviewItem.status === 'preview_ready' ? 'Review Design' : 'Product Details'}
+                                {selectedPreviewProduct.status === 'preview_ready' ? 'Review Design' : 'Product Details'}
                             </h3>
                         </div>
                         <div className="p-4">
-                            {selectedPreviewItem.status === 'preview_ready' ? (
+                            {selectedPreviewProduct.status === 'preview_ready' ? (
                                 <PreviewApproval
-                                    preview={itemPreviews[selectedPreviewItem.id]}
-                                    orderItem={selectedPreviewItem}
+                                    preview={productPreviews[selectedPreviewProduct.id]}
+                                    orderProduct={selectedPreviewProduct}
                                     onApprove={async () => {
                                         setIsApproving(true);
                                         try {
-                                            const result = await approve_preview(itemPreviews[selectedPreviewItem.id].id, order.id);
+                                            const result = await approve_preview(productPreviews[selectedPreviewProduct.id].id, order.id);
                                             if (result.success) {
                                                 toast.success('Product approved! Production has started.');
-                                                setSelectedPreviewItem(null);
+                                                setSelectedPreviewProduct(null);
                                             } else {
                                                 toast.error(result.error ?? 'Failed to approve');
                                             }
@@ -134,10 +134,10 @@ export function OrderProductsList({ order, itemPreviews, onPersonalizationSubmit
                                     onRequestChange={async (feedback: string) => {
                                         setIsRequestingChange(true);
                                         try {
-                                            const result = await request_change(itemPreviews[selectedPreviewItem.id].id, order.id, feedback);
+                                            const result = await request_change(productPreviews[selectedPreviewProduct.id].id, order.id, feedback);
                                             if (result.success) {
                                                 toast.success('Feedback sent. Vendor will upload a new preview.');
-                                                setSelectedPreviewItem(null);
+                                                setSelectedPreviewProduct(null);
                                             } else {
                                                 toast.error(result.error ?? 'Failed to send feedback');
                                             }
@@ -163,20 +163,20 @@ export function OrderProductsList({ order, itemPreviews, onPersonalizationSubmit
                                                     <Package className="size-5 text-zinc-400" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs font-bold text-zinc-900 tracking-tight">{selectedPreviewItem.status || order.status}</p>
+                                                    <p className="text-xs font-bold text-zinc-900 tracking-tight">{selectedPreviewProduct.status || order.status}</p>
                                                     <p className="text-xs text-zinc-500 font-medium">Last updated recently</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {selectedPreviewItem.is_personalized && (
+                                    {selectedPreviewProduct.is_personalized && (
                                         <div className="space-y-3">
                                             <span className="text-xs font-black text-zinc-400 tracking-tight px-1">Identity Details</span>
-                                            {selectedPreviewItem.personalization_details ? (
+                                            {selectedPreviewProduct.personalization_details ? (
                                                 <SubmittedIdentity
-                                                    details={selectedPreviewItem.personalization_details as any}
-                                                    itemName={selectedPreviewItem.product_name}
+                                                    details={selectedPreviewProduct.personalization_details as any}
+                                                    itemName={selectedPreviewProduct.product_name}
                                                 />
                                             ) : (
                                                 <div className="p-8 text-center bg-zinc-50 rounded-xl border border-zinc-100">

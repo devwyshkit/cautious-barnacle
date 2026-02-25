@@ -5,10 +5,10 @@ import { ORDER_STATUS } from '@/lib/types/order-status';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 import { Database, Json } from '@/lib/supabase/database.types';
-import type { Order, Tables, OrderDetails, Address, Vendor, OrderItem } from '@/lib/supabase/types';
+import type { Order, Tables, OrderDetails, Address, Vendor, OrderProduct } from '@/lib/supabase/types';
 import { logError, handleActionError } from '@/lib/utils/error-handler';
 import { logger } from '@/lib/logging/logger';
-import { hasItemPersonalization } from '@/lib/utils/personalization';
+import { hasProductPersonalization } from '@/lib/utils/personalization';
 import { withTrace } from '@/lib/observability/tracer';
 
 export type OrderStatus = Database['public']['Enums']['order_status'];
@@ -18,7 +18,7 @@ export type OrderStatus = Database['public']['Enums']['order_status'];
 // No hardcoded FSM logic allowed in TypeScript.
 
 export type VendorOrder = Omit<Order, 'delivery_address' | 'vendor'> & {
-  order_products: (OrderItem & {
+  order_products: (OrderProduct & {
     product?: Tables<'products'> | null;
     variant?: { stock_quantity: number } | null;
     personalization_entry?: any; // Added for vendor dashboard
@@ -212,21 +212,21 @@ export async function approve_preview(preview_submission_id: string, order_id: s
   }
 }
 
-export async function cancel_order_item(order_product_id: string, order_id: string, reason: string = 'Preview Rejected') {
+export async function cancel_order_product(order_product_id: string, order_id: string, reason: string = 'Preview Rejected') {
   try {
     const admin_supabase = await createAdminClient();
 
     // 1. Fetch order product and main order to get Razorpay Payment ID
-    const [itemRes, orderRes] = await Promise.all([
+    const [productRes, orderRes] = await Promise.all([
       admin_supabase.from('order_products').select('*').eq('id', order_product_id).single(),
 
       admin_supabase.from('orders').select('id, payment_id, total, status').eq('id', order_id).single()
     ]);
 
-    if (itemRes.error || !itemRes.data) throw new Error('Order product not found');
+    if (productRes.error || !productRes.data) throw new Error('Order product not found');
     if (orderRes.error || !orderRes.data) throw new Error('Order not found');
 
-    const product = itemRes.data;
+    const product = productRes.data;
     const order = orderRes.data;
 
     // 1.5 Liability Shift Check
@@ -264,7 +264,7 @@ export async function cancel_order_item(order_product_id: string, order_id: stri
     if (rpc_error) throw rpc_error;
 
     // Update history
-    await log_order_status_history(order_id, 'item_cancelled', 'Product Cancelled & Refunded', `An product (${product.product_name}) was rejected and cancelled. ${refundSuccessful ? 'Refund initiated.' : 'Refund action logged.'}`, {
+    await log_order_status_history(order_id, 'product_cancelled', 'Product Cancelled & Refunded', `A product (${product.product_name}) was rejected and cancelled. ${refundSuccessful ? 'Refund initiated.' : 'Refund action logged.'}`, {
       order_product_id,
       reason,
       refunded_amount: product.total_price
@@ -274,7 +274,7 @@ export async function cancel_order_item(order_product_id: string, order_id: stri
     revalidateTag('orders');
     return { success: true };
   } catch (error) {
-    logError(error, `CancelOrderItem:${order_product_id}`);
+    logError(error, `CancelOrderProduct:${order_product_id}`);
     const { error: errMsg } = handleActionError(error);
     return { success: false, error: errMsg };
   }

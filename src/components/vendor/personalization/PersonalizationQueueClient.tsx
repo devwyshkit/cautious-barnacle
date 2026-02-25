@@ -28,15 +28,15 @@ type PersonalizationInput = {
 
 export function PersonalizationQueueClient({ initialOrders }: PersonalizationQueueClientProps) {
   const [orders, setOrders] = useState(initialOrders);
-  const [uploadState, setUploadState] = useState<{ orderId: string; orderItemId: string; orderNumber: string } | null>(null);
+  const [uploadState, setUploadState] = useState<{ orderId: string; orderProductId: string; orderNumber: string } | null>(null);
 
   const waitingForInput = orders.filter(o => o.has_personalization && (!o.personalization_status || o.personalization_status === 'pending'));
   const needsPreview = orders.filter(o => o.has_personalization && o.personalization_status === 'submitted');
   const revisionRequested = orders.filter(o => o.has_personalization && o.personalization_status === 'revision_requested');
   const awaitingApproval = orders.filter(o => o.has_personalization && o.personalization_status === 'preview_ready');
 
-  const handleUploadClick = (orderId: string, orderItemId: string, orderNumber: string) => {
-    setUploadState({ orderId, orderItemId, orderNumber });
+  const handleUploadClick = (orderId: string, orderProductId: string, orderNumber: string) => {
+    setUploadState({ orderId, orderProductId, orderNumber });
   };
 
   const handleUploadSuccess = () => {
@@ -46,7 +46,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
         ? {
           ...o,
           order_products: o.order_products.map(product =>
-            product.id === uploadState.orderItemId ? {
+            product.id === uploadState.orderProductId ? {
               ...product,
               personalization_entry: {
                 ...product.personalization_entry,
@@ -411,7 +411,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
 
       <PreviewUploader
         orderId={uploadState?.orderId || ''}
-        orderItemId={uploadState?.orderItemId || ''}
+        orderProductId={uploadState?.orderProductId || ''}
         orderNumber={uploadState?.orderNumber || ''}
         isOpen={!!uploadState}
         onClose={() => setUploadState(null)}

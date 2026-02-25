@@ -15,7 +15,7 @@ import imageCompression from 'browser-image-compression';
 
 interface PreviewUploaderProps {
   orderId: string;
-  orderItemId: string; // Relational Mapping
+  orderProductId: string; // Relational Mapping
   orderNumber: string;
   isOpen: boolean;
   onClose: () => void;
@@ -24,7 +24,7 @@ interface PreviewUploaderProps {
 
 type Mode = 'select' | 'upload' | 'camera';
 
-export function PreviewUploader({ orderId, orderItemId, orderNumber, isOpen, onClose, onSuccess }: PreviewUploaderProps) {
+export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, onClose, onSuccess }: PreviewUploaderProps) {
   const [mode, setMode] = useState<Mode>('select');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -149,7 +149,7 @@ export function PreviewUploader({ orderId, orderItemId, orderNumber, isOpen, onC
         .from('order-assets')
         .getPublicUrl(data.path);
 
-      const result = await upload_preview(orderId, orderItemId, publicUrl);
+      const result = await upload_preview(orderId, orderProductId, publicUrl);
 
       if (result.success) {
         toast.success('Preview uploaded');

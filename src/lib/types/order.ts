@@ -21,8 +21,8 @@ export interface OrderListItem extends Omit<Views<'v_order_tracking'>, 'personal
   // Any extra UI fields NOT in the view can be added here
   // But for WYSHKIT 2026, we prefer view-authority
   products?: any[]; // Keep for compatibility if needed, though view uses first_product_name
-  personalization_status?: string | null; // Placeholder if needed
-  item_count?: number;
+  personalization_status?: string | null;
+  product_count: number | null;
   first_product_name?: string | null;
   vendor_name?: string | null;
 }
@@ -68,7 +68,7 @@ export interface PreviewSubmission {
   reviewed_at?: string;
 }
 
-export interface OrderItemDetail {
+export interface OrderProductDetail {
   id: string;
   product_id: string;
   product_name: string;
@@ -97,7 +97,7 @@ export interface OrderStatusHistory {
 export interface OrderDetail extends Tables<'orders'> {
   order_personalization?: PreviewSubmission[];
   personalizations?: any[];
-  order_products?: OrderItemDetail[];
+  order_products?: OrderProductDetail[];
   status_history?: Record<string, any>[] | null;
 
   // Composite/Joins

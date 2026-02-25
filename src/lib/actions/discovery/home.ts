@@ -6,9 +6,9 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
 import { logError } from '@/lib/utils/error-handler';
-import { WyshkitItem } from '@/lib/types/product';
+import { WyshkitProduct } from '@/lib/types/product';
 import {
-    WyshkitItemSchema,
+    WyshkitProductSchema,
 } from '@/lib/validations/discovery';
 
 /**
@@ -30,14 +30,14 @@ export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusK
         return { products: [], error: error.message };
     }
 
-    const validated = z.array(WyshkitItemSchema).safeParse(nearbyItems);
+    const validated = z.array(WyshkitProductSchema).safeParse(nearbyItems);
     if (!validated.success) {
         logger.error('Validation failed for nearby products', validated.error);
         return { products: nearbyItems as any, error: null };
     }
 
     return {
-        products: validated.data as unknown as WyshkitItem[],
+        products: validated.data as unknown as WyshkitProduct[],
         error: null
     };
 });

@@ -8,7 +8,7 @@ import { useCart } from '@/components/customer/CartProvider';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-import { hasAnyPersonalization, hasItemPersonalization } from '@/lib/utils/personalization';
+import { hasAnyPersonalization, hasProductPersonalization } from '@/lib/utils/personalization';
 import { formatCurrency } from '@/lib/utils/pricing';
 
 /**
@@ -23,7 +23,7 @@ export function FloatingCartBar() {
   const { user: authUser } = useAuth();
 
   const displayCart = draftOrder;
-  const hasItems = displayCart && displayCart.item_count > 0;
+  const hasItems = displayCart && displayCart.product_count > 0;
   const isVisible = hasItems;
 
   const handleOpenCart = (e: React.MouseEvent) => {
@@ -35,26 +35,26 @@ export function FloatingCartBar() {
 
   const firstItemImage = displayCart?.products?.[0]?.product_image;
   const hasPersonalization = hasAnyPersonalization((displayCart?.products || []) as any[]);
-  const displayCount = displayCart?.item_count || 0;
+  const productCount = displayCart?.product_count || 0;
   const displayTotal = displayCart?.total || 0;
   const isLoading = loading;
 
   const [shouldPulse, setShouldPulse] = useState(false);
-  const [visualCount, setVisualCount] = useState(displayCount);
-  const prevCount = useRef(displayCount);
+  const [visualCount, setVisualCount] = useState(productCount);
+  const prevCount = useRef(productCount);
 
   useEffect(() => {
-    setVisualCount(displayCount);
-    if (displayCount !== prevCount.current && displayCount > 0) {
-      if (displayCount > prevCount.current) {
+    setVisualCount(productCount);
+    if (productCount !== prevCount.current && productCount > 0) {
+      if (productCount > prevCount.current) {
         setShouldPulse(true);
         triggerHaptic(HapticPattern.ACTION);
         const timer = setTimeout(() => setShouldPulse(false), 300);
         return () => clearTimeout(timer);
       }
-      prevCount.current = displayCount;
+      prevCount.current = productCount;
     }
-  }, [displayCount]);
+  }, [productCount]);
 
   return (
     <div

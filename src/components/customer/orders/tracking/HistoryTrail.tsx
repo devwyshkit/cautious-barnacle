@@ -15,7 +15,7 @@ interface HistoryEvent {
 }
 
 interface HistoryTrailProps {
-    orderItems: any[];
+    orderProducts: any[];
     previews: any[];
     timeline: HistoryEvent[];
 }
@@ -27,10 +27,10 @@ interface HistoryTrailProps {
  * 2. What Vendor Sent (Preview)
  * 3. What Changed (Revisions)
  */
-export function HistoryTrail({ orderItems, previews, timeline }: HistoryTrailProps) {
-    const personalizedItems = orderItems.filter(i => i.is_personalized);
+export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrailProps) {
+    const personalizedProducts = orderProducts.filter(i => i.is_personalized);
 
-    if (personalizedItems.length === 0) return null;
+    if (personalizedProducts.length === 0) return null;
 
     // Filter timeline for relevant creative events
     const creativeEvents = timeline.filter(e =>
@@ -49,7 +49,7 @@ export function HistoryTrail({ orderItems, previews, timeline }: HistoryTrailPro
                 <div className="absolute left-[11px] top-2 bottom-2 w-px bg-zinc-100" />
 
                 {/* Layer 1: The Briefing */}
-                {personalizedItems.map(product => (
+                {personalizedProducts.map(product => (
                     <div key={product.id} className="relative">
                         <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-zinc-900 ring-4 ring-white shadow-sm" />
                         <div className="space-y-2">
@@ -144,7 +144,7 @@ export function HistoryTrail({ orderItems, previews, timeline }: HistoryTrailPro
                 ))}
 
                 {/* Future layer: Final Fulfillment */}
-                {personalizedItems.some(i => i.status === 'in_production') && (
+                {personalizedProducts.some(i => i.status === 'in_production') && (
                     <div className="relative opacity-50">
                         <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-zinc-100 ring-4 ring-white" />
                         <div className="space-y-2">

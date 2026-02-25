@@ -9,18 +9,18 @@ import { AlertCircle } from 'lucide-react';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { StoreHeader } from '@/components/ui/blocks/store/StoreHeader';
 import { CircleRail } from '@/components/ui/blocks/discovery/CircleRail';
-import { WyshkitItem } from '@/lib/types/product';
+import { WyshkitProduct } from '@/lib/types/product';
 import { ProductCard } from '@/components/ui/ProductCard';
 
 interface VendorStorePageProps {
   vendorId: string;
   initialData?: MappedVendor;
-  products: WyshkitItem[];
-  itemsGroupedByCategory: Record<string, WyshkitItem[]>;
+  products: WyshkitProduct[];
+  productsGroupedByCategory: Record<string, WyshkitProduct[]>;
   categories: any[];
 }
 
-export function VendorStorePage({ vendorId, initialData, products, itemsGroupedByCategory, categories }: VendorStorePageProps) {
+export function VendorStorePage({ vendorId, initialData, products, productsGroupedByCategory, categories }: VendorStorePageProps) {
   const router = useRouter();
 
   // WYSHKIT 2026: Proactive Cart Validation
@@ -75,7 +75,7 @@ export function VendorStorePage({ vendorId, initialData, products, itemsGroupedB
         </section>
 
         <div className="flex flex-col gap-10 px-4 md:px-8 max-w-[1440px] mx-auto w-full pb-12">
-          {Object.entries(itemsGroupedByCategory).map(([category, categoryItems]) => (
+          {Object.entries(productsGroupedByCategory).map(([category, categoryItems]) => (
             <section key={category} id={category.toLowerCase()} className="flex flex-col gap-4">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg font-black text-zinc-950 tracking-tighter capitalize">{category}</h2>

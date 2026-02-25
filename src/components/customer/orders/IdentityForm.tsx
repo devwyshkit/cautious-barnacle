@@ -15,7 +15,7 @@ import { IdentityFormHeader } from './IdentityFormHeader';
 import { IdentityProductField } from './IdentityProductField';
 import { IdentitySuccessState } from './IdentitySuccessState';
 
-interface OrderItem {
+interface OrderProduct {
     id: string;
     product_name: string;
     is_personalized?: boolean;
@@ -28,7 +28,7 @@ interface OrderItem {
 
 interface IdentityFormProps {
     orderId: string;
-    products: OrderItem[];
+    products: OrderProduct[];
     onSubmitted: () => void;
     onSkip?: () => void;
     designDeadline?: string | null;
@@ -95,8 +95,8 @@ export function IdentityForm({
         }
     }, [formData, orderId]);
 
-    const personalizedItems = products;
-    const allOptional = personalizedItems.every(product => {
+    const personalizedProducts = products;
+    const allOptional = personalizedProducts.every(product => {
         const config = product.personalization_config || {};
         return !config.text_required && !config.image_required;
     });
@@ -160,7 +160,7 @@ export function IdentityForm({
 
     const handleSubmit = async () => {
         // Validation logic
-        for (const product of personalizedItems) {
+        for (const product of personalizedProducts) {
             const config = (product.personalization_config || {}) as PersonalizationConfig;
             const input = formData[product.id] || {};
             if (config.text_required && !input.text?.trim()) {
@@ -174,11 +174,11 @@ export function IdentityForm({
         triggerHaptic(HapticPattern.SUCCESS);
 
         try {
-            const personalizationData = personalizedItems.reduce((acc: Record<string, any>, product: any) => {
-                const itemFormData = formData[product.id] || {};
+            const personalizationData = personalizedProducts.reduce((acc: Record<string, any>, product: any) => {
+                const productFormData = formData[product.id] || {};
                 acc[product.id] = {
-                    text: itemFormData.text || null,
-                    image_url: itemFormData.image_url || null,
+                    text: productFormData.text || null,
+                    image_url: productFormData.image_url || null,
                     addons: (product.selected_addons || []).filter((a: any) => a.requires_preview).map((a: any) => a.name)
                 };
                 return acc;
@@ -202,14 +202,14 @@ export function IdentityForm({
         return <IdentitySuccessState onClose={onSubmitted} />;
     }
 
-    if (personalizedItems.length === 0) return null;
+    if (personalizedProducts.length === 0) return null;
 
     return (
         <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
             {isAutoOpenedForSuccess && <IdentityFormHeader orderId={orderId} designDeadline={designDeadline} />}
 
             <div className="space-y-6">
-                {personalizedItems.map((product, idx) => {
+                {personalizedProducts.map((product, idx) => {
                     const legacyConfig = product.personalization_config || (product.personalization as any) || {};
                     const addons = (product.selected_addons || []).filter(a => a.requires_preview);
                     const config: PersonalizationConfig = addons.length > 0 ? {
@@ -229,8 +229,8 @@ export function IdentityForm({
                         <IdentityProductField
                             key={product.id}
                             product={product}
-                            itemIndex={idx}
-                            totalItems={personalizedItems.length}
+                            productIndex={idx}
+                            totalProducts={personalizedProducts.length}
                             config={config}
                             schema={product.personalization_schema}
                             input={formData[product.id] || {}}

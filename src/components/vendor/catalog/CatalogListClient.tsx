@@ -6,7 +6,7 @@ import { Plus, Search, Package } from 'lucide-react';
 import { CatalogList } from './CatalogList';
 import { ProductForm } from './ProductForm';
 import { executeVendorIntent } from '@/lib/actions/vendor/engine';
-import { getItemWithFullSpec } from '@/lib/actions/discovery/products';
+import { getProductWithFullSpec } from '@/lib/actions/discovery/products';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,36 +25,36 @@ import type { Database } from '@/lib/supabase/database.types';
 type Product = Database['public']['Tables']['products']['Row'];
 
 // Use a more relaxed type for the vendor dashboard to avoid discovery-only field requirements
-export type ItemWithDetails = any;
+export type ProductWithDetails = any;
 
 interface CatalogListClientProps {
-  initialItems: any[];
+  initialProducts: any[];
   vendorId: string;
 }
 
-export function CatalogListClient({ initialItems, vendorId }: CatalogListClientProps) {
+export function CatalogListClient({ initialProducts, vendorId }: CatalogListClientProps) {
   const router = useRouter();
-  const [products, setItems] = useState<ItemWithDetails[]>(initialItems as ItemWithDetails[]);
+  const [products, setProducts] = useState<ProductWithDetails[]>(initialProducts as ProductWithDetails[]);
   const [search, setSearch] = useState('');
   const [showProductForm, setShowProductForm] = useState(false);
-  const [editingItem, setEditingItem] = useState<ItemWithDetails | null>(null);
-  const [deletingItem, setDeletingItem] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<ProductWithDetails | null>(null);
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
-  const filteredItems = products.filter(product =>
+  const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(search.toLowerCase()) ||
     (product as any).category?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleToggleActive = async (itemId: string, isActive: boolean) => {
+  const handleToggleActive = async (productId: string, isActive: boolean) => {
     const result = await executeVendorIntent({
       entity: 'product',
       action: 'TOGGLE_STATUS',
-      id: itemId,
+      id: productId,
       metadata: { isActive }
     });
     if (result.success) {
-      setItems(prev => prev.map(product =>
-        product.id === itemId ? { ...product, is_active: isActive } : product
+      setProducts(prev => prev.map(product =>
+        product.id === productId ? { ...product, is_active: isActive } : product
       ));
       toast.success(isActive ? 'Product activated' : 'Product deactivated');
     } else {
@@ -62,16 +62,16 @@ export function CatalogListClient({ initialItems, vendorId }: CatalogListClientP
     }
   };
 
-  const handleToggleStock = async (itemId: string, stockStatus: string) => {
+  const handleToggleStock = async (productId: string, stockStatus: string) => {
     const result = await executeVendorIntent({
       entity: 'product',
       action: 'TOGGLE_STOCK',
-      id: itemId,
+      id: productId,
       metadata: { stockStatus }
     });
     if (result.success) {
-      setItems(prev => prev.map(product =>
-        product.id === itemId ? { ...product, is_active: stockStatus === 'IN_STOCK' } : product
+      setProducts(prev => prev.map(product =>
+        product.id === productId ? { ...product, is_active: stockStatus === 'IN_STOCK' } : product
       ));
       toast.success('Stock status updated');
     } else {
@@ -79,39 +79,39 @@ export function CatalogListClient({ initialItems, vendorId }: CatalogListClientP
     }
   };
 
-  const handleEditItem = async (product: Product) => {
-    const result = await getItemWithFullSpec(product.id);
+  const handleEditProduct = async (product: Product) => {
+    const result = await getProductWithFullSpec(product.id);
 
     if (result.data) {
       // Swiggy Pattern: Ensure full specification is passed to the editing sheet
-      setEditingItem(result.data as ItemWithDetails);
+      setEditingProduct(result.data as ProductWithDetails);
     } else {
-      // Fallback if getItemWithDetails fails
-      setEditingItem({
+      // Fallback
+      setEditingProduct({
         ...product,
         product_variants: [],
         personalization_options: [],
         vendors: (product as any).vendors || {} as any,
-        item_addons: []
-      } as ItemWithDetails);
+        product_addons: []
+      } as ProductWithDetails);
     }
   };
 
-  const handleDeleteItem = async () => {
-    if (!deletingItem) return;
+  const handleDeleteProduct = async () => {
+    if (!deletingProduct) return;
 
     const result = await executeVendorIntent({
       entity: 'product',
       action: 'DELETE',
-      id: deletingItem.id
+      id: deletingProduct.id
     });
     if (result.success) {
-      setItems(prev => prev.filter(product => product.id !== deletingItem.id));
+      setProducts(prev => prev.filter(product => product.id !== deletingProduct.id));
       toast.success('Product deleted');
     } else {
       toast.error(result.error || 'Failed to delete');
     }
-    setDeletingItem(null);
+    setDeletingProduct(null);
   };
 
   const handleFormSuccess = () => {
@@ -136,7 +136,7 @@ export function CatalogListClient({ initialItems, vendorId }: CatalogListClientP
         </Button>
       </div>
 
-      {filteredItems.length === 0 ? (
+      {filteredProducts.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border border-zinc-100">
           <Package className="size-12 text-zinc-300 mx-auto mb-3" />
           {search ? (
@@ -166,11 +166,11 @@ export function CatalogListClient({ initialItems, vendorId }: CatalogListClientP
         </div>
       ) : (
         <CatalogList
-          products={filteredItems as any}
+          products={filteredProducts as any}
           onToggleActive={handleToggleActive}
           onToggleStock={handleToggleStock}
-          onEdit={handleEditItem}
-          onDelete={setDeletingItem}
+          onEdit={handleEditProduct}
+          onDelete={setDeletingProduct}
         />
       )}
 
@@ -181,28 +181,28 @@ export function CatalogListClient({ initialItems, vendorId }: CatalogListClientP
         onSuccess={handleFormSuccess}
       />
 
-      {editingItem && (
+      {editingProduct && (
         <ProductForm
           vendorId={vendorId}
-          product={editingItem}
-          open={!!editingItem}
-          onOpenChange={(open) => !open && setEditingItem(null)}
+          product={editingProduct}
+          open={!!editingProduct}
+          onOpenChange={(open) => !open && setEditingProduct(null)}
           onSuccess={handleFormSuccess}
         />
       )}
 
-      <AlertDialog open={!!deletingItem} onOpenChange={(open) => !open && setDeletingItem(null)}>
+      <AlertDialog open={!!deletingProduct} onOpenChange={(open) => !open && setDeletingProduct(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete product?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete &quot;{deletingItem?.name}&quot;. This action cannot be undone.
+              This will permanently delete &quot;{deletingProduct?.name}&quot;. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDeleteItem}
+              onClick={handleDeleteProduct}
               className="bg-red-600 hover:bg-red-700"
             >
               Delete

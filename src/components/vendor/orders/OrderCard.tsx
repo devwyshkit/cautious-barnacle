@@ -84,7 +84,7 @@ const STATUS_COLORS: Partial<Record<OrderStatus, string>> = {
 export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdating }: OrderCardProps) {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [selectedOrderItemId, setSelectedOrderItemId] = useState<string | null>(null);
+  const [selectedOrderProductId, setSelectedOrderProductId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [designDeadlineLeft, setDesignDeadlineLeft] = useState<number | null>(null);
@@ -331,7 +331,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                                 size="sm"
                                 className="h-6 px-2 text-[11px] bg-white text-zinc-900 border-none hover:bg-zinc-100"
                                 onClick={() => {
-                                  setSelectedOrderItemId(product.id);
+                                  setSelectedOrderProductId(product.id);
                                   setShowPreviewModal(true);
                                 }}
                               >
@@ -457,16 +457,16 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
       </ResponsiveSurface>
       <PreviewUploader
         orderId={order.id}
-        orderItemId={selectedOrderItemId || ''}
+        orderProductId={selectedOrderProductId || ''}
         orderNumber={order.order_number!}
         isOpen={showPreviewModal}
         onClose={() => {
           setShowPreviewModal(false);
-          setSelectedOrderItemId(null);
+          setSelectedOrderProductId(null);
         }}
         onSuccess={() => {
           setShowPreviewModal(false);
-          setSelectedOrderItemId(null);
+          setSelectedOrderProductId(null);
           // Status update is handled inside PreviewUploader via lib/actions
         }}
       />

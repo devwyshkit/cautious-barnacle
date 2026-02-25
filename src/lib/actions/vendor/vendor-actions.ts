@@ -7,8 +7,8 @@ import {
   Address,
   Vendor,
   Product,
-  OrderItem,
-  OrderWithItems,
+  OrderProduct,
+  OrderWithProducts,
   Tables
 } from '@/lib/supabase/types';
 import { ShadowfaxService } from '@/lib/services/shadowfax';
@@ -123,14 +123,14 @@ export async function reject_order(
   });
 }
 
-export type ItemWithCounts = Product & {
+export type ProductWithCounts = Product & {
   variants_count?: number;
   total_stock?: number;
   personalization_count?: number;
   product_variants: Partial<Tables<'product_variants'>>[];
 };
 
-export async function get_vendor_items(vendor_id: string): Promise<{ data?: ItemWithCounts[]; error?: string }> {
+export async function get_vendor_products(vendor_id: string): Promise<{ data?: ProductWithCounts[]; error?: string }> {
   try {
     const supabase = await createClient();
 
@@ -146,7 +146,7 @@ export async function get_vendor_items(vendor_id: string): Promise<{ data?: Item
 
     if (error) throw error;
 
-    const enriched_items: ItemWithCounts[] = (products as any[] || []).map(product => ({
+    const enriched_products: ProductWithCounts[] = (products as any[] || []).map(product => ({
       ...product,
       variants_count: product.product_variants?.length || 0,
       total_stock: (product.product_variants || []).reduce((sum: number, v: any) => sum + (v.stock_quantity || 0), 0),
@@ -154,9 +154,9 @@ export async function get_vendor_items(vendor_id: string): Promise<{ data?: Item
       product_variants: product.product_variants || []
     }));
 
-    return { data: enriched_items };
+    return { data: enriched_products };
   } catch (error) {
-    logError(error, 'get_vendor_items');
+    logError(error, 'get_vendor_products');
     return { error: 'Failed to fetch products' };
   }
 }
@@ -334,7 +334,7 @@ export async function upload_preview(
   }
 }
 
-export async function toggle_item_active_status(
+export async function toggle_product_active_status(
   product_id: string,
   is_active: boolean
 ): Promise<{ success: boolean; error?: string }> {
@@ -352,7 +352,7 @@ export async function toggle_item_active_status(
     revalidatePath('/');
     return { success: true };
   } catch (error) {
-    logError(error, 'toggle_item_active_status');
+    logError(error, 'toggle_product_active_status');
     return { success: false, error: 'Failed to update product status' };
   }
 }

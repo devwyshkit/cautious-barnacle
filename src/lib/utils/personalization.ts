@@ -10,14 +10,14 @@ export interface PersonalizationCheckItem {
 }
 
 /**
- * Universal check to see if an product requires personalization input.
+ * Universal check to see if a product requires personalization input.
  * Supports both Legacy (is_personalized flag) and New (Add-ons with requires_preview).
  */
 /**
- * Checks if an product has active personalization requirements.
+ * Checks if a product has active personalization requirements.
  * Swiggy 2026: Narrowed to prevent over-triggering badges.
  */
-export function hasItemPersonalization(product: any): boolean {
+export function hasProductPersonalization(product: any): boolean {
   if (!product) return false;
 
   // 1. Explicit Personalization Options (JSONB array from DB - Products table)
@@ -43,14 +43,14 @@ export function hasItemPersonalization(product: any): boolean {
  * Checks if a list of products contains any that require personalization.
  */
 export function hasAnyPersonalization(products: PersonalizationCheckItem[]): boolean {
-  return products.some(hasItemPersonalization);
+  return products.some(hasProductPersonalization);
 }
 
 /**
  * Checks if an order or a list of products has any personalized components.
  * Supports both order object (direct flag) and product list (iterative check).
  */
-export function orderHasPersonalizedItems(input: { has_personalization?: boolean | null } | Array<{ has_personalization?: boolean | null }>): boolean {
+export function orderHasPersonalizedProducts(input: { has_personalization?: boolean | null } | Array<{ has_personalization?: boolean | null }>): boolean {
   if (Array.isArray(input)) {
     return input.some(product => !!product.has_personalization);
   }

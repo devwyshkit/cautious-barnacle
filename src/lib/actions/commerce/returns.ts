@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { ORDER_STATUS } from '@/lib/types/order-status';
-import { orderHasPersonalizedItems } from '@/lib/utils/personalization';
+import { orderHasPersonalizedProducts } from '@/lib/utils/personalization';
 import type { Order } from '@/lib/supabase/types';
 import { logError, handleActionError } from '@/lib/utils/error-handler';
 import { update_order_status } from '@/lib/actions/commerce/orders';
@@ -59,7 +59,7 @@ export async function initiateReturn({ orderId, reason, description, images }: I
       return { error: 'Only delivered orders can be returned' };
     }
 
-    const isPersonalized = orderHasPersonalizedItems(order as Order);
+    const isPersonalized = orderHasPersonalizedProducts(order as Order);
 
     // Enforce return policy: No refund for personalized products unless wrong or damaged
     if (isPersonalized && !['wrong_item', 'damaged'].includes(reason)) {

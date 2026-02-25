@@ -46,7 +46,7 @@ export default async function VendorPage({
 }
 
 async function AsyncVendorContent({ id, category }: { id: string; category?: string }) {
-  const { vendor, products, itemsGroupedByCategory, categories, error } = await getVendorStoreData(id, category);
+  const { vendor, products, productsGroupedByCategory, categories, error } = await getVendorStoreData(id, category);
 
   if (!vendor || error) {
     notFound();
@@ -57,7 +57,7 @@ async function AsyncVendorContent({ id, category }: { id: string; category?: str
       vendorId={id}
       initialData={(vendor as unknown) as MappedVendor}
       products={products}
-      itemsGroupedByCategory={itemsGroupedByCategory}
+      productsGroupedByCategory={productsGroupedByCategory}
       categories={categories}
     />
   );

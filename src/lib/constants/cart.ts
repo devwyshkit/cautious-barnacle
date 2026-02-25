@@ -11,6 +11,6 @@ export const EMPTY_CART: DraftTransaction = {
     discount: 0,
     wallet_discount: 0,
     total: 0,
-    item_count: 0,
+    product_count: 0,
     cashback_amount: 0
 };

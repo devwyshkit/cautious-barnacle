@@ -7,7 +7,7 @@ import { calculateOrderTotalRPC } from './pricing'
 import { logError } from '@/lib/utils/error-handler'
 import { logger } from '@/lib/logging/logger';
 import { calculateHaversineDistance } from '@/lib/utils/sla'
-import { hasItemPersonalization } from '@/lib/utils/personalization'
+import { hasProductPersonalization } from '@/lib/utils/personalization'
 import type { PricingBreakdown } from '@/components/customer/checkout/types'
 import type { DraftLineItem } from '@/lib/types/personalization'
 import type { Address } from '@/lib/types/address'

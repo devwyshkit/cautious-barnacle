@@ -217,7 +217,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
       <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2">
         {recentOrders.map((order, index) => {
           const firstItem = order.products?.[0];
-          const itemCount = order.products?.length || 0;
+          const productCount = order.products?.length || 0;
           const isReordering = reorderingId === order.id;
           const hasPersonalization = hasAnyPersonalization(order.products || []);
 
@@ -270,9 +270,9 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
                   <p className="text-sm font-semibold text-zinc-900 truncate">
                     {firstItem?.product_name || 'Order'}
                   </p>
-                  {itemCount > 1 && (
+                  {productCount > 1 && (
                     <p className="text-[11px] text-zinc-500">
-                      +{itemCount - 1} more product{itemCount > 2 ? 's' : ''}
+                      +{productCount - 1} more product{productCount > 2 ? 's' : ''}
                     </p>
                   )}
 

@@ -10,8 +10,8 @@ export type Order = Tables<'orders'>;
 export type User = Tables<'users'>;
 export type Address = Tables<'user_addresses'>;
 export type Variant = Tables<'product_variants'>;
-export type OrderItem = Tables<'order_products'>;
-export type OrderPersonalization = OrderItem['personalization_details'];
+export type OrderProduct = Tables<'order_products'>;
+export type OrderPersonalization = OrderProduct['personalization_details'];
 export type Return = Tables<'returns'>;
 export type UserRole = Tables<'user_roles'>;
 
@@ -35,8 +35,8 @@ export const mapLegacyStatus = (status: string): OrderStatus => {
 // WYSHKIT 2026: Composite Types for Joins (Single Source of Truth)
 // Use these instead of `as any` when querying with joins
 
-export type OrderWithItems = Order & {
-    order_products: (OrderItem & {
+export type OrderWithProducts = Order & {
+    order_products: (OrderProduct & {
         personalization_details: any;
     })[];
     vendors: Pick<Vendor, 'name' | 'image_url'> | null;
@@ -44,7 +44,7 @@ export type OrderWithItems = Order & {
 
 // For `getOrderWithHistory` return type
 export interface OrderDetails extends Order {
-    order_products: OrderItem[];
+    order_products: OrderProduct[];
     vendors?: {
         name: string;
         image_url: string | null;
@@ -55,15 +55,15 @@ export interface OrderDetails extends Order {
     vendor_image?: string | null;
 }
 
-export type ItemWithVendor = Product & {
+export type ProductWithVendor = Product & {
     vendors: Pick<Vendor, 'id' | 'name' | 'slug' | 'image_url'> | null;
 };
 
-export type ItemListing = Pick<Product, 'id' | 'name' | 'slug' | 'base_price' | 'images' | 'rating' | 'total_ratings' | 'category_id' | 'has_personalization' | 'is_perishable' | 'production_time_minutes' | 'preview_time_minutes'> & {
+export type ProductListing = Pick<Product, 'id' | 'name' | 'slug' | 'base_price' | 'images' | 'rating' | 'total_ratings' | 'category_id' | 'has_personalization' | 'is_perishable' | 'production_time_minutes' | 'preview_time_minutes'> & {
     vendors: Pick<Vendor, 'id' | 'name' | 'slug' | 'city' | 'is_online' | 'is_active'> | null;
 };
 
-export type ItemWithFullSpec = Product & {
+export type ProductWithFullSpec = Product & {
     vendors: Pick<Vendor, 'id' | 'name' | 'slug' | 'city' | 'rating' | 'image_url' | 'gstin' | 'is_active'> | null;
     product_variants: Variant[];
 };

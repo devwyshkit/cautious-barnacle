@@ -41,7 +41,7 @@ export default async function OrdersPage() {
             order_number: row.order_number ?? null,
             created_at: row.created_at ?? null,
             vendor_name: row.vendors?.name ?? null,
-            item_count: row.order_products?.length || 1,
+            product_count: row.order_products?.length || 1,
             first_product_name: row.vendors?.image_url || row.order_products?.[0]?.product_name || null,
             has_personalization: row.has_personalization || false,
             personalization_status: p_status,

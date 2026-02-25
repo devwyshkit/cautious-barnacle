@@ -12,9 +12,9 @@ import { createClient } from "@/lib/supabase/client";
 // import { submitItemReview } from "@/lib/actions/vendor/catalog";
 import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
 
-interface ItemReviewsProps {
+interface ProductReviewsProps {
   itemId: string;
-  orderItemId?: string; // WYSHKIT 2026: Link to the specific order item
+  orderProductId?: string; // WYSHKIT 2026: Link to the specific order product
   approvedMockupUrl?: string; // WYSHKIT 2026: Pass the mockup seen by customer
   initialReviews?: Array<{
     id: string;
@@ -31,7 +31,7 @@ interface ItemReviewsProps {
   }>;
 }
 
-export function ItemReviews({ itemId, orderItemId, approvedMockupUrl, initialReviews }: ItemReviewsProps) {
+export function ProductReviews({ itemId, orderProductId, approvedMockupUrl, initialReviews }: ProductReviewsProps) {
   const { user } = useAuth();
 
   // WYSHKIT 2026: Use server-provided initial reviews (data comes to user)
@@ -89,7 +89,7 @@ export function ItemReviews({ itemId, orderItemId, approvedMockupUrl, initialRev
       const { data, error: rpc_error } = await (supabase.rpc as any)('add_item_review', {
         p_product_id: itemId,
         p_order_id: (reviews[0]?.order_id || null), // We should ideally pass this in props if available
-        p_order_item_id: orderItemId,
+        p_order_item_id: orderProductId,
         p_rating: rating,
         p_comment: comment.trim(),
         p_personalization_rating: personalizationRating,

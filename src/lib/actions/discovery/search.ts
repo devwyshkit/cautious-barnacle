@@ -3,10 +3,10 @@
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
-import { WyshkitItem } from '@/lib/types/product';
+import { WyshkitProduct } from '@/lib/types/product';
 import {
     SearchResultsSchema,
-    WyshkitItemSchema,
+    WyshkitProductSchema,
 } from '@/lib/validations/discovery';
 
 /**
@@ -27,7 +27,7 @@ export async function searchFiltered(options: {
     const { q, category, limit = 20, lat, lng } = options;
 
     // Combined query for products
-    let itemsQuery = supabase
+    let productsQuery = supabase
         .from('products')
         .select('*, vendors!inner(name, slug, city, state, is_active, location)')
         .eq('is_active', true)
@@ -40,7 +40,7 @@ export async function searchFiltered(options: {
         .eq('is_active', true);
 
     if (q && q.length >= 2) {
-        itemsQuery = itemsQuery.textSearch('fts', q, {
+        productsQuery = productsQuery.textSearch('fts', q, {
             type: 'websearch',
             config: 'english'
         });
@@ -48,12 +48,12 @@ export async function searchFiltered(options: {
     }
 
     if (category) {
-        itemsQuery = itemsQuery.ilike('category_id', category);
+        productsQuery = productsQuery.ilike('category_id', category);
     }
 
     // ELITE: Hyperlocal sorting if lat/lng provided
     if (lat && lng) {
-        itemsQuery = itemsQuery
+        productsQuery = productsQuery
             .order('location <-> st_setsrid(st_makepoint(?, ?), 4326)', {
                 ascending: true,
                 placeholder: [lng, lat]
@@ -66,18 +66,18 @@ export async function searchFiltered(options: {
             } as any);
     }
 
-    const [itemsResponse, vendorsResponse] = await Promise.all([
-        itemsQuery.limit(limit),
+    const [productsResponse, vendorsResponse] = await Promise.all([
+        productsQuery.limit(limit),
         vendorsQuery.limit(Math.floor(limit / 2))
     ]);
 
     const rawResults = {
-        products: (itemsResponse.data || []).map(product => ({
+        products: (productsResponse.data || []).map((product: any) => ({
             ...product,
             image_url: (product as any).images?.[0] || (product as any).image_url
         })),
         vendors: vendorsResponse.data || [],
-        total: (itemsResponse.data?.length || 0) + (vendorsResponse.data?.length || 0)
+        total: (productsResponse.data?.length || 0) + (vendorsResponse.data?.length || 0)
     };
 
     const validated = SearchResultsSchema.safeParse(rawResults);
@@ -93,7 +93,7 @@ export async function searchFiltered(options: {
  * Discovery Products Fetcher (Purified)
  * Handles infinite pagination and category filters.
  */
-export async function getFilteredItems(options: {
+export async function getFilteredProducts(options: {
     limit?: number;
     offset?: number;
     category?: string;
@@ -102,7 +102,7 @@ export async function getFilteredItems(options: {
     maxPrice?: number;
     lat?: number;
     lng?: number;
-} = {}): Promise<{ data?: { products: WyshkitItem[]; total: number }; error?: string }> {
+} = {}): Promise<{ data?: { products: WyshkitProduct[]; total: number }; error?: string }> {
     try {
         const supabase = await createClient();
         const { limit = 12, offset = 0, category, search, minPrice, maxPrice, lat, lng } = options;
@@ -149,13 +149,13 @@ export async function getFilteredItems(options: {
 
         if (error) throw error;
 
-        const validated = z.array(WyshkitItemSchema).safeParse(data);
+        const validated = z.array(WyshkitProductSchema).safeParse(data);
         if (!validated.success) {
-            logger.error('Zod Validation Failed: getFilteredItems', validated.error);
+            logger.error('Zod Validation Failed: getFilteredProducts', validated.error);
             return { data: { products: (data || []) as any, total: count || 0 } };
         }
 
-        return { data: { products: validated.data as unknown as WyshkitItem[], total: count || 0 } };
+        return { data: { products: validated.data as unknown as WyshkitProduct[], total: count || 0 } };
     } catch (error) {
         logger.error('Failed to fetch filtered products in Discovery', error, { options });
         return { error: 'Failed to fetch products' };

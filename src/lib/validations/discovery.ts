@@ -46,7 +46,7 @@ export const VendorSchema = z.object({
     gstin: z.string().nullable().optional(),
 }).passthrough();
 
-export const WyshkitItemSchema = z.object({
+export const WyshkitProductSchema = z.object({
     id: z.string(),
     name: z.string(),
     description: z.string().nullable(),
@@ -64,7 +64,7 @@ export const WyshkitItemSchema = z.object({
     vendor_name: z.string().nullable().optional(),
     vendors: VendorSchema.nullable().optional(),
     variants: z.array(z.any()).nullable().optional(), // Will refine later
-    item_addons: z.array(z.any()).nullable().optional(),
+    product_addons: z.array(z.any()).nullable().optional(),
     personalization_options: z.array(z.any()).nullable().optional(),
 
     // Search Metadata
@@ -90,13 +90,13 @@ export const HomeSurfaceSchema = z.object({
 });
 
 export const SearchResultsSchema = z.object({
-    products: z.array(WyshkitItemSchema),
+    products: z.array(WyshkitProductSchema),
     vendors: z.array(VendorSchema),
     total: z.number(),
 });
 
 export type ValidatedCategory = z.infer<typeof CategorySchema>;
 export type ValidatedVendor = z.infer<typeof VendorSchema>;
-export type ValidatedWyshkitItem = z.infer<typeof WyshkitItemSchema>;
+export type ValidatedWyshkitProduct = z.infer<typeof WyshkitProductSchema>;
 export type ValidatedHomeSurface = z.infer<typeof HomeSurfaceSchema>;
 export type ValidatedSearchResults = z.infer<typeof SearchResultsSchema>;

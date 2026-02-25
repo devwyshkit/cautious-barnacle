@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { cn } from '@/lib/utils';
-import { InfiniteItemsGrid } from '@/components/customer/home/InfiniteProductsGrid';
+import { InfiniteProductsGrid } from '@/components/customer/home/InfiniteProductsGrid';
 
 /**
  * WYSHKIT 2026: Server-Driven UI Engine
@@ -57,8 +57,8 @@ export function BlocksEngine({ blocks, className, context }: BlocksEngineProps) 
                 return <VendorGroupedGrid data={block.data} title={block.title} subtitle={block.subtitle} context={context} />;
             case 'INFINITE_GRID':
                 return (
-                    <InfiniteItemsGrid
-                        initialItems={block.data || []}
+                    <InfiniteProductsGrid
+                        initialProducts={block.data || []}
                         category={block.metadata?.category || null}
                         totalCount={block.metadata?.totalCount}
                         startOffset={block.data?.length || 0}

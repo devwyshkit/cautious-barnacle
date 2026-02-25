@@ -13,10 +13,10 @@ import { formatCurrency } from '@/lib/utils/pricing';
 
 const FALLBACK_IMAGE = '/images/logo.png';
 
-import { WyshkitItem } from '@/lib/types/product';
+import { WyshkitProduct } from '@/lib/types/product';
 
 interface ProductDetailViewProps {
-    product: WyshkitItem;
+    product: WyshkitProduct;
     onBack?: () => void;
     /** When in sheet from vendor page, pass for optional View cart CTA. */
     vendorId?: string;

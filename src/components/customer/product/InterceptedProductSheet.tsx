@@ -5,7 +5,7 @@ import { ResponsiveSurface } from "@/components/ui/ResponsiveSurface";
 import { ProductDetailView } from '@/components/customer/product/ProductDetailView';
 import { z } from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { WyshkitItem } from '@/lib/types/product';
+import { WyshkitProduct } from '@/lib/types/product';
 
 const checkoutStateSchema = z.object({
     edit: z.string().optional(),
@@ -16,7 +16,7 @@ const checkoutStateSchema = z.object({
 });
 
 interface InterceptedProductSheetProps {
-    product: WyshkitItem;
+    product: WyshkitProduct;
     onCloseOverride?: string;
 }
 

@@ -8,7 +8,7 @@ import { ActionSlider } from '@/components/ui/ActionSlider';
 import { PreviewSubmission } from '@/lib/types/order';
 import { SubmittedIdentity } from './tracking/SubmittedIdentity';
 
-interface PreviewOrderItemContext {
+interface PreviewOrderProductContext {
     personalization_details: Record<string, unknown>;
     product_name: string;
 }
@@ -22,7 +22,7 @@ interface PreviewApprovalProps {
     onReject?: () => void;
     isApproving: boolean;
     isRejecting?: boolean;
-    orderItem?: PreviewOrderItemContext;
+    orderProduct?: PreviewOrderProductContext;
 }
 
 export function PreviewApproval({
@@ -34,7 +34,7 @@ export function PreviewApproval({
     onReject,
     isApproving,
     isRejecting = false,
-    orderItem
+    orderProduct
 }: PreviewApprovalProps) {
     const [showFeedback, setShowFeedback] = useState(false);
     const [showContext, setShowContext] = useState(false);
@@ -57,7 +57,7 @@ export function PreviewApproval({
             </div>
 
             {/* WYSHKIT 2026: Requirement Context (Cross-Verification) */}
-            {orderItem?.personalization_details && (
+            {orderProduct?.personalization_details && (
                 <div className="bg-zinc-50 rounded-xl border border-zinc-100 overflow-hidden">
                     <button
                         onClick={() => setShowContext(!showContext)}
@@ -72,8 +72,8 @@ export function PreviewApproval({
                     {showContext && (
                         <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-300">
                             <SubmittedIdentity
-                                details={orderItem.personalization_details as any}
-                                itemName={orderItem.product_name}
+                                details={orderProduct.personalization_details as any}
+                                itemName={orderProduct.product_name}
                             />
                         </div>
                     )}

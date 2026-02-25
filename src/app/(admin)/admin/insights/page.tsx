@@ -23,7 +23,7 @@ async function getInsights() {
     weekOrders,
     monthOrders,
     topVendors,
-    topItems,
+    topProducts,
     ordersByStatus,
   ] = await Promise.all([
     // Today's orders
@@ -62,14 +62,14 @@ async function getInsights() {
     .slice(0, 5)
 
   // Calculate product leaderboard
-  const itemCounts: Record<string, { name: string; count: number }> = {}
-  for (const product of (topItems.data || []) as { product_id?: string; quantity?: number; products?: { name?: string } }[]) {
+  const productCounts: Record<string, { name: string; count: number }> = {}
+  for (const product of (topProducts.data || []) as { product_id?: string; quantity?: number; products?: { name?: string } }[]) {
     const id = product.product_id ?? ''
     const name = product.products?.name || 'Unknown'
-    if (!itemCounts[id]) itemCounts[id] = { name, count: 0 }
-    itemCounts[id].count += product.quantity ?? 0
+    if (!productCounts[id]) productCounts[id] = { name, count: 0 }
+    productCounts[id].count += product.quantity ?? 0
   }
-  const topItemsList = Object.values(itemCounts)
+  const topProductsList = Object.values(productCounts)
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
@@ -86,7 +86,7 @@ async function getInsights() {
     week: { gmv: weekGMV, orders: (weekOrders.data || []).length },
     month: { gmv: monthGMV, orders: (monthOrders.data || []).length },
     topVendors: topVendorsList,
-    topItems: topItemsList,
+    topProducts: topProductsList,
     statusDistribution: statusCounts,
   }
 }
@@ -196,11 +196,11 @@ export default async function InsightsPage() {
             <CardTitle className="text-sm font-medium">Top products</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            {insights.topItems.length === 0 ? (
+            {insights.topProducts.length === 0 ? (
               <p className="p-4 text-sm text-zinc-500">No data yet</p>
             ) : (
               <div className="divide-y">
-                {insights.topItems.map((product, i) => (
+                {insights.topProducts.map((product, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-zinc-400 w-4">{i + 1}</span>

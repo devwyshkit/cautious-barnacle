@@ -9,8 +9,8 @@ import { PersonalizationConfig } from '@/lib/types/personalization';
 
 interface IdentityProductFieldProps {
     product: any;
-    itemIndex: number;
-    totalItems: number;
+    productIndex: number;
+    totalProducts: number;
     config: PersonalizationConfig;
     schema?: any[];
     input: { text?: string; image_url?: string;[key: string]: any };
@@ -22,8 +22,8 @@ interface IdentityProductFieldProps {
 
 export function IdentityProductField({
     product,
-    itemIndex,
-    totalItems,
+    productIndex,
+    totalProducts,
     config,
     schema,
     input,
@@ -37,7 +37,7 @@ export function IdentityProductField({
 
     return (
         <section className="group transition-all">
-            {totalItems > 1 && (
+            {totalProducts > 1 && (
                 <div className="flex items-center gap-3 mb-4 px-2">
                     <div className="size-8 rounded-xl bg-zinc-900 flex items-center justify-center shadow-lg shadow-zinc-900/10">
                         <ShoppingBag className="size-4 text-white" />
@@ -46,7 +46,7 @@ export function IdentityProductField({
                         <h4 className="text-[12px] font-black text-zinc-950 tracking-tight truncate leading-none">
                             {product.product_name}
                         </h4>
-                        <p className="text-[11px] font-bold text-zinc-400 tracking-tight mt-1">Product {itemIndex + 1}</p>
+                        <p className="text-[11px] font-bold text-zinc-400 tracking-tight mt-1">Product {productIndex + 1}</p>
                     </div>
                     {!config.text_required && !config.image_required && (
                         <span className="text-[11px] font-black bg-zinc-100 text-zinc-400 px-2 py-1 rounded-lg tracking-tight border border-zinc-200/50">Optional</span>

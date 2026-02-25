@@ -38,7 +38,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FeedbackStep } from './FeedbackStep';
 import { formatCurrency } from '@/lib/utils/pricing';
 import { SurfaceErrorBoundaryWithRouter } from '@/components/error/SurfaceErrorBoundary';
-import { hasItemPersonalization } from '@/lib/utils/personalization';
+import { hasProductPersonalization } from '@/lib/utils/personalization';
 
 import { StatusCard } from './tracking/StatusCard';
 import { OrderTimeline } from './tracking/OrderTimeline';
@@ -246,7 +246,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
           <SurfaceErrorBoundaryWithRouter surfaceName="Products List">
             <OrderProductsList
               order={order as OrderDetail}
-              itemPreviews={itemPreviews}
+              productPreviews={itemPreviews}
               onPersonalizationSubmitted={handlePersonalizationSubmitted}
             />
           </SurfaceErrorBoundaryWithRouter>
@@ -265,7 +265,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                 orderId={orderId}
                 products={order.order_products?.map((product: any) => ({
                   id: product.product_id,
-                  order_item_id: product.id,
+                  orderProductId: product.id,
                   name: product.product_name,
                   is_personalized: product.is_personalized,
                   mockup_url: itemPreviews[product.id]?.preview_url

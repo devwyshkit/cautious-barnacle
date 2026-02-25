@@ -1,5 +1,5 @@
 import { getVendorFromSession } from '@/lib/auth/server';
-import { get_vendor_items } from '@/lib/actions/vendor/vendor-actions';
+import { get_vendor_products } from '@/lib/actions/vendor/vendor-actions';
 import { CatalogListClient } from '@/components/vendor/catalog/CatalogListClient';
 import { redirect } from 'next/navigation';
 
@@ -7,7 +7,7 @@ export default async function VendorCatalogPage() {
   const vendor = await getVendorFromSession();
   if (!vendor) redirect('/vendor/login');
 
-  const { data: products } = await get_vendor_items(vendor.id);
+  const { data: products } = await get_vendor_products(vendor.id);
 
   return (
     <div className="px-4 py-6">
@@ -19,7 +19,7 @@ export default async function VendorCatalogPage() {
       </div>
 
       <CatalogListClient
-        initialItems={products || []}
+        initialProducts={products || []}
         vendorId={vendor.id}
       />
     </div>

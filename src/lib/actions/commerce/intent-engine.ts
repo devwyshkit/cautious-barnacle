@@ -52,7 +52,7 @@ const TransitionOrderSchema = z.object({
     metadata: z.any().optional(),
 });
 
-const OrderItemInputSchema = z.object({
+const OrderProductInputSchema = z.object({
     product_id: z.string().uuid(),
     variant_id: z.string().uuid().nullable().optional(),
     quantity: z.number().int().positive(),
@@ -62,7 +62,7 @@ const OrderItemInputSchema = z.object({
 
 const PlaceOrderSchema = z.object({
     razorpay_order_id: z.string(),
-    products: z.array(OrderItemInputSchema).optional(),
+    products: z.array(OrderProductInputSchema).optional(),
     payment_id: z.string().optional(),
     address_id: z.string().uuid().optional(),
     coupon_code: z.string().optional(),
@@ -75,7 +75,7 @@ const PlaceOrderSchema = z.object({
 const CommerceIntentSchema = z.discriminatedUnion('intent', [
     z.object({ intent: z.literal('ADD_TO_CART'), payload: AddToCartSchema }),
     z.object({ intent: z.literal('UPDATE_CART_QUANTITY'), payload: UpdateCartSchema }),
-    z.object({ intent: z.literal('UPDATE_CART_ITEM'), payload: AddToCartSchema }), // Uses same schema
+    z.object({ intent: z.literal('UPDATE_CART_PRODUCT'), payload: AddToCartSchema }), // Uses same schema
     z.object({ intent: z.literal('APPLY_COUPON'), payload: ApplyCouponSchema }),
     z.object({ intent: z.literal('TOGGLE_WALLET'), payload: ToggleWalletSchema }),
     z.object({ intent: z.literal('SET_ADDRESS'), payload: SetAddressSchema }),
@@ -105,7 +105,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
         const isMutation = [
             'ADD_TO_CART',
             'UPDATE_CART_QUANTITY',
-            'UPDATE_CART_ITEM',
+            'UPDATE_CART_PRODUCT',
             'APPLY_COUPON',
             'TOGGLE_WALLET',
             'SET_ADDRESS',
@@ -231,7 +231,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     return { success: true, data };
                 }
 
-                case 'UPDATE_CART_ITEM': {
+                case 'UPDATE_CART_PRODUCT': {
                     const { data, error } = await supabase.rpc('execute_cart_mutation', {
                         p_product_id: validated.payload.product_id,
                         p_quantity: validated.payload.quantity ?? 1,

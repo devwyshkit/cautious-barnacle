@@ -18,7 +18,7 @@ export function OrderCard({ order }: OrderCardProps) {
   const status = order.status ?? 'UNKNOWN';
   const total = order.total ?? 0;
   const created_at = order.created_at ?? '';
-  const item_count = order.item_count ?? 1;
+  const product_count = order.product_count ?? 1;
 
   const isActive = ['PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED', 'OUT_FOR_DELIVERY'].includes(status);
 

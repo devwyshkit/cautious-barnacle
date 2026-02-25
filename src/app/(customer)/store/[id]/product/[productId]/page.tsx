@@ -5,18 +5,18 @@ import { notFound } from 'next/navigation';
 import { MappedVendor } from '@/lib/types/vendor';
 
 
-export default async function ItemPage({
+export default async function ProductFullPage({
   params,
 }: {
-  params: Promise<{ id: string; itemId: string }>;
+  params: Promise<{ id: string; productId: string }>;
 }) {
-  const { id, itemId } = await params;
+  const { id, productId } = await params;
 
   // WYSHKIT 2026: Immersive Store Context
-  // Tapping a shared link to an product should show the store in the background, not a standalone page.
-  const { vendor, products, itemsGroupedByCategory, categories, error } = await getVendorStoreData(id);
+  // Tapping a shared link to a product should show the store in the background, not a standalone page.
+  const { vendor, products, productsGroupedByCategory, categories, error } = await getVendorStoreData(id);
 
-  const product = products?.find(i => String(i.id) === itemId);
+  const product = products?.find(i => String(i.id) === productId);
 
   if (!vendor || !product || error) {
     notFound();
@@ -28,13 +28,13 @@ export default async function ItemPage({
         vendorId={id}
         initialData={(vendor as unknown) as MappedVendor}
         products={products}
-        itemsGroupedByCategory={itemsGroupedByCategory}
+        productsGroupedByCategory={productsGroupedByCategory}
         categories={categories}
       />
 
       <InterceptedProductSheet
         product={product}
-        onCloseOverride={`/vendor/${id}`}
+        onCloseOverride={`/store/${id}`}
       />
     </div>
   );

@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Database } from '@/lib/supabase/database.types';
 import { useRealtime } from '@/providers/RealtimeProvider';
 import { OrderStatus } from '@/lib/types/order-status';
-import { OrderItemDetail, OrderDetail, PreviewSubmission } from '@/lib/types/order';
+import { OrderProductDetail, OrderDetail, PreviewSubmission } from '@/lib/types/order';
 
 export type RequirementStatus = 'pending' | 'submitted' | 'accepted' | 'clarification_needed' | 'approved' | 'rejected' | null;
 
@@ -196,13 +196,13 @@ export function useOrderRealtime({
       'postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'order_products', filter: `order_id=eq.${orderId}` },
       (payload) => {
-        const updatedItem = payload.new as OrderItemDetail;
+        const updatedProduct = payload.new as OrderProductDetail;
         setOrder(prev => {
           if (!prev || !prev.order_products) return prev;
           return {
             ...prev,
             order_products: prev.order_products.map(product =>
-              product.id === updatedItem.id ? { ...product, ...updatedItem } : product
+              product.id === updatedProduct.id ? { ...product, ...updatedProduct } : product
             ),
           };
         });

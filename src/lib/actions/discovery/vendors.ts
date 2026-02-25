@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
 import { handleActionError } from '@/lib/utils/error-handler';
 import { MappedVendor } from '@/lib/types/vendor';
-import { WyshkitItem } from '@/lib/types/product';
+import { WyshkitProduct } from '@/lib/types/product';
 
 /**
  * WYSHKIT 2026: Vendor & Store Actions
@@ -75,7 +75,7 @@ export const getVendorStoreData = cache(async (vendorId: string, category?: stri
             logger.error('Products fetch failed in getVendorStoreData', itemsError, { vendorId });
         }
 
-        const products = (itemsData as unknown as WyshkitItem[]) || [];
+        const products = (itemsData as unknown as WyshkitProduct[]) || [];
 
         // 3. Fetch Distinct Categories for this Vendor (for navigation/filtering)
         const { data: catData } = await supabase
@@ -97,7 +97,7 @@ export const getVendorStoreData = cache(async (vendorId: string, category?: stri
         return {
             vendor,
             products: products.map(product => ({ ...product, vendor_name: vendor.name })),
-            itemsGroupedByCategory: groupedItems,
+            productsGroupedByCategory: groupedItems,
             categories: [{ id: 'all', name: 'All', slug: 'All' }, ...categories],
             error: null
         };
@@ -107,11 +107,11 @@ export const getVendorStoreData = cache(async (vendorId: string, category?: stri
     }
 });
 
-export async function getItemVendor(itemId: string) {
+export async function getProductVendor(productId: string) {
     const supabase = await createClient();
     const query = supabase.from('products')
         .select('vendor_id')
-        .eq('id', itemId)
+        .eq('id', productId)
         .eq('is_active', true);
 
     const { data, error } = await query.maybeSingle();

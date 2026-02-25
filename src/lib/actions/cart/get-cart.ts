@@ -108,7 +108,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
             wallet_discount: Number(dbRes.wallet_discount) || 0,
             total: Number(dbRes.total) || 0,
             cashback_amount: Number((dbRes as any).cashback_amount) || 0,
-            item_count: products.reduce((sum, product) => sum + product.quantity, 0),
+            product_count: products.reduce((sum, product) => sum + product.quantity, 0),
             applied_coupon: sessionData.applied_coupon,
             use_wallet: sessionData.use_wallet || false,
             selected_address_id: sessionData.selected_address_id,

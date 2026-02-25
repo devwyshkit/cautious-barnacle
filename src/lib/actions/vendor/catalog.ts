@@ -11,7 +11,7 @@ import type { Database, Json } from '@/lib/supabase/database.types';
  * Standardized for Vendor Catalog Management.
  */
 
-export type ItemInput = {
+export type ProductInput = {
     name: string;
     description?: string;
     base_price: number;
@@ -28,7 +28,7 @@ export type ItemInput = {
     hsn_code?: string;
     gst_percentage?: number;
     personalization_options?: any;
-    item_addons?: any;
+    product_addons?: any;
 };
 
 export type VariantInput = {
@@ -52,7 +52,7 @@ const CATEGORY_TAX_MAP: Record<string, { hsn: string; gst: number }> = {
 /**
  * Create product mutation
  */
-export async function createItem(vendorId: string, input: ItemInput) {
+export async function createProduct(vendorId: string, input: ProductInput) {
     try {
         if (!vendorId) return { error: 'Invalid Vendor ID' };
         const supabase = await createClient();
@@ -108,15 +108,15 @@ export async function createItem(vendorId: string, input: ItemInput) {
 /**
  * Update product mutation
  */
-export async function updateItem(itemId: string, input: Partial<ItemInput>) {
+export async function updateProduct(productId: string, input: Partial<ProductInput>) {
     try {
-        if (!itemId) return { success: false, error: 'Invalid Product ID' };
+        if (!productId) return { success: false, error: 'Invalid Product ID' };
         const supabase = await createClient();
 
         const { data: existing } = await supabase
             .from('products')
             .select('vendor_id')
-            .eq('id', itemId)
+            .eq('id', productId)
             .single();
 
         const { error } = await supabase
@@ -126,7 +126,7 @@ export async function updateItem(itemId: string, input: Partial<ItemInput>) {
                 updated_at: new Date().toISOString(),
                 personalization_options: input.personalization_options !== undefined ? input.personalization_options : undefined,
             } as any)
-            .eq('id', itemId);
+            .eq('id', productId);
 
         if (error) throw error;
 
@@ -135,7 +135,7 @@ export async function updateItem(itemId: string, input: Partial<ItemInput>) {
         revalidatePath('/');
         return { success: true };
     } catch (error) {
-        logger.error('Failed to update product', error, { itemId });
+        logger.error('Failed to update product', error, { productId });
         return { success: false, error: 'Failed to update product' };
     }
 }
@@ -143,23 +143,23 @@ export async function updateItem(itemId: string, input: Partial<ItemInput>) {
 /**
  * Delete product mutation
  */
-export async function deleteItem(itemId: string) {
+export async function deleteProduct(productId: string) {
     try {
         const supabase = await createClient();
 
         const { data: existing } = await supabase
             .from('products')
             .select('vendor_id')
-            .eq('id', itemId)
+            .eq('id', productId)
             .single();
 
         // Cascade deletions (variants)
-        await supabase.from('product_variants').delete().eq('product_id', itemId);
+        await supabase.from('product_variants').delete().eq('product_id', productId);
 
         const { error } = await supabase
             .from('products')
             .delete()
-            .eq('id', itemId);
+            .eq('id', productId);
 
         if (error) throw error;
 
@@ -168,7 +168,7 @@ export async function deleteItem(itemId: string) {
         revalidatePath('/');
         return { success: true };
     } catch (error) {
-        logger.error('Failed to delete product', error, { itemId });
+        logger.error('Failed to delete product', error, { productId });
         return { success: false, error: 'Failed to delete product' };
     }
 }
@@ -177,13 +177,13 @@ export async function deleteItem(itemId: string) {
 /**
  * Variant mutations
  */
-export async function createVariant(itemId: string, input: VariantInput) {
+export async function createVariant(productId: string, input: VariantInput) {
     try {
         const supabase = await createClient();
         const { data, error } = await supabase
             .from('product_variants')
             .insert({
-                product_id: itemId,
+                product_id: productId,
                 name: input.name,
                 price: input.price,
                 mrp: input.mrp || null,
@@ -199,7 +199,7 @@ export async function createVariant(itemId: string, input: VariantInput) {
         revalidatePath('/vendor/catalog');
         return { data: { id: data.id } };
     } catch (error) {
-        logger.error('Failed to create variant', error, { itemId });
+        logger.error('Failed to create variant', error, { productId });
         return { error: 'Failed to create variant' };
     }
 }
@@ -241,19 +241,19 @@ export async function deleteVariant(variantId: string) {
 }
 
 
-export async function toggleItemActive(itemId: string, isActive: boolean) {
+export async function toggleProductActive(productId: string, isActive: boolean) {
     try {
         const supabase = await createClient();
         const { error } = await supabase
             .from('products')
             .update({ is_active: isActive })
-            .eq('id', itemId);
+            .eq('id', productId);
         if (error) throw error;
         revalidatePath('/vendor/catalog');
         revalidatePath('/');
         return { success: true };
     } catch (error) {
-        logger.error('Failed to toggle product active status', error, { itemId });
+        logger.error('Failed to toggle product active status', error, { productId });
         return { success: false, error: 'Failed to update status' };
     }
 }

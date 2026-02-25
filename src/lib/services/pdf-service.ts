@@ -1,8 +1,8 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { DraftTransaction as Cart, DraftLineItem } from '@/lib/types/personalization';
+import { DraftTransaction as Cart, DraftProductItem } from '@/lib/types/personalization';
 import { Address } from '@/lib/types/address';
-import { OrderItemDetail } from '@/lib/types/order';
+import { OrderProductDetail } from '@/lib/types/order';
 
 // Initialize autoTable
 const _autoTable = autoTable;
@@ -11,7 +11,7 @@ interface DocumentData {
     order_number?: string;
     date: string;
     cart?: Cart; // For checkout estimates
-    order_products?: OrderItemDetail[]; // For post-order documents
+    order_products?: OrderProductDetail[]; // For post-order documents
     gstin?: string;
     customer_name?: string;
     business_name?: string;
@@ -24,7 +24,7 @@ interface DocumentData {
         phone?: string;
     };
     totals: {
-        item_total: number;
+        product_total: number;
         delivery_fee: number;
         platform_fee: number;
         gst_amount: number;
@@ -106,13 +106,13 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     // Table
     const products = data.order_products || data.cart?.products || [];
     const tableBody = products.map(product => {
-        const itemName = (product as any).product_name || (product as any).product_name || 'Item';
+        const productName = (product as any).product_name || (product as any).product_name || 'Product';
         const quantity = product.quantity || 1;
         const unitPrice = product.unit_price || 0;
         const totalPrice = (product as any).total_price || (product as any).line_total || 0;
 
         return [
-            itemName,
+            productName,
             (product as any).hsn_code || '6912',
             quantity,
             `₹${unitPrice}`,
@@ -141,7 +141,7 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
 
     doc.setFont('helvetica', 'normal');
     doc.text('Subtotal:', totalsX, y);
-    doc.text(`₹${data.totals.item_total.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
+    doc.text(`₹${data.totals.product_total.toFixed(2)}`, pageWidth - 14, y, { align: 'right' });
 
     y += 6;
     doc.text('Delivery Fee:', totalsX, y);

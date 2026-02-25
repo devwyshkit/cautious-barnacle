@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/client';
 
 interface Product {
     id: string;
-    order_item_id: string;
+    orderProductId: string;
     name: string;
     is_personalized: boolean;
     mockup_url?: string;
@@ -23,9 +23,9 @@ interface FeedbackStepProps {
     onComplete?: () => void;
 }
 
-interface ItemReview {
+interface ProductReview {
     productId: string;
-    orderItemId: string;
+    orderProductId: string;
     rating: number;
     fidelityRating?: number;
     comment: string;
@@ -35,12 +35,12 @@ interface ItemReview {
 
 export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProps) {
     const [overallRating, setOverallRating] = useState(0);
-    const [itemReviews, setItemReviews] = useState<Record<string, ItemReview>>(() => {
-        const initial: Record<string, ItemReview> = {};
+    const [itemReviews, setItemReviews] = useState<Record<string, ProductReview>>(() => {
+        const initial: Record<string, ProductReview> = {};
         products.forEach(p => {
-            initial[p.order_item_id] = {
+            initial[p.orderProductId] = {
                 productId: p.id,
-                orderItemId: p.order_item_id,
+                orderProductId: p.orderProductId,
                 rating: 5,
                 fidelityRating: p.is_personalized ? 5 : undefined,
                 comment: '',
@@ -65,22 +65,22 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
         triggerHaptic(HapticPattern.ACTION);
     };
 
-    const handleItemRatingChange = (orderItemId: string, field: keyof ItemReview, value: any) => {
+    const handleProductRatingChange = (orderProductId: string, field: keyof ProductReview, value: any) => {
         setItemReviews(prev => ({
             ...prev,
-            [orderItemId]: { ...prev[orderItemId], [field]: value }
+            [orderProductId]: { ...prev[orderProductId], [field]: value }
         }));
         if (field === 'rating' || field === 'fidelityRating') {
             triggerHaptic(HapticPattern.ACTION);
         }
     };
 
-    const toggleTag = (orderItemId: string, tag: string) => {
-        const currentTags = itemReviews[orderItemId].tags;
+    const toggleTag = (orderProductId: string, tag: string) => {
+        const currentTags = itemReviews[orderProductId].tags;
         const newTags = currentTags.includes(tag)
             ? currentTags.filter(t => t !== tag)
             : [...currentTags, tag];
-        handleItemRatingChange(orderItemId, 'tags', newTags);
+        handleProductRatingChange(orderProductId, 'tags', newTags);
         triggerHaptic(HapticPattern.ACTION);
     };
 
@@ -99,9 +99,9 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                 supabase.rpc('add_item_review' as any, {
                     p_product_id: review.productId,
                     p_order_id: orderId,
-                    p_order_item_id: review.orderItemId,
+                    p_order_item_id: review.orderProductId,
                     p_rating: review.rating,
-                    p_comment: review.comment || (review.orderItemId === Object.keys(itemReviews)[0] ? `Overall order: ${overallRating}` : ''),
+                    p_comment: review.comment || (review.orderProductId === Object.keys(itemReviews)[0] ? `Overall order: ${overallRating}` : ''),
                     p_personalization_rating: review.fidelityRating,
                     p_fidelity_tags: review.tags,
                     p_approved_mockup_url: review.mockupUrl
@@ -179,7 +179,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                     <div className="h-px bg-zinc-50 w-full" />
 
                     {personalisedProducts.map(product => (
-                        <div key={product.order_item_id} className="space-y-6 p-1">
+                        <div key={product.orderProductId} className="space-y-6 p-1">
                             <div className="flex items-center gap-2">
                                 <Sparkles className="size-4 text-emerald-500" />
                                 <h4 className="text-xs font-black text-zinc-900 tracking-tight uppercase">Personalization Fidelity</h4>
@@ -205,13 +205,13 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                                         {[1, 2, 3, 4, 5].map((s) => (
                                             <button
                                                 key={s}
-                                                onClick={() => handleItemRatingChange(product.order_item_id, 'fidelityRating', s)}
+                                                onClick={() => handleProductRatingChange(product.orderProductId, 'fidelityRating', s)}
                                                 className="transition-transform active:scale-90"
                                             >
                                                 <Star
                                                     className={cn(
                                                         "size-5",
-                                                        (itemReviews[product.order_item_id].fidelityRating || 0) >= s ? "fill-emerald-500 text-emerald-500" : "text-zinc-200"
+                                                        (itemReviews[product.orderProductId].fidelityRating || 0) >= s ? "fill-emerald-500 text-emerald-500" : "text-zinc-200"
                                                     )}
                                                 />
                                             </button>
@@ -225,15 +225,15 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                                 {fidelityTags.map(tag => (
                                     <button
                                         key={tag.id}
-                                        onClick={() => toggleTag(product.order_item_id, tag.label)}
+                                        onClick={() => toggleTag(product.orderProductId, tag.label)}
                                         className={cn(
                                             "whitespace-nowrap px-4 py-2 rounded-full text-[10px] font-black border transition-all flex items-center gap-1.5",
-                                            itemReviews[product.order_item_id].tags.includes(tag.label)
+                                            itemReviews[product.orderProductId].tags.includes(tag.label)
                                                 ? "bg-zinc-900 border-zinc-900 text-white"
                                                 : "bg-white border-zinc-100 text-zinc-500"
                                         )}
                                     >
-                                        {itemReviews[product.order_item_id].tags.includes(tag.label) && <Check className="size-3" />}
+                                        {itemReviews[product.orderProductId].tags.includes(tag.label) && <Check className="size-3" />}
                                         #{tag.label.replace(' ', '')}
                                     </button>
                                 ))}
@@ -241,8 +241,8 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
 
                             {/* Comment */}
                             <textarea
-                                value={itemReviews[product.order_item_id].comment}
-                                onChange={(e) => handleItemRatingChange(product.order_item_id, 'comment', e.target.value)}
+                                value={itemReviews[product.orderProductId].comment}
+                                onChange={(e) => handleProductRatingChange(product.orderProductId, 'comment', e.target.value)}
                                 placeholder="Add any specific details about the design..."
                                 className="w-full min-h-[80px] p-4 rounded-xl bg-zinc-50 border border-zinc-100 text-xs font-medium focus:bg-white focus:border-zinc-900 transition-all outline-none resize-none placeholder:text-zinc-300 text-zinc-900"
                             />

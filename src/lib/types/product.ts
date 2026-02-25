@@ -9,11 +9,10 @@
  */
 
 import type { Tables } from '@/lib/supabase/types';
-import type { ItemWithFullSpec, Variant } from '@/lib/supabase/types';
-import { ValidatedWyshkitItem } from '../validations/discovery';
+import { ValidatedWyshkitProduct } from '../validations/discovery';
 
 export type { Product } from '@/lib/supabase/types';
-export type ItemListItem = Tables<'products'> & {
+export type ProductListItem = Tables<'products'> & {
   price?: number;
   image_url?: string;
   vendor_name?: string;
@@ -26,10 +25,10 @@ export type ItemListItem = Tables<'products'> & {
 
 
 /**
- * WyshkitItem: The standard product shape for all discovery components.
+ * WyshkitProduct: The standard product shape for all discovery components.
  * Derives directly from Supabase 'products' table plus joins.
  */
-export interface WyshkitItem extends Omit<Tables<'products'>, 'variants' | 'personalization_options' | 'video_url' | 'preview_time_minutes'> {
+export interface WyshkitProduct extends Omit<Tables<'products'>, 'variants' | 'personalization_options' | 'video_url' | 'preview_time_minutes'> {
   // UI Computed & Joined fields
   price?: number; // Normalized price (base_price or variant price)
   image_url?: string | null;
@@ -55,6 +54,6 @@ export interface WyshkitItem extends Omit<Tables<'products'>, 'variants' | 'pers
   preview_time_minutes?: number | null;
   return_eligible?: boolean;
 
-  elite_signals?: ValidatedWyshkitItem['elite_signals'];
+  elite_signals?: ValidatedWyshkitProduct['elite_signals'];
 }
 
