@@ -93,13 +93,13 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
                     p_target_status: 'RIDER_ASSIGNED',
                     p_metadata: {
                         awb_number: dispatch_result.awbNumber,
-                        courier_partner: 'Shadowfax',
+                        courier_vendor: 'Shadowfax',
                         tracking_url: dispatch_result.trackingUrl
                     } as any
                 }),
                 supabase.from('orders').update({
                     awb_number: dispatch_result.awbNumber,
-                    courier_partner: 'Shadowfax',
+                    courier_vendor: 'Shadowfax',
                     tracking_url: dispatch_result.trackingUrl,
                     updated_at: new Date().toISOString()
                 }).eq('id', payload.order_id)

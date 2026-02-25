@@ -6,7 +6,7 @@ import { Store, Search } from 'lucide-react';
  * WYSHKIT 2026: Vendor Not Found Page
  * Swiggy 2026 Pattern: Proper 404 handling with helpful navigation
  */
-export default function PartnerNotFound() {
+export default function VendorNotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
       <div className="text-center space-y-4 max-w-md">
@@ -15,7 +15,7 @@ export default function PartnerNotFound() {
         </div>
         <h1 className="text-2xl font-bold text-zinc-900">Store Not Found</h1>
         <p className="text-sm text-zinc-500">
-          The store you're looking for doesn't exist or is no longer available.
+          The store you&apos;re looking for doesn&apos;t exist or is no longer available.
         </p>
         <div className="flex gap-3 justify-center pt-4">
           <Button asChild variant="default">

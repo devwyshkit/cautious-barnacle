@@ -52,18 +52,18 @@ export interface OrderDetails extends Order {
 
     // Computed/Mapped properties for frontend
     vendor_name: string | null;
-    partner_image?: string | null;
+    vendor_image?: string | null;
 }
 
-export type ItemWithPartner = Product & {
+export type ItemWithVendor = Product & {
     vendors: Pick<Vendor, 'id' | 'name' | 'slug' | 'image_url'> | null;
 };
 
-export type ItemListing = Pick<Product, 'id' | 'name' | 'slug' | 'base_price' | 'images' | 'rating' | 'total_ratings' | 'category' | 'has_personalization' | 'is_perishable' | 'delivery_time_min' | 'delivery_time_max'> & {
+export type ItemListing = Pick<Product, 'id' | 'name' | 'slug' | 'base_price' | 'images' | 'rating' | 'total_ratings' | 'category_id' | 'has_personalization' | 'is_perishable' | 'production_time_minutes' | 'preview_time_minutes'> & {
     vendors: Pick<Vendor, 'id' | 'name' | 'slug' | 'city' | 'is_online' | 'is_active'> | null;
 };
 
 export type ItemWithFullSpec = Product & {
-    vendors: Pick<Vendor, 'id' | 'name' | 'slug' | 'city' | 'rating' | 'image_url' | 'fssai_license' | 'gstin' | 'is_active'> | null;
+    vendors: Pick<Vendor, 'id' | 'name' | 'slug' | 'city' | 'rating' | 'image_url' | 'gstin' | 'is_active'> | null;
     product_variants: Variant[];
 };

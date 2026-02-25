@@ -18,9 +18,9 @@ export async function getCurrentUserPermissions(): Promise<UserPermissions> {
     if (!user) {
       return {
         isAdmin: false,
-        isPartner: false,
+        isVendor: false,
         isCustomer: false,
-        partnerIds: [],
+        vendorIds: [],
       };
     }
 
@@ -29,9 +29,9 @@ export async function getCurrentUserPermissions(): Promise<UserPermissions> {
     logger.error('Unexpected error in getCurrentUserPermissions', err);
     return {
       isAdmin: false,
-      isPartner: false,
+      isVendor: false,
       isCustomer: false,
-      partnerIds: [],
+      vendorIds: [],
     };
   }
 }

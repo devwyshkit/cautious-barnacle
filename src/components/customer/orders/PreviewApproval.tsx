@@ -92,7 +92,7 @@ export function PreviewApproval({
                 {/* Gradient Overlay for Text Readability */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                {preview.partner_notes && (
+                {preview.vendor_notes && (
                     <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-xl p-4 rounded-xl shadow-lg border border-white/20">
                         <div className="flex items-start gap-3">
                             <div className="size-8 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
@@ -101,7 +101,7 @@ export function PreviewApproval({
                             <div className="space-y-0.5">
                                 <span className="text-xs font-black tracking-tight text-zinc-400">Vendor Note</span>
                                 <p className="text-sm font-medium text-zinc-900 leading-snug">
-                                    "{preview.partner_notes}"
+                                    &quot;{preview.vendor_notes}&quot;
                                 </p>
                             </div>
                         </div>

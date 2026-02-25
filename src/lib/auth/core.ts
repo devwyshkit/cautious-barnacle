@@ -4,9 +4,9 @@ export type UserRole = 'admin' | 'vendor' | 'customer';
 
 export interface UserPermissions {
   isAdmin: boolean;
-  isPartner: boolean;
+  isVendor: boolean;
   isCustomer: boolean;
-  partnerIds: string[];
+  vendorIds: string[];
 }
 
 import { logger } from '@/lib/logging/logger';
@@ -21,9 +21,9 @@ export function getRedirectPath(permissions: UserPermissions, returnUrl?: string
 
   // Redirect based on the strongest capability if no returnUrl
   // Context-aware: If we are already in a portal flow, stay there
-  if (permissions.isPartner) {
+  if (permissions.isVendor) {
     // If they have multiple outlets, they must select one
-    if (permissions.partnerIds.length > 1) {
+    if (permissions.vendorIds.length > 1) {
       return '/vendor/select-outlet';
     }
     return '/vendor';
@@ -57,13 +57,13 @@ export async function resolveUserPermissions(
   }
 
   const roles = data?.roles || [];
-  const partnerIds = data?.partnerIds || [];
+  const vendorIds = data?.vendorIds || [];
 
   return {
     isAdmin: roles.includes('admin'),
-    isPartner: roles.includes('vendor') || partnerIds.length > 0,
+    isVendor: roles.includes('vendor') || vendorIds.length > 0,
     isCustomer: true,
-    partnerIds,
+    vendorIds,
   };
 }
 
@@ -84,9 +84,9 @@ export async function resolveUserPermissionsWithTimeout(
     // Fallback to basic customer permissions
     return {
       isAdmin: false,
-      isPartner: false,
+      isVendor: false,
       isCustomer: true,
-      partnerIds: []
+      vendorIds: []
     };
   });
 }

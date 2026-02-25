@@ -18,7 +18,7 @@ export function ItemSkeleton({ className }: { className?: string }) {
   );
 }
 
-export function PartnerCardSkeleton({ className }: { className?: string }) {
+export function VendorCardSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       <Skeleton className="aspect-[4/3] w-full rounded-[20px]" />
@@ -30,7 +30,7 @@ export function PartnerCardSkeleton({ className }: { className?: string }) {
   );
 }
 
-export function PartnerCircleSkeleton({ className }: { className?: string }) {
+export function VendorCircleSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col items-center gap-2", className)}>
       <Skeleton className="size-16 rounded-full" />
@@ -71,7 +71,7 @@ export function ItemSurfaceSkeleton() {
   );
 }
 
-export function PartnerSheetSkeleton() {
+export function VendorSheetSkeleton() {
   return (
     <div className="flex flex-col animate-in fade-in duration-500">
       <Skeleton className="aspect-[16/10] w-full rounded-none" />

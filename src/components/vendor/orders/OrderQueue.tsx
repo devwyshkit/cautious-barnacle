@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { OrderCard } from './OrderCard';
-import { executePartnerIntent } from '@/lib/actions/vendor/engine';
+import { executeVendorIntent } from '@/lib/actions/vendor/engine';
 import type { VendorOrder } from '@/lib/actions/commerce/orders';
 import { useVendorRealtime } from '@/hooks/useVendorRealtime';
 import { toast } from 'sonner';
@@ -38,16 +38,16 @@ const STATUS_TABS: { id: StatusTab; label: string; statuses: OrderStatus[] }[] =
 
 interface OrderQueueProps {
   initialOrders: VendorOrder[];
-  partnerId: string;
+  vendorId: string;
 }
 
-export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
+export function OrderQueue({ initialOrders, vendorId }: OrderQueueProps) {
   const [activeTab, setActiveTab] = useState<StatusTab>('new');
   const [updating, setUpdating] = useState<string | null>(null);
 
   // WYSHKIT 2026: Standardized Pulse Hook
   const { orders, setOrders } = useVendorRealtime({
-    partnerId,
+    vendorId,
     initialOrders
   });
 
@@ -64,7 +64,7 @@ export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
   const handleAccept = async (orderId: string) => {
     setUpdating(orderId);
     try {
-      const result = await executePartnerIntent({
+      const result = await executeVendorIntent({
         entity: 'order',
         action: 'ACCEPT',
         id: orderId
@@ -88,7 +88,7 @@ export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
   const handleReject = async (orderId: string, reason: string) => {
     setUpdating(orderId);
     try {
-      const result = await executePartnerIntent({
+      const result = await executeVendorIntent({
         entity: 'order',
         action: 'REJECT',
         id: orderId,
@@ -112,7 +112,7 @@ export function OrderQueue({ initialOrders, partnerId }: OrderQueueProps) {
   const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
     setUpdating(orderId);
     try {
-      const result = await executePartnerIntent({
+      const result = await executeVendorIntent({
         entity: 'order',
         action: 'UPDATE_STATUS',
         id: orderId,

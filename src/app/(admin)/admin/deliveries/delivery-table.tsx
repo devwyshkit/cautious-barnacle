@@ -120,8 +120,8 @@ export function DeliveryTable({ deliveries, currentStatus }: DeliveryTableProps)
                   <TableCell>
                     <div>
                       <span className="font-mono text-sm">{delivery.awb_number || 'Not assigned'}</span>
-                      {delivery.courier_partner && (
-                        <span className="block text-xs text-zinc-500">{delivery.courier_partner}</span>
+                      {delivery.courier_vendor && (
+                        <span className="block text-xs text-zinc-500">{delivery.courier_vendor}</span>
                       )}
                     </div>
                   </TableCell>

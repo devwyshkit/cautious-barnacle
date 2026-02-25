@@ -32,12 +32,12 @@ export interface AdminSession {
 export interface DashboardMetrics {
   gmv_today: number
   orders_today: number
-  active_partners: number
+  active_vendors: number
   pending_kyc: number
 }
 
 // Vendor with joined data for lists
-export interface PartnerWithStats extends Omit<Vendor, 'total_orders'> {
+export interface VendorWithStats extends Omit<Vendor, 'total_orders'> {
   total_orders?: number | null
   total_gmv?: number
   total_items?: number

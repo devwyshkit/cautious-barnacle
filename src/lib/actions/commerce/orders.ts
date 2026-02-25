@@ -87,7 +87,7 @@ export async function update_order_status(
     }
 
     // 4. ATOMIC Transition via DB RPC (SINGLE SOURCE OF TRUTH)
-    const { data: result, error: rpc_error } = await supabase.rpc('transition_order', {
+    const { data: result, error: rpc_error } = await supabase.rpc('transition_order' as any, {
       p_order_id: order_id,
       p_target_status: target_status as OrderStatus,
       p_metadata: {
@@ -136,7 +136,7 @@ export async function submit_order_personalization(order_id: string, personaliza
       const supabase = await createClient();
 
       // WYSHKIT 2026: Atomic Submission via RPC (Single Trip)
-      const { data, error: rpc_error } = await supabase.rpc('submit_order_personalization', {
+      const { data, error: rpc_error } = await supabase.rpc('submit_order_personalization' as any, {
         p_order_id: order_id,
         p_personalization_input: personalization_input as any
       });
@@ -191,7 +191,7 @@ export async function approve_preview(preview_submission_id: string, order_id: s
     const supabase = await createClient();
 
     // WYSHKIT 2026: Atomic Preview Approval via RPC
-    const { data, error: rpc_error } = await supabase.rpc('approve_order_preview', {
+    const { data, error: rpc_error } = await supabase.rpc('approve_order_preview' as any, {
       p_order_id: order_id
     });
 
@@ -387,7 +387,7 @@ export async function get_order_with_history(order_id: string): Promise<{ order:
     const mapped_order: OrderDetails = {
       ...raw_order,
       vendor_name: raw_order.vendors?.name || 'Vendor',
-      partner_image: raw_order.vendors?.image_url || null,
+      vendor_image: raw_order.vendors?.image_url || null,
       order_status_history: order_status_history_arr as any,
       order_products: products,
       personalization_status: p_status

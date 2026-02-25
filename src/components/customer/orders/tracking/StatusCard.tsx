@@ -11,6 +11,7 @@ import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 
 import { OrderDetail } from '@/lib/types/order';
+import { formatArrivalTime } from '@/lib/utils/sla';
 
 interface StatusCardProps {
     order: OrderDetail;
@@ -91,7 +92,7 @@ export function StatusCard({ order }: StatusCardProps) {
                 return hasPersonalization ? 'Share identity to start crafting' : 'Vendor is securing your products';
             case ORDER_STATUS.IN_PRODUCTION: return 'Your gift is being masterfully prepared';
             case ORDER_STATUS.PACKED: return 'Waiting for delivery partner';
-            case ORDER_STATUS.OUT_FOR_DELIVERY: return 'Partner is navigating to your address';
+            case ORDER_STATUS.OUT_FOR_DELIVERY: return 'Delivery agent is navigating to your address';
             case ORDER_STATUS.DELIVERED: return 'Gift successfully delivered';
             default: return 'Processing your order';
         }
@@ -168,7 +169,7 @@ export function StatusCard({ order }: StatusCardProps) {
                         <div className="mt-2 p-3 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
                             <AlertCircle className="size-3.5 text-amber-600 shrink-0 mt-0.5" />
                             <p className="text-[11px] font-bold text-amber-900/80 leading-relaxed italic">
-                                "{order.cancellation_reason}"
+                                &quot;{order.cancellation_reason}&quot;
                             </p>
                         </div>
                     ) : (
@@ -181,11 +182,16 @@ export function StatusCard({ order }: StatusCardProps) {
                                 <p className="text-xs font-bold text-zinc-900 leading-tight">{getNextStep(order.status || '', !!order.has_personalization)}</p>
                             )}
                             {deadline && (
-                                <HyperlocalTimer
-                                    deadline={deadline}
-                                    variant="minimal"
-                                    className={cn("text-[11px] font-black", isBreached ? "text-rose-500" : "")}
-                                />
+                                <div className="flex flex-col gap-1">
+                                    <p className={cn("text-xs font-black tracking-tight", isBreached ? "text-rose-600" : "text-zinc-900")}>
+                                        {formatArrivalTime(deadline)}
+                                    </p>
+                                    <HyperlocalTimer
+                                        deadline={deadline}
+                                        variant="minimal"
+                                        className={cn("text-[10px] font-bold", isBreached ? "text-rose-500" : "text-zinc-500")}
+                                    />
+                                </div>
                             )}
                         </div>
                     )}

@@ -1,10 +1,10 @@
-import { getPartnerFromSession } from '@/lib/auth/server';
+import { getVendorFromSession } from '@/lib/auth/server';
 import { get_personalization_queue } from "@/lib/actions/vendor/vendor-actions";
 import { PersonalizationQueueClient } from '@/components/vendor/personalization/PersonalizationQueueClient';
 import { redirect } from 'next/navigation';
 
-export default async function PartnerPersonalizationPage() {
-  const vendor = await getPartnerFromSession();
+export default async function VendorPersonalizationPage() {
+  const vendor = await getVendorFromSession();
   if (!vendor) redirect('/vendor/login');
 
   const { data: queue } = await get_personalization_queue(vendor.id);

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Search, Package } from 'lucide-react';
 import { CatalogList } from './CatalogList';
 import { ProductForm } from './ProductForm';
-import { executePartnerIntent } from '@/lib/actions/vendor/engine';
+import { executeVendorIntent } from '@/lib/actions/vendor/engine';
 import { getItemWithFullSpec } from '@/lib/actions/discovery/products';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -24,16 +24,15 @@ import type { Database } from '@/lib/supabase/database.types';
 
 type Product = Database['public']['Tables']['products']['Row'];
 
-// Use the unified ItemWithFullSpec type for consistency
-import { ItemWithFullSpec } from '@/lib/supabase/types';
-type ItemWithDetails = ItemWithFullSpec;
+// Use a more relaxed type for the vendor dashboard to avoid discovery-only field requirements
+export type ItemWithDetails = any;
 
 interface CatalogListClientProps {
-  initialItems: Product[];
-  partnerId: string;
+  initialItems: any[];
+  vendorId: string;
 }
 
-export function CatalogListClient({ initialItems, partnerId }: CatalogListClientProps) {
+export function CatalogListClient({ initialItems, vendorId }: CatalogListClientProps) {
   const router = useRouter();
   const [products, setItems] = useState<ItemWithDetails[]>(initialItems as ItemWithDetails[]);
   const [search, setSearch] = useState('');
@@ -43,11 +42,11 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
 
   const filteredItems = products.filter(product =>
     product.name.toLowerCase().includes(search.toLowerCase()) ||
-    product.category?.toLowerCase().includes(search.toLowerCase())
+    (product as any).category?.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleToggleActive = async (itemId: string, isActive: boolean) => {
-    const result = await executePartnerIntent({
+    const result = await executeVendorIntent({
       entity: 'product',
       action: 'TOGGLE_STATUS',
       id: itemId,
@@ -64,7 +63,7 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
   };
 
   const handleToggleStock = async (itemId: string, stockStatus: string) => {
-    const result = await executePartnerIntent({
+    const result = await executeVendorIntent({
       entity: 'product',
       action: 'TOGGLE_STOCK',
       id: itemId,
@@ -72,7 +71,7 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
     });
     if (result.success) {
       setItems(prev => prev.map(product =>
-        product.id === itemId ? { ...product, stock_status: stockStatus } : product
+        product.id === itemId ? { ...product, is_active: stockStatus === 'IN_STOCK' } : product
       ));
       toast.success('Stock status updated');
     } else {
@@ -101,7 +100,7 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
   const handleDeleteItem = async () => {
     if (!deletingItem) return;
 
-    const result = await executePartnerIntent({
+    const result = await executeVendorIntent({
       entity: 'product',
       action: 'DELETE',
       id: deletingItem.id
@@ -142,7 +141,7 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
           <Package className="size-12 text-zinc-300 mx-auto mb-3" />
           {search ? (
             <>
-              <p className="text-zinc-500 text-sm">No products match "{search}"</p>
+              <p className="text-zinc-500 text-sm">No products match &quot;{search}&quot;</p>
               <Button
                 variant="link"
                 className="mt-2 text-sm"
@@ -176,7 +175,7 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
       )}
 
       <ProductForm
-        partnerId={partnerId}
+        vendorId={vendorId}
         open={showProductForm}
         onOpenChange={setShowProductForm}
         onSuccess={handleFormSuccess}
@@ -184,7 +183,7 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
 
       {editingItem && (
         <ProductForm
-          partnerId={partnerId}
+          vendorId={vendorId}
           product={editingItem}
           open={!!editingItem}
           onOpenChange={(open) => !open && setEditingItem(null)}
@@ -197,7 +196,7 @@ export function CatalogListClient({ initialItems, partnerId }: CatalogListClient
           <AlertDialogHeader>
             <AlertDialogTitle>Delete product?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete "{deletingItem?.name}". This action cannot be undone.
+              This will permanently delete &quot;{deletingItem?.name}&quot;. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

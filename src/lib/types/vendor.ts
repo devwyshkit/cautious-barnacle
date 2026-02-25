@@ -4,11 +4,11 @@
  * All types derive directly from Supabase database types.
  */
 
-import { ValidatedPartner } from '../validations/discovery';
+import { ValidatedVendor } from '../validations/discovery';
 
 export type { Vendor } from '@/lib/supabase/types';
 // ✅ UI-optimized vendor shape (Subset of table for performance & clarity)
-export interface MappedPartner {
+export interface MappedVendor {
   id: string;
   name: string;
   image_url: string | null;
@@ -21,6 +21,6 @@ export interface MappedPartner {
   is_online: boolean;
   description: string | null;
   gstin?: string | null;
-  elite_signals?: ValidatedPartner['elite_signals'];
+  elite_signals?: ValidatedVendor['elite_signals'];
 }
 

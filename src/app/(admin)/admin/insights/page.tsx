@@ -22,7 +22,7 @@ async function getInsights() {
     yesterdayOrders,
     weekOrders,
     monthOrders,
-    topPartners,
+    topVendors,
     topItems,
     ordersByStatus,
   ] = await Promise.all([
@@ -50,14 +50,14 @@ async function getInsights() {
   const monthGMV = ((monthOrders.data || []) as { total?: number }[]).reduce((sum, o) => sum + (o.total ?? 0), 0)
 
   // Calculate vendor leaderboard
-  const partnerCounts: Record<string, { name: string; count: number }> = {}
-  for (const order of (topPartners.data || []) as { vendor_id?: string; vendors?: { business_name?: string } }[]) {
+  const vendorCounts: Record<string, { name: string; count: number }> = {}
+  for (const order of (topVendors.data || []) as { vendor_id?: string; vendors?: { business_name?: string } }[]) {
     const id = order.vendor_id ?? ''
     const name = order.vendors?.business_name || 'Unknown'
-    if (!partnerCounts[id]) partnerCounts[id] = { name, count: 0 }
-    partnerCounts[id].count++
+    if (!vendorCounts[id]) vendorCounts[id] = { name, count: 0 }
+    vendorCounts[id].count++
   }
-  const topPartnersList = Object.values(partnerCounts)
+  const topVendorsList = Object.values(vendorCounts)
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
@@ -85,7 +85,7 @@ async function getInsights() {
     yesterday: { gmv: yesterdayGMV, orders: (yesterdayOrders.data || []).length },
     week: { gmv: weekGMV, orders: (weekOrders.data || []).length },
     month: { gmv: monthGMV, orders: (monthOrders.data || []).length },
-    topPartners: topPartnersList,
+    topVendors: topVendorsList,
     topItems: topItemsList,
     statusDistribution: statusCounts,
   }
@@ -172,11 +172,11 @@ export default async function InsightsPage() {
             <CardTitle className="text-sm font-medium">Top vendors</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            {insights.topPartners.length === 0 ? (
+            {insights.topVendors.length === 0 ? (
               <p className="p-4 text-sm text-zinc-500">No data yet</p>
             ) : (
               <div className="divide-y">
-                {insights.topPartners.map((vendor, i) => (
+                {insights.topVendors.map((vendor, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-zinc-400 w-4">{i + 1}</span>

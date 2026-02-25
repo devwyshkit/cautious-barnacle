@@ -1,16 +1,16 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { getPartnerFromSession } from '@/lib/auth/server';
+import { getVendorFromSession } from '@/lib/auth/server';
 import { VendorLayoutShell } from '@/components/vendor/layout/VendorLayoutShell';
 
 export const dynamic = 'force-dynamic'
 
-export default async function PartnerLayout({
+export default async function VendorLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const vendor = await getPartnerFromSession();
+  const vendor = await getVendorFromSession();
   if (!vendor) {
     redirect('/vendor/login');
   }

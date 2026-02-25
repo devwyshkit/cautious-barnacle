@@ -23,11 +23,11 @@ export async function resolveUserPermissionsServer(userId: string): Promise<User
  * Returns null if user is not logged in or not associated with any vendor
  * 
  * Lookup order:
- * 1. Check partner_users table (many-to-many relationship)
+ * 1. Check vendor_users table (many-to-many relationship)
  * 2. Check users table for role = 'vendor' and find matching vendor
  * 3. Check app_metadata for vendor_id
  */
-export async function getPartnerFromSession(): Promise<Vendor | null> {
+export async function getVendorFromSession(): Promise<Vendor | null> {
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
 
@@ -36,7 +36,7 @@ export async function getPartnerFromSession(): Promise<Vendor | null> {
   const user = session.user;
 
   // WYSHKIT 2026: Single-Trip Vendor Resolution via RPC
-  const { data: vendor, error } = await (supabase as any).rpc('get_partner_from_session', {
+  const { data: vendor, error } = await (supabase as any).rpc('get_vendor_from_session', {
     p_user_id: user.id,
     p_email: user.email || null,
     p_app_metadata: user.app_metadata || {}

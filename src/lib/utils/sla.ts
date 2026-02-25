@@ -96,8 +96,9 @@ export function calculateTravelTime(distanceKm?: number | null): { min: number; 
 }
 
 /**
- * WYSHKIT 2026: SLA & Time Utilities
- * Centralized formatting for delivery and prep times.
+ * WYSHKIT 2026: Time > Distance Philosophy
+ * Centralized formatting for arrival windows and prep times.
+ * Rule: Always favor "Arriving by 5:30 PM" over "30-40 mins".
  */
 
 export function formatPrepTime(prepMins: number): string {
@@ -108,6 +109,32 @@ export function formatPrepTime(prepMins: number): string {
     return hours % 1 === 0 ? `${hours}h` : `${hours.toFixed(1)}h`;
 }
 
+/**
+ * @deprecated WYSHKIT 2026: Use formatArrivalTime instead for customer-facing SLA.
+ * Only use for internal courier metrics.
+ */
 export function formatDeliveryTime(min: number, max: number): string {
     return `${min}-${max} mins`;
+}
+
+/**
+ * Validates and formats the server-driven ETA signal.
+ * Example input: "2026-02-25T17:15:00Z"
+ * Output: "Arriving by 5:15 PM"
+ */
+export function formatArrivalTime(eta?: string | null): string {
+    if (!eta) return 'Arriving soon';
+
+    try {
+        const date = new Date(eta);
+        if (isNaN(date.getTime())) return 'Arriving soon';
+
+        return `Arriving by ${date.toLocaleTimeString('en-IN', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        })}`;
+    } catch (e) {
+        return 'Arriving soon';
+    }
 }

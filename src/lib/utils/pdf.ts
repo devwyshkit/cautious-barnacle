@@ -4,7 +4,7 @@
  */
 
 import { jsPDF } from 'jspdf';
-import { OrderForPDF, PartnerForPDF } from '@/lib/types/order';
+import { OrderForPDF, VendorForPDF } from '@/lib/types/order';
 
 export function generateEstimatePDF(order: OrderForPDF): Blob {
   const doc = new jsPDF();
@@ -94,7 +94,7 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   return doc.output('blob');
 }
 
-export function generateGSTINPDF(order: OrderForPDF, vendor: PartnerForPDF): Blob {
+export function generateGSTINPDF(order: OrderForPDF, vendor: VendorForPDF): Blob {
   const doc = new jsPDF();
   const margin = 20;
   let y = margin;

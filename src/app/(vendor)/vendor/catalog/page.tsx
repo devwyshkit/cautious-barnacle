@@ -1,13 +1,13 @@
-import { getPartnerFromSession } from '@/lib/auth/server';
-import { get_partner_items } from '@/lib/actions/vendor/vendor-actions';
+import { getVendorFromSession } from '@/lib/auth/server';
+import { get_vendor_items } from '@/lib/actions/vendor/vendor-actions';
 import { CatalogListClient } from '@/components/vendor/catalog/CatalogListClient';
 import { redirect } from 'next/navigation';
 
-export default async function PartnerCatalogPage() {
-  const vendor = await getPartnerFromSession();
+export default async function VendorCatalogPage() {
+  const vendor = await getVendorFromSession();
   if (!vendor) redirect('/vendor/login');
 
-  const { data: products } = await get_partner_items(vendor.id);
+  const { data: products } = await get_vendor_items(vendor.id);
 
   return (
     <div className="px-4 py-6">
@@ -20,7 +20,7 @@ export default async function PartnerCatalogPage() {
 
       <CatalogListClient
         initialItems={products || []}
-        partnerId={vendor.id}
+        vendorId={vendor.id}
       />
     </div>
   );

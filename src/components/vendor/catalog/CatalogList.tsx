@@ -31,6 +31,7 @@ type Product = Database['public']['Tables']['products']['Row'] & {
   total_stock?: number;
   personalization_count?: number;
   variants?: Variant[];
+  category?: string;
 };
 
 interface CatalogListProps {

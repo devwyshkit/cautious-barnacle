@@ -66,18 +66,15 @@ export function OrderCard({ order }: OrderCardProps) {
 
             {order.has_personalization && (
               <span className={cn(
-                "px-2 py-0.5 rounded-md text-[11px] font-black tracking-tight flex items-center gap-1",
-                order.personalization_status === 'submitted' ? "bg-amber-50 text-amber-600" :
-                  order.personalization_status === 'approved' ? "bg-emerald-50 text-emerald-600" :
-                    "bg-zinc-100 text-zinc-500"
+                "px-2 py-0.5 rounded-md text-[10px] font-black tracking-tighter flex items-center gap-1 uppercase border",
+                order.personalization_status === 'submitted' ? "bg-amber-50 text-amber-600 border-amber-200" :
+                  order.personalization_status === 'approved' ? "bg-emerald-50 text-emerald-600 border-emerald-200" :
+                    "bg-zinc-100 text-zinc-500 border-zinc-200"
               )}>
-                <div className={cn(
-                  "size-1 rounded-full",
-                  order.personalization_status === 'submitted' ? "bg-amber-500 animate-pulse" :
-                    order.personalization_status === 'approved' ? "bg-emerald-500" :
-                      "bg-zinc-400"
-                )} />
-                {order.personalization_status || 'Design Pending'}
+                <span>✦</span>
+                {order.personalization_status === 'approved' ? 'Design Approved' :
+                  order.personalization_status === 'submitted' ? 'Reviewing Design' :
+                    'Personalised'}
               </span>
             )}
           </div>

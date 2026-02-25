@@ -5,12 +5,12 @@ import { createClient } from '@/lib/supabase/client';
 import { ORDER_STATUS } from '@/lib/types/order-status';
 import { logger } from '@/lib/logging/logger';
 
-export function useVendorOrdersStatus(partnerId: string | undefined) {
+export function useVendorOrdersStatus(vendorId: string | undefined) {
     const [pendingCount, setPendingCount] = useState<number>(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!partnerId) {
+        if (!vendorId) {
             setLoading(false);
             return;
         }
@@ -21,7 +21,7 @@ export function useVendorOrdersStatus(partnerId: string | undefined) {
             const { count, error } = await supabase
                 .from('orders')
                 .select('*', { count: 'exact', head: true })
-                .eq('vendor_id', partnerId)
+                .eq('vendor_id', vendorId)
                 .in('status', [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED]);
 
             if (error) {
@@ -40,14 +40,14 @@ export function useVendorOrdersStatus(partnerId: string | undefined) {
 
         // Subscribe to status changes for badge updates
         const channel = supabase
-            .channel(`vendor-status-${partnerId}`)
+            .channel(`vendor-status-${vendorId}`)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
                     table: 'orders',
-                    filter: `vendor_id=eq.${partnerId}`,
+                    filter: `vendor_id=eq.${vendorId}`,
                 },
                 () => {
                     fetchPendingCount();
@@ -58,7 +58,7 @@ export function useVendorOrdersStatus(partnerId: string | undefined) {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [partnerId]);
+    }, [vendorId]);
 
     return { pendingCount, loading };
 }

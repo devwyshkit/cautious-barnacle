@@ -1,5 +1,5 @@
-import { getPartnerFromSession } from '@/lib/auth/server';
-import { get_partner_stats, get_partner_orders } from "@/lib/actions/vendor/vendor-actions";
+import { getVendorFromSession } from '@/lib/auth/server';
+import { get_vendor_stats, get_vendor_orders } from "@/lib/actions/vendor/vendor-actions";
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import {
@@ -14,15 +14,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-export default async function PartnerDashboard() {
-  const vendor = await getPartnerFromSession();
+export default async function VendorDashboard() {
+  const vendor = await getVendorFromSession();
   if (!vendor) redirect('/vendor/login');
 
   const vendor_id = vendor.id; // Define vendor_id as per instruction's usage
 
   const [statsResult, ordersResult] = await Promise.all([
-    get_partner_stats(vendor_id),
-    get_partner_orders(vendor_id, ['PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED'])
+    get_vendor_stats(vendor_id),
+    get_vendor_orders(vendor_id, ['PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED'])
   ]);
 
   const stats = statsResult.data;

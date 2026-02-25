@@ -85,37 +85,23 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
 
 
         // WYSHKIT 2026: Deterministic Category Resolution
+        // We trust the RPC, but keep fallback logic for safety during transition
         let resolvedCategories = raw?.categories || [];
-        if (!resolvedCategories || resolvedCategories.length === 0) {
-            const { data: fallbackCats, error: catError } = await supabase
-                .from('categories')
-                .select('*')
-                .eq('is_active', true)
-                .order('display_order', { ascending: true });
-
-            if (catError) {
-                logger.error('CRITICAL: Category fallback failed', catError);
-            }
-            resolvedCategories = fallbackCats || [];
-        }
 
         const sections = raw.sections || [];
         const sectionsData = raw.sections_data || {};
 
-        const hour = new Date().getHours();
-        const system_status = (hour >= 22 || hour < 6) ? 'delayed' : (hour >= 18 && hour < 21) ? 'capacity' : 'normal';
-
         return {
             sections,
-            categories: sectionsData.categories || [],
-            trendingProducts: sectionsData.best_sellers || raw.trendingProducts || [],
+            categories: resolvedCategories,
+            trendingProducts: raw.featured_products || sectionsData.best_sellers || [],
             newArrivals: sectionsData.new_arrivals || [],
-            featuredVendors: sectionsData.vendors || [],
-            activeOrders: raw.activeOrders || [],
-            cartCount: raw.cartCount || 0,
+            featuredVendors: raw.vendors || sectionsData.vendors || [],
+            activeOrders: raw.active_orders || [],
+            cartCount: raw.cart_count || 0,
             metadata: {
-                system_status,
-                orders: raw.activeOrders || []
+                system_status: raw.system_status || 'normal',
+                orders: raw.active_orders || []
             }
         };
     } catch (error: any) {
@@ -131,13 +117,17 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
     }
 });
 
+/** @deprecated WYSHKIT 2026: Use getHomeSurfaceContext() instead. */
 export async function getCategories() {
+    logger.warn('getCategories is DEPRECATED. Use getHomeSurfaceContext for atomic discovery context.');
     const supabase = await createClient();
     const { data } = await supabase.from('categories').select('*').order('name');
     return data || [];
 }
 
-export async function getFeaturedPartners(limit: number = 8) {
+/** @deprecated WYSHKIT 2026: Use getHomeSurfaceContext() instead. */
+export async function getFeaturedVendors(limit: number = 8) {
+    logger.warn('getFeaturedVendors is DEPRECATED. Use getHomeSurfaceContext for atomic discovery context.');
     const supabase = await createClient();
     const { data, error } = await supabase
         .from('vendors')
@@ -152,16 +142,18 @@ export async function getFeaturedPartners(limit: number = 8) {
     if (error) return { data: [], error: error.message };
 
     // Map to UI-friendly structure
-    const mappedPartners = (data || []).map(p => ({
+    const mappedVendors = (data || []).map(p => ({
         ...p,
         prep_mins: p.avg_prep_time_mins || 45,
         delivery_fee: Number(p.base_delivery_charge || 0)
     }));
 
-    return { data: mappedPartners, error: null };
+    return { data: mappedVendors, error: null };
 }
 
+/** @deprecated WYSHKIT 2026: Use getHomeSurfaceContext() instead. */
 export async function getTrendingProducts(limit: number = 3) {
+    logger.warn('getTrendingProducts is DEPRECATED. Use getHomeSurfaceContext for atomic discovery context.');
     try {
         const supabase = await createClient();
         const { data, error } = await supabase

@@ -147,7 +147,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             </div>
             <p className="text-sm font-black text-zinc-900 tracking-tight mb-2">No Results</p>
             <p className="text-xs font-medium text-zinc-500 max-w-[200px] mb-8 leading-relaxed">
-              We couldn't find {currentQ ? `"${currentQ}"` : 'what you were looking for'}
+              We couldn&apos;t find {currentQ ? `&quot;${currentQ}&quot;` : 'what you were looking for'}
               {currentCategory && ` in ${currentCategory}`}.
             </p>
             <Button
@@ -181,17 +181,17 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                   <h3 className="text-xs font-black text-zinc-400 tracking-tight mb-4 px-1">Products from stores</h3>
                   <div className="space-y-6">
                     {Object.entries(
-                      results.products.reduce((acc: Record<string, { partnerName: string, products: any[] }>, product: any) => {
-                        const pId = product.vendor_id || '';
-                        if (!acc[pId]) acc[pId] = { partnerName: product.vendor_name || 'Vendor', products: [] };
-                        acc[pId].products.push(product);
+                      results.products.reduce((acc: Record<string, { vendorName: string, products: any[] }>, product: any) => {
+                        const vId = product.vendor_id || '';
+                        if (!acc[vId]) acc[vId] = { vendorName: product.vendor_name || 'Vendor', products: [] };
+                        acc[vId].products.push(product);
                         return acc;
                       }, {})
-                    ).map(([pId, group]) => (
-                      <div key={pId} className="space-y-3">
+                    ).map(([vId, group]) => (
+                      <div key={vId} className="space-y-3">
                         <div className="flex items-center justify-between px-1">
-                          <Link href={`/store/${pId}`} className="text-xs font-black text-zinc-900 tracking-tight hover:text-[var(--primary)] transition-colors">
-                            {group.partnerName}
+                          <Link href={`/store/${vId}`} className="text-xs font-black text-zinc-900 tracking-tight hover:text-[var(--primary)] transition-colors">
+                            No results found for &apos;{searchParamsHook.get('q')}&apos;
                           </Link>
                           <span className="text-[11px] font-bold text-zinc-400 tracking-tight">{group.products.length} Match{group.products.length > 1 ? 'es' : ''}</span>
                         </div>

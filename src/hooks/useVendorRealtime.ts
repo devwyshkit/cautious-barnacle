@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import type { VendorOrder } from '@/lib/actions/commerce/orders';
 
 interface UseVendorRealtimeOptions {
-    partnerId: string;
+    vendorId: string;
     initialOrders: VendorOrder[];
     onNewOrder?: (order: VendorOrder) => void;
 }
@@ -19,7 +19,7 @@ interface UseVendorRealtimeOptions {
  * Re-fetches the full order on every update to handle rich relation joins (Zero Shadow Sync).
  */
 export function useVendorRealtime({
-    partnerId,
+    vendorId,
     initialOrders,
     onNewOrder
 }: UseVendorRealtimeOptions) {
@@ -65,18 +65,18 @@ export function useVendorRealtime({
     }, []);
 
     useEffect(() => {
-        if (!partnerId || !isConnected) return;
+        if (!vendorId || !isConnected) return;
 
         const supabase = createClient();
         const channel = supabase
-            .channel(`vendor-pulse-${partnerId}`)
+            .channel(`vendor-pulse-${vendorId}`)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
                     table: 'orders',
-                    filter: `vendor_id=eq.${partnerId}`,
+                    filter: `vendor_id=eq.${vendorId}`,
                 },
                 async (payload) => {
                     if (payload.eventType === 'INSERT') {
@@ -114,7 +114,7 @@ export function useVendorRealtime({
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [partnerId, isConnected, fetchFullOrder, playNotification, onNewOrder]);
+    }, [vendorId, isConnected, fetchFullOrder, playNotification, onNewOrder]);
 
     return {
         orders,

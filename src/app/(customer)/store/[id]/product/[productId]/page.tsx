@@ -1,8 +1,8 @@
-import { getPartnerStoreData } from '@/lib/actions/discovery/vendors';
+import { getVendorStoreData } from '@/lib/actions/discovery/vendors';
 import { VendorStorePage } from '@/components/customer/VendorStorePage';
 import { InterceptedProductSheet } from '@/components/customer/product/InterceptedProductSheet';
 import { notFound } from 'next/navigation';
-import { MappedPartner } from '@/lib/types/vendor';
+import { MappedVendor } from '@/lib/types/vendor';
 
 
 export default async function ItemPage({
@@ -14,7 +14,7 @@ export default async function ItemPage({
 
   // WYSHKIT 2026: Immersive Store Context
   // Tapping a shared link to an product should show the store in the background, not a standalone page.
-  const { vendor, products, itemsGroupedByCategory, categories, error } = await getPartnerStoreData(id);
+  const { vendor, products, itemsGroupedByCategory, categories, error } = await getVendorStoreData(id);
 
   const product = products?.find(i => String(i.id) === itemId);
 
@@ -25,8 +25,8 @@ export default async function ItemPage({
   return (
     <div className="min-h-screen">
       <VendorStorePage
-        partnerId={id}
-        initialData={(vendor as unknown) as MappedPartner}
+        vendorId={id}
+        initialData={(vendor as unknown) as MappedVendor}
         products={products}
         itemsGroupedByCategory={itemsGroupedByCategory}
         categories={categories}

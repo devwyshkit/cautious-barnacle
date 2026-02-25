@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { PartnerDetailView } from './vendor-detail'
+import { VendorDetailView } from './vendor-detail'
 import type { Vendor } from '@/lib/types/admin.types'
 
-async function getPartner(id: string): Promise<Vendor | null> {
+async function getVendor(id: string): Promise<Vendor | null> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('vendors')
@@ -13,11 +13,11 @@ async function getPartner(id: string): Promise<Vendor | null> {
   return data
 }
 
-async function getPartnerStats(partnerId: string) {
+async function getVendorStats(vendorId: string) {
   const supabase = await createClient()
   const [ordersResult, itemsResult] = await Promise.all([
-    supabase.from('orders').select('total').eq('vendor_id', partnerId),
-    supabase.from('products').select('id', { count: 'exact' }).eq('vendor_id', partnerId),
+    supabase.from('orders').select('total').eq('vendor_id', vendorId),
+    supabase.from('products').select('id', { count: 'exact' }).eq('vendor_id', vendorId),
   ])
 
   // Explicit type cast to fix 'never' inference
@@ -30,15 +30,15 @@ async function getPartnerStats(partnerId: string) {
   }
 }
 
-export default async function PartnerDetailPage({
+export default async function VendorDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const [vendor, stats] = await Promise.all([getPartner(id), getPartnerStats(id)])
+  const [vendor, stats] = await Promise.all([getVendor(id), getVendorStats(id)])
 
   if (!vendor) notFound()
 
-  return <PartnerDetailView vendor={vendor} stats={stats} />
+  return <VendorDetailView vendor={vendor} stats={stats} />
 }

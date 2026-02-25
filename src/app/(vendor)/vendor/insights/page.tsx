@@ -1,17 +1,17 @@
-import { getPartnerFromSession } from '@/lib/auth/server';
-import { get_partner_stats, get_partner_orders } from "@/lib/actions/vendor/vendor-actions";
+import { getVendorFromSession } from '@/lib/auth/server';
+import { get_vendor_stats, get_vendor_orders } from "@/lib/actions/vendor/vendor-actions";
 import { redirect } from 'next/navigation';
 import { Package, TrendingUp, BarChart3, Star } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default async function PartnerInsightsPage() {
-  const vendor = await getPartnerFromSession();
+export default async function VendorInsightsPage() {
+  const vendor = await getVendorFromSession();
   if (!vendor) redirect('/vendor/login');
 
   const vendor_id = vendor.id; // Define vendor_id for clarity
 
-  const { data: stats } = await get_partner_stats(vendor_id);
-  const { data: orders } = await get_partner_orders(vendor_id, ['DELIVERED', 'CANCELLED', 'REFUNDED', 'PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED', 'OUT_FOR_DELIVERY']); // Fetch all orders for breakdown
+  const { data: stats } = await get_vendor_stats(vendor_id);
+  const { data: orders } = await get_vendor_orders(vendor_id, ['DELIVERED', 'CANCELLED', 'REFUNDED', 'PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED', 'OUT_FOR_DELIVERY']); // Fetch all orders for breakdown
 
   const allOrders = orders || [];
 

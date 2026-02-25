@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      cart_products: {
+      cart_items: {
         Row: {
           created_at: string | null
           expires_at: string | null
@@ -56,21 +56,21 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cart_products_product_id_fkey"
+            foreignKeyName: "cart_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_products_selected_variant_id_fkey"
+            foreignKeyName: "cart_items_selected_variant_id_fkey"
             columns: ["selected_variant_id"]
             isOneToOne: false
             referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_products_user_id_fkey"
+            foreignKeyName: "cart_items_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -437,7 +437,7 @@ export type Database = {
           cashback_credited: boolean | null
           change_request_count: number | null
           commission_amount: number | null
-          courier_partner: string | null
+          courier_vendor: string | null
           courier_tracking_id: string | null
           created_at: string | null
           delivery_address: Json | null
@@ -486,7 +486,7 @@ export type Database = {
           cashback_credited?: boolean | null
           change_request_count?: number | null
           commission_amount?: number | null
-          courier_partner?: string | null
+          courier_vendor?: string | null
           courier_tracking_id?: string | null
           created_at?: string | null
           delivery_address?: Json | null
@@ -535,7 +535,7 @@ export type Database = {
           cashback_credited?: boolean | null
           change_request_count?: number | null
           commission_amount?: number | null
-          courier_partner?: string | null
+          courier_vendor?: string | null
           courier_tracking_id?: string | null
           created_at?: string | null
           delivery_address?: Json | null
@@ -1614,21 +1614,21 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cart_products_product_id_fkey"
+            foreignKeyName: "cart_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_products_selected_variant_id_fkey"
+            foreignKeyName: "cart_items_selected_variant_id_fkey"
             columns: ["variant_id"]
             isOneToOne: false
             referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_products_user_id_fkey"
+            foreignKeyName: "cart_items_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -1714,11 +1714,11 @@ export type Database = {
         Returns: boolean
       }
       _st_coveredby:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       _st_covers:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       _st_crosses: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: boolean
@@ -1774,42 +1774,42 @@ export type Database = {
       _st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       addauth: { Args: { "": string }; Returns: boolean }
       addgeometrycolumn:
-        | {
-            Args: {
-              catalog_name: string
-              column_name: string
-              new_dim: number
-              new_srid_in: number
-              new_type: string
-              schema_name: string
-              table_name: string
-              use_typmod?: boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              column_name: string
-              new_dim: number
-              new_srid: number
-              new_type: string
-              schema_name: string
-              table_name: string
-              use_typmod?: boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              column_name: string
-              new_dim: number
-              new_srid: number
-              new_type: string
-              table_name: string
-              use_typmod?: boolean
-            }
-            Returns: string
-          }
+      | {
+        Args: {
+          catalog_name: string
+          column_name: string
+          new_dim: number
+          new_srid_in: number
+          new_type: string
+          schema_name: string
+          table_name: string
+          use_typmod?: boolean
+        }
+        Returns: string
+      }
+      | {
+        Args: {
+          column_name: string
+          new_dim: number
+          new_srid: number
+          new_type: string
+          schema_name: string
+          table_name: string
+          use_typmod?: boolean
+        }
+        Returns: string
+      }
+      | {
+        Args: {
+          column_name: string
+          new_dim: number
+          new_srid: number
+          new_type: string
+          table_name: string
+          use_typmod?: boolean
+        }
+        Returns: string
+      }
       calculate_order_total: {
         Args: {
           p_address_id?: string
@@ -1846,66 +1846,66 @@ export type Database = {
       }
       disablelongtransactions: { Args: never; Returns: string }
       dropgeometrycolumn:
-        | {
-            Args: {
-              catalog_name: string
-              column_name: string
-              schema_name: string
-              table_name: string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              column_name: string
-              schema_name: string
-              table_name: string
-            }
-            Returns: string
-          }
-        | { Args: { column_name: string; table_name: string }; Returns: string }
+      | {
+        Args: {
+          catalog_name: string
+          column_name: string
+          schema_name: string
+          table_name: string
+        }
+        Returns: string
+      }
+      | {
+        Args: {
+          column_name: string
+          schema_name: string
+          table_name: string
+        }
+        Returns: string
+      }
+      | { Args: { column_name: string; table_name: string }; Returns: string }
       dropgeometrytable:
-        | {
-            Args: {
-              catalog_name: string
-              schema_name: string
-              table_name: string
-            }
-            Returns: string
-          }
-        | { Args: { schema_name: string; table_name: string }; Returns: string }
-        | { Args: { table_name: string }; Returns: string }
+      | {
+        Args: {
+          catalog_name: string
+          schema_name: string
+          table_name: string
+        }
+        Returns: string
+      }
+      | { Args: { schema_name: string; table_name: string }; Returns: string }
+      | { Args: { table_name: string }; Returns: string }
       enablelongtransactions: { Args: never; Returns: string }
       equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       execute_admin_intent: { Args: { p_intent: Json }; Returns: Json }
       execute_cart_mutation:
-        | {
-            Args: {
-              p_mode?: string
-              p_personalization?: Json
-              p_product_id: string
-              p_quantity: number
-              p_selected_addons?: Json
-              p_session_id?: string
-              p_user_id?: string
-              p_variant_id?: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_clear_other_vendors?: boolean
-              p_mode?: string
-              p_personalization?: Json
-              p_product_id: string
-              p_quantity: number
-              p_selected_addons?: Json
-              p_session_id?: string
-              p_user_id?: string
-              p_variant_id?: string
-            }
-            Returns: Json
-          }
+      | {
+        Args: {
+          p_mode?: string
+          p_personalization?: Json
+          p_product_id: string
+          p_quantity: number
+          p_selected_addons?: Json
+          p_session_id?: string
+          p_user_id?: string
+          p_variant_id?: string
+        }
+        Returns: Json
+      }
+      | {
+        Args: {
+          p_clear_other_vendors?: boolean
+          p_mode?: string
+          p_personalization?: Json
+          p_product_id: string
+          p_quantity: number
+          p_selected_addons?: Json
+          p_session_id?: string
+          p_user_id?: string
+          p_variant_id?: string
+        }
+        Returns: Json
+      }
       geometry: { Args: { "": string }; Returns: unknown }
       geometry_above: {
         Args: { geom1: unknown; geom2: unknown }
@@ -2053,26 +2053,26 @@ export type Database = {
       }
       gettransactionid: { Args: never; Returns: unknown }
       log_order_status_history:
-        | {
-            Args: {
-              p_description?: string
-              p_metadata?: Json
-              p_order_id: string
-              p_status: Database["public"]["Enums"]["order_status"]
-              p_title?: string
-            }
-            Returns: undefined
-          }
-        | {
-            Args: {
-              p_description: string
-              p_metadata?: Json
-              p_order_id: string
-              p_title: string
-              p_type: string
-            }
-            Returns: Json
-          }
+      | {
+        Args: {
+          p_description?: string
+          p_metadata?: Json
+          p_order_id: string
+          p_status: Database["public"]["Enums"]["order_status"]
+          p_title?: string
+        }
+        Returns: undefined
+      }
+      | {
+        Args: {
+          p_description: string
+          p_metadata?: Json
+          p_order_id: string
+          p_title: string
+          p_type: string
+        }
+        Returns: Json
+      }
       longtransactionsenabled: { Args: never; Returns: boolean }
       merge_guest_to_user: {
         Args: { p_session_id: string; p_user_id: string }
@@ -2097,8 +2097,8 @@ export type Database = {
         Returns: Json
       }
       populate_geometry_columns:
-        | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
-        | { Args: { use_typmod?: boolean }; Returns: string }
+      | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
+      | { Args: { use_typmod?: boolean }; Returns: string }
       postgis_constraint_dims: {
         Args: { geomcolumn: string; geomschema: string; geomtable: string }
         Returns: number
@@ -2183,86 +2183,86 @@ export type Database = {
         Returns: unknown
       }
       st_angle:
-        | { Args: { line1: unknown; line2: unknown }; Returns: number }
-        | {
-            Args: { pt1: unknown; pt2: unknown; pt3: unknown; pt4?: unknown }
-            Returns: number
-          }
+      | { Args: { line1: unknown; line2: unknown }; Returns: number }
+      | {
+        Args: { pt1: unknown; pt2: unknown; pt3: unknown; pt4?: unknown }
+        Returns: number
+      }
       st_area:
-        | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
-        | { Args: { "": string }; Returns: number }
+      | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
+      | { Args: { "": string }; Returns: number }
       st_asencodedpolyline: {
         Args: { geom: unknown; nprecision?: number }
         Returns: string
       }
       st_asewkt: { Args: { "": string }; Returns: string }
       st_asgeojson:
-        | {
-            Args: { geog: unknown; maxdecimaldigits?: number; options?: number }
-            Returns: string
-          }
-        | {
-            Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
-            Returns: string
-          }
-        | {
-            Args: {
-              geom_column?: string
-              maxdecimaldigits?: number
-              pretty_bool?: boolean
-              r: Record<string, unknown>
-            }
-            Returns: string
-          }
-        | { Args: { "": string }; Returns: string }
+      | {
+        Args: { geog: unknown; maxdecimaldigits?: number; options?: number }
+        Returns: string
+      }
+      | {
+        Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
+        Returns: string
+      }
+      | {
+        Args: {
+          geom_column?: string
+          maxdecimaldigits?: number
+          pretty_bool?: boolean
+          r: Record<string, unknown>
+        }
+        Returns: string
+      }
+      | { Args: { "": string }; Returns: string }
       st_asgml:
-        | {
-            Args: {
-              geog: unknown
-              id?: string
-              maxdecimaldigits?: number
-              nprefix?: string
-              options?: number
-            }
-            Returns: string
-          }
-        | {
-            Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
-            Returns: string
-          }
-        | { Args: { "": string }; Returns: string }
-        | {
-            Args: {
-              geog: unknown
-              id?: string
-              maxdecimaldigits?: number
-              nprefix?: string
-              options?: number
-              version: number
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              geom: unknown
-              id?: string
-              maxdecimaldigits?: number
-              nprefix?: string
-              options?: number
-              version: number
-            }
-            Returns: string
-          }
+      | {
+        Args: {
+          geog: unknown
+          id?: string
+          maxdecimaldigits?: number
+          nprefix?: string
+          options?: number
+        }
+        Returns: string
+      }
+      | {
+        Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
+        Returns: string
+      }
+      | { Args: { "": string }; Returns: string }
+      | {
+        Args: {
+          geog: unknown
+          id?: string
+          maxdecimaldigits?: number
+          nprefix?: string
+          options?: number
+          version: number
+        }
+        Returns: string
+      }
+      | {
+        Args: {
+          geom: unknown
+          id?: string
+          maxdecimaldigits?: number
+          nprefix?: string
+          options?: number
+          version: number
+        }
+        Returns: string
+      }
       st_askml:
-        | {
-            Args: { geog: unknown; maxdecimaldigits?: number; nprefix?: string }
-            Returns: string
-          }
-        | {
-            Args: { geom: unknown; maxdecimaldigits?: number; nprefix?: string }
-            Returns: string
-          }
-        | { Args: { "": string }; Returns: string }
+      | {
+        Args: { geog: unknown; maxdecimaldigits?: number; nprefix?: string }
+        Returns: string
+      }
+      | {
+        Args: { geom: unknown; maxdecimaldigits?: number; nprefix?: string }
+        Returns: string
+      }
+      | { Args: { "": string }; Returns: string }
       st_aslatlontext: {
         Args: { geom: unknown; tmpl?: string }
         Returns: string
@@ -2279,60 +2279,60 @@ export type Database = {
         Returns: unknown
       }
       st_assvg:
-        | {
-            Args: { geog: unknown; maxdecimaldigits?: number; rel?: number }
-            Returns: string
-          }
-        | {
-            Args: { geom: unknown; maxdecimaldigits?: number; rel?: number }
-            Returns: string
-          }
-        | { Args: { "": string }; Returns: string }
+      | {
+        Args: { geog: unknown; maxdecimaldigits?: number; rel?: number }
+        Returns: string
+      }
+      | {
+        Args: { geom: unknown; maxdecimaldigits?: number; rel?: number }
+        Returns: string
+      }
+      | { Args: { "": string }; Returns: string }
       st_astext: { Args: { "": string }; Returns: string }
       st_astwkb:
-        | {
-            Args: {
-              geom: unknown
-              prec?: number
-              prec_m?: number
-              prec_z?: number
-              with_boxes?: boolean
-              with_sizes?: boolean
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              geom: unknown[]
-              ids: number[]
-              prec?: number
-              prec_m?: number
-              prec_z?: number
-              with_boxes?: boolean
-              with_sizes?: boolean
-            }
-            Returns: string
-          }
+      | {
+        Args: {
+          geom: unknown
+          prec?: number
+          prec_m?: number
+          prec_z?: number
+          with_boxes?: boolean
+          with_sizes?: boolean
+        }
+        Returns: string
+      }
+      | {
+        Args: {
+          geom: unknown[]
+          ids: number[]
+          prec?: number
+          prec_m?: number
+          prec_z?: number
+          with_boxes?: boolean
+          with_sizes?: boolean
+        }
+        Returns: string
+      }
       st_asx3d: {
         Args: { geom: unknown; maxdecimaldigits?: number; options?: number }
         Returns: string
       }
       st_azimuth:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: number }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
+      | { Args: { geog1: unknown; geog2: unknown }; Returns: number }
+      | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
       st_boundingdiagonal: {
         Args: { fits?: boolean; geom: unknown }
         Returns: unknown
       }
       st_buffer:
-        | {
-            Args: { geom: unknown; options?: string; radius: number }
-            Returns: unknown
-          }
-        | {
-            Args: { geom: unknown; quadsegs: number; radius: number }
-            Returns: unknown
-          }
+      | {
+        Args: { geom: unknown; options?: string; radius: number }
+        Returns: unknown
+      }
+      | {
+        Args: { geom: unknown; quadsegs: number; radius: number }
+        Returns: unknown
+      }
       st_centroid: { Args: { "": string }; Returns: unknown }
       st_clipbybox2d: {
         Args: { box: unknown; geom: unknown }
@@ -2361,11 +2361,11 @@ export type Database = {
       }
       st_coorddim: { Args: { geometry: unknown }; Returns: number }
       st_coveredby:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_covers:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_crosses: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_curvetoline: {
         Args: { flags?: number; geom: unknown; tol?: number; toltype?: number }
@@ -2384,17 +2384,17 @@ export type Database = {
         Returns: boolean
       }
       st_distance:
-        | {
-            Args: { geog1: unknown; geog2: unknown; use_spheroid?: boolean }
-            Returns: number
-          }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
+      | {
+        Args: { geog1: unknown; geog2: unknown; use_spheroid?: boolean }
+        Returns: number
+      }
+      | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
       st_distancesphere:
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
-        | {
-            Args: { geom1: unknown; geom2: unknown; radius: number }
-            Returns: number
-          }
+      | { Args: { geom1: unknown; geom2: unknown }; Returns: number }
+      | {
+        Args: { geom1: unknown; geom2: unknown; radius: number }
+        Returns: number
+      }
       st_distancespheroid: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: number
@@ -2410,21 +2410,21 @@ export type Database = {
       }
       st_equals: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_expand:
-        | { Args: { box: unknown; dx: number; dy: number }; Returns: unknown }
-        | {
-            Args: { box: unknown; dx: number; dy: number; dz?: number }
-            Returns: unknown
-          }
-        | {
-            Args: {
-              dm?: number
-              dx: number
-              dy: number
-              dz?: number
-              geom: unknown
-            }
-            Returns: unknown
-          }
+      | { Args: { box: unknown; dx: number; dy: number }; Returns: unknown }
+      | {
+        Args: { box: unknown; dx: number; dy: number; dz?: number }
+        Returns: unknown
+      }
+      | {
+        Args: {
+          dm?: number
+          dx: number
+          dy: number
+          dz?: number
+          geom: unknown
+        }
+        Returns: unknown
+      }
       st_force3d: { Args: { geom: unknown; zvalue?: number }; Returns: unknown }
       st_force3dm: {
         Args: { geom: unknown; mvalue?: number }
@@ -2439,16 +2439,16 @@ export type Database = {
         Returns: unknown
       }
       st_generatepoints:
-        | { Args: { area: unknown; npoints: number }; Returns: unknown }
-        | {
-            Args: { area: unknown; npoints: number; seed: number }
-            Returns: unknown
-          }
+      | { Args: { area: unknown; npoints: number }; Returns: unknown }
+      | {
+        Args: { area: unknown; npoints: number; seed: number }
+        Returns: unknown
+      }
       st_geogfromtext: { Args: { "": string }; Returns: unknown }
       st_geographyfromtext: { Args: { "": string }; Returns: unknown }
       st_geohash:
-        | { Args: { geog: unknown; maxchars?: number }; Returns: string }
-        | { Args: { geom: unknown; maxchars?: number }; Returns: string }
+      | { Args: { geog: unknown; maxchars?: number }; Returns: string }
+      | { Args: { geom: unknown; maxchars?: number }; Returns: string }
       st_geomcollfromtext: { Args: { "": string }; Returns: unknown }
       st_geometricmedian: {
         Args: {
@@ -2462,9 +2462,9 @@ export type Database = {
       st_geometryfromtext: { Args: { "": string }; Returns: unknown }
       st_geomfromewkt: { Args: { "": string }; Returns: unknown }
       st_geomfromgeojson:
-        | { Args: { "": Json }; Returns: unknown }
-        | { Args: { "": Json }; Returns: unknown }
-        | { Args: { "": string }; Returns: unknown }
+      | { Args: { "": Json }; Returns: unknown }
+      | { Args: { "": Json }; Returns: unknown }
+      | { Args: { "": string }; Returns: unknown }
       st_geomfromgml: { Args: { "": string }; Returns: unknown }
       st_geomfromkml: { Args: { "": string }; Returns: unknown }
       st_geomfrommarc21: { Args: { marc21xml: string }; Returns: unknown }
@@ -2492,8 +2492,8 @@ export type Database = {
         Returns: unknown
       }
       st_intersects:
-        | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
+      | { Args: { geog1: unknown; geog2: unknown }; Returns: boolean }
+      | { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_isvaliddetail: {
         Args: { flags?: number; geom: unknown }
         Returns: Database["public"]["CompositeTypes"]["valid_detail"]
@@ -2505,8 +2505,8 @@ export type Database = {
         }
       }
       st_length:
-        | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
-        | { Args: { "": string }; Returns: number }
+      | { Args: { geog: unknown; use_spheroid?: boolean }; Returns: number }
+      | { Args: { "": string }; Returns: number }
       st_letters: { Args: { font?: Json; letters: string }; Returns: unknown }
       st_linecrossingdirection: {
         Args: { line1: unknown; line2: unknown }
@@ -2646,8 +2646,8 @@ export type Database = {
         Returns: unknown
       }
       st_setsrid:
-        | { Args: { geog: unknown; srid: number }; Returns: unknown }
-        | { Args: { geom: unknown; srid: number }; Returns: unknown }
+      | { Args: { geog: unknown; srid: number }; Returns: unknown }
+      | { Args: { geom: unknown; srid: number }; Returns: unknown }
       st_sharedpaths: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown
@@ -2670,8 +2670,8 @@ export type Database = {
         Returns: Record<string, unknown>[]
       }
       st_srid:
-        | { Args: { geog: unknown }; Returns: number }
-        | { Args: { geom: unknown }; Returns: number }
+      | { Args: { geog: unknown }; Returns: number }
+      | { Args: { geom: unknown }; Returns: number }
       st_subdivide: {
         Args: { geom: unknown; gridsize?: number; maxvertices?: number }
         Returns: unknown[]
@@ -2700,22 +2700,22 @@ export type Database = {
       }
       st_touches: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
       st_transform:
-        | {
-            Args: { from_proj: string; geom: unknown; to_proj: string }
-            Returns: unknown
-          }
-        | {
-            Args: { from_proj: string; geom: unknown; to_srid: number }
-            Returns: unknown
-          }
-        | { Args: { geom: unknown; to_proj: string }; Returns: unknown }
+      | {
+        Args: { from_proj: string; geom: unknown; to_proj: string }
+        Returns: unknown
+      }
+      | {
+        Args: { from_proj: string; geom: unknown; to_srid: number }
+        Returns: unknown
+      }
+      | { Args: { geom: unknown; to_proj: string }; Returns: unknown }
       st_triangulatepolygon: { Args: { g1: unknown }; Returns: unknown }
       st_union:
-        | { Args: { geom1: unknown; geom2: unknown }; Returns: unknown }
-        | {
-            Args: { geom1: unknown; geom2: unknown; gridsize: number }
-            Returns: unknown
-          }
+      | { Args: { geom1: unknown; geom2: unknown }; Returns: unknown }
+      | {
+        Args: { geom1: unknown; geom2: unknown; gridsize: number }
+        Returns: unknown
+      }
       st_voronoilines: {
         Args: { extend_to?: unknown; g1: unknown; tolerance?: number }
         Returns: unknown
@@ -2768,17 +2768,17 @@ export type Database = {
     }
     Enums: {
       order_status:
-        | "PLACED"
-        | "CONFIRMED"
-        | "IN_PRODUCTION"
-        | "PACKED"
-        | "RIDER_ASSIGNED"
-        | "ARRIVED_PICKUP"
-        | "OUT_FOR_DELIVERY"
-        | "ARRIVED_DROP"
-        | "DELIVERED"
-        | "CANCELLED"
-        | "REFUNDED"
+      | "PLACED"
+      | "CONFIRMED"
+      | "IN_PRODUCTION"
+      | "PACKED"
+      | "RIDER_ASSIGNED"
+      | "ARRIVED_PICKUP"
+      | "OUT_FOR_DELIVERY"
+      | "ARRIVED_DROP"
+      | "DELIVERED"
+      | "CANCELLED"
+      | "REFUNDED"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -2800,116 +2800,116 @@ type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+  | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+  ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+  : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-    ? R
-    : never
+  ? R
+  : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
+    DefaultSchema["Views"])
+  ? (DefaultSchema["Tables"] &
+    DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+      Row: infer R
+    }
+  ? R
+  : never
+  : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof DefaultSchema["Tables"]
+  | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+  : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
+    Insert: infer I
+  }
+  ? I
+  : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
+  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+    Insert: infer I
+  }
+  ? I
+  : never
+  : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof DefaultSchema["Tables"]
+  | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+  : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
+    Update: infer U
+  }
+  ? U
+  : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
+  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+    Update: infer U
+  }
+  ? U
+  : never
+  : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof DefaultSchema["Enums"]
+  | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+  ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+  : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
+  | keyof DefaultSchema["CompositeTypes"]
+  | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+  ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+  : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : never
 
 export const Constants = {
   public: {

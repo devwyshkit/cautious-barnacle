@@ -18,7 +18,7 @@ const StoreHeader = React.lazy(() => import('./blocks/store/StoreHeader').then(m
 
 // Checkout Blocks - PURGED as per Wyshkit 2026 Structural Blueprint (SPI Principle)
 
-export type BlockType = 'CIRCLE_RAIL' | 'CARD_RAIL' | 'GRID' | 'BANNER_BENTO' | 'PARTNER_LIST' | 'PARTNER_GROUPED_GRID' | 'INFINITE_GRID' | 'STORE_HEADER';
+export type BlockType = 'CIRCLE_RAIL' | 'CARD_RAIL' | 'GRID' | 'BANNER_BENTO' | 'VENDOR_LIST' | 'VENDOR_GROUPED_GRID' | 'INFINITE_GRID' | 'STORE_HEADER';
 
 export interface BlockData<T = any> {
     id: string;
@@ -52,8 +52,8 @@ export function BlocksEngine({ blocks, className, context }: BlocksEngineProps) 
                 return <CardRail data={block.data} />;
             case 'GRID':
                 return <Grid data={block.data} />;
-            case 'PARTNER_LIST':
-            case 'PARTNER_GROUPED_GRID':
+            case 'VENDOR_LIST':
+            case 'VENDOR_GROUPED_GRID':
                 return <VendorGroupedGrid data={block.data} title={block.title} subtitle={block.subtitle} context={context} />;
             case 'INFINITE_GRID':
                 return (

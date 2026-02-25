@@ -4,7 +4,7 @@ import { useState, useActionState } from 'react';
 import { FileText, Download, Loader2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
-import { getPartnerInfo } from '@/lib/actions/discovery/vendors';
+import { getVendorInfo } from '@/lib/actions/discovery/vendors';
 import { toast } from 'sonner';
 
 import { DraftLineItem } from '@/lib/types/personalization';
@@ -36,9 +36,9 @@ export function EstimateButton({
         }
 
         try {
-            const partnerId = products[0]?.vendor_id;
-            if (!partnerId) throw new Error("Vendor ID missing");
-            const { data: vendor } = await getPartnerInfo(partnerId);
+            const vendorId = products[0]?.vendor_id;
+            if (!vendorId) throw new Error("Vendor ID missing");
+            const { data: vendor } = await getVendorInfo(vendorId);
 
             generateEstimatePDF({
                 date: new Date().toLocaleDateString(),

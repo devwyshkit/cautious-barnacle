@@ -65,7 +65,7 @@ export function HistoryTrail({ orderItems, previews, timeline }: HistoryTrailPro
                                     <p className="text-[11px] font-bold text-zinc-900">{product.product_name}</p>
                                 </div>
                                 {product.personalization_details?.text && (
-                                    <p className="text-xs text-zinc-500 italic leading-relaxed">"{product.personalization_details.text}"</p>
+                                    <p className="text-xs text-zinc-500 italic leading-relaxed">&quot;{product.personalization_details.text}&quot;</p>
                                 )}
                                 {product.personalization_details?.image_url && (
                                     <div className="aspect-video rounded-xl overflow-hidden border border-zinc-100">
@@ -117,13 +117,13 @@ export function HistoryTrail({ orderItems, previews, timeline }: HistoryTrailPro
                                     )}
                                 </div>
 
-                                {preview.partner_notes && (
+                                {preview.vendor_notes && (
                                     <div className="p-4 px-6">
                                         <p className="text-xs font-bold text-zinc-400 tracking-tight mb-1.5 flex items-center gap-1.5">
                                             <Sparkles className="size-3" /> Designer Notes
                                         </p>
                                         <p className="text-xs text-zinc-600 leading-relaxed bg-amber-50/50 p-3 rounded-xl border border-amber-100/50">
-                                            {preview.partner_notes}
+                                            {preview.vendor_notes}
                                         </p>
                                     </div>
                                 )}
@@ -134,7 +134,7 @@ export function HistoryTrail({ orderItems, previews, timeline }: HistoryTrailPro
                                             <RefreshCw className="size-3" /> Your Feedback (Revision)
                                         </p>
                                         <p className="text-xs text-zinc-600 leading-relaxed italic">
-                                            "{preview.customer_feedback}"
+                                            &quot;{preview.customer_feedback}&quot;
                                         </p>
                                     </div>
                                 )}

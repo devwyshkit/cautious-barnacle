@@ -30,7 +30,7 @@ export const EliteSignalsSchema = z.object({
     }).nullable().optional(),
 });
 
-export const PartnerSchema = z.object({
+export const VendorSchema = z.object({
     id: z.string(),
     name: z.string(),
     image_url: z.string().nullable().optional(),
@@ -62,7 +62,7 @@ export const WyshkitItemSchema = z.object({
 
     // Joins
     vendor_name: z.string().nullable().optional(),
-    vendors: PartnerSchema.nullable().optional(),
+    vendors: VendorSchema.nullable().optional(),
     variants: z.array(z.any()).nullable().optional(), // Will refine later
     item_addons: z.array(z.any()).nullable().optional(),
     personalization_options: z.array(z.any()).nullable().optional(),
@@ -91,12 +91,12 @@ export const HomeSurfaceSchema = z.object({
 
 export const SearchResultsSchema = z.object({
     products: z.array(WyshkitItemSchema),
-    vendors: z.array(PartnerSchema),
+    vendors: z.array(VendorSchema),
     total: z.number(),
 });
 
 export type ValidatedCategory = z.infer<typeof CategorySchema>;
-export type ValidatedPartner = z.infer<typeof PartnerSchema>;
+export type ValidatedVendor = z.infer<typeof VendorSchema>;
 export type ValidatedWyshkitItem = z.infer<typeof WyshkitItemSchema>;
 export type ValidatedHomeSurface = z.infer<typeof HomeSurfaceSchema>;
 export type ValidatedSearchResults = z.infer<typeof SearchResultsSchema>;

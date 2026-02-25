@@ -21,7 +21,7 @@ import { ArrowLeft, Check, X, Loader2, ExternalLink } from 'lucide-react'
 import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import type { Vendor } from '@/lib/types/admin.types'
 
-interface PartnerDetailViewProps {
+interface VendorDetailViewProps {
   vendor: Vendor
   stats: { orders: number; gmv: number; products: number }
 }
@@ -48,7 +48,7 @@ function getStatusBadge(status: string | null) {
   }
 }
 
-export function PartnerDetailView({ vendor, stats }: PartnerDetailViewProps) {
+export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
   const [loading, setLoading] = useState(false)
   const [commission, setCommission] = useState(String(vendor.commission_percentage ?? 10))
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false)

@@ -43,6 +43,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
   const [itemAvailability, setItemAvailability] = useState<Record<string, { inStock: boolean; name: string }>>({});
   const [loading, setLoading] = useState(!initialOrders);
   const [reorderingId, setReorderingId] = useState<string | null>(null);
+  const [personalizationChoiceOrder, setPersonalizationChoiceOrder] = useState<RecentOrder | null>(null);
 
   useEffect(() => {
     if (initialOrders || !user) {
@@ -57,7 +58,14 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
         .select(`
           id, order_number, total, created_at,
           vendors(name),
-          order_products(product_id, product_name, quantity, variant_id, products(images))
+          order_products(
+            product_id, 
+            product_name, 
+            quantity, 
+            variant_id, 
+            personalization_details,
+            products(images, is_personalized)
+          )
         `)
         .eq('user_id', user.id)
         .in('status', ['DELIVERED', 'OUT_FOR_DELIVERY', 'PACKED', 'IN_PRODUCTION'])
@@ -73,7 +81,12 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
             product_name: oi.product_name,
             quantity: oi.quantity,
             images: oi.products?.images || [],
-            variant_id: oi.variant_id
+            is_personalized: oi.products?.is_personalized,
+            variant_id: oi.variant_id,
+            personalization: oi.personalization_details ? {
+              enabled: true,
+              ...oi.personalization_details
+            } : undefined
           }))
         }));
         setRecentOrders(mappedData);
@@ -104,20 +117,32 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
     fetchRecentOrders();
   }, [user]);
 
-  const handleReorder = async (order: RecentOrder) => {
+  const initiateReorder = (order: RecentOrder) => {
+    const personalizedItems = order.products.filter(p => (p as any).is_personalized);
+    if (personalizedItems.length > 0) {
+      setPersonalizationChoiceOrder(order);
+    } else {
+      handleReorder(order, false);
+    }
+  };
+
+  const handleReorder = async (order: RecentOrder, reusePersonalization: boolean) => {
     if (!order.products || order.products.length === 0) return;
 
     // WYSHKIT 2026: Momentum Haptic
     triggerHaptic(HapticPattern.ACTION);
 
     setReorderingId(order.id);
+    setPersonalizationChoiceOrder(null);
 
     try {
       for (const product of order.products) {
         const result = await addToDraftOrder(
           product.product_id,
           product.variant_id || null,
-          product.personalization || { enabled: false },
+          reusePersonalization && product.personalization
+            ? product.personalization
+            : { enabled: !!(product as any).is_personalized },
           [],
           product.quantity,
           {
@@ -129,7 +154,6 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
         );
 
         if (result?.error) {
-          // Swiggy 2026: Stop early on error (like VENDOR_MISMATCH or OUT_OF_STOCK)
           if (result.code === 'OUT_OF_STOCK') {
             toast.error(result.error);
             return;
@@ -138,16 +162,14 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
             toast.error(result.error || 'Failed to add some products');
             return;
           }
-          // If mismatch, the dialog is shown by CartProvider, we should stop our loop
           return;
         }
       }
       toast.success('Products added to cart!');
-      logger.info('Reorder successful', { orderId: order.id, itemCount: order.products.length });
+      logger.info('Reorder successful', { orderId: order.id, reusePersonalization });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('Reorder failed', error, { orderId: order.id, itemCount: order.products.length });
-      toast.error('Failed to add products. Please try again.');
+      logger.error('Reorder failed', error as Error);
+      toast.error('Failed to add products');
     } finally {
       setReorderingId(null);
     }
@@ -204,8 +226,8 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
           return (
             <button
               key={order.id}
-              onClick={() => handleReorder(order)}
-              disabled={isPending || isReordering || !isOrderAvailable}
+              onClick={() => initiateReorder(order)}
+              disabled={isPending || reorderingId === order.id || !isOrderAvailable}
               className={cn(
                 "shrink-0 w-[260px] bg-zinc-50/50 rounded-xl border border-zinc-100/50 overflow-hidden",
                 "hover:bg-white hover:border-zinc-200 hover:shadow-sm transition-all duration-300",
@@ -231,7 +253,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
                     </div>
                   )}
                   {hasPersonalization && (
-                    <div className="absolute bottom-1 left-1 px-1 py-0.5 rounded bg-amber-500/90">
+                    <div className="absolute bottom-1 left-1 px-1 py-0.5 rounded bg-amber-500/90 shadow-sm animate-pulse">
                       <Sparkles className="size-2.5 text-white" />
                     </div>
                   )}
@@ -261,13 +283,13 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
 
                     <div className={cn(
                       "flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all",
-                      isReordering
+                      reorderingId === order.id
                         ? "bg-emerald-100 text-emerald-700"
                         : !isOrderAvailable
                           ? "bg-rose-50 text-rose-600"
                           : "bg-zinc-100 text-zinc-700 group-hover:bg-zinc-900 group-hover:text-white"
                     )}>
-                      {isReordering ? (
+                      {reorderingId === order.id ? (
                         <>
                           <Check className="size-3" />
                           <span>Adding</span>
@@ -291,6 +313,49 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
           );
         })}
       </div>
+
+      {/* WYSHKIT 2026: Personalisation Choice Modal (PA-08) */}
+      {personalizationChoiceOrder && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
+            <div className="flex flex-col items-center text-center space-y-6">
+              <div className="size-20 rounded-[30px] bg-amber-50 flex items-center justify-center shadow-inner relative overflow-hidden">
+                <Sparkles className="size-10 text-amber-500 relative z-10" />
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-200/20 to-transparent" />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black tracking-tight text-zinc-900">Personalise again?</h3>
+                <p className="text-sm font-medium text-zinc-500 px-4">
+                  Do you want to use the same personalisation as before, or create something new?
+                </p>
+              </div>
+
+              <div className="w-full space-y-3 pt-4">
+                <button
+                  onClick={() => handleReorder(personalizationChoiceOrder, true)}
+                  className="w-full h-16 bg-zinc-900 text-white rounded-2xl font-black tracking-tight hover:bg-black active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-xl shadow-zinc-200"
+                >
+                  <RotateCcw className="size-5 text-amber-500" />
+                  Reuse same details
+                </button>
+                <button
+                  onClick={() => handleReorder(personalizationChoiceOrder, false)}
+                  className="w-full h-16 bg-zinc-50 text-zinc-900 border border-zinc-100 rounded-2xl font-black tracking-tight hover:bg-zinc-100 active:scale-[0.98] transition-all"
+                >
+                  Create new design
+                </button>
+                <button
+                  onClick={() => setPersonalizationChoiceOrder(null)}
+                  className="w-full py-4 text-xs font-black text-zinc-400 tracking-tight hover:text-zinc-600 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

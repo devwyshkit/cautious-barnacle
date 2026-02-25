@@ -62,7 +62,7 @@ export function SubmittedIdentity({ details, itemName, isOptimisticSubmitted }: 
                         <div className="space-y-1.5">
                             <p className="text-[11px] font-black text-zinc-400 tracking-[0.15em]">Instructions</p>
                             <div className="bg-white p-3 rounded-xl border border-zinc-100 italic text-sm text-zinc-700 leading-relaxed">
-                                "{details.text}"
+                                &quot;{details.text}&quot;
                             </div>
                         </div>
                     )}

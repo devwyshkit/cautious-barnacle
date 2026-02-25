@@ -43,7 +43,7 @@ export function RoleGuard({
           // We check the specific permission flags
           const isAuthorized =
             (allowedRoles.includes('admin') && permissions.isAdmin) ||
-            (allowedRoles.includes('vendor') && (permissions.isPartner || permissions.isAdmin)) ||
+            (allowedRoles.includes('vendor') && (permissions.isVendor || permissions.isAdmin)) ||
             (allowedRoles.includes('customer') && permissions.isCustomer);
 
           if (isAuthorized) {
@@ -82,7 +82,7 @@ export function RoleGuard({
       <div className="flex h-screen w-full flex-col items-center justify-center bg-white">
         <div className="text-center space-y-4 px-6">
           <h2 className="text-xl font-bold text-zinc-900">Access Denied</h2>
-          <p className="text-sm text-zinc-600">You don't have permission to access this page.</p>
+          <p className="text-sm text-zinc-600">You don&apos;t have permission to access this page.</p>
           <p className="text-xs text-zinc-400">Redirecting...</p>
         </div>
       </div>

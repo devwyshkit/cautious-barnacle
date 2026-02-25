@@ -55,7 +55,7 @@ export class PaymentErrorBoundary extends Component<Props, State> {
             <div className="flex-1">
               <h3 className="text-sm font-bold text-red-900">Payment Error</h3>
               <p className="text-xs text-red-700 mt-0.5">
-                We couldn't process your payment. Please check your payment details and try again.
+                Something went wrong while processing your payment. Don&apos;t worry, if any amount was deducted, it will be refunded automatically.
               </p>
               {process.env.NODE_ENV === 'development' && this.state.error && (
                 <p className="text-xs text-red-600 mt-1 font-mono">

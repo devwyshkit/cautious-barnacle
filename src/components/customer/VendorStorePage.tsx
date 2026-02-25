@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { MappedPartner } from '@/lib/types/vendor';
+import { MappedVendor } from '@/lib/types/vendor';
 import { useRouter } from 'next/navigation';
 import { useCartValidation } from '@/hooks/useCartValidation';
 import { AlertCircle } from 'lucide-react';
@@ -13,18 +13,18 @@ import { WyshkitItem } from '@/lib/types/product';
 import { ProductCard } from '@/components/ui/ProductCard';
 
 interface VendorStorePageProps {
-  partnerId: string;
-  initialData?: MappedPartner;
+  vendorId: string;
+  initialData?: MappedVendor;
   products: WyshkitItem[];
   itemsGroupedByCategory: Record<string, WyshkitItem[]>;
   categories: any[];
 }
 
-export function VendorStorePage({ partnerId, initialData, products, itemsGroupedByCategory, categories }: VendorStorePageProps) {
+export function VendorStorePage({ vendorId, initialData, products, itemsGroupedByCategory, categories }: VendorStorePageProps) {
   const router = useRouter();
 
   // WYSHKIT 2026: Proactive Cart Validation
-  const { isMismatch } = useCartValidation(partnerId);
+  const { isMismatch } = useCartValidation(vendorId);
 
   if (!initialData || !products) {
     return (

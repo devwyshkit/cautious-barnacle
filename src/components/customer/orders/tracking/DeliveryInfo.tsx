@@ -20,7 +20,7 @@ export function DeliveryInfo({ order }: DeliveryInfoProps) {
                         </div>
                         <div>
                             <p className="text-xs font-black text-zinc-500 tracking-tight leading-none mb-1.5">Tracking ID</p>
-                            <p className="text-sm font-bold text-zinc-900">{order.courier_partner || 'Shadowfax'} • {order.awb_number}</p>
+                            <p className="text-sm font-bold text-zinc-900">{order.courier_vendor || 'Shadowfax'} • {order.awb_number}</p>
                         </div>
                     </div>
                     {order.tracking_url && (

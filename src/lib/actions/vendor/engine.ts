@@ -1,7 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { getPartnerFromSession } from '@/lib/auth/server';
+import { getVendorFromSession } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { ORDER_STATUS } from '@/lib/types/order-status';
@@ -11,7 +11,7 @@ import { ORDER_STATUS } from '@/lib/types/order-status';
  * One primitive for all vendor-side operations.
  */
 
-const PartnerIntentSchema = z.discriminatedUnion('entity', [
+const VendorIntentSchema = z.discriminatedUnion('entity', [
     z.object({
         entity: z.literal('order'),
         action: z.enum(['ACCEPT', 'REJECT', 'UPDATE_STATUS', 'UPLOAD_PREVIEW']),
@@ -33,16 +33,16 @@ const PartnerIntentSchema = z.discriminatedUnion('entity', [
     })
 ]);
 
-export type PartnerIntent = z.infer<typeof PartnerIntentSchema>;
+export type VendorIntent = z.infer<typeof VendorIntentSchema>;
 
-export async function executePartnerIntent(intent: PartnerIntent) {
-    const vendor = await getPartnerFromSession();
+export async function executeVendorIntent(intent: VendorIntent) {
+    const vendor = await getVendorFromSession();
     if (!vendor) throw new Error('Unauthorized');
 
     // Safety: ensure the vendor can only act on their own entities
     // We'll verify this inside each case for granular security.
 
-    const validated = PartnerIntentSchema.parse(intent);
+    const validated = VendorIntentSchema.parse(intent);
     const supabase = await createClient();
 
     try {
@@ -72,7 +72,7 @@ export async function executePartnerIntent(intent: PartnerIntent) {
                         validated.id,
                         validated.metadata.order_product_id,
                         validated.metadata.preview_url,
-                        validated.metadata.partner_notes
+                        validated.metadata.vendor_notes
                     );
                 }
                 break;
@@ -116,7 +116,7 @@ export async function executePartnerIntent(intent: PartnerIntent) {
 
         return { success: true };
     } catch (error: any) {
-        console.error('[executePartnerIntent] Error:', error);
+        console.error('[executeVendorIntent] Error:', error);
         return { success: false, error: error.message };
     }
 }

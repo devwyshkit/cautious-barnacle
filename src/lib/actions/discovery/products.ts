@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
 import { WyshkitItem } from '@/lib/types/product';
-import { MappedPartner } from '@/lib/types/vendor';
+import { MappedVendor } from '@/lib/types/vendor';
 import {
     WyshkitItemSchema,
 } from '@/lib/validations/discovery';
@@ -41,7 +41,7 @@ export async function getItemWithFullSpec(itemId: string) {
         const [itemRes, variantsRes] = await Promise.all([
             supabase
                 .from('products')
-                .select('*, vendors:vendors(id, name, slug, city, rating, image_url, fssai_license, gstin)')
+                .select('*, vendors:vendors(id, name, slug, city, rating, image_url, gstin)')
                 .eq('id', itemId)
                 .eq('is_active', true)
                 .maybeSingle(),
@@ -58,7 +58,7 @@ export async function getItemWithFullSpec(itemId: string) {
 
         const rawItem = {
             ...(itemRes.data),
-            vendors: (itemRes.data.vendors as unknown) as MappedPartner,
+            vendors: (itemRes.data.vendors as unknown) as MappedVendor,
             variants: variantsRes.data || [],
         };
 
@@ -80,7 +80,7 @@ export async function getItemWithFullSpec(itemId: string) {
  */
 export async function getUpsellItems(
     itemId: string,
-    partnerId: string,
+    vendorId: string,
     category: string
 ) {
     try {
@@ -91,7 +91,7 @@ export async function getUpsellItems(
             .select('id, name, base_price, images, vendor_id, slug, vendors(name)')
             .eq('is_active', true)
             .neq('id', itemId)
-            .or(`vendor_id.eq.${partnerId},category.eq.${category}`)
+            .or(`vendor_id.eq.${vendorId},category_id.eq.${category}`)
             .limit(4);
 
         if (error) throw error;
@@ -104,7 +104,7 @@ export async function getUpsellItems(
 
         return { data: validated.data as unknown as WyshkitItem[] };
     } catch (error) {
-        logger.error('Failed to fetch upsell products', error, { itemId, partnerId, category });
+        logger.error('Failed to fetch upsell products', error, { itemId, vendorId, category });
         return { data: null, error: 'Failed to fetch upsell products' };
     }
 }

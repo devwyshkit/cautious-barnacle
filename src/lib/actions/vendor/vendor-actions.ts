@@ -14,9 +14,10 @@ import {
 import { ShadowfaxService } from '@/lib/services/shadowfax';
 import { ORDER_STATUS } from '@/lib/types/order-status';
 import { logger } from '@/lib/logging/logger';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { update_order_status, type OrderStatus, type VendorOrder } from '@/lib/actions/commerce/orders';
 
-export type PartnerStats = {
+export type VendorStats = {
   today_orders: number;
   today_revenue: number;
   pending_orders: number;
@@ -32,7 +33,7 @@ function logError(error: unknown, context: string) {
 
 // [PURGED] validate_status_transition & VALID_TRANSITIONS (Moved to lib/actions/commerce/orders.ts)
 
-export async function get_partner_orders(
+export async function get_vendor_orders(
   vendor_id: string,
   status?: OrderStatus[]
 ): Promise<{ data?: VendorOrder[]; error?: string }> {
@@ -82,16 +83,16 @@ export async function get_partner_orders(
 
     return { data: mapped_data };
   } catch (error) {
-    logError(error, `get_partner_orders:${vendor_id}`);
+    logError(error, `get_vendor_orders:${vendor_id}`);
     return { error: 'Failed to fetch orders' };
   }
 }
 
-export async function get_partner_stats(vendor_id: string): Promise<{ data?: PartnerStats; error?: string }> {
+export async function get_vendor_stats(vendor_id: string): Promise<{ data?: VendorStats; error?: string }> {
   try {
     const supabase = await createClient();
 
-    // get_partner_dashboard_stats was dropped — query directly
+    // get_vendor_dashboard_stats was dropped — query directly
     const { data, error } = await supabase
       .from('orders')
       .select('total, status, created_at')
@@ -99,9 +100,9 @@ export async function get_partner_stats(vendor_id: string): Promise<{ data?: Par
 
     if (error) throw error;
 
-    return { data: data as unknown as PartnerStats };
+    return { data: data as unknown as VendorStats };
   } catch (error) {
-    logError(error, 'get_partner_stats');
+    logError(error, 'get_vendor_stats');
     return { error: 'Failed to fetch stats' };
   }
 }
@@ -129,7 +130,7 @@ export type ItemWithCounts = Product & {
   product_variants: Partial<Tables<'product_variants'>>[];
 };
 
-export async function get_partner_items(vendor_id: string): Promise<{ data?: ItemWithCounts[]; error?: string }> {
+export async function get_vendor_items(vendor_id: string): Promise<{ data?: ItemWithCounts[]; error?: string }> {
   try {
     const supabase = await createClient();
 
@@ -155,12 +156,12 @@ export async function get_partner_items(vendor_id: string): Promise<{ data?: Ite
 
     return { data: enriched_items };
   } catch (error) {
-    logError(error, 'get_partner_items');
+    logError(error, 'get_vendor_items');
     return { error: 'Failed to fetch products' };
   }
 }
 
-export async function get_partner_financials(vendor_id: string): Promise<{
+export async function get_vendor_financials(vendor_id: string): Promise<{
   data?: {
     total_earnings: number;
     pending_settlement: number;
@@ -173,7 +174,7 @@ export async function get_partner_financials(vendor_id: string): Promise<{
     const supabase = await createClient();
 
     // WYSHKIT 2026: Single RPC call (Eliminate Shadow Math in JS)
-    const { data, error } = await (supabase.rpc as any)('get_partner_financials_v2', {
+    const { data, error } = await (supabase.rpc as any)('get_vendor_financials_v2', {
       p_vendor_id: vendor_id
     });
 
@@ -181,14 +182,14 @@ export async function get_partner_financials(vendor_id: string): Promise<{
 
     return { data: data as any };
   } catch (error) {
-    logError(error, 'get_partner_financials');
+    logError(error, 'get_vendor_financials');
     return { error: 'Failed to fetch financials' };
   }
 }
 
-// [PURGED] get_partner_payouts (Payouts now linked directly to orders)
+// [PURGED] get_vendor_payouts (Payouts now linked directly to orders)
 
-export async function get_partner_profile(vendor_id: string): Promise<{ data?: Vendor; error?: string }> {
+export async function get_vendor_profile(vendor_id: string): Promise<{ data?: Vendor; error?: string }> {
   try {
     const supabase = await createClient();
 
@@ -202,12 +203,12 @@ export async function get_partner_profile(vendor_id: string): Promise<{ data?: V
     return { data: (data as unknown) as Vendor };
 
   } catch (error) {
-    logError(error, 'get_partner_profile');
+    logError(error, 'get_vendor_profile');
     return { error: 'Failed to fetch vendor profile' };
   }
 }
 
-export async function update_partner_online_status(
+export async function update_vendor_online_status(
   vendor_id: string,
   is_online: boolean
 ): Promise<{ success: boolean; error?: string }> {
@@ -222,7 +223,7 @@ export async function update_partner_online_status(
     if (error) throw error;
     return { success: true };
   } catch (error) {
-    logError(error, 'update_partner_online_status');
+    logError(error, 'update_vendor_online_status');
     return { success: false, error: 'Failed to update status' };
   }
 }
@@ -291,7 +292,7 @@ export async function upload_preview(
   order_id: string,
   order_product_id: string,
   preview_url: string,
-  partner_notes?: string
+  vendor_notes?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
@@ -311,7 +312,7 @@ export async function upload_preview(
       .update({
         personalization_details: {
           preview_url: preview_url,
-          partner_notes: partner_notes || null,
+          vendor_notes: vendor_notes || null,
           preview_ready: true,
           preview_uploaded_at: new Date().toISOString()
         } as any
@@ -320,7 +321,13 @@ export async function upload_preview(
 
     if (item_error) throw item_error;
 
-    return update_order_status(order_id, ORDER_STATUS.PACKED); // In 8-state FSM, PACKED is the next logical step for preview approval
+    // WYSHKIT 2026: DO NOT move to PACKED on preview upload.
+    // The order stays IN_PRODUCTION until the customer approves.
+    // We update the local state for the vendor dashboard to reflect 'submitted'.
+    revalidatePath(`/vendor/orders/${order_id}`);
+    revalidateTag(`order-${order_id}`);
+
+    return { success: true };
   } catch (error) {
     logError(error, 'upload_preview');
     return { success: false, error: 'Failed to upload preview' };

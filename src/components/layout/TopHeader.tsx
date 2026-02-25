@@ -142,7 +142,7 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
             className="flex items-center gap-3 h-12 px-4 bg-zinc-100/50 rounded-2xl border border-zinc-100/50 active:scale-[0.98] transition-all"
           >
             <Search className="size-4.5 text-rose-600" />
-            <span className="text-[13px] font-bold text-zinc-400">Search "Best Birthday Cakes"</span>
+            <span className="text-[13px] font-bold text-zinc-400">Search &quot;Best Birthday Cakes&quot;</span>
           </button>
         </div>
       </header>

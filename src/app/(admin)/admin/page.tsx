@@ -9,7 +9,7 @@ async function getMetrics(): Promise<DashboardMetrics> {
   const supabase = await createClient()
   const today = new Date().toISOString().split('T')[0]
 
-  const [ordersResult, partnersResult, kycResult] = await Promise.all([
+  const [ordersResult, vendorsResult, kycResult] = await Promise.all([
     supabase
       .from('orders')
       .select('total')
@@ -30,7 +30,7 @@ async function getMetrics(): Promise<DashboardMetrics> {
   return {
     gmv_today: (orders as { total?: number }[]).reduce((sum, o) => sum + (o.total ?? 0), 0),
     orders_today: orders.length,
-    active_partners: partnersResult.count || 0,
+    active_vendors: vendorsResult.count || 0,
     pending_kyc: kycResult.count || 0,
   }
 }
@@ -122,13 +122,13 @@ export default async function AdminDashboard() {
             <CardTitle className="text-sm font-medium text-zinc-500">Active vendors</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold">{metrics.active_partners}</p>
+            <p className="text-2xl font-semibold">{metrics.active_vendors}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Pending KYC</CardTitle>
+            <CardTitle className="text-sm font-medium text-zinc-500">KYC Queue</CardTitle>
           </CardHeader>
           <CardContent>
             <Link href="/admin/vendors?status=SUBMITTED" className="flex items-center gap-2">

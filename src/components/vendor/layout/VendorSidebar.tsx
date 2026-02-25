@@ -31,7 +31,7 @@ const NAV_ITEMS = [
 export function VendorSidebar() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const [partnerId, setPartnerId] = useState<string | undefined>();
+  const [vendorId, setVendorId] = useState<string | undefined>();
 
   useEffect(() => {
     async function getVendorId() {
@@ -43,12 +43,12 @@ export function VendorSidebar() {
         .select('id')
         .eq('vendor_external_id', user.id)
         .maybeSingle();
-      if (data) setPartnerId(data.id);
+      if (data) setVendorId(data.id);
     }
     getVendorId();
   }, [user]);
 
-  const { pendingCount } = useVendorOrdersStatus(partnerId);
+  const { pendingCount } = useVendorOrdersStatus(vendorId);
 
   return (
     <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-zinc-100 h-screen fixed left-0 top-0">

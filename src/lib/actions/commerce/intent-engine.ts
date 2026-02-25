@@ -226,12 +226,6 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     });
                     if (error) throw error;
 
-                    // Post-order cleanup
-                    await Promise.all([
-                        supabase.from('cart_products').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`),
-                        supabase.from('checkout_sessions').delete().or(user ? `user_id.eq.${user.id}` : `session_id.eq.${sessionId}`)
-                    ]);
-
                     revalidatePath('/');
                     revalidateTag('orders');
                     return { success: true, data };
@@ -272,7 +266,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                 case 'CLEAR_CART': {
                     const match = user ? { user_id: user.id } : { session_id: sessionId };
                     await Promise.all([
-                        supabase.from('cart_products').delete().match(match),
+                        supabase.from('cart_items').delete().match(match),
                         supabase.from('checkout_sessions').delete().match(match)
                     ]);
                     break;

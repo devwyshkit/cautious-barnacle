@@ -187,7 +187,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                 <div>
                   <p className="text-xs font-black text-orange-900 tracking-tight leading-none mb-1">Action Required: Correction Requested</p>
                   <p className="text-sm font-bold text-orange-800 leading-tight">
-                    "{order.latest_preview.customer_feedback}"
+                    &quot;{order.latest_preview.customer_feedback}&quot;
                   </p>
                   <p className="text-xs text-orange-600 mt-2 font-medium italic">
                     Upload a corrected preview to proceed.
@@ -311,7 +311,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                     <div key={product.id || idx} className="space-y-2">
                       <p className="text-xs font-bold text-amber-800">{product.product_name || 'Personalization'}</p>
                       {data.text && (
-                        <p className="text-sm text-amber-900 bg-white/50 p-2 rounded-lg border border-amber-100 font-medium">"{data.text}"</p>
+                        <p className="text-sm text-amber-900 bg-white/50 p-2 rounded-lg border border-amber-100 font-medium">&quot;{data.text}&quot;</p>
                       )}
                       {data.image_url && (
                         <div className="relative aspect-square w-24 rounded-lg overflow-hidden border border-amber-200 group">

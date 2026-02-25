@@ -4,7 +4,7 @@ import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
 import { handleActionError } from '@/lib/utils/error-handler';
-import { MappedPartner } from '@/lib/types/vendor';
+import { MappedVendor } from '@/lib/types/vendor';
 import { WyshkitItem } from '@/lib/types/product';
 
 /**
@@ -18,61 +18,61 @@ import { WyshkitItem } from '@/lib/types/product';
  * WYSHKIT 2026: Server-Driven UI (SDUI)
  * Now returns a pre-computed 'blocks' array for the StorePage.
  */
-export const getPartnerStoreData = cache(async (partnerId: string, category?: string | null) => {
+export const getVendorStoreData = cache(async (vendorId: string, category?: string | null) => {
     try {
-        if (!partnerId || partnerId.trim() === '') {
+        if (!vendorId || vendorId.trim() === '') {
             return { vendor: null, products: [], blocks: [], error: 'Invalid Vendor ID' };
         }
 
         const supabase = await createClient();
 
         // 1. Fetch Vendor Basic Info
-        const { data: partnerData, error: partnerError } = await supabase
+        const { data: vendorData, error: vendorError } = await supabase
             .from('vendors')
             .select(`
                 id, name, image_url, rating, city, 
                 avg_prep_time_mins, base_delivery_charge, 
                 slug, business_type, is_online, description, gstin
             `)
-            .eq('id', partnerId)
+            .eq('id', vendorId)
             .maybeSingle();
 
-        if (partnerError || !partnerData) {
-            logger.error('Vendor fetch failed in getPartnerStoreData', partnerError || 'Not found', { partnerId });
-            return { vendor: null, products: [], blocks: [], error: partnerError?.message || 'Vendor not found' };
+        if (vendorError || !vendorData) {
+            logger.error('Vendor fetch failed in getVendorStoreData', vendorError || 'Not found', { vendorId });
+            return { vendor: null, products: [], blocks: [], error: vendorError?.message || 'Vendor not found' };
         }
 
-        // Map database columns to UI-friendly MappedPartner interface
-        const vendor: MappedPartner = {
-            id: partnerData.id,
-            name: partnerData.name,
-            image_url: partnerData.image_url,
-            rating: partnerData.rating ? Number(partnerData.rating) : null,
-            city: partnerData.city,
-            prep_mins: partnerData.avg_prep_time_mins || 45,
-            delivery_fee: Number(partnerData.base_delivery_charge || 0),
-            slug: partnerData.slug,
-            business_type: partnerData.business_type,
-            is_online: partnerData.is_online ?? true,
-            description: partnerData.description,
-            gstin: partnerData.gstin
+        // Map database columns to UI-friendly MappedVendor interface
+        const vendor: MappedVendor = {
+            id: vendorData.id,
+            name: vendorData.name,
+            image_url: vendorData.image_url,
+            rating: vendorData.rating ? Number(vendorData.rating) : null,
+            city: vendorData.city,
+            prep_mins: vendorData.avg_prep_time_mins || 45,
+            delivery_fee: Number(vendorData.base_delivery_charge || 0),
+            slug: vendorData.slug,
+            business_type: vendorData.business_type,
+            is_online: vendorData.is_online ?? true,
+            description: vendorData.description,
+            gstin: vendorData.gstin
         };
 
         // 2. Fetch Vendor Products (Filtered by Category if provided)
         let query = supabase
             .from('products')
             .select('*')
-            .eq('vendor_id', partnerId)
+            .eq('vendor_id', vendorId)
             .eq('is_active', true);
 
         if (category && category !== 'Recommended' && category !== 'All') {
-            query = query.eq('category', category);
+            query = query.eq('category_id', category);
         }
 
         const { data: itemsData, error: itemsError } = await query;
 
         if (itemsError) {
-            logger.error('Products fetch failed in getPartnerStoreData', itemsError, { partnerId });
+            logger.error('Products fetch failed in getVendorStoreData', itemsError, { vendorId });
         }
 
         const products = (itemsData as unknown as WyshkitItem[]) || [];
@@ -80,19 +80,19 @@ export const getPartnerStoreData = cache(async (partnerId: string, category?: st
         // 3. Fetch Distinct Categories for this Vendor (for navigation/filtering)
         const { data: catData } = await supabase
             .from('products')
-            .select('category')
-            .eq('vendor_id', partnerId)
+            .select('category_id')
+            .eq('vendor_id', vendorId)
             .eq('is_active', true);
 
         const groupedItems = products.reduce((acc: any, product: any) => {
-            const cat = product.category || 'Other';
+            const cat = product.category_id || 'Other';
             if (!acc[cat]) acc[cat] = [];
             acc[cat].push({ ...product, vendor_name: vendor.name });
             return acc;
         }, {});
 
-        const categories = Array.from(new Set(catData?.map(i => i.category).filter(Boolean)))
-            .map(c => ({ id: c, name: c, slug: c }));
+        const categories = Array.from(new Set(catData?.map((i: any) => i.category_id).filter(Boolean)))
+            .map(c => ({ id: c as string, name: c as string, slug: c as string }));
 
         return {
             vendor,
@@ -102,12 +102,12 @@ export const getPartnerStoreData = cache(async (partnerId: string, category?: st
             error: null
         };
     } catch (error) {
-        logger.error('Unexpected error in getPartnerStoreData', error, { partnerId });
+        logger.error('Unexpected error in getVendorStoreData', error, { vendorId });
         return { vendor: null, products: [], categories: [], error: 'Failed to fetch vendor store data' };
     }
 });
 
-export async function getItemPartner(itemId: string) {
+export async function getItemVendor(itemId: string) {
     const supabase = await createClient();
     const query = supabase.from('products')
         .select('vendor_id')
@@ -120,12 +120,12 @@ export async function getItemPartner(itemId: string) {
     return { data: data as { vendor_id: string } };
 }
 
-export async function getPartnerInfo(partnerId: string) {
+export async function getVendorInfo(vendorId: string) {
     try {
         const supabase = await createClient();
         const query = supabase.from('vendors')
             .select('id, name, gstin, city')
-            .eq('id', partnerId)
+            .eq('id', vendorId)
 
         const { data, error } = await query.maybeSingle();
 

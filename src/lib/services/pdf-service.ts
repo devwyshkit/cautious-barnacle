@@ -61,9 +61,9 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     y += 5;
     doc.text(data.vendor.name, col1, y);
     y += 5;
-    const partnerAddress = doc.splitTextToSize(data.vendor.address, (pageWidth / 2) - 20);
-    doc.text(partnerAddress, col1, y);
-    y += (partnerAddress.length * 5);
+    const vendorAddress = doc.splitTextToSize(data.vendor.address, (pageWidth / 2) - 20);
+    doc.text(vendorAddress, col1, y);
+    y += (vendorAddress.length * 5);
     if (data.vendor.gstin) doc.text(`GSTIN: ${data.vendor.gstin}`, col1, y += 5);
     if (data.vendor.phone) doc.text(`Phone: ${data.vendor.phone}`, col1, y += 5);
 

@@ -251,16 +251,29 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
             />
           </SurfaceErrorBoundaryWithRouter>
 
-          {order.status === ORDER_STATUS.DELIVERED && (
-            <FeedbackStep
-              orderId={orderId}
-              products={order.order_products?.map((product: any) => ({
-                id: product.product_id,
-                name: product.product_name
-              })) || []}
-              onComplete={() => { }}
-            />
-          )}
+          {order.status === ORDER_STATUS.DELIVERED && (() => {
+            const deliveryTime = new Date(order.updated_at).getTime();
+            const now = Date.now();
+            const isPersonalized = order.has_personalization;
+            const delayMinutes = isPersonalized ? 30 : 10;
+            const isDelayOver = (now - deliveryTime) >= (delayMinutes * 60 * 1000);
+
+            if (!isDelayOver) return null;
+
+            return (
+              <FeedbackStep
+                orderId={orderId}
+                products={order.order_products?.map((product: any) => ({
+                  id: product.product_id,
+                  order_item_id: product.id,
+                  name: product.product_name,
+                  is_personalized: product.is_personalized,
+                  mockup_url: itemPreviews[product.id]?.preview_url
+                })) || []}
+                onComplete={() => { }}
+              />
+            );
+          })()}
 
           <div className="space-y-4">
             <DeliveryInfo order={order as OrderDetail} />

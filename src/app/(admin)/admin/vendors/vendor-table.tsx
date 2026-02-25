@@ -27,7 +27,7 @@ import { Search, Check, X } from 'lucide-react'
 import { executeAdminIntent } from '@/lib/actions/admin/engine'
 import type { Vendor } from '@/lib/types/admin.types'
 
-interface PartnerTableProps {
+interface VendorTableProps {
   vendors: Vendor[]
   currentStatus?: string
   totalCount: number
@@ -60,7 +60,7 @@ function formatDate(date: string | null) {
   return new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' })
 }
 
-export function PartnerTable({ vendors, currentStatus, totalCount, currentPage, pageSize }: PartnerTableProps) {
+export function VendorTable({ vendors, currentStatus, totalCount, currentPage, pageSize }: VendorTableProps) {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState<string | null>(null)
   const router = useRouter()

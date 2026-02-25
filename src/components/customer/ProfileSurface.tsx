@@ -126,14 +126,14 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
       <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar pb-24">
         {activeTab === 'account' && (
           <div className="p-6 space-y-6">
-            {(permissions?.isPartner || permissions?.isAdmin) && (
+            {(permissions?.isVendor || permissions?.isAdmin) && (
               <section className="bg-zinc-900 rounded-xl p-6 text-white relative overflow-hidden shadow-sm mb-6">
                 <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
                   <Logo variant="minimal" className="size-32" />
                 </div>
                 <div className="relative z-10 space-y-3">
                   <h3 className="text-xs font-black text-white/40 tracking-[0.3em] mb-4">Professional Access</h3>
-                  {permissions.isPartner && (
+                  {permissions.isVendor && (
                     <Link href="/vendor" className="flex items-center gap-4 p-4 bg-white/10 rounded-xl hover:bg-white/15 transition-all border border-white/5 group">
                       <div className="size-12 rounded-xl bg-indigo-500 flex items-center justify-center shrink-0">
                         <Store className="size-6 text-white" />

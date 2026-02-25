@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { searchFiltered } from '@/lib/actions/discovery/search';
-import { ValidatedWyshkitItem, ValidatedPartner } from '@/lib/validations/discovery';
+import { ValidatedWyshkitItem, ValidatedVendor } from '@/lib/validations/discovery';
 
 interface SearchParams {
   q?: string;
@@ -15,7 +15,7 @@ interface SearchParams {
 
 interface SearchResults {
   products: ValidatedWyshkitItem[];
-  vendors: ValidatedPartner[];
+  vendors: ValidatedVendor[];
   total: number;
 }
 

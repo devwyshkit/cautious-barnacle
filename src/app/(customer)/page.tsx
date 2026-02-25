@@ -125,7 +125,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 <section className="px-4 md:px-8 py-20 text-center border-2 border-dashed border-zinc-100 rounded-3xl mx-4">
                   <div className="max-w-xs mx-auto flex flex-col gap-2">
                     <p className="font-bold text-zinc-900">No stores found nearby</p>
-                    <p className="text-sm text-zinc-500 italic">"Coming soon to {location.name}..."</p>
+                    <p className="text-sm text-zinc-500 italic">&quot;Coming soon to {location.name}...&quot;</p>
                   </div>
                 </section>
               )}

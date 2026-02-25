@@ -194,9 +194,9 @@ export async function verify_payment_signature(
 
         // WYSHKIT 2026: Deterministic Execution via Session Snapshot
         // Bypassing the mutable `v_active_cart_detailed` to prevent race conditions during transaction settlement.
-        const cart_products = session.snapshot_items as any[];
+        const cart_items = session.snapshot_items as any[];
 
-        if (!cart_products || cart_products.length === 0) {
+        if (!cart_items || cart_items.length === 0) {
             return { error: 'Your checkout session expired or is invalid. Cannot finalize order.', status: 400 };
         }
 
@@ -233,14 +233,14 @@ export async function verify_payment_signature(
         }
 
         // 3. ATOMIC ORDER PLACEMENT
-        const has_pers = cart_products.some(product => (product.personalization as any)?.enabled);
+        const has_pers = cart_items.some(product => (product.personalization as any)?.enabled);
 
         const order_result = await executeCommerceIntent({
             intent: 'PLACE_ORDER',
             payload: {
                 razorpay_order_id: razorpay_order_id,
                 payment_id: razorpay_payment_id,
-                products: cart_products.map(product => ({
+                products: cart_items.map(product => ({
                     product_id: product.product_id ?? '',
                     variant_id: product.variant_id,
                     quantity: product.quantity,

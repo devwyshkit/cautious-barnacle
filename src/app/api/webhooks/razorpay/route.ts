@@ -105,9 +105,9 @@ export async function POST(req: NextRequest) {
         }
 
         // Fetch snapshot_items from session for true determinism
-        const cart_products = session.snapshot_items as any[];
+        const cart_items = session.snapshot_items as any[];
 
-        if (!cart_products || !Array.isArray(cart_products) || cart_products.length === 0) {
+        if (!cart_items || !Array.isArray(cart_items) || cart_items.length === 0) {
           log.error('[webhooks/razorpay] Cart snapshot empty for session', { sessionId: draftId });
           return NextResponse.json({ received: true, message: 'Cart snapshot empty' });
         }
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
           payload: {
             razorpay_order_id: razorpayOrderId,
             payment_id: razorpayPaymentId,
-            products: cart_products.map(product => ({
+            products: cart_items.map(product => ({
               product_id: product.product_id!,
               variant_id: product.variant_id ?? null,
               quantity: product.quantity!,

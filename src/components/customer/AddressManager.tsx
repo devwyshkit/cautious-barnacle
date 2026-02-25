@@ -56,7 +56,7 @@ export function AddressManager({ initialAddresses, isAdding, onToggleAdding }: A
 
                 <div>
                     <h3 className="text-lg font-black text-zinc-900">Add New Address</h3>
-                    <p className="text-xs text-zinc-500 mt-1">We'll save this for your next orders</p>
+                    <p className="text-xs text-zinc-500 mt-1">We&apos;ll save this for your next orders</p>
                 </div>
 
                 <div className="bg-zinc-50 rounded-xl p-6 border border-zinc-100">

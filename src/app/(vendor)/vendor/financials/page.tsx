@@ -1,5 +1,5 @@
-import { getPartnerFromSession } from '@/lib/auth/server';
-import { get_partner_financials } from '@/lib/actions/vendor/vendor-actions';
+import { getVendorFromSession } from '@/lib/auth/server';
+import { get_vendor_financials } from '@/lib/actions/vendor/vendor-actions';
 import { formatCurrency } from '@/lib/utils/pricing';
 import { redirect } from 'next/navigation';
 import { IndianRupee, Clock, ArrowUpRight, Percent, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -72,11 +72,11 @@ function SettlementCalendar({ pendingAmount, settlementDays }: { pendingAmount: 
   );
 }
 
-export default async function PartnerFinancialsPage() {
-  const vendor = await getPartnerFromSession();
+export default async function VendorFinancialsPage() {
+  const vendor = await getVendorFromSession();
   if (!vendor) redirect('/vendor/login');
 
-  const { data: financials } = await get_partner_financials(vendor.id);
+  const { data: financials } = await get_vendor_financials(vendor.id);
   const payouts: any[] = []; // WYSHKIT 2026: Payouts table purged. Managed via Ledger now.
 
   const settlementDays = vendor.settlement_days || 7;

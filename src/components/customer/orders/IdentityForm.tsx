@@ -48,6 +48,8 @@ export function IdentityForm({
     const [isOptimisticSuccess, setIsOptimisticSuccess] = useState(false);
     const [uploadingItems, setUploadingItems] = useState<Record<string, number>>({});
 
+    const [pastMockups, setPastMockups] = useState<Record<string, string>>({});
+
     // Load draft details on mount
     useEffect(() => {
         const saved = localStorage.getItem(`wyshkit_draft_${orderId}`);
@@ -58,7 +60,33 @@ export function IdentityForm({
                 logger.error('Failed to parse saved draft', e as Error);
             }
         }
-    }, [orderId]);
+
+        // Fetch past mockups for reference (PA-10)
+        const fetchPastMockups = async () => {
+            const supabase = createClient();
+            const results: Record<string, string> = {};
+
+            for (const product of products) {
+                if (!product.id) continue;
+
+                const { data } = await supabase
+                    .from('order_products')
+                    .select('final_approved_mockup_url, orders!inner(created_at)')
+                    .eq('product_id', (product as any).product_id || product.id)
+                    .not('final_approved_mockup_url', 'is', null)
+                    .order('orders(created_at)', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if ((data as any)?.final_approved_mockup_url) {
+                    results[product.id] = (data as any).final_approved_mockup_url;
+                }
+            }
+            setPastMockups(results);
+        };
+
+        fetchPastMockups();
+    }, [orderId, products]);
 
     // Save draft details on change
     useEffect(() => {
@@ -207,6 +235,7 @@ export function IdentityForm({
                             schema={product.personalization_schema}
                             input={formData[product.id] || {}}
                             uploadingProgress={uploadingItems[product.id]}
+                            pastMockupUrl={pastMockups[product.id]}
                             onInputChange={(field, value) => handleInputChange(product.id, field, value)}
                             onFileUpload={(file) => handleFileUpload(product.id, file)}
                         />

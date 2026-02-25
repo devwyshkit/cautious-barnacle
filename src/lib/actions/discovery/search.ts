@@ -31,11 +31,10 @@ export async function searchFiltered(options: {
         .from('products')
         .select('*, vendors!inner(name, slug, city, state, is_active, location)')
         .eq('is_active', true)
-        .eq('vendors.is_active', true)
-        .eq('vendors.state', 'active');
+        .eq('vendors.is_active', true);
 
     // Combined query for vendors
-    let partnersQuery = supabase
+    let vendorsQuery = supabase
         .from('vendors')
         .select('*')
         .eq('is_active', true);
@@ -45,11 +44,11 @@ export async function searchFiltered(options: {
             type: 'websearch',
             config: 'english'
         });
-        partnersQuery = partnersQuery.ilike('name', `%${q}%`);
+        vendorsQuery = vendorsQuery.ilike('name', `%${q}%`);
     }
 
     if (category) {
-        itemsQuery = itemsQuery.ilike('category', category);
+        itemsQuery = itemsQuery.ilike('category_id', category);
     }
 
     // ELITE: Hyperlocal sorting if lat/lng provided
@@ -60,16 +59,16 @@ export async function searchFiltered(options: {
                 placeholder: [lng, lat]
             } as any);
 
-        partnersQuery = partnersQuery
+        vendorsQuery = vendorsQuery
             .order('location <-> st_setsrid(st_makepoint(?, ?), 4326)', {
                 ascending: true,
                 placeholder: [lng, lat]
             } as any);
     }
 
-    const [itemsResponse, partnersResponse] = await Promise.all([
+    const [itemsResponse, vendorsResponse] = await Promise.all([
         itemsQuery.limit(limit),
-        partnersQuery.limit(Math.floor(limit / 2))
+        vendorsQuery.limit(Math.floor(limit / 2))
     ]);
 
     const rawResults = {
@@ -77,8 +76,8 @@ export async function searchFiltered(options: {
             ...product,
             image_url: (product as any).images?.[0] || (product as any).image_url
         })),
-        vendors: partnersResponse.data || [],
-        total: (itemsResponse.data?.length || 0) + (partnersResponse.data?.length || 0)
+        vendors: vendorsResponse.data || [],
+        total: (itemsResponse.data?.length || 0) + (vendorsResponse.data?.length || 0)
     };
 
     const validated = SearchResultsSchema.safeParse(rawResults);
@@ -129,7 +128,7 @@ export async function getFilteredItems(options: {
         query = query.eq('is_active', true);
 
         if (category) {
-            query = query.ilike('category', category);
+            query = query.ilike('category_id', category);
         }
         if (search) {
             // SWIGGY 2026: Using FTS for 5x faster search performance

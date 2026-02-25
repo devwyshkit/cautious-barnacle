@@ -196,7 +196,7 @@ export function AuthPageClient({
           />
           <div className="text-center">
             <p className="text-[14px] text-zinc-500">
-              Didn't receive the code?
+              Didn&apos;t receive the code?
               <button
                 onClick={handleResendOTP}
                 className="text-zinc-900 ml-1.5 font-semibold hover:underline"

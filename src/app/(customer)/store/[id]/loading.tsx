@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function PartnerPageLoading() {
+export default function VendorPageLoading() {
   return (
     <div className="min-h-screen">
       <Skeleton className="w-full aspect-[3/2]" />

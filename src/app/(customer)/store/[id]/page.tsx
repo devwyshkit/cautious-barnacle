@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { VendorStorePage } from '@/components/customer/VendorStorePage';
-import { getPartnerStoreData } from '@/lib/actions/discovery/vendors';
+import { getVendorStoreData } from '@/lib/actions/discovery/vendors';
 import { VendorSkeleton } from '@/components/customer/VendorSkeleton';
-import { MappedPartner } from '@/lib/types/vendor';
+import { MappedVendor } from '@/lib/types/vendor';
 
 
 /**
@@ -26,7 +26,7 @@ import { MappedPartner } from '@/lib/types/vendor';
  */
 // export const experimental_ppr = true;
 
-export default async function PartnerPage({
+export default async function VendorPage({
   params,
   searchParams,
 }: {
@@ -39,14 +39,14 @@ export default async function PartnerPage({
   return (
     <div className="min-h-screen">
       <Suspense fallback={<VendorSkeleton />}>
-        <AsyncPartnerContent id={id} category={category} />
+        <AsyncVendorContent id={id} category={category} />
       </Suspense>
     </div>
   );
 }
 
-async function AsyncPartnerContent({ id, category }: { id: string; category?: string }) {
-  const { vendor, products, itemsGroupedByCategory, categories, error } = await getPartnerStoreData(id, category);
+async function AsyncVendorContent({ id, category }: { id: string; category?: string }) {
+  const { vendor, products, itemsGroupedByCategory, categories, error } = await getVendorStoreData(id, category);
 
   if (!vendor || error) {
     notFound();
@@ -54,8 +54,8 @@ async function AsyncPartnerContent({ id, category }: { id: string; category?: st
 
   return (
     <VendorStorePage
-      partnerId={id}
-      initialData={(vendor as unknown) as MappedPartner}
+      vendorId={id}
+      initialData={(vendor as unknown) as MappedVendor}
       products={products}
       itemsGroupedByCategory={itemsGroupedByCategory}
       categories={categories}

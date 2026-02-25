@@ -86,7 +86,7 @@ export function ItemReviews({ itemId, orderItemId, approvedMockupUrl, initialRev
       const supabase = createClient();
 
       // WYSHKIT 2026: Atomic Review Submission via RPC (Single Trip)
-      const { data, error: rpc_error } = await supabase.rpc('add_item_review', {
+      const { data, error: rpc_error } = await (supabase.rpc as any)('add_item_review', {
         p_product_id: itemId,
         p_order_id: (reviews[0]?.order_id || null), // We should ideally pass this in props if available
         p_order_item_id: orderItemId,

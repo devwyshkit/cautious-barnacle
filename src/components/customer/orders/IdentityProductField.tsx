@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { ShoppingBag, Info, ImageIcon, Camera, X } from 'lucide-react';
+import { ShoppingBag, Info, ImageIcon, Camera, X, Sparkles } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,7 @@ interface IdentityProductFieldProps {
     schema?: any[];
     input: { text?: string; image_url?: string;[key: string]: any };
     uploadingProgress?: number;
+    pastMockupUrl?: string;
     onInputChange: (field: string, value: string) => void;
     onFileUpload: (file: File) => void;
 }
@@ -27,6 +28,7 @@ export function IdentityProductField({
     schema,
     input,
     uploadingProgress,
+    pastMockupUrl,
     onInputChange,
     onFileUpload
 }: IdentityProductFieldProps) {
@@ -180,6 +182,22 @@ export function IdentityProductField({
                                         >
                                             <X className="size-5" />
                                         </button>
+                                    </div>
+                                )}
+
+                                {pastMockupUrl && (
+                                    <div className="space-y-3 p-4 bg-amber-50/30 rounded-xl border border-amber-100/50">
+                                        <div className="flex items-center gap-2">
+                                            <Sparkles className="size-3 text-amber-500" />
+                                            <span className="text-[10px] font-black text-amber-900 tracking-tight uppercase">Previous Design Reference</span>
+                                        </div>
+                                        <div className="relative aspect-video rounded-lg overflow-hidden border border-amber-100 shadow-sm">
+                                            <img src={pastMockupUrl} alt="Previous Design" className="size-full object-cover opacity-80" />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                                        </div>
+                                        <p className="text-[10px] font-medium text-amber-700 leading-tight">
+                                            Use your previous approved design as a guide for your new request.
+                                        </p>
                                     </div>
                                 )}
                             </div>

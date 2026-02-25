@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { validateGSTINAction } from '@/lib/actions/commerce/gstin';
 import { toast } from 'sonner';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
-import { getPartnerInfo } from '@/lib/actions/discovery/vendors';
+import { getVendorInfo } from '@/lib/actions/discovery/vendors';
 import { DraftLineItem } from '@/lib/types/personalization';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 import { Address } from '@/lib/types/address';
@@ -75,13 +75,13 @@ export function GstinIdentity({
 
     const handleDownloadEstimate = async () => {
         const firstItem = products[0];
-        const partnerId = firstItem.vendor_id;
-        if (!partnerId) {
+        const vendorId = firstItem.vendor_id;
+        if (!vendorId) {
             toast.error("Vendor information missing");
             return;
         }
 
-        const { data: vendor } = await getPartnerInfo(partnerId);
+        const { data: vendor } = await getVendorInfo(vendorId);
 
         generateEstimatePDF({
             date: new Date().toLocaleDateString(),

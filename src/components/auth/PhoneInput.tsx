@@ -40,8 +40,8 @@ export function PhoneInput({ value, onChange, onFocus, disabled, error }: PhoneI
             disabled={disabled}
             className={cn(
               "w-full pl-12 h-14 text-base font-semibold transition-all duration-200 rounded-xl border-none focus-visible:ring-1",
-              error 
-                ? "bg-red-50 text-red-900 focus-visible:ring-red-200" 
+              error
+                ? "bg-red-50 text-red-900 focus-visible:ring-red-200"
                 : "bg-zinc-50 text-zinc-900 focus-visible:ring-zinc-200"
             )}
             autoFocus
@@ -54,7 +54,7 @@ export function PhoneInput({ value, onChange, onFocus, disabled, error }: PhoneI
         </p>
       ) : (
         <p className="text-xs text-zinc-400 leading-relaxed font-medium">
-          We'll send a 6-digit verification code to this number.
+          We&apos;ll send a 6-digit verification code to this number.
         </p>
       )}
     </div>

@@ -1,20 +1,20 @@
 'use client';
 
-import { 
-  IndianRupee, 
-  TrendingUp, 
-  Clock, 
+import {
+  IndianRupee,
+  TrendingUp,
+  Clock,
   Download,
   Info,
   Zap
 } from 'lucide-react';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,7 +45,7 @@ export function FinancialsOverview({ vendor, stats }: FinancialsOverviewProps) {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-5 rounded-xl border border-zinc-100">
-          <p className="text-xs text-zinc-500 mb-1">Today's earnings</p>
+          <p className="text-xs text-zinc-500 mb-1">Today&apos;s earnings</p>
           <h2 className="text-2xl font-semibold text-zinc-900">₹{stats.todayEarnings.toLocaleString('en-IN')}</h2>
           <div className="mt-3 flex items-center gap-2 text-emerald-600">
             <div className="bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
@@ -107,13 +107,13 @@ export function FinancialsOverview({ vendor, stats }: FinancialsOverviewProps) {
                   </code>
                 </TableCell>
                 <TableCell>
-                  <Badge 
+                  <Badge
                     variant="outline"
                     className={cn(
                       "text-xs",
                       payout.status === 'PROCESSED' ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                      payout.status === 'PENDING' ? "bg-amber-50 text-amber-700 border-amber-200" :
-                      "bg-red-50 text-red-700 border-red-200"
+                        payout.status === 'PENDING' ? "bg-amber-50 text-amber-700 border-amber-200" :
+                          "bg-red-50 text-red-700 border-red-200"
                     )}
                   >
                     {payout.status.toLowerCase()}
@@ -136,7 +136,7 @@ export function FinancialsOverview({ vendor, stats }: FinancialsOverviewProps) {
           <div className="flex-1">
             <h3 className="font-medium text-zinc-900 mb-1">Commission structure</h3>
             <p className="text-sm text-zinc-600 mb-4">
-              You're charged {vendor.commission_percentage || 20}% on successful orders. 
+              You&apos;re charged {vendor.commission_percentage || 20}% on successful orders.
               Personalization fees are settled 100% to you.
             </p>
             <div className="flex gap-6">

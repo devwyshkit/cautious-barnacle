@@ -13,7 +13,7 @@ import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { VendorCard } from "@/components/ui/VendorCard";
 
 type EntityItem = any;
-type EntityPartner = any;
+type EntityVendor = any;
 
 export function GlobalSearch() {
   const router = useRouter();
@@ -43,7 +43,7 @@ export function GlobalSearch() {
   // No manual useMemo needed - React Compiler optimizes this calculation
   const results = {
     products: (searchResults?.products || []) as EntityItem[],
-    vendors: (searchResults?.vendors || []) as EntityPartner[],
+    vendors: (searchResults?.vendors || []) as EntityVendor[],
   };
 
   const hasResults = results.products.length > 0 || results.vendors.length > 0;
@@ -89,7 +89,7 @@ export function GlobalSearch() {
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Search className="size-8 text-zinc-200 mb-3" />
-            <p className="text-sm font-medium text-zinc-500">No results for "{query}"</p>
+            <p className="text-sm font-medium text-zinc-500">No results for &quot;{query}&quot;</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -123,9 +123,9 @@ export function GlobalSearch() {
                         triggerHaptic(HapticPattern.ACTION);
 
                         // WYSHKIT 2026: Navigate to product via vendor route
-                        const partnerId = product.vendor_id || (product as any).partnerId;
-                        if (partnerId) {
-                          router.push(`/vendor/${partnerId}?product=${product.id}`);
+                        const vendorId = product.vendor_id || (product as any).vendorId;
+                        if (vendorId) {
+                          router.push(`/vendor/${vendorId}?product=${product.id}`);
                         } else {
                           // No vendor context — navigate to search with product ID for intent resolution
                           router.push(`/search?q=${encodeURIComponent(product.name || '')}&product=${product.id}`);

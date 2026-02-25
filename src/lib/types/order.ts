@@ -49,7 +49,7 @@ export interface OrderForPDF {
   }>;
 }
 
-export interface PartnerForPDF {
+export interface VendorForPDF {
   name: string;
   gstin?: string;
   business_type?: string;
@@ -62,7 +62,7 @@ export interface PreviewSubmission {
   order_product_id: string;
   preview_url: string;
   status: 'pending' | 'approved' | 'change_requested';
-  partner_notes?: string;
+  vendor_notes?: string;
   customer_feedback?: string;
   submitted_at: string;
   reviewed_at?: string;
@@ -106,7 +106,7 @@ export interface OrderDetail extends Tables<'orders'> {
 
   // Mapped for UI Convenience (snake_case)
   vendor_name: string | null;
-  partner_image: string | null;
+  vendor_image: string | null;
   personalization_status?: string | null;
   gst?: number | null;
 }

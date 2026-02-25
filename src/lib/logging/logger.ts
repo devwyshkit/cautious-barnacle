@@ -14,7 +14,7 @@ export interface LogContext {
   userId?: string;
   requestId?: string;
   orderId?: string;
-  partnerId?: string;
+  vendorId?: string;
   action?: string;
   [key: string]: unknown;
 }

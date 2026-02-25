@@ -19,7 +19,7 @@ interface ProductDetailViewProps {
     product: WyshkitItem;
     onBack?: () => void;
     /** When in sheet from vendor page, pass for optional View cart CTA. */
-    partnerId?: string;
+    vendorId?: string;
     /** Initial state for Edit mode from Checkout */
     initialState?: {
         variantId?: string | null;
@@ -29,7 +29,7 @@ interface ProductDetailViewProps {
     };
 }
 
-export function ProductDetailView({ product, onBack, partnerId, initialState }: ProductDetailViewProps) {
+export function ProductDetailView({ product, onBack, vendorId, initialState }: ProductDetailViewProps) {
     const router = useRouter();
 
     const { addToDraftOrder, isPending, draftOrder } = useCart();
@@ -126,7 +126,7 @@ export function ProductDetailView({ product, onBack, partnerId, initialState }: 
                         product_image: product.images?.[0] || FALLBACK_IMAGE,
                         unit_price: unitPrice,
                         vendor_id: product.vendor_id!,
-                        vendor_name: product.vendors?.name || partnerId,
+                        vendor_name: product.vendors?.name || vendorId,
                         update_product_id: initialState.cartItemId
                     }
                 );
@@ -142,7 +142,7 @@ export function ProductDetailView({ product, onBack, partnerId, initialState }: 
                         product_image: product.images?.[0] || FALLBACK_IMAGE,
                         unit_price: unitPrice,
                         vendor_id: product.vendor_id!,
-                        vendor_name: product.vendors?.name || partnerId,
+                        vendor_name: product.vendors?.name || vendorId,
                     }
                 );
             }
@@ -246,9 +246,9 @@ export function ProductDetailView({ product, onBack, partnerId, initialState }: 
                         <div className="flex items-start justify-between gap-4">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <p className="text-sm font-semibold text-zinc-500 tracking-tight">{product.category}</p>
+                                    <p className="text-sm font-semibold text-zinc-500 tracking-tight">{(product as any).category || product.category_id || 'Product'}</p>
                                     <div className="size-1 rounded-full bg-zinc-200" />
-                                    <p className="text-sm font-semibold text-zinc-500 tracking-tight">{product.vendors?.name || partnerId}</p>
+                                    <p className="text-sm font-semibold text-zinc-500 tracking-tight">{product.vendors?.name || vendorId}</p>
                                 </div>
                                 <h2 className="text-2xl font-black text-zinc-900 leading-tight tracking-tight">
                                     {product.name}
@@ -454,7 +454,7 @@ export function ProductDetailView({ product, onBack, partnerId, initialState }: 
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
                                 <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Weight</span>
                                 <span className="text-xs font-semibold text-zinc-900">
-                                    {product.net_weight || '–'}
+                                    {product.weight_kg ? `${product.weight_kg} kg` : '–'}
                                 </span>
                             </div>
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
