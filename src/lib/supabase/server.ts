@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from './database.types'
 import { getSupabaseEnv } from '@/lib/env'
+import { logger } from '@/lib/logging/logger'
 
 export async function createClient() {
   const { cookies } = await import('next/headers')
@@ -30,9 +31,9 @@ export async function createClient() {
       } catch (err: any) {
         lastError = err;
         if (err.name === 'AbortError') {
-          console.warn(`[SUPABASE_RESILIENCE] Timeout on attempt ${i + 1} for ${url}`);
+          logger.warn(`[SUPABASE_RESILIENCE] Timeout on attempt ${i + 1} for ${url}`);
         } else {
-          console.warn(`[SUPABASE_RESILIENCE] Fetch failed on attempt ${i + 1}: ${err.message}`);
+          logger.warn(`[SUPABASE_RESILIENCE] Fetch failed on attempt ${i + 1}: ${err.message}`);
         }
         await new Promise(res => setTimeout(res, 500 * (i + 1))); // Exponential backoff
       }
