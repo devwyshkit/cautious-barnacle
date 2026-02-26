@@ -11,6 +11,18 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
     ...compat.extends("next/core-web-vitals"),
+    {
+        files: ["src/**/*.ts", "src/**/*.tsx"],
+        rules: {
+            "no-console": ["error", { allow: ["warn", "error"] }],
+        },
+    },
+    {
+        files: ["src/lib/logging/logger.ts"],
+        rules: {
+            "no-console": "off",
+        },
+    },
 ];
 
 export default eslintConfig;

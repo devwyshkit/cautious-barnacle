@@ -41,6 +41,24 @@ Engraving takes 1–5 minutes. Build the SLA accordingly.
 
 ---
 
+## Design System & Mobile-First Principles
+
+### 1. The Shadcn Directive (Composition Over Customisation)
+- **Rule**: Never modify `src/components/ui/` primitives directly unless fixing a fundamental theme/accessibility bug.
+- **Composition**: Build complex surfaces by composing primitives. Wrap logic in feature-specific components.
+- **Purity**: If a ghost variant is needed, use `cva` within the feature component, don't pollute the global UI kit.
+
+### 2. The 44px Law (Mobile-First Tap Targets)
+- **Law**: Every interactive element (Buttons, Checkboxes, Selects, Toggles) MUST have a minimum tap target of **44×44px**.
+- **Visual vs Physical**: A button might look 32px high, but its invisible hit-box must be 44px to satisfy Fitts' Law and prevent "Fat Finger" errors.
+- **Enforcement**: Use `min-h-[44px]` or padding to ensure compliance.
+
+### 3. Progressive Disclosure (The Hick's Law Shield)
+- **Rule**: Never show more than 5 primary choices at once.
+- **Implementation**: Use "Show More" accordions for secondary filters or variants. Keep the "Path to Purchase" clean.
+
+---
+
 ## Canonical Flow (Complete, Linear)
 
 ### Step 1 — HOME FEED `/`

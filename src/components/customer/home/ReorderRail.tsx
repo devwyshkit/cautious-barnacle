@@ -192,7 +192,7 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
                   </p>
                   {productCount > 1 && (
                     <p className="text-[10px] font-bold text-zinc-500 uppercase mt-0.5">
-                      +{productCount - 1} other item{productCount > 2 ? 's' : ''}
+                      +{productCount - 1} other product{productCount > 2 ? 's' : ''}
                     </p>
                   )}
 

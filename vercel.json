@@ -1,7 +1,7 @@
 {
     "crons": [
         {
-            "path": "/api/cron/partner-timeout",
+            "path": "/api/cron/vendor-timeout",
             "schedule": "*/5 * * * *"
         },
         {

@@ -2,7 +2,6 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { logger } from '@/lib/logging/logger'
 import { getSupabaseEnvSafe } from '@/lib/env'
-import { getVendorFromSession } from '@/lib/auth/server';
 
 export async function updateSession(request: NextRequest) {
   try {
@@ -43,14 +42,14 @@ export async function updateSession(request: NextRequest) {
     const isVendorHost = host.startsWith('vendor.')
     const isAdminHost = host.startsWith('admin.')
 
-    // WYSHKIT 2026: Strict Prefix Routing
-    // All vendor admin routes now exclusively own the /vendor prefix.
-    // Customer facing stores have been moved to /vendor/[id].
-    const isVendorAdminRoute = pathname.startsWith('/vendor');
+    // WYSHKIT 2026: Precision Routing
+    // Vendor admin routes own specific fixed suffixes under /vendor.
+    // Customer facing stores (/vendor/[id]) are excluded from admin surface checks.
+    const vendorAdminPaths = ['/vendor/catalog', '/vendor/orders', '/vendor/financials', '/vendor/insights', '/vendor/personalization', '/vendor/login']
+    const isVendorAdminRoute = pathname === '/vendor' || vendorAdminPaths.some(p => pathname.startsWith(p))
 
     // Path-based fallback for local dev
     const isAdminSurface = isAdminHost || pathname.startsWith('/admin')
-    // Only treat as vendor surface if it's a vendor admin route (not customer-facing routes)
     const isVendorSurface = isVendorHost || isVendorAdminRoute
 
     // Auth Routes
@@ -59,8 +58,7 @@ export async function updateSession(request: NextRequest) {
     const isGlobalLogin = pathname === '/login' || pathname === '/signup' || pathname === '/auth/login'
 
     // WYSHKIT 2026: Middleware Diet - Session refresh only, no DB queries
-    // Role/KYC checks delegated to
-    const vendor = await getVendorFromSession();
+    // Role/KYC checks delegated to layouts/pages for maximum Edge performance.
     let user = null
     try {
       const { data } = await supabase.auth.getSession()

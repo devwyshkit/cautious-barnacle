@@ -8,11 +8,11 @@ import { NextResponse } from 'next/server';
 import { logger } from "@/lib/logging/logger";
 
 const ERROR_MAP: Record<string, string> = {
-  'LIABILITY_SHIFTED': 'This item is already in production and cannot be cancelled.',
-  'PRODUCT_NOT_FOUND': 'We couldn\'t find that item. It might have been removed.',
-  'ALREADY_CANCELLED': 'This item has already been cancelled.',
-  'OUT_OF_STOCK': 'Sorry, this item is currently out of stock.',
-  'VENDOR_MISMATCH': 'You already have items from another store. Clear your cart to switch.',
+  'LIABILITY_SHIFTED': 'This product is already in production and cannot be cancelled.',
+  'PRODUCT_NOT_FOUND': 'We couldn\'t find that product. It might have been removed.',
+  'ALREADY_CANCELLED': 'This product has already been cancelled.',
+  'OUT_OF_STOCK': 'Sorry, this product is currently out of stock.',
+  'VENDOR_MISMATCH': 'You already have products from another store. Clear your cart to switch.',
   'INSUFFICIENT_WALLET_BALANCE': 'You don\'t have enough WyshKit Money for this selection.',
 };
 

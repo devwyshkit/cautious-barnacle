@@ -390,18 +390,18 @@ Customer submits details
 
 ---
 
-## Developer Setup
+## Setup
 
 ### Prerequisites
 - Node.js 18+
-- Supabase Project (DB & Auth)
-- Razorpay Account (for testing payments)
+- npm or yarn
+- Supabase account
 
 ### Installation
 ```bash
 npm install
 cp .env.example .env.local
-# Fill in credentials
+# Fill in environment variables
 npm run dev
 ```
 
