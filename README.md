@@ -1,5 +1,5 @@
 # WyshKit 2026: Hyperlocal Purity
-**"The Shadow of Swiggy. The Speed of Instamart. Individual Identity."**
+**"The Shadow of Swiggy. The Speed of Instamart. Individual Auth."**
 
 Wyshkit is a **hyperlocal product utility** designed for the "2026 Economy"—where local inventory becomes a substrate for personalization, delivered in under 60 minutes.
 
@@ -16,7 +16,7 @@ Wyshkit is not an app; it is a **Stateless Projection** of the communal commerce
 
 ## 🏛️ The Operational Equation
 ```
-WyshKit = [Logistics Purity] + [Curated Substrate] + [Identity Layer]
+WyshKit = [Logistics Purity] + [Curated Substrate] + [Auth Layer]
 ```
 
 ---
@@ -352,7 +352,7 @@ Customer submits details
 ### Customer-Facing UI
 | Use | Never use |
 |---|---|
-| "personalisation" | "customisation", "Design Hub", "Identity" |
+| "personalisation" | "customisation", "Design Hub", "Auth" |
 | "vendor", "local store" | "partner", "merchant", "seller", "SKU" |
 | "your vendor is making it" | "IN_PRODUCTION" |
 | "Arriving by 5:15 PM" | "2.4 km", "distance" |

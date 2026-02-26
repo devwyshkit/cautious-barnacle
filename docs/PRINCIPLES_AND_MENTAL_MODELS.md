@@ -132,7 +132,7 @@ Already documented. Primary actions are large, high-contrast, thumb-friendly.
 | **Similarity** | All "primary CTA" buttons must share the same colour, radius, and weight across the entire app. No exceptions. |
 | **Continuity** | Horizontal scroll rails (categories, vendor chips) signal "swipe for more." Never mix horizontal and vertical scroll in the same rail. |
 | **Figure-Ground** | Product sheet overlay must dim the background (0.6 opacity black). This signals "you are in a sub-context." |
-| **Closure** | Progress indicators (Step 1 of 3) leverage closure — users complete tasks they've started. |
+| **Closure** | Humans prefer seeing the complete picture over fragments. Single-page checkout: Address → Bill → Payment → [Pay] — all visible on one page. User sees the complete journey = reduced anxiety. Multi-step wizards (Step 1 → 2 → ???) violate this — the user can't see the end, feels uncertain. Progress indicators help, but **showing everything at once** eliminates the problem entirely. WyshKit checkout is a single scrollable page, not a wizard. |
 
 ---
 
@@ -143,6 +143,115 @@ Already documented. Primary actions are large, high-contrast, thumb-friendly.
 ₹600 for a glass feels expensive. If the UI looks like Zomato + Apple, ₹600 feels reasonable.
 
 **Rule**: Every screen must pass "Would a VC forward a screenshot of this?" test before shipping.
+
+---
+
+### Von Restorff Effect — The Isolation Effect (Hedwig von Restorff, 1933)
+> *Among a group of similar items, the one that differs most is best remembered.*
+
+| Where It Applies | WyshKit Implementation |
+|---|---|
+| Home feed | The "Promoted" vendor card has a subtle gold border + badge. It looks *slightly different* from organic cards — enough to catch the eye, not enough to feel like an ad. |
+| Checkout bill | The **discount line** is green while all other lines are neutral zinc. The savings stand out. |
+| Order tracking | The **current status step** is highlighted with brand colour + pulse dot while past/future steps are muted. |
+| CTA buttons | Only ONE button per screen is the primary colour. Everything else is secondary (outlined or muted). |
+
+**Rule**: If everything is highlighted, nothing is highlighted. Isolate the ONE thing the user must notice.
+
+---
+
+### Doherty Threshold (Walter J. Doherty & Ahrvind J. Thadani, 1982)
+> *Productivity soars when system response time is under 400ms. Users enter a "flow state" and perceive the system as instantaneous.*
+
+**WyshKit Standard**: Every user-initiated action must provide visual feedback within 400ms.
+
+| Action | Target Response | How |
+|---|---|---|
+| Add to Cart tap | <100ms | Optimistic UI update + haptic. RPC fires in background. |
+| Slide to Pay release | <200ms | Razorpay modal opens immediately. Order creation is async. |
+| Search keystroke | <300ms | Debounced `search_products_atomic` RPC. Show skeleton during load. |
+| Page navigation | <400ms | Next.js prefetching + RSC streaming. No blank white screens. |
+
+**Rule**: If the user can perceive a delay, add a skeleton or animation. Never show a blank void.
+
+---
+
+### Jakob's Law (Jakob Nielsen, 2000)
+> *Users spend most of their time on **other** apps. They prefer your app to work the same way as all the others they already know.*
+
+**WyshKit Application**: We don't invent interaction patterns. We borrow from Swiggy, Zomato, and Blinkit — the apps our users open 10× more than ours.
+
+| Pattern | Borrowed From | WyshKit Implementation |
+|---|---|---|
+| Bottom sheet for product detail | Swiggy/Zomato | Product sheet slides up from bottom, swipe-down to dismiss |
+| Slide-to-pay gesture | Swiggy/Uber | Horizontal slider with haptic confirmation |
+| Pull-to-refresh | iOS/Android system | All feed pages support native pull-to-refresh via `router.refresh()` |
+| Floating cart button | Swiggy/Blinkit | Bottom-right cart FAB with item count badge |
+| Order tracking timeline | Swiggy/Amazon | Vertical stepper with completed/active/pending states |
+
+**Rule**: If a user has to *learn* an interaction, it's wrong. The best UX is invisible because it's already muscle memory.
+
+---
+
+### Tesler's Law — The Law of Conservation of Complexity (Larry Tesler, 1984)
+> *Every system has irreducible complexity. The question is who bears it — the user or the system.*
+
+**WyshKit Doctrine**: The system bears ALL complexity. The user sees only decisions.
+
+| Complexity | Who Bears It |
+|---|---|
+| GST calculation (5%/12%/18%/28% per HSN code) | Postgres `calculate_order_total` RPC. User sees one line: "GST: ₹XX" |
+| Delivery fee (distance-based, vendor-specific, minimum order override) | Postgres. User sees: "Delivery: ₹30" or "FREE" |
+| Personalization schema (text vs image vs multi-field) | Product's `personalization_schema` JSONB drives a dynamic form. User fills fields, doesn't think about schema. |
+| Vendor tier commission rates | `platform_settings` table. Vendor sees "Commission: 12%" — never calculates it. |
+| Coupon validation (min order, expiry, usage limit, vendor-specific) | Atomic RPC. User taps "Apply" → sees green/red. No manual checks. |
+
+**Rule**: If the user is calculating, we've failed. Zero Shadow Math is Tesler's Law applied to commerce.
+
+---
+
+### Postel's Law — The Robustness Principle (Jon Postel, 1980)
+> *Be conservative in what you send, be liberal in what you accept.*
+
+**WyshKit Application**: Accept messy input, return clean output.
+
+| Input | Liberal Accept | Conservative Send |
+|---|---|---|
+| Phone number | `+91 98765 43210`, `09876543210`, `9876543210` → all accepted | Always store as `9876543210` (10 digits, no prefix) |
+| GSTIN | `29AADCW1234F1ZA` or `29aadcw1234f1za` → uppercase normalize | Always return uppercase |
+| Search query | `"laser glass"`, `"lazer glas"`, `"LASER GLASS"` → FTS with websearch handles all | Return properly cased product names |
+| Delivery instructions | Free text, emojis, presets, combinations → all accepted | Store as-is, display as-is |
+
+**Rule**: Never reject user input for formatting reasons. Normalize silently.
+
+---
+
+### Serial Position Effect (Hermann Ebbinghaus, 1885)
+> *People best remember the first (primacy) and last (recency) items in a list. The middle is forgotten.*
+
+**WyshKit Application**:
+
+| List | First Item (Primacy) | Last Item (Recency) | Middle |
+|---|---|---|---|
+| Home feed | **Best-selling or promoted** vendor | **"Explore More" CTA** to discovery | Standard organic results |
+| Checkout bill | **Products subtotal** (what you're buying) | **Total to pay** (what you owe) | Fees, taxes, discounts (important but secondary) |
+| Order tracking timeline | **"Order Placed" with timestamp** | **Current status with ETA** | Intermediate states (Confirmed, In Production) |
+| Category rail | **"All" or "For You"** | **"More →" button** | Category chips (browsing) |
+
+**Rule**: Put the most important thing FIRST. Put the CTA or summary LAST. The middle is for details.
+
+---
+
+### Weber's Law (Ernst Heinrich Weber, 1834)
+> *The just-noticeable difference (JND) between two stimuli is proportional to the magnitude of the stimuli.*
+
+**WyshKit Application**: Price perception.
+- On a ₹200 product, ₹30 delivery feels steep (15%). On a ₹2000 product, ₹30 feels negligible (1.5%).
+- **Rule**: For low-AOV orders, subsidize or waive delivery. For high-AOV, delivery fee is invisible.
+- **Cashback perception**: 5% cashback on ₹500 = ₹25. Feels good. 2% on ₹200 = ₹4. Feels pointless.
+- **Rule**: Minimum cashback floor: ₹10. Below that, round up. The Hook Model's variable reward must feel meaningful.
+
+**Implementation**: `platform_settings.min_cashback_amount` governs this. Never hardcoded.
 
 ---
 
@@ -363,6 +472,26 @@ The `vendor_tier` column exists. Here's the canonical model:
 
 ---
 
-*Last updated: February 2026*
-*Maintained by the WyshKit 2026 Product Team.*
-*Follow the best. Don't reinvent. This is the Swiggy 2026 way.*
+## 🎨 SHADCN & DESIGN SYSTEM PURITY
+
+### 1. The Shadcn Directive (Composition Over Customisation)
+> *Shadcn is a starting point, not a dependency.*
+
+- **Rule**: Never modify `src/components/ui/` files unless it's to fix a multi-theme accessibility issue.
+- **Implementation**: Wrap Shadcn primitives in `ResponsiveSurface` or local feature components.
+- **Purity**: Avoid "Component Bloat". If a primitive doesn't exist (e.g., a "Swipeable Card"), build it from Radix primitives directly, following Shadcn's visual language.
+
+### 2. Mobile-First & The 44px Law
+> *Desktop is just a wide mobile.*
+
+- **Rule**: Every interactive element (Button, Input, Toggle) MUST have a minimum tap target of **44×44px** on mobile.
+- **Responsive Logic**: 
+  - Mobile (<640px): Full-bleed sheets, bottom-sticky CTAs, 16px horizontal safe areas.
+  - Desktop (>1024px): Max-width containers (e.g., `max-w-md` for checkout), hover-states, keyboard shortcuts.
+- **Typography**: Sub-14px text is prohibited for primary content. Minimum body: 16px.
+
+### 3. Glassmorphism & Elevation
+- Use `backdrop-blur` for sheets and overlays to maintain spatial context.
+- Elevation is defined by **Money Density**: Higher monetary impact = higher visual shadow/blur.
+
+---

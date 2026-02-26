@@ -4,7 +4,7 @@ import { useState, useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
-import { MapPin, Check, Home, Briefcase, ChevronRight, Loader2, Plus } from "lucide-react";
+import { MapPin, Check, Home, Briefcase, ChevronRight, Loader2, Plus, Clock } from "lucide-react";
 
 import { setSelectedAddressAction } from "@/lib/actions/checkout/checkout";
 import type { Address } from "@/lib/types/address";
@@ -13,9 +13,10 @@ interface AddressSlotProps {
   initialAddresses?: Address[];
   currentAddress?: Address;
   disabled?: boolean;
+  etaMinutes?: number | null;
 }
 
-export function AddressSlot({ initialAddresses = [], currentAddress, disabled }: AddressSlotProps) {
+export function AddressSlot({ initialAddresses = [], currentAddress, disabled, etaMinutes }: AddressSlotProps) {
   const router = useRouter();
   const { user } = useAuth();
   const [isChanging, setIsChanging] = useState(false);
@@ -120,13 +121,23 @@ export function AddressSlot({ initialAddresses = [], currentAddress, disabled }:
         <div className="flex-1 min-w-0 px-1">
           {currentAddress ? (
             <>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <p className="text-[15px] font-black text-zinc-900 truncate tracking-tight">
                   {currentAddress.name || currentAddress.type || 'Address'}
                 </p>
-                <label className="text-[10px] font-black text-[var(--primary)] tracking-widest px-2.5 py-1 bg-[var(--primary)]/5 rounded-full border border-[var(--primary)]/10">
-                  Current
-                </label>
+                {etaMinutes && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-100/50 rounded-full animate-in fade-in zoom-in duration-500">
+                    <Clock className="size-3 text-emerald-600" />
+                    <span className="text-[10px] font-black text-emerald-700 uppercase tracking-tight">
+                      Arriving in ~{etaMinutes} mins
+                    </span>
+                  </div>
+                )}
+                {!etaMinutes && (
+                  <label className="text-[10px] font-black text-[var(--primary)] tracking-widest px-2.5 py-1 bg-[var(--primary)]/5 rounded-full border border-[var(--primary)]/10">
+                    Current
+                  </label>
+                )}
               </div>
               <p className="text-[11px] text-zinc-500 leading-tight mt-1 line-clamp-2 font-bold tracking-tight">
                 {currentAddress.address_line1}{currentAddress.city ? `, ${currentAddress.city}` : ''}

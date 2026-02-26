@@ -64,12 +64,12 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
                 trendingProducts: [],
                 featuredVendors: [],
                 activeOrders: [],
+                recentOrders: [],
                 error: error.message
             };
         }
 
         // SWIGGY 2026 Pattern: Robust Unwrapping
-        // Supabase RPC can return data directly or nested in an array depending on call context
         const raw = Array.isArray(data) ? (data[0]?.get_home_surface || data[0]) : data;
 
         if (!raw) {
@@ -79,7 +79,8 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
                 categories: [],
                 trendingProducts: [],
                 featuredVendors: [],
-                activeOrders: []
+                activeOrders: [],
+                recentOrders: []
             };
         }
 
@@ -98,6 +99,7 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
             newArrivals: sectionsData.new_arrivals || [],
             featuredVendors: raw.vendors || sectionsData.vendors || [],
             activeOrders: raw.active_orders || [],
+            recentOrders: raw.recent_orders || [],
             cartCount: raw.cart_count || 0,
             metadata: {
                 system_status: raw.system_status || 'normal',
@@ -112,6 +114,7 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
             trendingProducts: [],
             featuredVendors: [],
             activeOrders: [],
+            recentOrders: [],
             error: error.message || 'An unexpected error occurred while fetching home surface'
         };
     }

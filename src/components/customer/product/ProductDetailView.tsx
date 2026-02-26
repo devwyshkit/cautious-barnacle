@@ -321,7 +321,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         </section>
                     )}
 
-                    {/* Identity Section */}
+                    {/* Auth Section */}
                     {personalizationArray.length > 0 && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">

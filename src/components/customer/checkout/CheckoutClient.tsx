@@ -61,17 +61,52 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
 
             <div className="flex-1 overflow-y-auto px-4 pb-32 space-y-3">
 
+                {/* ITEMS SECTION - Anchoring Commitment */}
+                <section className="bg-white rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
+                    <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-zinc-50">
+                        <ShieldCheck className="size-3.5 text-[var(--primary)]" />
+                        <span className="text-[11px] font-black text-zinc-500 tracking-widest uppercase">Your Order</span>
+                    </div>
+                    <div className="px-4 py-3 space-y-3">
+                        {checkoutData.products.map(product => (
+                            <div key={product.id} className="flex items-center gap-3">
+                                <div className="relative size-12 rounded-xl bg-zinc-100 overflow-hidden shrink-0">
+                                    <Image
+                                        src={product.product_image || '/images/logo.png'}
+                                        alt={product.product_name}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-black text-zinc-900 truncate">{product.product_name}</p>
+                                    <div className="flex items-center gap-1.5 mt-0.5">
+                                        <span className="text-xs text-zinc-500">Qty {product.quantity}</span>
+                                        {product.is_personalized && (
+                                            <span className="flex items-center gap-0.5 text-[9px] font-black text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">
+                                                <Sparkles className="size-2" /> Personalized
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <span className="text-sm font-black text-zinc-900">{formatCurrency(product.line_total)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
                 {/* DELIVERY SECTION */}
                 <section className="bg-white rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-zinc-50">
                         <MapPin className="size-3.5 text-[var(--primary)]" />
-                        <span className="text-[11px] font-black text-zinc-500 tracking-widest">Delivery</span>
+                        <span className="text-[11px] font-black text-zinc-500 tracking-widest uppercase">Delivery</span>
                     </div>
                     <div className="px-4 py-3">
                         <AddressSlot
                             initialAddresses={checkoutData.addresses}
                             currentAddress={checkoutData.addresses?.find(a => a.id === checkoutData.selected_address_id)}
                             disabled={paymentFlow.isProcessing}
+                            etaMinutes={checkoutData.distance_km ? (checkoutData.vendor_prep_mins || 30) + Math.ceil(checkoutData.distance_km * 5) + 5 : 45}
                         />
                         <div className="mt-3">
                             <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
@@ -122,35 +157,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                 <section className="bg-white rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-zinc-50">
                         <FileText className="size-3.5 text-[var(--primary)]" />
-                        <span className="text-[11px] font-black text-zinc-500 tracking-widest">Bill</span>
-                    </div>
-
-                    {/* Products */}
-                    <div className="px-4 py-3 space-y-3 border-b border-zinc-50">
-                        {checkoutData.products.map(product => (
-                            <div key={product.id} className="flex items-center gap-3">
-                                <div className="relative size-12 rounded-xl bg-zinc-100 overflow-hidden shrink-0">
-                                    <Image
-                                        src={product.product_image || '/images/logo.png'}
-                                        alt={product.product_name}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-black text-zinc-900 truncate">{product.product_name}</p>
-                                    <div className="flex items-center gap-1.5 mt-0.5">
-                                        <span className="text-xs text-zinc-500">Qty {product.quantity}</span>
-                                        {product.is_personalized && (
-                                            <span className="flex items-center gap-0.5 text-[9px] font-black text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">
-                                                <Sparkles className="size-2" /> Personalized
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <span className="text-sm font-black text-zinc-900">{formatCurrency(product.line_total)}</span>
-                            </div>
-                        ))}
+                        <span className="text-[11px] font-black text-zinc-500 tracking-widest uppercase">Bill</span>
                     </div>
 
                     {/* Pricing Breakdown */}
@@ -174,7 +181,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                             )}
                             {checkoutData.pricing.gst > 0 && (
                                 <div className="flex justify-between text-xs font-bold text-zinc-500">
-                                    <span>GST (18%)</span>
+                                    <span>GST</span>
                                     <span>{formatCurrency(checkoutData.pricing.gst)}</span>
                                 </div>
                             )}

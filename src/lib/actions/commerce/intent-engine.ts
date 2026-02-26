@@ -118,8 +118,8 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
-        // Resolve Session Identity
-        // WYSHKIT 2026: Mutations MUST have an identity (User or Session)
+        // Resolve Session Auth
+        // WYSHKIT 2026: Mutations MUST have an auth context (User or Session)
         // Transitions/Place Order/Clear Cart/Add/Update all need session creation if guest.
         const isMutation = [
             'ADD_TO_CART',

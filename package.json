@@ -13,10 +13,7 @@
     "seed": "echo 'Run this SQL file in your Supabase SQL editor: supabase/seed.sql'",
     "seed:rich": "npx tsx scripts/seed-rich-data.ts",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e:seed": "npm run seed:rich && playwright test"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -73,9 +70,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.1",
     "@eslint/eslintrc": "^3.3.1",
-    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

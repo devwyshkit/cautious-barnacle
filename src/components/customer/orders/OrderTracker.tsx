@@ -168,7 +168,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
           </div>
         )}
         <div className="flex flex-col gap-4 p-4 pb-20">
-          <SurfaceErrorBoundaryWithRouter surfaceName="Success & Identity Overlay">
+          <SurfaceErrorBoundaryWithRouter surfaceName="Success & Auth Overlay">
             {(showSuccess || showPersonalizationForm) && (
               <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-white rounded-xl p-1 border border-zinc-100 shadow-sm shadow-zinc-200/50 overflow-hidden relative">
                 {showSuccess && !showPersonalizationForm && (

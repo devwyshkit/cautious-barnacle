@@ -43,9 +43,9 @@ async function AsyncLayoutContent({
   children: React.ReactNode;
   modal: React.ReactNode;
 }) {
-  let cartResult: { cart?: DraftTransaction, cartIdentity?: string, guestSessionId?: string | null } = {
+  let cartResult: { cart?: DraftTransaction, cartSessionId?: string, guestSessionId?: string | null } = {
     cart: EMPTY_CART,
-    cartIdentity: 'empty',
+    cartSessionId: 'empty',
     guestSessionId: null
   };
   let location: LocationData = { name: 'Select location', address: '', pincode: '' };
@@ -57,7 +57,7 @@ async function AsyncLayoutContent({
         logger.error('getCart failed:', err);
         return {
           cart: EMPTY_CART,
-          cartIdentity: 'error',
+          cartSessionId: 'error',
           guestSessionId: null
         };
       }),
@@ -82,7 +82,7 @@ async function AsyncLayoutContent({
         {modal}
       </NavShell>
       <CartErrorBoundary>
-        <FloatingCartBar key={cartResult.cartIdentity} />
+        <FloatingCartBar key={cartResult.cartSessionId} />
       </CartErrorBoundary>
       <OrderTrackingBar />
     </CartProvider>

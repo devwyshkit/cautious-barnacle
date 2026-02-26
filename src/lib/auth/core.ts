@@ -12,7 +12,7 @@ export interface UserPermissions {
 import { logger } from '@/lib/logging/logger';
 
 /**
- * Shared redirect logic (Unified Identity Model)
+ * Shared redirect logic (Unified Auth Model)
  */
 export function getRedirectPath(permissions: UserPermissions, returnUrl?: string | null): string {
   if (returnUrl && returnUrl.startsWith('/')) {

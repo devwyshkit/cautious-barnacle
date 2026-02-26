@@ -8,7 +8,7 @@ import { logger } from '@/lib/logging/logger';
 
 /**
  * Gets the current user's permissions from the database.
- * Following the Wyshkit 2026 Unified Identity model.
+ * Following the Wyshkit 2026 Unified Auth model.
  */
 export async function getCurrentUserPermissions(): Promise<UserPermissions> {
   try {

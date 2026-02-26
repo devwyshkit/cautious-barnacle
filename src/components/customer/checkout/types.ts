@@ -10,11 +10,6 @@ import type { PricingBreakdown } from '@/lib/types/pricing';
 export type { PricingBreakdown };
 
 /**
- * Identity state
- */
-export type IdentityState = 'checking' | 'logged-in' | 'not-logged-in' | 'verifying';
-
-/**
  * Address commit state
  */
 export interface AddressCommitState {

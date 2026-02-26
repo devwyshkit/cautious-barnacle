@@ -57,7 +57,7 @@ export function usePaymentFlow({
         if (finalOrderId) {
             const params = new URLSearchParams();
             params.set('success', 'true');
-            if (finalHasPersonalization) params.set('identity', 'true');
+            if (finalHasPersonalization) params.set('auth', 'true');
 
             // SWIGGY 2026: Success Ripple Glory Time.
             // We allow the success overlay to breathe before redirecting.

@@ -89,7 +89,7 @@ export function StatusCard({ order }: StatusCardProps) {
             case ORDER_STATUS.PLACED:
                 return hasPersonalization ? 'Waiting for your design details' : 'Waiting for vendor to accept';
             case ORDER_STATUS.CONFIRMED:
-                return hasPersonalization ? 'Share identity to start crafting' : 'Vendor is securing your products';
+                return hasPersonalization ? 'Verify Auth to start crafting' : 'Vendor is securing your products';
             case ORDER_STATUS.IN_PRODUCTION: return 'Your gift is being masterfully prepared';
             case ORDER_STATUS.PACKED: return 'Waiting for delivery executive';
             case ORDER_STATUS.OUT_FOR_DELIVERY: return 'Delivery agent is navigating to your address';

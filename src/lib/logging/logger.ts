@@ -39,9 +39,9 @@ class Logger {
   constructor() {
     this.isDevelopment = process.env.NODE_ENV === 'development';
     // WYSHKIT 2026: God Level Purity. 
-    // Even in development, we suppress noisy DEBUG/INFO logs to keep the console clean.
-    // Set to LogLevel.DEBUG only if active debugging is required.
-    this.minLevel = LogLevel.WARN;
+    // Absolute production-grade silence. Only ERRORs reach the stream in non-development.
+    // In development, we use WARN to keep the DX clean.
+    this.minLevel = this.isDevelopment ? LogLevel.WARN : LogLevel.ERROR;
   }
 
   private shouldLog(level: LogLevel): boolean {

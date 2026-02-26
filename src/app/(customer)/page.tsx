@@ -1,15 +1,12 @@
 import { Suspense } from 'react';
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { getHomeSurfaceContext } from "@/lib/actions/discovery/home";
-import { getFilteredProducts } from "@/lib/actions/discovery/search";
 import { getServerLocation } from "@/lib/actions/discovery/location";
 import { HomeSkeleton } from "@/components/customer/home/HomeSkeleton";
-import { WyshkitProduct } from '@/lib/types/product';
 import { Masthead } from "@/components/customer/home/Masthead";
-import { ReorderWidget } from "@/components/customer/home/ReorderWidget";
+import { ReorderRail } from "@/components/customer/home/ReorderRail";
+import { ActiveOrdersBanner } from '@/components/customer/home/ActiveOrdersBanner';
 import { cn } from "@/lib/utils";
-import { SurfaceErrorBoundaryWithRouter } from "@/components/error/SurfaceErrorBoundary";
 
 
 import { CircleRail } from "@/components/ui/blocks/discovery/CircleRail";
@@ -46,58 +43,48 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             locationName={location.name || 'Your Area'}
           />
 
-          {/* SWIGGY 2026: Diagnostic Dump (Temporary) */}
-          {process.env.NODE_ENV === 'development' && (
-            <details className="mx-4 md:mx-8 mb-4 p-2 bg-zinc-900 text-zinc-400 rounded-lg text-[8px] font-mono">
-              <summary className="cursor-pointer hover:text-white">Debug: Home Surface Data ({discovery.featuredVendors?.length} vendors, {discovery.trendingProducts?.length} products)</summary>
-              <pre className="mt-2 max-h-40 overflow-auto">
-                {JSON.stringify({
-                  vendors: discovery.featuredVendors?.length,
-                  products: discovery.trendingProducts?.length,
-                  categories: discovery.categories?.length,
-                  hasError: !!(discovery as any).error,
-                  location: { lat: location.lat, lng: location.lng, name: location.name }
-                }, null, 2)}
-              </pre>
-            </details>
-          )}
-
-          {(discovery as any).error && (
-            <div className="mx-4 md:mx-8 mb-8 p-6 bg-rose-50 border border-rose-100 rounded-3xl text-rose-950 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
-              <div className="flex items-center gap-3 font-black tracking-tight">
-                <div className="size-8 rounded-full bg-rose-500 flex items-center justify-center">
-                  <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                </div>
-                Discovery Engine Offline
-              </div>
-              <p className="text-sm font-medium opacity-80 leading-relaxed max-w-lg">
-                We are having trouble connecting to the Supabase API. This is common in certain regions (especially India) due to ISP-level DNS blocks on `.supabase.co` domains.
-              </p>
-              <div className="flex flex-col gap-2 mt-2">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-rose-900/40">Technical Details</p>
-                <pre className="text-[10px] bg-white/60 p-4 rounded-xl font-mono overflow-auto border border-rose-100/50">
-                  {String((discovery as any).error)}
-                </pre>
-              </div>
-              <div className="pt-4 flex flex-col gap-2">
-                <p className="text-xs font-bold text-rose-900">Recommended Fixes:</p>
-                <ul className="text-xs space-y-1 opacity-70 list-disc ml-4">
-                  <li>Use a VPN or set your DNS to 8.8.8.8</li>
-                  <li>Verify your <code className="bg-rose-100 px-1 rounded">/etc/hosts</code> mapping for the Supabase URL is correct.</li>
-                  <li>Check if <code className="bg-rose-100 px-1 rounded">NEXT_PUBLIC_SUPABASE_URL</code> in your <code className="bg-rose-100 px-1 rounded">.env</code> matches your host entry.</li>
-                </ul>
-              </div>
-            </div>
-          )}
-
           <div className="max-w-[1440px] mx-auto">
-            {!category && discovery.activeOrders?.length > 0 && (
-              <div className="px-4 md:px-8">
-                <ReorderWidget initialOrders={discovery.metadata?.orders} />
+            {!category && (
+              <div className="px-4 md:px-8 space-y-8">
+                {/* SWIGGY 2026: Zeigarnik Banner (High Priority) */}
+                {discovery.activeOrders?.length > 0 && (
+                  <ActiveOrdersBanner orders={discovery.activeOrders} />
+                )}
+
+                {/* SWIGGY 2026: BannerBento (The Hook) */}
+                <BannerBento data={discovery.trendingProducts} />
+
+                {/* SWIGGY 2026: Reorder Rail (Low Priority / Discovery) */}
+                {discovery.recentOrders?.length > 0 && (
+                  <ReorderRail initialOrders={discovery.recentOrders} />
+                )}
               </div>
             )}
 
-            <div className="mt-2 flex flex-col gap-8">
+            {/* Error Handling (Hardened for Production) */}
+            {(discovery as any).error && (
+              <div className="mx-4 md:mx-8 mb-8 p-6 bg-rose-50 border border-rose-100 rounded-3xl text-rose-950 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                <div className="flex items-center gap-3 font-black tracking-tight">
+                  <div className="size-8 rounded-full bg-rose-500 flex items-center justify-center">
+                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                  </div>
+                  Unable to reach Discovery Engine
+                </div>
+                <p className="text-sm font-medium opacity-80 leading-relaxed max-w-lg">
+                  We&apos;re having trouble connecting to our services. Please try refreshing the page or checking your internet connection.
+                </p>
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="flex flex-col gap-2 mt-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-rose-900/40">Technical Details (Dev Only)</p>
+                    <pre className="text-[10px] bg-white/60 p-4 rounded-xl font-mono overflow-auto border border-rose-100/50">
+                      {String((discovery as any).error)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-8 flex flex-col gap-8">
               {/* Categories */}
               <section className="px-4 md:px-8">
                 <CircleRail data={discovery.categories} context={{ selected_category: category }} />
@@ -136,16 +123,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     );
   } catch (err: any) {
     return (
-      <div className="p-10 text-red-600 bg-red-50 min-h-screen font-mono">
-        <h1 className="text-xl font-bold mb-4">Server Error (Debug)</h1>
-        <pre className="whitespace-pre-wrap text-xs bg-white p-4 rounded border border-red-100 shadow-sm">
-          {err.stack || err.message || String(err)}
-        </pre>
+      <div className="px-4 py-20 text-center min-h-screen bg-white flex flex-col items-center justify-center gap-4">
+        <h1 className="text-2xl font-black tracking-tight text-zinc-900">Something went wrong</h1>
+        <p className="text-sm text-zinc-500 max-w-sm">We encountered an error while loading the home feed. Please refresh the page.</p>
+        {process.env.NODE_ENV === 'development' && (
+          <pre className="mt-8 p-4 bg-zinc-50 rounded-xl text-[10px] font-mono text-zinc-400 max-w-lg overflow-auto border border-zinc-100">
+            {err.stack || err.message}
+          </pre>
+        )}
       </div>
     );
   }
 }
-
-
-
-

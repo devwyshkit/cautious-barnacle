@@ -216,59 +216,33 @@ export async function cancel_order_product(order_product_id: string, order_id: s
   try {
     const admin_supabase = await createAdminClient();
 
-    // 1. Fetch order product and main order to get Razorpay Payment ID
-    const [productRes, orderRes] = await Promise.all([
-      admin_supabase.from('order_products').select('*').eq('id', order_product_id).single(),
+    // 1. ATOMIC Transition & Recalculation via DB RPC
+    const { data: rpc_data, error: rpc_error } = await admin_supabase.rpc('cancel_order_product_atomic', {
+      p_order_product_id: order_product_id,
+      p_order_id: order_id,
+      p_reason: reason
+    });
 
-      admin_supabase.from('orders').select('id, payment_id, total, status').eq('id', order_id).single()
-    ]);
+    if (rpc_error) throw rpc_error;
+    const result = rpc_data as any;
 
-    if (productRes.error || !productRes.data) throw new Error('Order product not found');
-    if (orderRes.error || !orderRes.data) throw new Error('Order not found');
-
-    const product = productRes.data;
-    const order = orderRes.data;
-
-    // 1.5 Liability Shift Check
-    if (product.liability_shifted_at) {
-      return { success: false, error: 'Cannot cancel once engraving has begun (Liability Shifted)' };
+    if (!result.success) {
+      return { success: false, error: result.error };
     }
 
-    // 2. Mark product as CANCELLED
-    const { error: updateError } = await admin_supabase
-      .from('order_products')
-      .update({ status: ORDER_STATUS.CANCELLED })
-      .eq('id', order_product_id);
-
-    if (updateError) throw updateError;
-
-    // 3. Process Razorpay Refund for exactly this line product
-    let refundSuccessful = false;
-    if (order.payment_id) {
+    // 2. Process Razorpay Refund (Side Effect - One-Trip!)
+    // We use the payment_id returned directly from the RPC result.
+    if (result.success && result.payment_id) {
       try {
         const { refund_payment } = await import('@/lib/services/razorpay');
-        // Refund in paise
-        await refund_payment(order.payment_id, product.total_price * 100, {
-          reason: 'Partial cancellation: Preview Rejected',
+        await refund_payment(result.payment_id, result.refund_amount * 100, {
+          reason: `Partial cancellation: ${reason}`,
           order_product_id: order_product_id
         });
-        refundSuccessful = true;
       } catch (err) {
-        logger.error(`Failed to refund product ${order_product_id} from payment ${order.payment_id}`, err as Error);
+        logger.error(`Refund failed for payment ${result.payment_id}`, err as Error);
       }
     }
-
-    // WYSHKIT 2026: Use DB function `recalculate_order_total(order_id)` to eliminate shadow math.
-    // This ensures discounts, delivery fees, and taxes are handled strictly in Postgres.
-    const { error: rpc_error } = await admin_supabase.rpc('recalculate_order_total', { p_order_id: order_id });
-    if (rpc_error) throw rpc_error;
-
-    // Update history
-    await log_order_status_history(order_id, 'product_cancelled', 'Product Cancelled & Refunded', `A product (${product.product_name}) was rejected and cancelled. ${refundSuccessful ? 'Refund initiated.' : 'Refund action logged.'}`, {
-      order_product_id,
-      reason,
-      refunded_amount: product.total_price
-    });
 
     revalidateTag(`order-${order_id}`);
     revalidateTag('orders');
@@ -284,56 +258,22 @@ export async function request_change(preview_submission_id: string, order_id: st
   try {
     const supabase = await createClient();
 
-    const { data: order, error: order_error } = await supabase
-      .from('orders')
-      .select('change_request_count, max_change_requests')
-      .eq('id', order_id)
-      .maybeSingle();
+    // WYSHKIT 2026: Atomic Submission via RPC (Zero Shadow Math)
+    const { data: rpc_data, error: rpc_error } = await supabase.rpc('request_change', {
+      p_order_id: order_id,
+      p_feedback: feedback
+    });
 
-    if (order_error) throw order_error;
-    if (!order) {
-      return { success: false, error: 'Order not found' };
+    if (rpc_error) throw rpc_error;
+
+    const result = rpc_data as any;
+    if (!result.success) {
+      return { success: false, error: result.error };
     }
-
-    const change_request_count = (order.change_request_count || 0) + 1;
-    const max_change_requests = order.max_change_requests || 2;
-
-    if (change_request_count > max_change_requests) {
-      return { success: false, error: `Maximum ${max_change_requests} change requests allowed. Please approve or contact support.` };
-    }
-
-    // WYSHKIT 2026: Use Admin Client for preview status updates (RLS Bypass)
-    const admin_supabase = await createAdminClient();
-
-    // Swiggy 2026: Metadata-Driven Revision
-    const { error: preview_error } = await admin_supabase
-      .from('order_products')
-      .update({
-        personalization_details: {
-          status: 'change_requested',
-          customer_feedback: feedback,
-          updated_at: new Date().toISOString()
-        } as any
-      })
-      .eq('order_id', order_id);
-
-    if (preview_error) throw preview_error;
-
-    const { error: update_order_error } = await admin_supabase
-      .from('orders')
-      .update({
-        change_request_count: change_request_count,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', order_id);
-
-    if (update_order_error) throw update_order_error;
-
-    await log_order_status_history(order_id, 'change_requested', 'Change Requested', `You have requested changes to the preview (${change_request_count}/${max_change_requests}).`, { feedback, change_request_count: change_request_count });
 
     revalidateTag(`order-${order_id}`);
     revalidateTag('orders');
-    return { success: true, change_request_count, max_change_requests };
+    return { success: true, change_request_count: result.new_count };
   } catch (error) {
     logError(error, `RequestChange:${order_id}`);
     const { error: errMsg } = handleActionError(error);
@@ -350,10 +290,11 @@ export async function get_order_with_history(order_id: string): Promise<{ order:
       .select(`
         *,
         order_products(*),
-        order_status_history(*),
+        order_status_history(*) ,
         vendors(name, image_url)
       `)
       .eq('id', order_id)
+      .order('created_at', { foreignTable: 'order_status_history', ascending: false })
       .single();
 
     if (error || !data) {
@@ -363,35 +304,17 @@ export async function get_order_with_history(order_id: string): Promise<{ order:
     // Cast to the robust join type we defined
     const raw_order = data as unknown as OrderDetails;
 
-    // Sort history by latest first
-    const order_status_history_arr = ((raw_order as any).order_status_history || []).sort((a: any, b: any) => {
-      const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
-      const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
-      return bTime - aTime;
-    });
-
     // Map snake_case for the frontend (Zero Shadow Schema)
-    let p_status = null;
-    const products = raw_order.order_products || [];
-    if (raw_order.has_personalization && products.length > 0) {
-      const hasSubmitted = products.some((i: any) => i.personalization_details?.text || i.personalization_details?.image_url);
-      const isPreviewReady = products.some((i: any) => i.personalization_details?.preview_ready);
-      const isApproved = products.every((i: any) => i.personalization_details?.approved || !i.personalization_details);
-
-      if (isApproved) p_status = 'approved';
-      else if (isPreviewReady) p_status = 'preview_ready';
-      else if (hasSubmitted) p_status = 'submitted';
-      else p_status = 'pending';
-    }
-
+    // WYSHKIT 2026: All status logic moved to Postgres get_personalization_status()
     const mapped_order: OrderDetails = {
       ...raw_order,
       vendor_name: raw_order.vendors?.name || 'Vendor',
       vendor_image: raw_order.vendors?.image_url || null,
-      order_status_history: order_status_history_arr as any,
-      order_products: products,
-      personalization_status: p_status,
-      total_savings: (Number(raw_order.discount) || 0) + (Number((raw_order as any).cashback_amount) || 0)
+      order_products: (raw_order.order_products || []).map((p: any) => ({
+        ...p,
+        personalization_status: (p as any).personalization_status // Added in DB view or computed
+      })),
+      // total_savings is now a generated column in the DB!
     } as any;
 
     return { order: mapped_order };

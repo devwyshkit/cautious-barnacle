@@ -17,7 +17,7 @@ import type { Tables } from '@/lib/supabase/types';
 export interface GetCartResult {
     cart?: DraftTransaction;
     error?: string;
-    cartIdentity?: string;
+    cartSessionId?: string;
     guestSessionId?: string | null;
 }
 
@@ -25,19 +25,19 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
     try {
         const supabase = await createClient();
 
-        // 1. Resolve Identity
+        // 1. Resolve Auth
         const { data: { user } } = await supabase.auth.getUser();
         const guestSessionId = !user ? await getGuestSessionIdReadOnly() : null;
 
         if (!user && !guestSessionId) {
             return {
                 cart: EMPTY_CART,
-                cartIdentity: 'empty',
+                cartSessionId: 'empty',
                 guestSessionId: null
             };
         }
 
-        const cartIdentity = user?.id ?? guestSessionId ?? 'empty';
+        const cartSessionId = user?.id ?? guestSessionId ?? 'empty';
         const queryClient = supabase; // Swiggy 2026: RLS handles guest reads via session_id
 
         // 2. Swiggy 2026: Single Trip Context Fetch
@@ -47,9 +47,9 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
                 p_session_id: guestSessionId ?? undefined
             });
 
-        if (contextError) {
-            logError(contextError, 'GetCartContextRPC');
-            return { cart: EMPTY_CART, error: contextError.message };
+        if (contextError || !context) {
+            if (contextError) logError(contextError, 'GetCartContextRPC');
+            return { cart: EMPTY_CART, error: contextError?.message || 'Cart context not found' };
         }
 
         const data = context as any;
@@ -114,7 +114,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
 
         return {
             cart,
-            cartIdentity,
+            cartSessionId,
             guestSessionId
         };
     } catch (error) {
@@ -122,7 +122,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
         return {
             cart: EMPTY_CART,
             error: message,
-            cartIdentity: 'error-fallback',
+            cartSessionId: 'error-fallback',
             guestSessionId: null
         };
     }

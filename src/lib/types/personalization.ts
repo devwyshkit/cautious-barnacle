@@ -34,7 +34,7 @@ export interface SelectedAddon {
  * NOTE: We no longer extend the view type directly to avoid optional/non-optional conflicts.
  */
 export interface DraftProduct {
-  // Cart product identity
+  // Cart product auth/verification
   id: string;
   product_id: string;
   product_name: string;

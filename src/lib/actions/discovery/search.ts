@@ -26,58 +26,28 @@ export async function searchFiltered(options: {
     const supabase = await createClient();
     const { q, category, limit = 20, lat, lng } = options;
 
-    // Combined query for products
-    let productsQuery = supabase
-        .from('products')
-        .select('*, vendors!inner(name, slug, city, state, is_active, location)')
-        .eq('is_active', true)
-        .eq('vendors.is_active', true);
+    // WYSHKIT 2026: Atomic Search & Hyperlocal Sort via Kernel RPC
+    const { data: results, error } = await supabase.rpc('search_products_atomic', {
+        p_query: q || '',
+        p_category_id: category || null,
+        p_lat: lat || null,
+        p_lng: lng || null,
+        p_limit: limit
+    } as any);
 
-    // Combined query for vendors
-    let vendorsQuery = supabase
-        .from('vendors')
-        .select('*')
-        .eq('is_active', true);
-
-    if (q && q.length >= 2) {
-        productsQuery = productsQuery.textSearch('fts', q, {
-            type: 'websearch',
-            config: 'english'
-        });
-        vendorsQuery = vendorsQuery.ilike('name', `%${q}%`);
+    if (error) {
+        logger.error('search_products_atomic failed', error);
+        return { products: [], vendors: [], total: 0 };
     }
 
-    if (category) {
-        productsQuery = productsQuery.ilike('category_id', category);
-    }
-
-    // ELITE: Hyperlocal sorting if lat/lng provided
-    if (lat && lng) {
-        productsQuery = productsQuery
-            .order('location <-> st_setsrid(st_makepoint(?, ?), 4326)', {
-                ascending: true,
-                placeholder: [lng, lat]
-            } as any);
-
-        vendorsQuery = vendorsQuery
-            .order('location <-> st_setsrid(st_makepoint(?, ?), 4326)', {
-                ascending: true,
-                placeholder: [lng, lat]
-            } as any);
-    }
-
-    const [productsResponse, vendorsResponse] = await Promise.all([
-        productsQuery.limit(limit),
-        vendorsQuery.limit(Math.floor(limit / 2))
-    ]);
-
+    // Results from RPC are already sorted by proximity and relevance
     const rawResults = {
-        products: (productsResponse.data || []).map((product: any) => ({
-            ...product,
-            image_url: (product as any).images?.[0] || (product as any).image_url
+        products: (results || []).map((p: any) => ({
+            ...p,
+            image_url: p.images?.[0] || '/images/logo.png'
         })),
-        vendors: vendorsResponse.data || [],
-        total: (productsResponse.data?.length || 0) + (vendorsResponse.data?.length || 0)
+        vendors: [], // We'll handle vendor separation if needed, but the unified list is better for the UI
+        total: results?.[0]?.total_count || 0
     };
 
     const validated = SearchResultsSchema.safeParse(rawResults);
@@ -105,57 +75,39 @@ export async function getFilteredProducts(options: {
 } = {}): Promise<{ data?: { products: WyshkitProduct[]; total: number }; error?: string }> {
     try {
         const supabase = await createClient();
-        const { limit = 12, offset = 0, category, search, minPrice, maxPrice, lat, lng } = options;
+        const { limit = 12, offset = 0, category, search, lat, lng } = options;
 
-        // ELITE: If coords are provided, we should use a proximity-aware query.
-        // For now, we utilize the standard view but we can add distance calculation if PostGIS is available.
-        // SWIGGY 2026: Never filter client-side.
-
-        let query = supabase
-            .from('products')
-            .select('*, vendors!inner(name, slug, city, is_active)', { count: 'exact' });
-
-        if (lat && lng) {
-            // Sort by proximity using PostGIS <-> operator
-            query = query.order('vendors(location) <-> st_setsrid(st_makepoint(?, ?), 4326)', {
-                ascending: true,
-                placeholder: [lng, lat]
-            } as any);
-        } else {
-            query = query.order('created_at', { ascending: false });
-        }
-
-        query = query.eq('is_active', true);
-
-        if (category) {
-            query = query.ilike('category_id', category);
-        }
-        if (search) {
-            // SWIGGY 2026: Using FTS for 5x faster search performance
-            query = query.textSearch('fts', search, {
-                type: 'websearch',
-                config: 'english'
-            });
-        }
-        if (minPrice !== undefined) {
-            query = query.gte('base_price', minPrice);
-        }
-        if (maxPrice !== undefined) {
-            query = query.lte('base_price', maxPrice);
-        }
-
-        const { data, error, count } = await query
-            .range(offset, offset + limit - 1);
+        // WYSHKIT 2026: Atomic Discovery Fetcher (Zero Shadow Math)
+        const { data, error } = await supabase.rpc('search_products_atomic', {
+            p_query: search || '',
+            p_category_id: category || null,
+            p_lat: lat || null,
+            p_lng: lng || null,
+            p_limit: limit,
+            p_offset: offset
+        } as any);
 
         if (error) throw error;
 
-        const validated = z.array(WyshkitProductSchema).safeParse(data);
+        const total = data?.[0]?.total_count || 0;
+        const productsRaw = (data || []).map((p: any) => ({
+            ...p,
+            image_url: p.images?.[0] || '/images/logo.png',
+            vendors: {
+                name: p.vendor_name,
+                slug: p.vendor_slug,
+                image_url: p.vendor_image_url,
+                is_active: p.vendor_is_active
+            }
+        }));
+
+        const validated = z.array(WyshkitProductSchema).safeParse(productsRaw);
         if (!validated.success) {
             logger.error('Zod Validation Failed: getFilteredProducts', validated.error);
-            return { data: { products: (data || []) as any, total: count || 0 } };
+            return { data: { products: productsRaw as any, total } };
         }
 
-        return { data: { products: validated.data as unknown as WyshkitProduct[], total: count || 0 } };
+        return { data: { products: validated.data as unknown as WyshkitProduct[], total } };
     } catch (error) {
         logger.error('Failed to fetch filtered products in Discovery', error, { options });
         return { error: 'Failed to fetch products' };

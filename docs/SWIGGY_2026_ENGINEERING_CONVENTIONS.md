@@ -48,6 +48,36 @@ Elite products eliminate typing by predicting intent.
 - **Rule**: Provide "One-Tap Presets" for high-frequency instructions (e.g., "Gate Drop", "Silence Mode").
 - **Goal**: Reduce cognitive load from "Input" to "Confirmation".
 
+### 10. Von Restorff Effect (Isolation)
+The different thing is the remembered thing. Only ONE element per screen gets the primary highlight (colour, size, animation). Everything else is muted. If everything screams, nothing is heard.
+
+### 11. Doherty Threshold (400ms Budget)
+Every user action must produce visual feedback within 400ms. Below that, users enter flow. Above that, they notice lag.
+- **Enforcement**: 
+  - All page transitions MUST show skeletons within 200ms.
+  - All mutations MUST use Optimistic UI (e.g., cart quantity updates instantly, RPC confirms in background).
+  - Every transactional intent MUST trigger Haptic Feedback (Resonance).
+
+### 12. Jakob's Law (Familiarity)
+Borrow interaction patterns from Swiggy, Zomato, Blinkit — apps our users already know. Bottom sheets, slide-to-pay, vertical steppers, floating cart. Zero invention of new gestures.
+
+### 13. Tesler's Law (Complexity Absorption)
+The system bears ALL irreducible complexity. GST, delivery fees, commissions, coupon validation — all computed in the Postgres kernel. The user sees only the result. Zero Shadow Math is Tesler's Law applied to commerce.
+
+### 14. Postel's Law (Robustness)
+Be liberal in what you accept (messy phone numbers, mixed-case GSTIN), conservative in what you store (normalized, clean). Never reject input for formatting.
+
+### 15. Serial Position Effect (First & Last)
+In any list, the first and last items are remembered. Put the best product first, the CTA last. The middle is for details the user scans, not memorizes.
+
+### 16. Weber's Law (Price Perception)
+₹30 delivery on ₹200 order = painful (15%). Same ₹30 on ₹2000 = invisible (1.5%). Subsidize delivery on low-AOV. Set a minimum cashback floor (₹10) so the variable reward always feels meaningful.
+
+### 17. Gestalt Closure (Complete Picture Checkout)
+Humans prefer the complete picture over fragments. WyshKit checkout is a **single scrollable page** (Address → Bill → Payment → [Slide to Pay]), NOT a multi-step wizard. The user sees the entire journey = reduced anxiety = higher conversion.
+
+See `docs/PRINCIPLES_AND_MENTAL_MODELS.md` for full implementation tables.
+
 ## ⚖️ The Laws of 2026 (Canonical)
 
 1.  **The Law of Zero Shadow Math**: All commerce arithmetic (GST, platform fees, delivery) is the exclusive domain of the Postgres kernel. Frontend math is prohibited.
@@ -69,7 +99,17 @@ Elite products eliminate typing by predicting intent.
 7. **No silent EXCEPTION swallowing**: `EXCEPTION WHEN OTHERS THEN RETURN json_build_object('success', false, 'error', SQLERRM)` is forbidden in production RPCs that modify state. RAISE the exception. Let the transaction roll back. Never silently succeed on a partial write.
 9. **FK Indexes**: PostgreSQL does NOT auto-index foreign keys. Every FK column must have a covering index.
 10. **Docs-First Onboarding**: Friction is a bug. OCR (IDfy) extraction must pre-fill all KYB forms. The vendor is a verifier, not an inputter.
-11. **Anti-Fragile State**: Decouple 3PL logistics from the order state machine. A Shadowfax API failure must NOT block a vendor from marking an order as 'PACKED'.
+11. **The ETA Contract**: Time > Distance.
+    - **Formula**: `ETA = vendor.avg_prep_time_mins + (distance_km * 5) + 5 [buffer]`
+    - **Usage**: Product Card: "~40 min" | Checkout: "Arriving in ~45 mins" | Tracking: "Arriving by 5:15 PM".
+
+12. **The Realtime Contract (Subscriptions)**: Never force a pull when the system can push.
+    - **Rule**: Order tracking MUST use Supabase Realtime subscriptions.
+    - **Channel**: `public:orders:id=eq.$order_id`
+    - **Events**: `UPDATE` (status, eta)
+    - **Fallback**: 30s background polling if WebSocket fails.
+
+13. **Anti-Fragile State**: Decouple 3PL logistics from the order state machine. A Shadowfax API failure must NOT block a vendor from marking an order as 'PACKED'.
 
 ## 💬 Nomenclature Guard (Purified)
 

@@ -15,7 +15,7 @@
 
 ## What Personalisation Means Here
 
-> **Personalisation** = Adding identity to an existing product. "Rahul" engraved on a whiskey glass.
+> **Personalisation** = Adding auth/verification to an existing product. "Rahul" engraved on a whiskey glass.
 > **Customisation** = Changing the product's specs. We don't do this.
 
 The vendor has a glass. The customer adds a name. That's it. The preview shows what the engraving *will look like on* the glass — a digital overlay. Not a photo of the engraved glass. Never confuse the two.
@@ -135,7 +135,7 @@ No "Design Hub" jargon. No 5-second loaders.
 - Order ref: `#WK-YYYYMMDD-XXXX`
 - ETA: "Arriving by 5:15 PM" (once rider assigned)
 
-#### Section B — IDENTITY FORM (personalised products only)
+#### Section B — AUTH FORM (personalised products only)
 Auto-opens if `?success=true` and order has personalised products.
 
 Vendor-defined fields (schema from `personalization_schema` config):
@@ -190,9 +190,14 @@ Each product with independent status badge:
 - Personalised: `AWAITING_DETAILS → DETAILS_RECEIVED → PREVIEW_READY → IN_PRODUCTION → PACKED → SHIPPED → DELIVERED`
 
 #### Section E — DELIVERY INFO (once `SHIPPED`)
-- "Arriving in ~22 mins"
-- Rider name + masked phone
-- No map embed for 3PL deliveries (Shadowfax/Porter handle routing)
+- **ETA Formula**: `vendor.avg_prep_time_mins + (distance_km * 5) + 5 [buffer]`
+- **Display**: "Arriving in ~22 mins" (Real-time countdown)
+- **Real-time Engine**: 
+  - Subscribe to `public:orders` where `id = order_id`.
+  - Listen for `UPDATE` events on `status` and `eta`.
+  - Trigger haptic notify on every status change.
+- Rider name + masked phone.
+- No map embed for 3PL deliveries (Shadowfax/Porter handle routing).
 
 #### Section F — BILL SUMMARY
 
@@ -324,7 +329,7 @@ Standard in every major platform. WyshKit supports:
 ### Customer-Facing UI
 | Use | Never use |
 |-|-|
-| "personalisation" | "customisation", "Design Hub", "Identity" |
+| "personalisation" | "customisation", "Design Hub", "Auth" |
 | "vendor", "local store" | "partner", "merchant", "SKU", "item" |
 | "Arriving by 5:15 PM" | "2.4 km away", "distance" |
 | "preview" | "mockup", "proof", "design" |

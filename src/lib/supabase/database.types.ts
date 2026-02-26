@@ -394,6 +394,7 @@ export type Database = {
           quantity: number
           selected_addons: Json | null
           selected_variant_id: string | null
+          selected_variant_options: Json | null
           status: Database["public"]["Enums"]["order_status"]
           stock_deducted: boolean | null
           total_price: number
@@ -422,6 +423,7 @@ export type Database = {
           quantity: number
           selected_addons?: Json | null
           selected_variant_id?: string | null
+          selected_variant_options?: Json | null
           status?: Database["public"]["Enums"]["order_status"]
           stock_deducted?: boolean | null
           total_price: number
@@ -450,6 +452,7 @@ export type Database = {
           quantity?: number
           selected_addons?: Json | null
           selected_variant_id?: string | null
+          selected_variant_options?: Json | null
           status?: Database["public"]["Enums"]["order_status"]
           stock_deducted?: boolean | null
           total_price?: number
@@ -1597,6 +1600,9 @@ export type Database = {
           is_active: boolean | null
           is_online: boolean | null
           is_promoted: boolean | null
+          kyc_data_json: Json | null
+          kyc_status: string | null
+          kyc_verified_at: string | null
           location: unknown
           minimum_order_amount: number | null
           name: string
@@ -1652,6 +1658,9 @@ export type Database = {
           is_active?: boolean | null
           is_online?: boolean | null
           is_promoted?: boolean | null
+          kyc_data_json?: Json | null
+          kyc_status?: string | null
+          kyc_verified_at?: string | null
           location?: unknown
           minimum_order_amount?: number | null
           name: string
@@ -1707,6 +1716,9 @@ export type Database = {
           is_active?: boolean | null
           is_online?: boolean | null
           is_promoted?: boolean | null
+          kyc_data_json?: Json | null
+          kyc_status?: string | null
+          kyc_verified_at?: string | null
           location?: unknown
           minimum_order_amount?: number | null
           name?: string
@@ -2169,6 +2181,14 @@ export type Database = {
         Args: { p_order_id: string; p_reason: string }
         Returns: Json
       }
+      cancel_order_product_atomic: {
+        Args: {
+          p_order_id: string
+          p_order_product_id: string
+          p_reason: string
+        }
+        Returns: Json
+      }
       clear_cart: {
         Args: { p_session_id?: string; p_user_id?: string }
         Returns: Json
@@ -2370,10 +2390,15 @@ export type Database = {
             }
             Returns: Json
           }
-      get_home_surface: {
-        Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
-        Returns: Json
-      }
+      get_home_surface:
+        | {
+            Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
+            Returns: Json
+          }
+        | {
+            Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
+            Returns: Json
+          }
       get_nearby_products: {
         Args: {
           include_out_of_stock?: boolean
@@ -2383,6 +2408,7 @@ export type Database = {
         }
         Returns: Json
       }
+      get_personalization_status: { Args: { p_details: Json }; Returns: string }
       get_vendor_financials_v2: { Args: { p_vendor_id: string }; Returns: Json }
       gettransactionid: { Args: never; Returns: unknown }
       log_order_status_history:
@@ -2411,20 +2437,35 @@ export type Database = {
         | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
         | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
         | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
-      place_atomic_order: {
-        Args: {
-          p_address_id?: string
-          p_coupon_code?: string
-          p_delivery_instructions?: string
-          p_distance_km?: number
-          p_gstin?: string
-          p_items?: Json
-          p_payment_id?: string
-          p_razorpay_order_id: string
-          p_use_wallet?: boolean
-        }
-        Returns: Json
-      }
+      place_atomic_order:
+        | {
+            Args: {
+              p_address_id: string
+              p_coupon_code?: string
+              p_delivery_instructions?: string
+              p_distance_km?: number
+              p_gstin?: string
+              p_items: Json
+              p_payment_id?: string
+              p_razorpay_order_id: string
+              p_use_wallet?: boolean
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_address_id: string
+              p_coupon_code?: string
+              p_delivery_instructions?: string
+              p_distance_km?: number
+              p_gstin?: string
+              p_items?: Json
+              p_payment_id: string
+              p_razorpay_order_id: string
+              p_use_wallet?: boolean
+            }
+            Returns: Json
+          }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }
@@ -2487,7 +2528,37 @@ export type Database = {
         }
         Returns: Json
       }
+      request_change: {
+        Args: { p_feedback: string; p_order_id: string }
+        Returns: Json
+      }
       resolve_user_permissions: { Args: { p_user_id: string }; Returns: Json }
+      search_products_atomic: {
+        Args: {
+          p_category_id?: string
+          p_lat?: number
+          p_limit?: number
+          p_lng?: number
+          p_offset?: number
+          p_query?: string
+        }
+        Returns: {
+          base_price: number
+          distance_meters: number
+          id: string
+          images: string[]
+          name: string
+          rating: number
+          slug: string
+          total_count: number
+          total_ratings: number
+          vendor_id: string
+          vendor_image_url: string
+          vendor_is_active: boolean
+          vendor_name: string
+          vendor_slug: string
+        }[]
+      }
       st_3dclosestpoint: {
         Args: { geom1: unknown; geom2: unknown }
         Returns: unknown
@@ -3121,6 +3192,7 @@ export type Database = {
         | "DELIVERED"
         | "CANCELLED"
         | "REFUNDED"
+      vendor_tier_type: "0" | "1" | "2" | "3"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -3269,6 +3341,7 @@ export const Constants = {
         "CANCELLED",
         "REFUNDED",
       ],
+      vendor_tier_type: ["0", "1", "2", "3"],
     },
   },
 } as const
