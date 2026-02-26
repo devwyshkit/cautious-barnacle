@@ -95,13 +95,9 @@ class Logger {
       if (entry.error?.stack) {
         console.error(entry.error.stack);
       }
-    } else {
-      // In production, output structured JSON for log aggregation (e.g., Datadog, Pino style)
-      // We ONLY emit logs for levels that meet the minimum threshold (WARN/ERROR by default)
-      if (entry.level === LogLevel.ERROR || entry.level === LogLevel.WARN) {
-        // Use console.log for structured logs (supported in Node and Edge)
-        console.log(JSON.stringify(entry));
-      }
+    } else if (entry.level === LogLevel.ERROR || entry.level === LogLevel.WARN) {
+      // In production, output structured JSON for log aggregation
+      console.log(JSON.stringify(entry));
     }
   }
 

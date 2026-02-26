@@ -117,11 +117,22 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
             cartSessionId,
             guestSessionId
         };
-    } catch (error) {
+    } catch (error: any) {
+        const isNetworkError = error?.message?.includes('fetch failed') || error?.name === 'AbortError';
         const { error: message } = handleActionError(error);
+
+        if (isNetworkError) {
+            logger.error('CRITICAL: Supabase Network Failure (fetch failed)', {
+                originalError: error?.message,
+                stack: error?.stack
+            });
+        } else {
+            logError(error, 'GetCartActionOuterCatch');
+        }
+
         return {
             cart: EMPTY_CART,
-            error: message,
+            error: isNetworkError ? 'Service temporarily unavailable. Retrying...' : message,
             cartSessionId: 'error-fallback',
             guestSessionId: null
         };

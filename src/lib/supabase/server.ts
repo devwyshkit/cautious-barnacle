@@ -7,10 +7,46 @@ export async function createClient() {
   const cookieStore = await cookies()
   const { url, key } = getSupabaseEnv()
 
+  // WYSHKIT 2026: Network Resilience Wrapper
+  // Specifically designed to combat "fetch failed" in unstable local environments.
+  const resilientFetch = async (url: string, options: any = {}) => {
+    let lastError;
+    for (let i = 0; i < 3; i++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal,
+          headers: {
+            ...options.headers,
+            'x-wyshkit-client-resilience': 'true',
+            'x-wyshkit-retry-count': i.toString(),
+          }
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (err: any) {
+        lastError = err;
+        if (err.name === 'AbortError') {
+          console.warn(`[SUPABASE_RESILIENCE] Timeout on attempt ${i + 1} for ${url}`);
+        } else {
+          console.warn(`[SUPABASE_RESILIENCE] Fetch failed on attempt ${i + 1}: ${err.message}`);
+        }
+        await new Promise(res => setTimeout(res, 500 * (i + 1))); // Exponential backoff
+      }
+    }
+    throw lastError;
+  };
+
   return createServerClient<Database>(
     url,
     key,
     {
+      global: {
+        fetch: resilientFetch as any
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll()

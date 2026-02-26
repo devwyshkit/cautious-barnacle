@@ -259,8 +259,8 @@ export async function get_personalization_queue(vendor_id: string): Promise<{
         };
       });
 
-      const latest_item_with_preview = order_products.find(i => i.personalization_entry?.preview_url);
-      const latest_preview = latest_item_with_preview?.personalization_entry || null;
+      const latest_product_with_preview = order_products.find(i => i.personalization_entry?.preview_url);
+      const latest_preview = latest_product_with_preview?.personalization_entry || null;
 
       // Map specialization status for the UI filters
       let personalization_status = 'pending';
@@ -307,7 +307,7 @@ export async function upload_preview(
 
     // WYSHKIT 2026: Combined Update (Metadata-Driven)
     // Update the specific order_product metadata with the preview URL
-    const { error: item_error } = await supabase
+    const { error: product_error } = await supabase
       .from('order_products')
       .update({
         personalization_details: {
@@ -319,7 +319,7 @@ export async function upload_preview(
       })
       .eq('id', order_product_id);
 
-    if (item_error) throw item_error;
+    if (product_error) throw product_error;
 
     // WYSHKIT 2026: DO NOT move to PACKED on preview upload.
     // The order stays IN_PRODUCTION until the customer approves.
