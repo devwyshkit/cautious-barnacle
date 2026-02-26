@@ -15,7 +15,7 @@ This script (`scripts/nomenclature-guard.sh`) will fail the build if any forbidd
 In 2026, we do not define types manually.
 1. **Database is the Source of Truth**: All domain names (Vendor, Product, cart_products) are defined in Supabase.
 2. **Type Generation**: Run `supabase gen types typescript` (or use the automated sync) to update `src/lib/supabase/database.types.ts`.
-3. **Strict Mapping**: Always map RPC outputs directly to purified TypeScript interfaces (e.g., `DraftProductItem`) as seen in `src/lib/actions/cart/get-cart.ts`.
+3. **Strict Mapping**: Always map RPC outputs directly to the generated TypeScript interfaces in `src/lib/supabase/database.types.ts`. Never hand-roll types that duplicate DB schema.
 
 ## 3. Forbidden Terms Rulebook
 | Legacy Term | 2026 Standard | Context |

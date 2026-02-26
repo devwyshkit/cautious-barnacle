@@ -83,20 +83,18 @@ SELECT issue_wallet_credit_atomic(
 **Symptom**: "Processing..." stuck on customer screen despite success in Razorpay dashboard.
 
 **Action**:
-1. Verify `payment_id` in Razorpay.
-2. Manually force the payment bridge:
+1. Verify `payment_id` in Razorpay dashboard.
+2. Use the atomic payment recovery RPC — **never** a raw `UPDATE` on `orders` (violates Zero Manual SQL doctrine):
 ```sql
--- This creates/updates the internal status safely.
-UPDATE orders 
-SET payment_status = 'PAID', 
-    payment_id = '[razorpay_payment_id]', 
-    updated_at = NOW()
-WHERE razorpay_order_id = '[razorpay_order_id]';
-
--- Log it!
-SELECT log_operator_action('MANUAL_PAYMENT_RECOVERY', 'orders', id, NULL, NULL, 'Webhook failure recovery')
-FROM orders WHERE razorpay_order_id = '[razorpay_order_id]';
+-- Atomic recovery: sets payment status, logs the operation, triggers order confirmation.
+SELECT recover_payment_atomic(
+  p_razorpay_order_id => '[razorpay_order_id]',
+  p_razorpay_payment_id => '[razorpay_payment_id]',
+  p_operator_note => 'Manual recovery: webhook failure'
+);
 ```
+
+> **If `recover_payment_atomic` does not exist yet**: log in ops Slack and escalate to engineering. Do NOT execute a raw UPDATE. A partial write without proper state machine transitions and audit logs is worse than a stuck order.
 
 ---
 

@@ -97,6 +97,7 @@ See `docs/PRINCIPLES_AND_MENTAL_MODELS.md` for full implementation tables.
 5. **SECURITY DEFINER + explicit search_path**: Every RPC that is `SECURITY DEFINER` MUST have `SET search_path = public, extensions`. No exceptions. Missing `search_path` = search_path injection risk.
 6. **Structured Error Codes, Not Raw SQLERRM**: Never expose raw database error strings to the API response. Always return machine-readable codes like `ORDER_ALREADY_EXISTS`. See `docs/PRINCIPLES_AND_MENTAL_MODELS.md` for the full error code table.
 7. **No silent EXCEPTION swallowing**: `EXCEPTION WHEN OTHERS THEN RETURN json_build_object('success', false, 'error', SQLERRM)` is forbidden in production RPCs that modify state. RAISE the exception. Let the transaction roll back. Never silently succeed on a partial write.
+8. **RLS-First Architecture**: All tables exposed to PostgREST must have RLS enabled. `SECURITY DEFINER` functions bypass RLS intentionally — treat them as privileged kernel operations, not general-purpose shortcuts.
 9. **FK Indexes**: PostgreSQL does NOT auto-index foreign keys. Every FK column must have a covering index.
 10. **Docs-First Onboarding**: Friction is a bug. OCR (IDfy) extraction must pre-fill all KYB forms. The vendor is a verifier, not an inputter.
 11. **The ETA Contract**: Time > Distance.

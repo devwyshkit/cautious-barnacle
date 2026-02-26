@@ -109,7 +109,7 @@ Ops Slack webhook payload:
 {
   "event": "SLA_BREACH_CRITICAL",
   "order_id": "...",
-  "order_number": "WSH-260225-ABCD12",
+  "order_number": "WK-YYYYMMDD-XXXX",
   "vendor_name": "...",
   "vendor_phone": "...",
   "customer_name": "...",
