@@ -3,7 +3,7 @@
  * Resolves DRY violation across orders.ts, payment.ts, and checkout.ts
  */
 
-export interface PersonalizationCheckItem {
+export interface PersonalizationCheckProduct {
   has_personalization?: boolean;
   personalization?: { enabled?: boolean; option_id?: string } | null;
   selected_addons?: Array<{ id: string; name?: string; price?: number; requires_preview?: boolean }>;
@@ -29,7 +29,7 @@ export function hasProductPersonalization(product: any): boolean {
   if (product.is_personalized === true) return true;
 
   // 3. Addons that require a preview (implies a design/approval step)
-  const addons = product.item_addons || product.selected_addons || product.selectedAddons || [];
+  const addons = product.product_addons || product.item_addons || product.selected_addons || product.selectedAddons || [];
   if (Array.isArray(addons) && addons.some((a: any) => !!a.requires_preview)) return true;
 
   // 4. Legacy check for specific metadata
@@ -42,7 +42,7 @@ export function hasProductPersonalization(product: any): boolean {
 /**
  * Checks if a list of products contains any that require personalization.
  */
-export function hasAnyPersonalization(products: PersonalizationCheckItem[]): boolean {
+export function hasAnyPersonalization(products: PersonalizationCheckProduct[]): boolean {
   return products.some(hasProductPersonalization);
 }
 

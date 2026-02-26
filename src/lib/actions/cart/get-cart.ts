@@ -6,7 +6,7 @@ import { getGuestSessionIdReadOnly } from '@/lib/session';
 import { logger } from '@/lib/logging/logger';
 import { logError, handleActionError } from '@/lib/utils/error-handler';
 import { EMPTY_CART } from '@/lib/constants/cart';
-import { DraftTransaction, DraftLineItem, SelectedPersonalization, SelectedAddon } from '@/lib/types/personalization';
+import { DraftTransaction, CartProduct, SelectedPersonalization, SelectedAddon } from '@/lib/types/personalization';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 import type { Tables } from '@/lib/supabase/types';
 
@@ -53,12 +53,12 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
         }
 
         const data = context as any;
-        const productsRows = data.products || data.items || [];  // RPC returns 'products' (Swiggy 2026 Standard)
+        const productsRows = data.products || [];  // RPC purified to 'products' (Swiggy 2026 Standard)
         const dbRes = data.pricing || {};
         const sessionData = data.session || {};
 
         // 3. Mapping with Purified Logic
-        const products: DraftLineItem[] = productsRows.map((row: any) => {
+        const cartProducts: CartProduct[] = productsRows.map((row: any) => {
             const quantity = Number(row.quantity) || 1;
             const base_price = Number(row.variant_price ?? row.base_price ?? 0);
             const selected_addons = (row.selected_addons as unknown as SelectedAddon[]) || [];
@@ -92,11 +92,11 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
             };
         });
 
-        const vendorIds = new Set(products.map(product => (product as any).vendor_id).filter(Boolean));
+        const vendorIds = new Set(cartProducts.map(product => (product as any).vendor_id).filter(Boolean));
         const vendorId = vendorIds.size === 1 ? Array.from(vendorIds)[0] as string : null;
 
         const cart: DraftTransaction = {
-            products,
+            products: cartProducts,
             vendor_id: vendorId as string | null,
             subtotal: Number(dbRes.subtotal) || 0,
             personalization_charges: Number(dbRes.personalization_charges) || 0,
@@ -107,7 +107,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
             wallet_discount: Number(dbRes.wallet_discount) || 0,
             total: Number(dbRes.total) || 0,
             cashback_amount: Number((dbRes as any).cashback_amount) || 0,
-            product_count: products.reduce((sum, product) => sum + product.quantity, 0),
+            product_count: cartProducts.reduce((sum, product) => sum + product.quantity, 0),
             applied_coupon: sessionData.applied_coupon,
             use_wallet: sessionData.use_wallet || false,
             selected_address_id: sessionData.selected_address_id,

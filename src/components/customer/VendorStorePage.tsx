@@ -75,16 +75,16 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
         </section>
 
         <div className="flex flex-col gap-10 px-4 md:px-8 max-w-[1440px] mx-auto w-full pb-12">
-          {Object.entries(productsGroupedByCategory).map(([category, categoryItems]) => (
+          {Object.entries(productsGroupedByCategory).map(([category, categoryProducts]) => (
             <section key={category} id={category.toLowerCase()} className="flex flex-col gap-4">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg font-black text-zinc-950 tracking-tighter capitalize">{category}</h2>
                 <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-50 px-2 py-0.5 rounded-full border border-zinc-100">
-                  {categoryItems.length} {categoryItems.length === 1 ? 'Product' : 'Products'}
+                  {categoryProducts.length} {categoryProducts.length === 1 ? 'Product' : 'Products'}
                 </span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-                {categoryItems.map((product) => (
+                {categoryProducts.map((product) => (
                   <ProductCard key={product.id} data={product} variant="portrait" />
                 ))}
               </div>

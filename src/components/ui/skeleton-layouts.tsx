@@ -2,10 +2,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 /**
- * ItemSkeleton implements the Wyshkit 2026 "Discovery Skeleton".
+ * ProductSkeleton implements the Wyshkit 2026 "Discovery Skeleton".
  * High-fidelity placeholders for smooth layout transitions.
  */
-export function ItemSkeleton({ className }: { className?: string }) {
+export function ProductSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       <Skeleton className="aspect-[4/5] w-full rounded-[20px]" />
@@ -40,9 +40,9 @@ export function VendorCircleSkeleton({ className }: { className?: string }) {
 }
 
 // Aliases for backward compatibility while refactoring
-export const ItemCardSkeleton = ItemSkeleton;
+export const ProductCardSkeleton = ProductSkeleton;
 
-export function ItemSurfaceSkeleton() {
+export function ProductSurfaceSkeleton() {
   return (
     <div className="flex flex-col animate-in fade-in duration-500">
       <Skeleton className="aspect-square w-full rounded-none" />
@@ -97,10 +97,10 @@ export function VendorSheetSkeleton() {
           <Skeleton className="h-3 w-20 rounded-full" />
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <ItemSkeleton />
-          <ItemSkeleton />
-          <ItemSkeleton />
-          <ItemSkeleton />
+          <ProductSkeleton />
+          <ProductSkeleton />
+          <ProductSkeleton />
+          <ProductSkeleton />
         </div>
       </div>
     </div>

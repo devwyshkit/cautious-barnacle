@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { ShieldAlert, Plus, Minus, Trash2, Edit3 } from 'lucide-react';
-import type { DraftLineItem } from '@/lib/types/personalization';
+import type { CartProduct } from '@/lib/types/personalization';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
@@ -14,7 +14,7 @@ import { formatCurrency } from '@/lib/utils/pricing';
 const FALLBACK_IMAGE = '/images/logo.png';
 
 interface DraftSummaryBlockProps {
-  products: DraftLineItem[];
+  products: CartProduct[];
   onUpdateQuantity?: (productId: string, variantId: string | null, quantity: number) => void;
   onRemoveItem?: (productId: string, variantId: string | null) => void;
   editable?: boolean;

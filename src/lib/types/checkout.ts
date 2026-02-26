@@ -1,4 +1,4 @@
-import type { DraftLineItem } from './personalization';
+import type { CartProduct } from './personalization';
 import type { Address } from './address';
 import type { PricingBreakdown } from './pricing';
 import type { WalletInfo } from '@/lib/actions/user/wallet';
@@ -8,7 +8,7 @@ import type { WalletInfo } from '@/lib/actions/user/wallet';
  * Representing the JSONB payload returned from get_checkout_context RPC.
  */
 export interface CheckoutContext {
-    products: DraftLineItem[];
+    products: CartProduct[];
     addresses: Address[];
     pricing: PricingBreakdown | null;
     wallet_info: WalletInfo | null;

@@ -32,11 +32,11 @@ interface CreativeBriefProps {
  */
 export function CreativeBrief({ order, previews, timeline, onOpenPersonalization, isOptimisticSubmitted }: CreativeBriefProps) {
     const latestPreview = previews[0];
-    const personalizedItems = order.order_products?.filter(i => i.is_personalized) || [];
+    const personalizedProducts = order.order_products?.filter(i => i.is_personalized) || [];
 
     // WYSHKIT 2026: Align with single status truth
     const hasSubmittedBrief = isOptimisticSubmitted ||
-        personalizedItems.some(i =>
+        personalizedProducts.some(i =>
             ['submitted', 'preview_ready', 'revision_requested', 'approved'].includes((i as any).personalization_status || order.personalization_status || '') ||
             i.personalization_details
         );
@@ -47,7 +47,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
         return new Date(new Date(latestPreview.submitted_at).getTime() + 15 * 60000).toISOString();
     }, [order.personalization_status, latestPreview?.submitted_at]);
 
-    if (personalizedItems.length === 0) return null;
+    if (personalizedProducts.length === 0) return null;
 
     return (
         <section className="flex flex-col gap-8 animate-in fade-in duration-700">
@@ -130,7 +130,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                 )}
                             </div>
 
-                            {onOpenPersonalization && personalizedItems.some(i => {
+                            {onOpenPersonalization && personalizedProducts.some(i => {
                                 const s = (i.status || ORDER_STATUS.PLACED).toUpperCase();
                                 const activeStates: string[] = [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED];
                                 return activeStates.includes(s) && !i.personalization_details && !isOptimisticSubmitted;

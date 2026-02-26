@@ -67,7 +67,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   const [hasAutoOpened, setHasAutoOpened] = useState(showIdentityParam);
   const [isIdentitySubmittedOptimistic, setIsIdentitySubmittedOptimistic] = useState(false);
 
-  const personalizedItemsPending = useMemo(() => {
+  const personalizedProductsPending = useMemo(() => {
     return (order?.order_products || []).filter((product: any) => {
       if (!product.is_personalized) return false;
       const s = (product.status || 'pending').toLowerCase();
@@ -77,11 +77,11 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   }, [order?.order_products]);
 
   useEffect(() => {
-    if (order && showSuccess && personalizedItemsPending.length > 0 && !hasAutoOpened) {
+    if (order && showSuccess && personalizedProductsPending.length > 0 && !hasAutoOpened) {
       setProactivePersonalizationOpen(true);
       setHasAutoOpened(true);
     }
-  }, [order, showSuccess, personalizedItemsPending.length, hasAutoOpened]);
+  }, [order, showSuccess, personalizedProductsPending.length, hasAutoOpened]);
 
   useEffect(() => {
     if (showSuccess) {
@@ -156,7 +156,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   }
 
   // WYSHKIT 2026: Simplified visibility logic for the identity overlay
-  const showIdentityForm = !isIdentitySubmittedOptimistic && proactivePersonalizationOpen && personalizedItemsPending.length > 0;
+  const showIdentityForm = !isIdentitySubmittedOptimistic && proactivePersonalizationOpen && personalizedProductsPending.length > 0;
 
   return (
     <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker" showHomeButton>
@@ -216,7 +216,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                   <div className="p-4 pt-2">
                     <IdentityForm
                       orderId={order?.id || orderId}
-                      products={personalizedItemsPending.length > 0 ? personalizedItemsPending : (order ? [] : [{ id: 'pending', product_name: 'Order Loading...', is_personalized: true }])}
+                      products={personalizedProductsPending.length > 0 ? personalizedProductsPending : (order ? [] : [{ id: 'pending', product_name: 'Order Loading...', is_personalized: true }])}
                       designDeadline={order ? (order as any).design_deadline_at : undefined}
                       isAutoOpenedForSuccess={showSuccess || showIdentityParam}
                       onSubmitted={handlePersonalizationSubmitted}

@@ -7,7 +7,7 @@ import { validateGSTINAction } from '@/lib/actions/commerce/gstin';
 import { toast } from 'sonner';
 import { generateEstimatePDF } from '@/lib/services/pdf-service';
 import { getVendorInfo } from '@/lib/actions/discovery/vendors';
-import { DraftLineItem } from '@/lib/types/personalization';
+import { CartProduct } from '@/lib/types/personalization';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 import { Address } from '@/lib/types/address';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
@@ -15,7 +15,7 @@ import type { User } from '@supabase/supabase-js';
 
 interface GstinIdentityProps {
     initialGstin: string;
-    products: DraftLineItem[];
+    products: CartProduct[];
     pricing: PricingBreakdown;
     user: User | null;
     selectedAddress: Address | null;

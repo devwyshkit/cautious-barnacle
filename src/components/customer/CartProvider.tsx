@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useOptimistic, useTransition, useEffect } from "react";
-import { DraftTransaction as Cart, SelectedPersonalization, SelectedAddon, DraftLineItem } from "@/lib/types/personalization";
+import { DraftTransaction as Cart, SelectedPersonalization, SelectedAddon, CartProduct } from "@/lib/types/personalization";
 import { EMPTY_CART } from "@/lib/constants/cart";
 import { useAuth } from "@/hooks/useAuth";
 import { executeCommerceIntent } from "@/lib/actions/commerce/intent-engine";
@@ -95,17 +95,17 @@ export function CartProvider({
                             id: 'temp-' + Math.random(),
                             ...update.payload,
                             quantity: update.payload.quantity || 1
-                        } as DraftLineItem],
+                        } as CartProduct],
                     };
                 case 'remove':
                     return {
                         ...state,
-                        products: state.products.filter((i: DraftLineItem) => i.id !== update.payload)
+                        products: state.products.filter((i: CartProduct) => i.id !== update.payload)
                     };
                 case 'update':
                     return {
                         ...state,
-                        products: state.products.map((i: DraftLineItem) => i.id === update.payload.id ? { ...i, quantity: update.payload.quantity } : i)
+                        products: state.products.map((i: CartProduct) => i.id === update.payload.id ? { ...i, quantity: update.payload.quantity } : i)
                     };
                 case 'clear':
                     return EMPTY_CART;
@@ -170,7 +170,7 @@ export function CartProvider({
     const removeFromDraftOrder = async (productId: string, variantId?: string | null) => {
         const normalizedVariantId = variantId ?? null;
         const cartItem = optimisticCart.products.find(
-            (i: DraftLineItem) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
+            (i: CartProduct) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
         );
         if (!cartItem) return;
 
@@ -194,7 +194,7 @@ export function CartProvider({
     const updateQuantity = async (productId: string, variantId: string | null, quantity: number) => {
         const normalizedVariantId = variantId ?? null;
         const cartItem = optimisticCart.products.find(
-            (i: DraftLineItem) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
+            (i: CartProduct) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
         );
         if (!cartItem) return;
 

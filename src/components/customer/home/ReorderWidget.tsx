@@ -118,8 +118,8 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
   }, [user]);
 
   const initiateReorder = (order: RecentOrder) => {
-    const personalizedItems = order.products.filter(p => (p as any).is_personalized);
-    if (personalizedItems.length > 0) {
+    const personalizedProducts = order.products.filter(p => (p as any).is_personalized);
+    if (personalizedProducts.length > 0) {
       setPersonalizationChoiceOrder(order);
     } else {
       handleReorder(order, false);

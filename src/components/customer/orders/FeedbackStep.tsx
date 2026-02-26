@@ -35,7 +35,7 @@ interface ProductReview {
 
 export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProps) {
     const [overallRating, setOverallRating] = useState(0);
-    const [itemReviews, setItemReviews] = useState<Record<string, ProductReview>>(() => {
+    const [productReviews, setProductReviews] = useState<Record<string, ProductReview>>(() => {
         const initial: Record<string, ProductReview> = {};
         products.forEach(p => {
             initial[p.orderProductId] = {
@@ -66,7 +66,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
     };
 
     const handleProductRatingChange = (orderProductId: string, field: keyof ProductReview, value: any) => {
-        setItemReviews(prev => ({
+        setProductReviews(prev => ({
             ...prev,
             [orderProductId]: { ...prev[orderProductId], [field]: value }
         }));
@@ -76,7 +76,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
     };
 
     const toggleTag = (orderProductId: string, tag: string) => {
-        const currentTags = itemReviews[orderProductId].tags;
+        const currentTags = productReviews[orderProductId].tags;
         const newTags = currentTags.includes(tag)
             ? currentTags.filter(t => t !== tag)
             : [...currentTags, tag];
@@ -95,13 +95,13 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
             const supabase = createClient();
 
             // WYSHKIT 2026: Atomic loop through product reviews
-            const promises = Object.values(itemReviews).map(review =>
+            const promises = Object.values(productReviews).map(review =>
                 supabase.rpc('add_product_review' as any, {
                     p_product_id: review.productId,
                     p_order_id: orderId,
                     p_order_product_id: review.orderProductId,
                     p_rating: review.rating,
-                    p_comment: review.comment || (review.orderProductId === Object.keys(itemReviews)[0] ? `Overall order: ${overallRating}` : ''),
+                    p_comment: review.comment || (review.orderProductId === Object.keys(productReviews)[0] ? `Overall order: ${overallRating}` : ''),
                     p_personalization_rating: review.fidelityRating,
                     p_fidelity_tags: review.tags,
                     p_approved_mockup_url: review.mockupUrl
@@ -211,7 +211,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                                                 <Star
                                                     className={cn(
                                                         "size-5",
-                                                        (itemReviews[product.orderProductId].fidelityRating || 0) >= s ? "fill-emerald-500 text-emerald-500" : "text-zinc-200"
+                                                        (productReviews[product.orderProductId].fidelityRating || 0) >= s ? "fill-emerald-500 text-emerald-500" : "text-zinc-200"
                                                     )}
                                                 />
                                             </button>
@@ -228,12 +228,12 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                                         onClick={() => toggleTag(product.orderProductId, tag.label)}
                                         className={cn(
                                             "whitespace-nowrap px-4 py-2 rounded-full text-[10px] font-black border transition-all flex items-center gap-1.5",
-                                            itemReviews[product.orderProductId].tags.includes(tag.label)
+                                            productReviews[product.orderProductId].tags.includes(tag.label)
                                                 ? "bg-zinc-900 border-zinc-900 text-white"
                                                 : "bg-white border-zinc-100 text-zinc-500"
                                         )}
                                     >
-                                        {itemReviews[product.orderProductId].tags.includes(tag.label) && <Check className="size-3" />}
+                                        {productReviews[product.orderProductId].tags.includes(tag.label) && <Check className="size-3" />}
                                         #{tag.label.replace(' ', '')}
                                     </button>
                                 ))}
@@ -241,7 +241,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
 
                             {/* Comment */}
                             <textarea
-                                value={itemReviews[product.orderProductId].comment}
+                                value={productReviews[product.orderProductId].comment}
                                 onChange={(e) => handleProductRatingChange(product.orderProductId, 'comment', e.target.value)}
                                 placeholder="Add any specific details about the design..."
                                 className="w-full min-h-[80px] p-4 rounded-xl bg-zinc-50 border border-zinc-100 text-xs font-medium focus:bg-white focus:border-zinc-900 transition-all outline-none resize-none placeholder:text-zinc-300 text-zinc-900"

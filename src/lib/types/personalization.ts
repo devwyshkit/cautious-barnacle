@@ -29,11 +29,11 @@ export interface SelectedAddon {
 }
 
 /**
- * DraftProductItem: Maps directly to output columns from v_active_cart_detailed view.
+ * DraftProduct: Maps directly to output columns from v_active_cart_detailed view.
  * Eliminates manual type-drift and shadow data.
  * NOTE: We no longer extend the view type directly to avoid optional/non-optional conflicts.
  */
-export interface DraftProductItem {
+export interface DraftProduct {
   // Cart product identity
   id: string;
   product_id: string;
@@ -75,11 +75,11 @@ export interface DraftProductItem {
   personalization_options?: any[];
 }
 
-export type DraftLineItem = DraftProductItem;
+export type CartProduct = DraftProduct;
 
 
 export interface DraftTransaction extends PricingBreakdown {
-  products: DraftProductItem[];
+  products: DraftProduct[];
   vendor_id: string | null;
   product_count: number;
   // Session fields

@@ -9,7 +9,7 @@ import { logger } from '@/lib/logging/logger';
 import { calculateHaversineDistance } from '@/lib/utils/sla'
 import { hasProductPersonalization } from '@/lib/utils/personalization'
 import type { PricingBreakdown } from '@/components/customer/checkout/types'
-import type { DraftLineItem } from '@/lib/types/personalization'
+import type { CartProduct } from '@/lib/types/personalization'
 import type { Address } from '@/lib/types/address'
 import type { WalletInfo } from '../user/wallet'
 import type { CheckoutContext } from '@/lib/types/checkout'
@@ -17,7 +17,7 @@ import type { UpsellItem } from '@/components/customer/checkout/UpsellGrid'
 
 
 export interface CheckoutData {
-    products: DraftLineItem[]
+    products: CartProduct[]
     addresses: Address[]
     wallet_info: WalletInfo | null
     pricing: PricingBreakdown | null
@@ -102,7 +102,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         }
 
         const typedContext = context as unknown as CheckoutContext; // Typed from JSONB RPC
-        const products = (typedContext.products || []) as DraftLineItem[];
+        const products = (typedContext.products || []) as CartProduct[];
         const addresses = (typedContext.addresses || []) as Address[];
         const pricing = typedContext.pricing as PricingBreakdown | null;
         const distanceKm = typedContext.distance_km ? Number(typedContext.distance_km) : null;

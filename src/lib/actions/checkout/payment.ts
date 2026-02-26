@@ -9,7 +9,7 @@ import { hasAnyPersonalization } from '@/lib/utils/personalization';
 // WYSHKIT 2026: Node-level recalculateOrderTotal removed.
 // We now use the database-level 'calculate_order_total' RPC for authority.
 
-import { DraftLineItem } from '@/lib/types/personalization';
+import { CartProduct } from '@/lib/types/personalization';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 import type { WalletInfo } from '../user/wallet';
 import type { Database, Json } from '@/lib/supabase/database.types';
@@ -34,7 +34,7 @@ export async function create_payment_order(
     currency: string = 'INR',
     payload: {
         address_id: string;
-        draft_items: DraftLineItem[];
+        draft_products: CartProduct[];
         pricing: PricingBreakdown;
         gstin?: string;
         applied_coupon?: { code: string } | null;
@@ -50,7 +50,7 @@ export async function create_payment_order(
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) return { error: 'Unauthorized', status: 401 };
-        if (!payload.draft_items || payload.draft_items.length === 0) return { error: 'No products in cart', status: 400 };
+        if (!payload.draft_products || payload.draft_products.length === 0) return { error: 'No products in cart', status: 400 };
         if (!payload.address_id || payload.address_id === 'guest_location') return { error: 'Please select a valid delivery address.', status: 400 };
 
         // WYSHKIT 2026: Pricing and delivery fees are strictly computed by the database RPC.
@@ -62,7 +62,7 @@ export async function create_payment_order(
 
         // 2. FETCH PRICING FROM DB RPC
         const { calculateOrderTotalRPC } = await import('./pricing');
-        const pricingItems = payload.draft_items.map((product) => ({
+        const pricingProducts = payload.draft_products.map((product) => ({
             product_id: product.product_id as string,
             variant_id: product.variant_id || null,
             quantity: product.quantity,
@@ -72,7 +72,7 @@ export async function create_payment_order(
         }));
 
         const { data: pricingData, error: pricingErrorMsg } = await calculateOrderTotalRPC(
-            pricingItems,
+            pricingProducts,
             delivery_fee, // Ensure delivery fee exactly matches the frontend override logic
             payload.address_id,
             payload.applied_coupon?.code || undefined,
@@ -120,14 +120,14 @@ export async function create_payment_order(
         // WYSHKIT 2026: Deterministic Webhook Snapshotting
         // Save the exact cart payload to `snapshot_products` so the webhook doesn't rely on the live cart.
         if (session?.id) {
-            const snapshotItems = payload.draft_items.map(product => ({
+            const snapshotProducts = payload.draft_products.map(product => ({
                 product_id: product.product_id,
                 variant_id: product.variant_id || null,
                 quantity: product.quantity,
                 personalization: product.personalization || null,
                 selected_addons: product.selected_addons || []
             }));
-            await supabase.from('checkout_sessions').update({ snapshot_products: snapshotItems as any }).eq('id', session.id);
+            await supabase.from('checkout_sessions').update({ snapshot_products: snapshotProducts as any }).eq('id', session.id);
         }
 
         // 5. RAZORPAY ORDER

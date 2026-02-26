@@ -37,7 +37,7 @@ export function InfiniteFlow<T extends { id: string | number }>({
     gridClassName = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
     renderContainer,
 }: InfiniteFlowProps<T>) {
-    const [products, setItems] = useState<T[]>(initialData);
+    const [products, setProducts] = useState<T[]>(initialData);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(() => {
         if (totalCount !== undefined) return initialData.length + startOffset < totalCount;
@@ -49,7 +49,7 @@ export function InfiniteFlow<T extends { id: string | number }>({
 
     // Sync state if initialData changes (e.g. category switch)
     useEffect(() => {
-        setItems(initialData);
+        setProducts(initialData);
         offsetRef.current = startOffset + initialData.length;
         setHasMore(totalCount !== undefined
             ? (initialData.length + startOffset < totalCount)
@@ -67,11 +67,10 @@ export function InfiniteFlow<T extends { id: string | number }>({
             const res = await fetchAction({ limit, offset: currentOffset });
 
             if (res.data?.products && res.data.products.length > 0) {
-                setItems(prev => {
-                    // Prevent duplicates by checking IDs
+                setProducts(prev => {
                     const existingIds = new Set(prev.map(i => i.id));
-                    const newItems = res.data!.products.filter(i => !existingIds.has(i.id));
-                    return [...prev, ...newItems];
+                    const newProducts = res.data!.products.filter(i => !existingIds.has(i.id));
+                    return [...prev, ...newProducts];
                 });
 
                 offsetRef.current += res.data.products.length;

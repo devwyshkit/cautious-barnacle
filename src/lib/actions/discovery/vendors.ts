@@ -69,13 +69,13 @@ export const getVendorStoreData = cache(async (vendorId: string, category?: stri
             query = query.eq('category_id', category);
         }
 
-        const { data: itemsData, error: itemsError } = await query;
+        const { data: productsData, error: productsError } = await query;
 
-        if (itemsError) {
-            logger.error('Products fetch failed in getVendorStoreData', itemsError, { vendorId });
+        if (productsError) {
+            logger.error('Products fetch failed in getVendorStoreData', productsError, { vendorId });
         }
 
-        const products = (itemsData as unknown as WyshkitProduct[]) || [];
+        const products = (productsData as unknown as WyshkitProduct[]) || [];
 
         // 3. Fetch Distinct Categories for this Vendor (for navigation/filtering)
         const { data: catData } = await supabase
@@ -84,7 +84,7 @@ export const getVendorStoreData = cache(async (vendorId: string, category?: stri
             .eq('vendor_id', vendorId)
             .eq('is_active', true);
 
-        const groupedItems = products.reduce((acc: any, product: any) => {
+        const groupedProducts = products.reduce((acc: any, product: any) => {
             const cat = product.category_id || 'Other';
             if (!acc[cat]) acc[cat] = [];
             acc[cat].push({ ...product, vendor_name: vendor.name });
@@ -97,7 +97,7 @@ export const getVendorStoreData = cache(async (vendorId: string, category?: stri
         return {
             vendor,
             products: products.map(product => ({ ...product, vendor_name: vendor.name })),
-            productsGroupedByCategory: groupedItems,
+            productsGroupedByCategory: groupedProducts,
             categories: [{ id: 'all', name: 'All', slug: 'All' }, ...categories],
             error: null
         };

@@ -23,8 +23,8 @@ export function FloatingCartBar() {
   const { user: authUser } = useAuth();
 
   const displayCart = draftOrder;
-  const hasItems = displayCart && displayCart.product_count > 0;
-  const isVisible = hasItems;
+  const hasProducts = displayCart && displayCart.product_count > 0;
+  const isVisible = hasProducts;
 
   const handleOpenCart = (e: React.MouseEvent) => {
     e.preventDefault();

@@ -3,7 +3,7 @@
  * Wyshkit 2026 Model - Block-based architecture
  */
 
-import type { DraftLineItem } from '@/lib/types/personalization';
+import type { CartProduct } from '@/lib/types/personalization';
 import type { Address } from '@/lib/types/address';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 

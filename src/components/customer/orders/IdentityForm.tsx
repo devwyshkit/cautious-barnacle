@@ -46,7 +46,7 @@ export function IdentityForm({
     const [formData, setFormData] = useState<Record<string, { text?: string; image_url?: string }>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isOptimisticSuccess, setIsOptimisticSuccess] = useState(false);
-    const [uploadingItems, setUploadingItems] = useState<Record<string, number>>({});
+    const [uploadingProducts, setUploadingProducts] = useState<Record<string, number>>({});
 
     const [pastMockups, setPastMockups] = useState<Record<string, string>>({});
 
@@ -115,13 +115,13 @@ export function IdentityForm({
         if (!file) return;
 
         try {
-            setUploadingItems(prev => ({ ...prev, [productId]: 10 }));
+            setUploadingProducts(prev => ({ ...prev, [productId]: 10 }));
             const options = {
                 maxSizeMB: 0.5,
                 maxWidthOrHeight: 1200,
                 useWebWorker: true,
                 onProgress: (percent: number) => {
-                    setUploadingItems(prev => ({ ...prev, [productId]: 10 + (percent * 0.4) }));
+                    setUploadingProducts(prev => ({ ...prev, [productId]: 10 + (percent * 0.4) }));
                 }
             };
 
@@ -136,12 +136,12 @@ export function IdentityForm({
 
             if (error) throw error;
 
-            setUploadingItems(prev => ({ ...prev, [productId]: 100 }));
+            setUploadingProducts(prev => ({ ...prev, [productId]: 100 }));
             const { data: { publicUrl } } = supabase.storage.from('order-assets').getPublicUrl(data.path);
 
             handleInputChange(productId, 'image_url', publicUrl);
             triggerHaptic(HapticPattern.SUCCESS);
-            setTimeout(() => setUploadingItems(prev => {
+            setTimeout(() => setUploadingProducts(prev => {
                 const next = { ...prev };
                 delete next[productId];
                 return next;
@@ -150,7 +150,7 @@ export function IdentityForm({
         } catch (error) {
             logger.error('Image upload error', error as Error);
             toast.error('Failed to upload image');
-            setUploadingItems(prev => {
+            setUploadingProducts(prev => {
                 const next = { ...prev };
                 delete next[productId];
                 return next;
@@ -234,7 +234,7 @@ export function IdentityForm({
                             config={config}
                             schema={product.personalization_schema}
                             input={formData[product.id] || {}}
-                            uploadingProgress={uploadingItems[product.id]}
+                            uploadingProgress={uploadingProducts[product.id]}
                             pastMockupUrl={pastMockups[product.id]}
                             onInputChange={(field, value) => handleInputChange(product.id, field, value)}
                             onFileUpload={(file) => handleFileUpload(product.id, file)}

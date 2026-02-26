@@ -89,7 +89,7 @@ export function usePaymentFlow({
                 'INR',
                 {
                     address_id: selectedAddressId || '',
-                    draft_items: data.products,
+                    draft_products: data.products,
                     pricing: data.pricing,
                     applied_coupon: data.applied_coupon || undefined,
                     use_wallet: data.use_wallet,

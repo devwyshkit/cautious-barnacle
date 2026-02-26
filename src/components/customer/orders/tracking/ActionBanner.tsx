@@ -6,12 +6,12 @@ import { cn } from '@/lib/utils';
 import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
 
 interface ActionBannerProps {
-    personalizedItemsCount: number;
+    personalizedProductsCount: number;
     deadline?: string;
 }
 
-export function ActionBanner({ personalizedItemsCount, deadline }: ActionBannerProps) {
-    if (personalizedItemsCount === 0) return null;
+export function ActionBanner({ personalizedProductsCount, deadline }: ActionBannerProps) {
+    if (personalizedProductsCount === 0) return null;
 
     return (
         <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 mb-2 animate-in fade-in slide-in-from-top-2">
@@ -20,7 +20,7 @@ export function ActionBanner({ personalizedItemsCount, deadline }: ActionBannerP
                 <h3 className="text-xs font-black text-amber-900 tracking-tight">Input Needed</h3>
             </div>
             <p className="text-[11px] text-amber-700 font-medium">
-                You have {personalizedItemsCount} product{personalizedItemsCount > 1 ? 's' : ''} that require design details. Please scroll to the products below to submit.
+                You have {personalizedProductsCount} product{personalizedProductsCount > 1 ? 's' : ''} that require design details. Please scroll to the products below to submit.
             </p>
             <div className="mt-3">
                 <HyperlocalTimer deadline={deadline} />

@@ -12,7 +12,7 @@ import { logger } from '@/lib/logging/logger';
  * The RPC computes everything. We return it directly — zero shadow math.
  */
 export async function calculateOrderTotalRPC(
-  cartItems: Array<{
+  cartProducts: Array<{
     product_id: string;
     quantity: number;
     variant_id?: string | null;
@@ -31,7 +31,7 @@ export async function calculateOrderTotalRPC(
     const supabase = await createClient();
 
     const { data, error } = await supabase.rpc('calculate_order_total', {
-      p_products: cartItems.map(product => ({
+      p_products: cartProducts.map(product => ({
         product_id: product.product_id,
         quantity: product.quantity,
         variant_id: product.variant_id ?? null,

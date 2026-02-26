@@ -4,11 +4,11 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DraftSummaryBlock } from "@/components/customer/checkout/blocks/DraftSummaryBlock";
 import { useCart } from '@/components/customer/CartProvider';
-import type { DraftLineItem } from "@/lib/types/personalization";
+import type { CartProduct } from "@/lib/types/personalization";
 import { toast } from "sonner";
 
 interface CartSlotProps {
-  initialHydratedItems?: DraftLineItem[];
+  initialHydratedProducts?: CartProduct[];
 }
 
 /**
@@ -19,18 +19,18 @@ interface CartSlotProps {
  * - Data injected via props
  * - Mutations via Server Actions + router.refresh()
  */
-export function CartSlot({ initialHydratedItems = [] }: CartSlotProps) {
+export function CartSlot({ initialHydratedProducts = [] }: CartSlotProps) {
   const router = useRouter();
   const { draftOrder, updateQuantity, removeFromDraftOrder } = useCart();
 
   // WYSHKIT 2026: Live sync CartSlot
   // We prefer live products from context if available, fallback to SSR products
-  const displayItems = useMemo(() => {
+  const displayProducts = useMemo(() => {
     if (draftOrder.products.length > 0) {
       return draftOrder.products;
     }
-    return initialHydratedItems;
-  }, [draftOrder.products, initialHydratedItems]);
+    return initialHydratedProducts;
+  }, [draftOrder.products, initialHydratedProducts]);
 
   const handleUpdateQuantity = async (productId: string, variantId: string | null, quantity: number) => {
     try {
@@ -49,7 +49,7 @@ export function CartSlot({ initialHydratedItems = [] }: CartSlotProps) {
     }
   };
 
-  if (displayItems.length === 0) {
+  if (displayProducts.length === 0) {
     return (
       <div className="py-8 text-center">
         <p className="text-sm text-zinc-400">Your cart is empty</p>
@@ -59,7 +59,7 @@ export function CartSlot({ initialHydratedItems = [] }: CartSlotProps) {
 
   return (
     <DraftSummaryBlock
-      products={displayItems}
+      products={displayProducts}
       onUpdateQuantity={handleUpdateQuantity}
       onRemoveItem={handleRemoveItem}
       editable={true}

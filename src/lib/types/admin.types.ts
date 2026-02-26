@@ -40,7 +40,7 @@ export interface DashboardMetrics {
 export interface VendorWithStats extends Omit<Vendor, 'total_orders'> {
   total_orders?: number | null
   total_gmv?: number
-  total_items?: number
+  total_products?: number
 }
 
 // Order with joined data for lists
@@ -50,7 +50,7 @@ export interface OrderWithRelations extends Order {
 }
 
 // Product with joined data for catalog
-export interface ItemWithRelations extends Product {
+export interface ProductWithRelations extends Product {
   vendor: Pick<Vendor, 'id' | 'name' | 'business_name'> | null
 }
 

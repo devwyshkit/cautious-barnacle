@@ -17,7 +17,7 @@ export function HeaderCart() {
 
     // WYSHKIT 2026: Single source of truth
     const displayCart = draftOrder;
-    const hasItems = displayCart && displayCart.product_count > 0;
+    const hasProducts = displayCart && displayCart.product_count > 0;
     const isCheckoutOpen = pathname.startsWith('/checkout');
 
     const productCount = displayCart?.product_count || 0;
@@ -50,7 +50,7 @@ export function HeaderCart() {
         router.push('/checkout');
     };
 
-    if (!hasItems || isCheckoutOpen) return null;
+    if (!hasProducts || isCheckoutOpen) return null;
 
     return (
         <div>

@@ -15,11 +15,11 @@ export function useCartValidation(targetVendorId?: string | null) {
         return draftOrder.vendor_id !== targetVendorId;
     }, [draftOrder.vendor_id, targetVendorId]);
 
-    const hasItemsInCart = draftOrder.products.length > 0;
+    const hasProductsInCart = draftOrder.products.length > 0;
 
     return {
-        isMismatch: isMismatch && hasItemsInCart,
+        isMismatch: isMismatch && hasProductsInCart,
         currentCartVendorId: draftOrder.vendor_id,
-        hasItemsInCart
+        hasProductsInCart
     };
 }

@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { DraftTransaction as Cart, DraftProductItem } from '@/lib/types/personalization';
+import { DraftTransaction as Cart, DraftProduct } from '@/lib/types/personalization';
 import { Address } from '@/lib/types/address';
 import { OrderProductDetail } from '@/lib/types/order';
 

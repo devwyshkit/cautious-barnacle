@@ -7,12 +7,12 @@ import { generateEstimatePDF } from '@/lib/services/pdf-service';
 import { getVendorInfo } from '@/lib/actions/discovery/vendors';
 import { toast } from 'sonner';
 
-import { DraftLineItem } from '@/lib/types/personalization';
+import { CartProduct } from '@/lib/types/personalization';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 import { Address } from '@/lib/types/address';
 
 interface EstimateButtonProps {
-    products: DraftLineItem[];
+    products: CartProduct[];
     pricing: PricingBreakdown;
     businessName?: string;
     billingAddress?: Address | null;

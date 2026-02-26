@@ -16,7 +16,7 @@ function ItemGroup({ className, ...props }: React.ComponentProps<"div">) {
  )
 }
 
-function ItemSeparator({
+function ProductSeparator({
  className,
  ...props
 }: React.ComponentProps<typeof Separator>) {
@@ -185,7 +185,7 @@ export {
  ItemContent,
  ItemActions,
  ItemGroup,
- ItemSeparator,
+ ProductSeparator,
  ItemTitle,
  ItemDescription,
  ItemHeader,
