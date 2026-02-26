@@ -25,7 +25,7 @@ interface ProductDetailViewProps {
         variantId?: string | null;
         quantity?: number;
         addonIds?: string[];
-        cartItemId?: string;
+        cartProductId?: string;
     };
 }
 
@@ -91,7 +91,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
 
     const totalPrice = unitPrice * quantity;
 
-    const isEditMode = !!initialState?.cartItemId;
+    const isEditMode = !!initialState?.cartProductId;
 
     const handleAddToCart = async () => {
         if (continuing) return;
@@ -114,7 +114,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
             ];
 
             let result;
-            if (isEditMode && initialState?.cartItemId) {
+            if (isEditMode && initialState?.cartProductId) {
                 result = await addToDraftOrder(
                     product.id,
                     selectedVariantId,
@@ -127,7 +127,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         unit_price: unitPrice,
                         vendor_id: product.vendor_id!,
                         vendor_name: product.vendors?.name || vendorId,
-                        update_product_id: initialState.cartItemId
+                        update_product_id: initialState.cartProductId
                     }
                 );
             } else {

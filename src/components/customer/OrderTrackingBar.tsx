@@ -15,8 +15,8 @@ export function OrderTrackingBar() {
     const pathname = usePathname();
     const router = useRouter();
 
-    const hasCartItems = draftOrder && draftOrder.product_count > 0;
-    const isCartVisible = hasCartItems;
+    const hasCartProducts = draftOrder && draftOrder.product_count > 0;
+    const isCartVisible = hasCartProducts;
 
     // WYSHKIT 2026: Show all active orders, but highlight those needing action
     const needsAttention = activeOrders.filter(o =>

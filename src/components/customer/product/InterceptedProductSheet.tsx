@@ -9,7 +9,7 @@ import { WyshkitProduct } from '@/lib/types/product';
 
 const checkoutStateSchema = z.object({
     edit: z.string().optional(),
-    cartItemId: z.string().uuid().optional(),
+    cartProductId: z.string().uuid().optional(),
     variantId: z.string().uuid().nullable().optional(),
     quantity: z.coerce.number().int().min(1).default(1),
     addons: z.string().optional()
@@ -44,8 +44,8 @@ export function InterceptedProductSheet({ product, onCloseOverride }: Intercepte
     const validated = checkoutStateSchema.safeParse(params);
     const checkoutState = validated.success ? validated.data : null;
 
-    const initialState = checkoutState?.edit === 'true' && checkoutState?.cartItemId ? {
-        cartItemId: checkoutState.cartItemId,
+    const initialState = checkoutState?.edit === 'true' && checkoutState?.cartProductId ? {
+        cartProductId: checkoutState.cartProductId,
         variantId: checkoutState.variantId || null,
         quantity: checkoutState.quantity,
         addonIds: checkoutState.addons?.split(',').filter(Boolean) || []
