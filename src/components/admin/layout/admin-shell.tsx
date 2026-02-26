@@ -73,7 +73,7 @@ function Sidebar() {
   return (
     <nav className="flex flex-col gap-1 p-3 overflow-y-auto max-h-[calc(100vh-56px)]">
       {NAV_LINKS.map((link) => (
-        <NavLink key={product.href} {...product} />
+        <NavLink key={link.href} {...link} />
       ))}
     </nav>
   )

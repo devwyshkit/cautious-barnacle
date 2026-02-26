@@ -64,14 +64,14 @@ export function VendorSidebar() {
       <nav className="flex-1 p-3">
         <ul className="space-y-1">
           {NAV_LINKS.map((link) => {
-            const isActive = pathname === product.href ||
-              (product.href !== '/vendor' && pathname.startsWith(product.href));
-            const Icon = product.icon;
+            const isActive = pathname === link.href ||
+              (link.href !== '/vendor' && pathname.startsWith(link.href));
+            const Icon = link.icon;
 
             return (
-              <li key={product.href}>
+              <li key={link.href}>
                 <Link
-                  href={product.href}
+                  href={link.href}
                   className={cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
                     isActive
@@ -80,8 +80,8 @@ export function VendorSidebar() {
                   )}
                 >
                   <Icon className="size-5" />
-                  <span className="flex-1">{product.label}</span>
-                  {product.label === 'Orders' && pendingCount > 0 && (
+                  <span className="flex-1">{link.label}</span>
+                  {link.label === 'Orders' && pendingCount > 0 && (
                     <Badge className="bg-red-500 text-white border-0 size-5 p-0 flex items-center justify-center text-xs font-bold">
                       {pendingCount > 9 ? '9+' : pendingCount}
                     </Badge>

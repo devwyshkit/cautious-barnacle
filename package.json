@@ -9,6 +9,7 @@
     "build:clean": "rm -rf .next .turbo && npm run build",
     "start": "next start",
     "lint": "next lint",
+    "lint:nomenclature": "bash scripts/nomenclature-guard.sh",
     "seed": "echo 'Run this SQL file in your Supabase SQL editor: supabase/seed.sql'",
     "seed:rich": "npx tsx scripts/seed-rich-data.ts",
     "test": "vitest run",
