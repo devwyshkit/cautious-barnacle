@@ -240,7 +240,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                     )}
                 </div>
 
-                <div className="px-5 py-5 space-y-6">
+                <div className="px-4 py-5 space-y-6">
                     {/* Header Info */}
                     <div className="space-y-3">
                         <div className="flex items-start justify-between gap-4">
