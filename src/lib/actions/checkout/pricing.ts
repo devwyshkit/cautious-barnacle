@@ -64,6 +64,9 @@ export async function calculateOrderTotalRPC(
 
     // SWIGGY 2026: Trust the database. Zero shadow math.
     const result = data as Record<string, any>;
+    const discount = Number(result.discount) || 0;
+    const wallet_discount = Number(result.wallet_discount) || 0;
+
     return {
       data: {
         subtotal: Number(result.subtotal) || 0,
@@ -71,10 +74,11 @@ export async function calculateOrderTotalRPC(
         delivery_fee: Number(result.delivery_fee) || 0,
         platform_fee: Number(result.platform_fee) || 0,
         gst: Number(result.gst) || 0,
-        discount: Number(result.discount) || 0,
-        wallet_discount: Number(result.wallet_discount) || 0,
+        discount: discount,
+        wallet_discount: wallet_discount,
         total: Number(result.total) || 0,
-        cashback_amount: Number(result.cashback_amount) || 0,
+        wyshkit_money_earned: Number(result.cashback_amount) || 0,
+        total_savings: discount + wallet_discount
       },
     };
   } catch (error) {

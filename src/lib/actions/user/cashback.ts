@@ -5,10 +5,10 @@ import { revalidatePath } from 'next/cache';
 import { logError, handleActionError } from '@/lib/utils/error-handler';
 
 /**
- * Credit cashback to user when order is delivered
+ * Credit WyshKit Money to user when order is delivered
  * WYSHKIT 2026: Zero Shadow Math. calculation is delegated to Postgres.
  */
-export async function credit_cashback_on_delivery(order_id: string, user_id: string, order_total: number) {
+export async function credit_wyshkit_money_on_delivery(order_id: string, user_id: string, order_total: number) {
   try {
     const supabase = await createClient();
 
@@ -22,7 +22,7 @@ export async function credit_cashback_on_delivery(order_id: string, user_id: str
 
     const result = data as any;
     if (!result.success) {
-      return { success: false, error: result.error || 'Cashback credit failed' };
+      return { success: false, error: result.error || 'WyshKit Money credit failed' };
     }
 
     revalidatePath('/');
@@ -34,15 +34,15 @@ export async function credit_cashback_on_delivery(order_id: string, user_id: str
       message: result.message
     };
   } catch (error) {
-    logError(error, 'CreditCashbackOnDelivery');
+    logError(error, 'CreditWyshkitMoneyOnDelivery');
     return handleActionError(error);
   }
 }
 
 /**
- * Get user's cashback balance
+ * Get user's WyshKit Money balance
  */
-export async function get_user_cashback_balance(user_id: string) {
+export async function get_user_wyshkit_money_balance(user_id: string) {
   try {
     const supabase = await createClient();
 
@@ -60,15 +60,15 @@ export async function get_user_cashback_balance(user_id: string) {
       total_withdrawn: data?.total_withdrawn || 0
     };
   } catch (error) {
-    logError(error, 'get_user_cashback_balance');
+    logError(error, 'get_user_wyshkit_money_balance');
     return { balance: 0, total_earned: 0, total_withdrawn: 0 };
   }
 }
 
 /**
- * Get user's cashback transaction history
+ * Get user's WyshKit Money transaction history
  */
-export async function get_cashback_transactions(user_id: string, limit: number = 20) {
+export async function get_wyshkit_money_transactions(user_id: string, limit: number = 20) {
   try {
     const supabase = await createClient();
 
@@ -83,7 +83,7 @@ export async function get_cashback_transactions(user_id: string, limit: number =
 
     return { transactions: data || [] };
   } catch (error) {
-    logError(error, 'get_cashback_transactions');
+    logError(error, 'get_wyshkit_money_transactions');
     return { transactions: [] };
   }
 }

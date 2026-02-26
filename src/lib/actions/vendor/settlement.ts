@@ -1,7 +1,7 @@
 'use server';
 
 import { createAdminClient } from '@/lib/supabase/server';
-import { credit_cashback_on_delivery } from '../user/cashback';
+import { credit_wyshkit_money_on_delivery } from '../user/cashback';
 import { logger } from '@/lib/logging/logger';
 import type { PricingBreakdown } from '@/lib/types/pricing';
 
@@ -72,12 +72,12 @@ export async function trigger_post_delivery_events(order_id: string) {
 
         if (update_error) throw update_error;
 
-        // 4. CREDIT CASHBACK (Customer Reward)
+        // 4. CREDIT WYSHKIT MONEY (Customer Reward)
         try {
-            await credit_cashback_on_delivery(order_id, order.user_id, total);
-        } catch (cashback_error) {
+            await credit_wyshkit_money_on_delivery(order_id, order.user_id, total);
+        } catch (wyshkit_money_error) {
             // Minor failure, don't crash the whole flow but log it
-            logger.error('Cashback credit failed', cashback_error, { order_id });
+            logger.error('WyshKit Money credit failed', wyshkit_money_error, { order_id });
         }
 
         logger.info('Post-delivery events triggered successfully', { order_id, net_settlement });

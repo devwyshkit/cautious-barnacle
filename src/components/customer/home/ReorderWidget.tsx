@@ -40,7 +40,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
   const { addToDraftOrder, clearDraftOrder, isPending } = useCart();
 
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>(initialOrders || []);
-  const [itemAvailability, setItemAvailability] = useState<Record<string, { inStock: boolean; name: string }>>({});
+  const [productAvailability, setProductAvailability] = useState<Record<string, { inStock: boolean; name: string }>>({});
   const [loading, setLoading] = useState(!initialOrders);
   const [reorderingId, setReorderingId] = useState<string | null>(null);
   const [personalizationChoiceOrder, setPersonalizationChoiceOrder] = useState<RecentOrder | null>(null);
@@ -107,7 +107,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
               };
               return acc;
             }, {});
-            setItemAvailability(availability);
+            setProductAvailability(availability);
           }
         }
       }
@@ -216,12 +216,12 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
 
       <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2">
         {recentOrders.map((order, index) => {
-          const firstItem = order.products?.[0];
+          const firstProduct = order.products?.[0];
           const productCount = order.products?.length || 0;
           const isReordering = reorderingId === order.id;
           const hasPersonalization = hasAnyPersonalization(order.products || []);
 
-          const isOrderAvailable = order.products?.every(product => itemAvailability[product.product_id]?.inStock ?? true);
+          const isOrderAvailable = order.products?.every(product => productAvailability[product.product_id]?.inStock ?? true);
 
           return (
             <button
@@ -239,10 +239,10 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
             >
               <div className="flex items-stretch">
                 <div className="relative w-20 bg-zinc-100">
-                  {firstItem?.images?.[0] ? (
+                  {firstProduct?.images?.[0] ? (
                     <Image
-                      src={firstItem.images[0]}
-                      alt={firstItem.product_name || 'Order product'}
+                      src={firstProduct.images[0]}
+                      alt={firstProduct.product_name || 'Order product'}
                       fill
                       className="object-cover"
                       sizes="80px"
@@ -268,7 +268,7 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
                   </div>
 
                   <p className="text-sm font-semibold text-zinc-900 truncate">
-                    {firstItem?.product_name || 'Order'}
+                    {firstProduct?.product_name || 'Order'}
                   </p>
                   {productCount > 1 && (
                     <p className="text-[11px] text-zinc-500">

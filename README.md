@@ -23,9 +23,9 @@ We are a **hyperlocal product marketplace** where local vendors sell physical go
 
 ## 🦉 The Swiggy 2026 Mental Model
 
-WyshKit is a fusion of two battle-tested operational models with one unique twist.
+WyshKit is a fusion of two battle-tested operational models with one unique twist, governed by the **Laws of Elite UX** (Miller's Law, Fitts' Law).
 
-**Equation:**
+**The Operational Equation:**
 ```
 WyshKit = [Swiggy Food Logistics] + [Instamart Product Catalog] + [Personalization Workflow]
 ```
@@ -82,7 +82,7 @@ A digital mockup before production = near-zero returns = premium pricing justifi
 
 ## 🏗️ Engineering Principles (Zero Reinvention)
 
-These are the exact principles used. None invented. All borrowed from the best.
+These are the exact principles used. None invented. All borrowed from the best. See the [Engineering Conventions](docs/SWIGGY_2026_ENGINEERING_CONVENTIONS.md) for the full rulebook.
 
 ### 1. Database = Single Source of Truth
 *Principle: Martin Fowler's Canonical Schema + PostgreSQL as an application platform.*
@@ -212,6 +212,8 @@ Every foreign key in the `public` schema has a covering index. Verified via `pg_
 ### 4. Deferred Feedback
 *Principle: Non-interrupting UX (Krug's "Don't Make Me Think") — don't interrupt the flow.*
 
+- **Miller's Law (UX)**: Never overwhelm. We limit primary actions to 7±2 items. Reveal complexity only when the user is ready (Progressive Disclosure).
+- **Fitts' Law (Interactions)**: Primary buttons are large, high-contrast, and "thumb-friendly" on mobile (e.g., `Slide to Pay`).
 - Rating prompt: NOT at delivery moment. Appears 30 mins post-delivery, OR on next app open, OR via push.
 - Cashback toast: shown post-delivery. Not a modal. Not blocking.
 

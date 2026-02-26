@@ -12,6 +12,7 @@ import { CheckoutData } from '@/lib/actions/checkout/checkout';
 import { CheckoutAddressProvider, useCheckoutAddress } from './CheckoutAddressContext';
 import { AddressSlot } from './slots/AddressSlot';
 import { WalletSlot } from './slots/WalletSlot';
+import { CouponSlot } from './slots/CouponSlot';
 import { GstinSection } from './GstinSection';
 import { EstimateButton } from './EstimateButton';
 import { SlideToPay } from './SlideToPay';
@@ -84,6 +85,12 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                         </div>
                     </div>
                 </section>
+
+                {/* COUPON SECTION - Progressive Disclosure */}
+                <CouponSlot
+                    initialCoupon={checkoutData.applied_coupon}
+                    disabled={paymentFlow.isProcessing}
+                />
 
                 {/* BILL SECTION */}
                 <section className="bg-white rounded-2xl border border-zinc-100 overflow-hidden shadow-sm">
@@ -161,9 +168,9 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                                 <span className="text-sm font-black text-zinc-900">To pay</span>
                                 <span className="text-base font-black text-zinc-900">{formatCurrency(checkoutData.pricing.total)}</span>
                             </div>
-                            {checkoutData.pricing.cashback_amount > 0 && (
+                            {checkoutData.pricing.wyshkit_money_earned > 0 && (
                                 <p className="text-[11px] font-bold text-emerald-600 text-right">
-                                    🎁 Earn {formatCurrency(checkoutData.pricing.cashback_amount)} cashback after delivery
+                                    🎁 Earn {formatCurrency(checkoutData.pricing.wyshkit_money_earned)} WyshKit Money after delivery
                                 </p>
                             )}
                         </div>

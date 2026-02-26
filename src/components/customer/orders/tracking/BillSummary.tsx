@@ -40,7 +40,7 @@ export function BillSummary({ order }: BillSummaryProps) {
                     platform_fee: order.platform_fee || 0,
                     gst_amount: order.gst || 0,
                     grand_total: order.total || 0,
-                    discount: (order.discount || 0) + (order.cashback_amount || 0)
+                    discount: order.total_savings || 0
                 }
             };
             generateTaxInvoicePDF(data as any);
@@ -118,10 +118,10 @@ export function BillSummary({ order }: BillSummaryProps) {
                             <span>{formatCurrency(order.gst || 0)}</span>
                         </div>
 
-                        {((order.discount || 0) + (order.cashback_amount || 0)) > 0 && (
+                        {(order.total_savings && order.total_savings > 0) && (
                             <div className="flex justify-between items-center py-2 px-3 bg-emerald-50/50 rounded-xl border border-emerald-100/50">
-                                <span className="text-xs font-black text-emerald-700 tracking-tight">Total Savings</span>
-                                <span className="text-sm font-black text-emerald-700">-{formatCurrency((order.discount || 0) + (order.cashback_amount || 0))}</span>
+                                <span className="text-xs font-black text-emerald-700 tracking-tight">WyshKit Money & Discounts</span>
+                                <span className="text-sm font-black text-emerald-700">-{formatCurrency(order.total_savings)}</span>
                             </div>
                         )}
 

@@ -103,13 +103,13 @@ export async function update_order_status(
       return { success: false, error: transition_result.error };
     }
 
-    // 5. Side Effect: Cashback
+    // 5. Side Effect: WyshKit Money (Cashback)
     if (target_status === 'DELIVERED') {
       try {
-        const { credit_cashback_on_delivery } = await import('@/lib/actions/user/cashback');
-        await credit_cashback_on_delivery(order_id, order.user_id, Number(order.total));
-      } catch (cashback_error) {
-        logger.error('Failed to credit cashback on delivery', cashback_error, { order_id });
+        const { credit_wyshkit_money_on_delivery } = await import('@/lib/actions/user/cashback');
+        await credit_wyshkit_money_on_delivery(order_id, order.user_id, Number(order.total));
+      } catch (wyshkit_money_error) {
+        logger.error('Failed to credit WyshKit Money on delivery', wyshkit_money_error, { order_id });
       }
     }
 
@@ -390,7 +390,8 @@ export async function get_order_with_history(order_id: string): Promise<{ order:
       vendor_image: raw_order.vendors?.image_url || null,
       order_status_history: order_status_history_arr as any,
       order_products: products,
-      personalization_status: p_status
+      personalization_status: p_status,
+      total_savings: (Number(raw_order.discount) || 0) + (Number((raw_order as any).cashback_amount) || 0)
     } as any;
 
     return { order: mapped_order };
