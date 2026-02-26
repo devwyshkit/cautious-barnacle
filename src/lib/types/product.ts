@@ -5,7 +5,7 @@
  * UI-only types are kept for display transformations.
  * 
  * Hyperlocal Product Marketplace with Optional Personalization
- * (Like Apple engraving - this IS personalization, NOT customization)
+ * (Like Apple engraving - this IS personalization, NOT personalizing)
  */
 
 import type { Tables } from '@/lib/supabase/types';

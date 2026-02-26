@@ -8,7 +8,8 @@
 
 1. **Commitment Before Creativity** — Pay first, personalise after. Always.
 2. **Hyperlocal Time > Distance** — Show "Arriving by 5:15 PM", never "2.4 km away".
-3. **Preview Trust > Price** — A digital mockup (not a product photo) before production starts. Fiverr-style. This prevents returns. This is the moat.
+3. **Preview Trust > Price** — A digital mockup (not a product photo) before production starts. This is the moat.
+4. **Anticipatory UX** — Eliminate typing. One-tap presets for delivery (Silence Mode, Gate Drop).
 
 ---
 
@@ -80,7 +81,7 @@ Content order (mandatory):
 
 ### Step 4 — CHECKOUT PAGE `/checkout`
 
-**One-trip RPC load.** `get_checkout_context` returns everything: products, addresses, pricing, wallet, coupons.
+**The One-Trip Promise.** `get_checkout_context` returns everything: products, addresses, pricing, wallet, coupons. No multi-step loading or state drift.
 
 Section order (BlocksEngine):
 1. **CHECKOUT_ITEMS** — product names, quantities, personalisation flag, add-on flag

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { getAddresses, setDefaultAddress, deleteAddress } from '@/lib/actions/user/addresses';
 import { setLocationFromCoords, setLocationCookies, searchPlaces, setLocationFromPlaceId } from '@/lib/actions/discovery/location';
 import type { Address } from '@/lib/types/address';

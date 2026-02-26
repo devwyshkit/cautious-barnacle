@@ -98,6 +98,29 @@ export function PersonalizationField({
                                         </span>
                                     )}
                                 </div>
+
+                                { /* WYSHKIT 2026: Smart Prediction Tokens (Anticipatory UX) */}
+                                <div className="flex flex-wrap gap-2 px-1">
+                                    {[
+                                        { label: '🎂 Birthday', value: 'Theme: Happy Birthday! Add name and date.' },
+                                        { label: '💍 Anniversary', value: 'Theme: Anniversary. Elegant style.' },
+                                        { label: '❤️ Love', value: 'Theme: Romantic/Love. Add initials.' },
+                                        { label: '🎓 Grad', value: 'Theme: Graduation. Class of 2026.' }
+                                    ].map(token => (
+                                        <button
+                                            key={token.label}
+                                            type="button"
+                                            onClick={() => {
+                                                const current = input.text || '';
+                                                onInputChange('text', current ? `${current}\n${token.value}` : token.value);
+                                            }}
+                                            className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-zinc-50 border border-zinc-100 text-zinc-500 hover:bg-zinc-100 transition-all active:scale-95"
+                                        >
+                                            {token.label}
+                                        </button>
+                                    ))}
+                                </div>
+
                                 <Textarea
                                     value={input.text || ''}
                                     onChange={(e) => onInputChange('text', e.target.value)}

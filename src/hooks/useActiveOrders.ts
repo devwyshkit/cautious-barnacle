@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/types/order-status';
 import { logger } from '@/lib/logging/logger';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { useRealtime } from '@/providers/RealtimeProvider';
 
 export interface ActiveOrder {
@@ -84,7 +84,7 @@ export function useActiveOrders() {
 
             // WYSHKIT 2026: Attach to the shared Pulse channel instead of creating a new one.
             // This follows the "One User = One Connection" principle.
-            channel.on(
+            const subscription = channel.on(
                 'postgres_changes',
                 {
                     event: '*',
@@ -96,6 +96,10 @@ export function useActiveOrders() {
                     fetchActiveOrders(user.id);
                 }
             );
+
+            return () => {
+                // Subscription cleanup if needed, but channel is managed globally
+            };
         }
 
         return () => {

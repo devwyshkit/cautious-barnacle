@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { PhoneInput } from '@/components/auth/PhoneInput';
 import { OTPInput } from '@/components/auth/OTPInput';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { cn } from '@/lib/utils';
 import type { IdentityState } from '../types';
 import { Smartphone, Check } from 'lucide-react';

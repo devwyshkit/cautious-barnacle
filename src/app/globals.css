@@ -13,6 +13,18 @@
   --space-4: 16px;
   --space-6: 24px;
   --space-8: 32px;
+
+  /* Surface Isolation */
+  --surface-border: #F1F1F1;
+  --surface-bg: #FFFFFF;
+}
+
+[data-slot="sheet-content"], [data-slot="drawer-content"] {
+  border-color: var(--surface-border) !important;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 body {

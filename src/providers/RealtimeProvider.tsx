@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 
 /**
  * WYSHKIT 2026: The "Realtime Pulse" Provider
@@ -27,7 +27,12 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     const { user, loading: authLoading } = useAuth();
     const [channel, setChannel] = useState<RealtimeChannel | null>(null);
     const [isConnected, setIsConnected] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const supabase = useMemo(() => createClient(), []);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (authLoading || !user) {
@@ -52,7 +57,9 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
         return () => {
             supabase.removeChannel(userChannel);
         };
-    }, [user?.id, authLoading]);
+    }, [user?.id, authLoading, supabase]);
+
+    if (!mounted) return null;
 
     return (
         <RealtimeContext.Provider value={{ channel, isConnected }}>

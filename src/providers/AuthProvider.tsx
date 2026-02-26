@@ -27,6 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [permissions, setPermissions] = useState<AuthCoreLib.UserPermissions | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [mounted, setMounted] = useState(false);
     const router = useRouter();
 
     const supabase = useMemo(() => createClient(), []);
@@ -77,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
+        setMounted(true);
         refreshSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
@@ -167,7 +169,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         verifyOTP,
         signOut,
         refreshSession
-    }), [user, permissions, loading, error]);
+    }), [user, permissions, loading, error, signInWithPhone, verifyOTP, signOut]);
+
+    // WYSHKIT 2026: Hydration Barrier
+    // Prevents SSR/CSR mismatch errors (the '10+ console errors' root cause)
+    if (!mounted) return null;
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

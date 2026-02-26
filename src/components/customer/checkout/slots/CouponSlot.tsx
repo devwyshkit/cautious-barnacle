@@ -50,7 +50,7 @@ export function CouponSlot({ initialCoupon, disabled }: CouponSlotProps) {
     };
 
     return (
-        <section className={cn("bg-zinc-50/50 rounded-2xl border border-zinc-100 overflow-hidden transition-all duration-300", disabled && "opacity-50 pointer-events-none")}>
+        <section className={cn("bg-white rounded-[24px] border border-[var(--surface-border)] overflow-hidden transition-all duration-300", disabled && "opacity-50 pointer-events-none")}>
             <button
                 onClick={() => setExpanded(!expanded)}
                 className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-zinc-100/50 transition-colors"

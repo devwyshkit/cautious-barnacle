@@ -29,7 +29,7 @@ import { ORDER_STATUS } from '@/lib/types/order-status';
 import { OrderDetail } from '@/lib/types/order';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { IdentityForm } from './IdentityForm';
+import { PersonalizationForm } from './PersonalizationForm';
 import { PreviewApproval } from './PreviewApproval';
 import { approve_preview, request_change } from '@/lib/actions/commerce/orders';
 import { generateEstimatePDF, generateTaxInvoicePDF } from '@/lib/services/pdf-service';
@@ -65,7 +65,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   const [showCelebration, setShowCelebration] = useState(showSuccess);
   const [proactivePersonalizationOpen, setProactivePersonalizationOpen] = useState(showIdentityParam);
   const [hasAutoOpened, setHasAutoOpened] = useState(showIdentityParam);
-  const [isIdentitySubmittedOptimistic, setIsIdentitySubmittedOptimistic] = useState(false);
+  const [isPersonalizationSubmittedOptimistic, setIsPersonalizationSubmittedOptimistic] = useState(false);
 
   const personalizedProductsPending = useMemo(() => {
     return (order?.order_products || []).filter((product: any) => {
@@ -93,10 +93,10 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
 
   const handlePersonalizationSubmitted = () => {
     toast.success("Details shared with vendor!");
-    setIsIdentitySubmittedOptimistic(true);
+    setIsPersonalizationSubmittedOptimistic(true);
     setProactivePersonalizationOpen(false);
     // WYSHKIT 2026: Force a local refetch if channel is slow, 
-    // but the setIsIdentitySubmittedOptimistic(true) handles the immediate UI toggle.
+    // but the setIsPersonalizationSubmittedOptimistic(true) handles the immediate UI toggle.
     setTimeout(() => refetch(), 1500);
   };
 
@@ -155,8 +155,8 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
     );
   }
 
-  // WYSHKIT 2026: Simplified visibility logic for the identity overlay
-  const showIdentityForm = !isIdentitySubmittedOptimistic && proactivePersonalizationOpen && personalizedProductsPending.length > 0;
+  // WYSHKIT 2026: Simplified visibility logic for the personalization overlay
+  const showPersonalizationForm = !isPersonalizationSubmittedOptimistic && proactivePersonalizationOpen && personalizedProductsPending.length > 0;
 
   return (
     <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker" showHomeButton>
@@ -169,9 +169,9 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
         )}
         <div className="flex flex-col gap-4 p-4 pb-20">
           <SurfaceErrorBoundaryWithRouter surfaceName="Success & Identity Overlay">
-            {(showSuccess || showIdentityForm) && (
+            {(showSuccess || showPersonalizationForm) && (
               <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-white rounded-xl p-1 border border-zinc-100 shadow-sm shadow-zinc-200/50 overflow-hidden relative">
-                {showSuccess && !showIdentityForm && (
+                {showSuccess && !showPersonalizationForm && (
                   <div className="gradient-vibrant p-7 text-white rounded-[30px] mb-1 relative overflow-hidden">
                     {showCelebration && <Confetti />}
                     <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -192,7 +192,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                   </div>
                 )}
 
-                {!showSuccess && showIdentityForm && (
+                {!showSuccess && showPersonalizationForm && (
                   <div className="flex items-center justify-between p-6 pb-2">
                     <div className="flex items-center gap-3">
                       <div className="size-10 rounded-xl bg-zinc-900 flex items-center justify-center shadow-lg shadow-zinc-900/10">
@@ -212,9 +212,9 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                   </div>
                 )}
 
-                {(showIdentityForm || (showIdentityParam && !order)) && (
+                {(showPersonalizationForm || (showIdentityParam && !order)) && (
                   <div className="p-4 pt-2">
-                    <IdentityForm
+                    <PersonalizationForm
                       orderId={order?.id || orderId}
                       products={personalizedProductsPending.length > 0 ? personalizedProductsPending : (order ? [] : [{ id: 'pending', product_name: 'Order Loading...', is_personalized: true }])}
                       designDeadline={order ? (order as any).design_deadline_at : undefined}
@@ -231,13 +231,13 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
             <StatusCard order={order as OrderDetail} />
           </SurfaceErrorBoundaryWithRouter>
 
-          {!showIdentityForm && (
+          {!showPersonalizationForm && (
             <SurfaceErrorBoundaryWithRouter surfaceName="Creative Brief">
               <CreativeBrief
                 order={order as OrderDetail}
                 previews={previews || []}
                 timeline={events}
-                isOptimisticSubmitted={isIdentitySubmittedOptimistic}
+                isOptimisticSubmitted={isPersonalizationSubmittedOptimistic}
                 onOpenPersonalization={() => setProactivePersonalizationOpen(true)}
               />
             </SurfaceErrorBoundaryWithRouter>

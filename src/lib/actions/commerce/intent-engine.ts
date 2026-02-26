@@ -52,6 +52,16 @@ const TransitionOrderSchema = z.object({
     metadata: z.any().optional(),
 });
 
+const RejectPreviewSchema = z.object({
+    order_id: z.string().uuid(),
+    reason: z.string().min(1),
+});
+
+const CancelOrderSchema = z.object({
+    order_id: z.string().uuid(),
+    reason: z.string().optional(),
+});
+
 const OrderProductInputSchema = z.object({
     product_id: z.string().uuid(),
     variant_id: z.string().uuid().nullable().optional(),
@@ -82,6 +92,8 @@ const CommerceIntentSchema = z.discriminatedUnion('intent', [
     z.object({ intent: z.literal('SET_GSTIN'), payload: SetGSTINSchema }),
     z.object({ intent: z.literal('SET_GUEST_LOCATION'), payload: SetGuestLocationSchema }),
     z.object({ intent: z.literal('TRANSITION_ORDER'), payload: TransitionOrderSchema }),
+    z.object({ intent: z.literal('REJECT_PREVIEW'), payload: RejectPreviewSchema }),
+    z.object({ intent: z.literal('CANCEL_ORDER'), payload: CancelOrderSchema }),
     z.object({ intent: z.literal('PLACE_ORDER'), payload: PlaceOrderSchema }),
     z.object({
         intent: z.literal('REORDER'),
@@ -119,6 +131,9 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
             'SET_GSTIN',
             'SET_GUEST_LOCATION',
             'PLACE_ORDER',
+            'TRANSITION_ORDER',
+            'REJECT_PREVIEW',
+            'CANCEL_ORDER',
             'REORDER',
             'CLEAR_CART'
         ].includes(intentAction.intent);
@@ -267,6 +282,35 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     if (data && !(data as any).success) {
                         throw new Error((data as any).error || 'Failed to transition order');
                     }
+                    revalidateTag('orders');
+                    return { success: true, data };
+                }
+
+                case 'REJECT_PREVIEW': {
+                    // One-Trip: Atomic status change with reason
+                    const { data, error } = await supabase.rpc('transition_order', {
+                        p_order_id: validated.payload.order_id,
+                        p_target_status: 'IN_PRODUCTION', // Back to production
+                        p_metadata: {
+                            rejection_reason: validated.payload.reason,
+                            rejected_at: new Date().toISOString()
+                        }
+                    });
+                    if (error) throw error;
+                    revalidateTag('orders');
+                    return { success: true, data };
+                }
+
+                case 'CANCEL_ORDER': {
+                    const { data, error } = await supabase.rpc('transition_order', {
+                        p_order_id: validated.payload.order_id,
+                        p_target_status: 'CANCELLED',
+                        p_metadata: {
+                            cancellation_reason: validated.payload.reason || 'User requested cancellation',
+                            cancelled_at: new Date().toISOString()
+                        }
+                    });
+                    if (error) throw error;
                     revalidateTag('orders');
                     return { success: true, data };
                 }

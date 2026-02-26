@@ -38,8 +38,10 @@ class Logger {
 
   constructor() {
     this.isDevelopment = process.env.NODE_ENV === 'development';
-    // In production, only log WARN and above
-    this.minLevel = this.isDevelopment ? LogLevel.DEBUG : LogLevel.WARN;
+    // WYSHKIT 2026: God Level Purity. 
+    // Even in development, we suppress noisy DEBUG/INFO logs to keep the console clean.
+    // Set to LogLevel.DEBUG only if active debugging is required.
+    this.minLevel = LogLevel.WARN;
   }
 
   private shouldLog(level: LogLevel): boolean {

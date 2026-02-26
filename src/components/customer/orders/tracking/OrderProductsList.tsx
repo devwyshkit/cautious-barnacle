@@ -7,8 +7,8 @@ import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/pricing';
 import { ORDER_STATUS, getProductStatusConfig } from '@/lib/types/order-status';
-import { IdentityForm } from '../IdentityForm';
-import { SubmittedIdentity } from './SubmittedIdentity';
+import { PersonalizationForm } from '../PersonalizationForm';
+import { SubmittedPersonalization } from './SubmittedPersonalization';
 import { PreviewApproval } from '../PreviewApproval';
 import { approve_preview, request_change } from '@/lib/actions/commerce/orders';
 import { toast } from 'sonner';
@@ -172,16 +172,16 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
 
                                     {selectedPreviewProduct.is_personalized && (
                                         <div className="space-y-3">
-                                            <span className="text-xs font-black text-zinc-400 tracking-tight px-1">Identity Details</span>
+                                            <span className="text-xs font-black text-zinc-400 tracking-tight px-1">Personalisation Details</span>
                                             {selectedPreviewProduct.personalization_details ? (
-                                                <SubmittedIdentity
+                                                <SubmittedPersonalization
                                                     details={selectedPreviewProduct.personalization_details as any}
                                                     itemName={selectedPreviewProduct.product_name}
                                                 />
                                             ) : (
                                                 <div className="p-8 text-center bg-zinc-50 rounded-xl border border-zinc-100">
                                                     <Sparkles className="size-8 text-zinc-200 mx-auto mb-3" />
-                                                    <p className="text-xs font-bold text-zinc-400 tracking-tight">Awaiting Identity Brief</p>
+                                                    <p className="text-xs font-bold text-zinc-400 tracking-tight">Awaiting Personalisation Brief</p>
                                                 </div>
                                             )}
                                         </div>

@@ -43,6 +43,21 @@ In hyperlocal, failures are inevitable. Recovery is the product.
 - **Rule**: If a primary path fails (Rider fail, Vendor breach), proactively offer an "SLA Salvation" (Credit + Auto-shift).
 - **Goal**: Turn an error into an investment moment.
 
+### 9. Anticipatory Design (Pre-Emptive UX)
+Elite products eliminate typing by predicting intent.
+- **Rule**: Provide "One-Tap Presets" for high-frequency instructions (e.g., "Gate Drop", "Silence Mode").
+- **Goal**: Reduce cognitive load from "Input" to "Confirmation".
+
+## ⚖️ The Laws of 2026 (Canonical)
+
+1.  **The Law of Zero Shadow Math**: All commerce arithmetic (GST, platform fees, delivery) is the exclusive domain of the Postgres kernel. Frontend math is prohibited.
+2.  **The Law of Atomic Intent**: Every user decision (Address select, Coupon apply) must be a single, transactional RPC trip. No "Shadow Sessions".
+3.  **The Law of Perpetual State Purity**: The UI is a stateless projection of the database. Hydration barriers must enforce that the first render is always the "Authored Source".
+4.  **The Law of Flush Symmetry**: Borders and headers are one surface. No padding leakage. No "Drawer-within-a-Drawer" artifacts.
+5.  **The Law of Healthy Friction**: Digital commitment (Slide to Pay) creates physical value. Friction is only a bug if it blocks the decision; it is a feature if it validates the intent.
+6.  **The Law of Visual Gravity**: Surfaces that contain money (Wallets, Bill) must have higher visual elevation (Shadows/Borders) than static information.
+7.  **The Law of Haptic Resonance**: Every transactional intent (Confirm, Toggle, Slide) must echo in the physical hand. No vibration, no transaction.
+
 ## 🛠️ Hard Engineering Rules
 
 1. **Zero Shadow Math**: The database is the only computer. Frontend is only for display. If you are calculating a total or an ETA in TypeScript, you have failed.

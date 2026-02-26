@@ -4,7 +4,7 @@ import { LogOut } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { useState } from 'react';
 import { logger } from '@/lib/logging/logger';
 

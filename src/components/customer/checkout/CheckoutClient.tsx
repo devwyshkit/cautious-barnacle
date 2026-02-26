@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, ShieldCheck, MapPin, CreditCard, FileText } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { useCart } from '@/components/customer/CartProvider';
 import { usePaymentFlow } from '@/hooks/usePaymentFlow';
 import { CheckoutData } from '@/lib/actions/checkout/checkout';
+import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
 import { CheckoutAddressProvider, useCheckoutAddress } from './CheckoutAddressContext';
 import { AddressSlot } from './slots/AddressSlot';
 import { WalletSlot } from './slots/WalletSlot';
@@ -29,8 +30,9 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
     const { clearDraftOrder } = useCart();
     const addressCtx = useCheckoutAddress();
 
-    const [checkoutData, setCheckoutData] = useState<CheckoutData>(initialData);
-    const [businessName, setBusinessName] = useState<string | null>(null);
+    // WYSHKIT 2026: Zero Shadow State 
+    // We strictly use initialData (refreshed via router.refresh)
+    const checkoutData = initialData;
 
     const paymentFlow = usePaymentFlow({
         data: checkoutData,
@@ -60,7 +62,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
             <div className="flex-1 overflow-y-auto px-4 pb-32 space-y-3">
 
                 {/* DELIVERY SECTION */}
-                <section className="bg-white rounded-2xl border border-zinc-100 overflow-hidden shadow-sm">
+                <section className="bg-white rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-zinc-50">
                         <MapPin className="size-3.5 text-[var(--primary)]" />
                         <span className="text-[11px] font-black text-zinc-500 tracking-widest">Delivery</span>
@@ -68,19 +70,43 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                     <div className="px-4 py-3">
                         <AddressSlot
                             initialAddresses={checkoutData.addresses}
-                            currentAddress={checkoutData.addresses?.find((a: any) => a.id === checkoutData.selected_address_id)}
+                            currentAddress={checkoutData.addresses?.find(a => a.id === checkoutData.selected_address_id)}
                             disabled={paymentFlow.isProcessing}
                         />
                         <div className="mt-3">
                             <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
                                 Instructions <span className="font-semibold normal-case text-zinc-300">(optional)</span>
                             </label>
+
+                            {/* WYSHKIT 2026: Anticipatory Presets (Zero Shadow UX) */}
+                            <div className="flex flex-wrap gap-2 mt-2 mb-3">
+                                {[
+                                    { id: 'silence', label: '🤫 Silence Mode', hint: 'Dont ring bell' },
+                                    { id: 'gate', label: '🚧 Gate Drop', hint: 'Leave at gate' },
+                                    { id: 'careful', label: '💎 Fragile', hint: 'Handle with care' }
+                                ].map(preset => (
+                                    <button
+                                        key={preset.id}
+                                        type="button"
+                                        onClick={() => {
+                                            triggerHaptic(HapticPattern.ACTION);
+                                            const current = addressCtx?.deliveryInstructions ?? '';
+                                            if (current.includes(preset.hint)) return;
+                                            addressCtx?.setDeliveryInstructions(current ? `${current}, ${preset.hint}` : preset.hint);
+                                        }}
+                                        className="text-[10px] font-bold px-3 py-1.5 rounded-full bg-zinc-50 border border-zinc-100 text-zinc-500 hover:bg-zinc-100 transition-colors active:scale-95"
+                                    >
+                                        {preset.label}
+                                    </button>
+                                ))}
+                            </div>
+
                             <textarea
                                 value={addressCtx?.deliveryInstructions ?? ''}
                                 onChange={(e) => addressCtx?.setDeliveryInstructions(e.target.value)}
                                 disabled={paymentFlow.isProcessing}
                                 placeholder="e.g. Ring bell, leave at gate..."
-                                className="w-full mt-1.5 h-16 px-3 py-2 rounded-xl bg-zinc-50 border border-zinc-100 text-sm font-medium focus:bg-white focus:border-zinc-300 transition-all resize-none outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full h-16 px-4 py-3 rounded-xl bg-zinc-50 border border-zinc-100 text-sm font-medium focus:bg-white focus:border-zinc-300 transition-all resize-none outline-none disabled:opacity-50"
                             />
                         </div>
                     </div>
@@ -93,7 +119,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                 />
 
                 {/* BILL SECTION */}
-                <section className="bg-white rounded-2xl border border-zinc-100 overflow-hidden shadow-sm">
+                <section className="bg-white rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-zinc-50">
                         <FileText className="size-3.5 text-[var(--primary)]" />
                         <span className="text-[11px] font-black text-zinc-500 tracking-widest">Bill</span>
@@ -101,7 +127,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
 
                     {/* Products */}
                     <div className="px-4 py-3 space-y-3 border-b border-zinc-50">
-                        {checkoutData.products.map((product: any) => (
+                        {checkoutData.products.map(product => (
                             <div key={product.id} className="flex items-center gap-3">
                                 <div className="relative size-12 rounded-xl bg-zinc-100 overflow-hidden shrink-0">
                                     <Image
@@ -178,7 +204,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                 </section>
 
                 {/* PAYMENT SECTION */}
-                <section className="bg-white rounded-2xl border border-zinc-100 overflow-hidden shadow-sm">
+                <section className="bg-white rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-zinc-50">
                         <CreditCard className="size-3.5 text-[var(--primary)]" />
                         <span className="text-[11px] font-black text-zinc-500 tracking-widest">Payment</span>
@@ -192,18 +218,8 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                         />
                         <GstinSection
                             initialGstin={checkoutData.gstin || ''}
-                            onGstinChange={(val) => setCheckoutData(prev => ({ ...prev, gstin: val }))}
-                            onBusinessNameChange={setBusinessName}
                             disabled={paymentFlow.isProcessing}
                         />
-                        {checkoutData.pricing && checkoutData.gstin && (
-                            <EstimateButton
-                                products={checkoutData.products}
-                                pricing={checkoutData.pricing}
-                                gstin={checkoutData.gstin}
-                                businessName={businessName || undefined}
-                            />
-                        )}
                     </div>
                 </section>
 

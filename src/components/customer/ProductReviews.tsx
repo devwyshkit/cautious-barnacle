@@ -4,7 +4,8 @@ import { useEffect, useState, useTransition } from "react";
 import { Star, User, MessageSquare, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/providers/AuthProvider";
+import { logger } from "@/lib/logging/logger";
 import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -110,7 +111,7 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
       // Optimistically we could refresh the list here
     } catch (error: any) {
       triggerHaptic(HapticPattern.ERROR);
-      console.error('Review submission failed', error);
+      logger.error('Review submission failed', { error });
       toast.error(error.message || "Failed to submit review");
     } finally {
       setSubmitting(false);

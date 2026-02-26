@@ -306,7 +306,7 @@ export async function upload_preview(
     if (fetch_error || !order) throw new Error('Order not found');
 
     // WYSHKIT 2026: Combined Update (Metadata-Driven)
-    // Update the specific order_item metadata with the preview URL
+    // Update the specific order_product metadata with the preview URL
     const { error: item_error } = await supabase
       .from('order_products')
       .update({

@@ -35,7 +35,7 @@ export function SubmittedPersonalization({ details, itemName, isOptimisticSubmit
                     </div>
                     <div>
                         <p className="text-xs font-black text-zinc-400 tracking-tight">
-                            {isOptimisticSubmitted && !hasContent ? 'Brief Processing...' : 'Submitted Brief'}
+                            {isOptimisticSubmitted && !hasContent ? 'Brief Processing...' : 'Submitted Personalisation'}
                         </p>
                         <p className="text-xs font-bold text-zinc-900 truncate max-w-[150px]">
                             {itemName || (isOptimisticSubmitted ? 'Sharing Vision...' : 'View your details')}

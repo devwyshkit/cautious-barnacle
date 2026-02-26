@@ -2,7 +2,7 @@
 
 import { useState, useActionState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
 import { MapPin, Check, Home, Briefcase, ChevronRight, Loader2, Plus } from "lucide-react";
 

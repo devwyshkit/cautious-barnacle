@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth/admin';
+import { logger } from '@/lib/logging/logger';
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { z } from 'zod'
 
@@ -104,7 +105,7 @@ export async function executeAdminIntent(intent: AdminIntent) {
 
         return { success: true };
     } catch (error: any) {
-        console.error('Admin Intent Error:', error);
+        logger.error('Admin Intent Error:', { error });
         return { success: false, error: error.message };
     }
 }

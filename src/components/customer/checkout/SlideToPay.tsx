@@ -47,11 +47,13 @@ export function SlideToPay({
     const [dragX, setDragX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
-    const [isTouchDevice, setIsTouchDevice] = useState<boolean | null>(null); // null until hydrated — avoids desktop flash
+    const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const constraintsRef = useRef<HTMLDivElement>(null);
     const handleRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        setMounted(true);
         setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     }, []);
 
@@ -142,9 +144,9 @@ export function SlideToPay({
     }
 
     // WYSHKIT 2026: Desktop Integrity
-    // isTouchDevice=null (SSR) or false (desktop) → always show button, never the slide track
-    // This prevents the flash of "Slide to Pay" text on desktop before hydration
-    if (isTouchDevice === null || !isTouchDevice) {
+    // If not mounted (SSR) or not a touch device -> show the standard button.
+    // This eliminates the 10+ hydration mismatch errors caused by conditional rendering.
+    if (!mounted || !isTouchDevice) {
         return (
             <Button
                 size="lg"

@@ -1,21 +1,23 @@
-# WyshKit 2026
+# WyshKit 2026: Hyperlocal Purity
+**"The Shadow of Swiggy. The Speed of Instamart. Individual Identity."**
 
-**Hyper-personalization at Blinkit Speeds.**
-
-> *"We are what Swiggy would be if they delivered personalised gifts instead of biryani. Personalization is an edge service on local stock, not a manufacturing process."*
+Wyshkit is a **hyperlocal product utility** designed for the "2026 Economy"—where local inventory becomes a substrate for personalization, delivered in under 60 minutes.
 
 ---
 
-## What We Are
+## 🏛️ The Engineering Manifesto
+Wyshkit is not an app; it is a **Stateless Projection** of the communal commerce intent. We follow three non-negotiable laws:
 
+1. **Commitment Before Creativity**: We never ask a vendor to work for free. Pay first, personalize after.
+2. **Time > Distance**: We measure success in minutes, not kilometers. SLA is the only unit of distance.
+3. **Zero Shadow Math**: The database is the only computer. The frontend is merely a high-fidelity display.
+
+---
+
+## 🏛️ The Operational Equation
 ```
-Swiggy Food   = Restaurant → Cooks food → 3PL Delivery
-WyshKit       = Local vendor → Personalises stock → 3PL Delivery
+WyshKit = [Logistics Purity] + [Curated Substrate] + [Identity Layer]
 ```
-
-One local vendor. One cart. One delivery. Always.
-
-We are a **hyperlocal product utility** where local vendors provide high-speed personalization services on blank inventory, and we handle the discovery-to-delivery loop.
 
 ---
 

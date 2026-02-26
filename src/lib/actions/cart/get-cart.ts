@@ -57,28 +57,24 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
         const dbRes = data.pricing || {};
         const sessionData = data.session || {};
 
-        // 3. Mapping with Purified Logic
+        // 3. Mapping with Purified Logic (Zero Shadow Math)
         const cartProducts: CartProduct[] = productsRows.map((row: any) => {
             const quantity = Number(row.quantity) || 1;
-            const base_price = Number(row.variant_price ?? row.base_price ?? 0);
-            const selected_addons = (row.selected_addons as unknown as SelectedAddon[]) || [];
-            const addons_price = selected_addons.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
             const personalization = (row.personalization as unknown as SelectedPersonalization) || { enabled: false };
 
-            // WYSHKIT 2026: Zero Shadow Math. 
-            // We trust the DB's line_total and personalization_fee 100%. No fallback derivations.
             return {
                 id: row.id || '',
                 product_id: row.product_id || '',
                 product_name: row.product_name || 'Product',
                 product_image: (Array.isArray(row.product_images) && row.product_images[0]) || row.product_image || '/images/logo.png',
                 quantity: quantity,
-                unit_price: base_price + addons_price,
-                line_total: Number(row.line_total || 0),
+                // Source of Truth: RPC Pre-Calculations
+                unit_price: Number(row.calculated_unit_price || 0),
+                line_total: Number(row.calculated_line_total || 0),
                 personalization_fee: Number(row.personalization_fee || 0),
                 variant_id: row.variant_id,
                 personalization: personalization,
-                selected_addons: selected_addons,
+                selected_addons: (row.selected_addons as unknown as SelectedAddon[]) || [],
                 vendor_name: row.vendor_name || 'Store',
                 vendor_id: row.vendor_id || '',
                 vendor_city: row.vendor_city || null,
@@ -86,7 +82,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
                 base_price: Number(row.base_price || 0),
                 variant_price: row.variant_price != null ? Number(row.variant_price) : null,
                 variant_name: row.variant_name || undefined,
-                addons_price: addons_price,
+                addons_price: Number(row.addons_price || 0),
                 is_personalized: !!personalization?.enabled,
                 personalization_options: (row.personalization_options as any[]) || [],
             };

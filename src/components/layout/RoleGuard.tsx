@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { Loader2 } from 'lucide-react';
 import { type UserRole } from '@/lib/auth/core';
 import { resolveUserPermissionsClient } from '@/lib/auth/client';

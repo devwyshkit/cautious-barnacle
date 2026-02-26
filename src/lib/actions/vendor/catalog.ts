@@ -37,7 +37,7 @@ export type VariantInput = {
     mrp?: number;
     attributes?: Record<string, string>;
     stock_quantity?: number;
-    sku?: string;
+    serial_number?: string;
     is_active?: boolean;
 };
 
@@ -189,7 +189,7 @@ export async function createVariant(productId: string, input: VariantInput) {
                 mrp: input.mrp || null,
                 attributes: input.attributes || {},
                 stock_quantity: input.stock_quantity ?? 100,
-                sku: input.sku || null,
+                serial_number: input.serial_number || null,
                 is_active: input.is_active ?? true,
             })
             .select('id')

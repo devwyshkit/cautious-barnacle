@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useVendorOrdersStatus } from '@/hooks/useVendorOrdersStatus';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';

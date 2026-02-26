@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useOptimistic, useTransition, useEffect } from "react";
 import { DraftTransaction as Cart, SelectedPersonalization, SelectedAddon, CartProduct } from "@/lib/types/personalization";
 import { EMPTY_CART } from "@/lib/constants/cart";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/providers/AuthProvider";
 import { executeCommerceIntent } from "@/lib/actions/commerce/intent-engine";
 import { getCart } from "@/lib/actions/cart/get-cart";
 import { logger } from "@/lib/logging/logger";
@@ -72,6 +72,11 @@ export function CartProvider({
 }) {
     const { user } = useAuth();
     const [isPending, startTransition] = useTransition();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // WYSHKIT 2026: Persist guestSessionId if it's the only anchor
     useEffect(() => {
@@ -251,6 +256,8 @@ export function CartProvider({
         updateQuantity,
         clearDraftOrder: clearCart,
     };
+
+    if (!mounted) return null;
 
     return (
         <CartContext.Provider value={value}>

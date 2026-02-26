@@ -5,7 +5,7 @@ import { ShoppingBag, ChevronRight, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/components/customer/CartProvider';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { hasAnyPersonalization, hasProductPersonalization } from '@/lib/utils/personalization';

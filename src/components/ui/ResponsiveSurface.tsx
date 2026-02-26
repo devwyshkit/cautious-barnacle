@@ -22,31 +22,13 @@ import {
 } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
 
-// WYSHKIT 2026: Zero-Dependency Container Arbitration
-let globalActiveSheetId: string | null = null;
-const sheetListeners = new Set<() => void>();
-
-function setGlobalActiveSheetId(id: string | null) {
-    globalActiveSheetId = id;
-    sheetListeners.forEach(notify => notify());
-}
-
-function useSheetArbiter() {
-    const [activeSheetId, setActiveSheetId] = React.useState(globalActiveSheetId);
-
-    React.useEffect(() => {
-        const notify = () => setActiveSheetId(globalActiveSheetId);
-        sheetListeners.add(notify);
-        return () => { sheetListeners.delete(notify); };
-    }, []);
-
-    return { activeSheetId, setActiveSheetId: setGlobalActiveSheetId };
-}
-
 /**
- * WYSHKIT 2026: The "One Surface" Pattern w/ Container Arbitration
+ * WYSHKIT 2026: The "One Surface" Pattern (Refined)
  * ResponsiveSurface unifies Drawers (Mobile) and Dialogs (Desktop).
- * Pattern: Elite Consolidation (Replace multiple components with one).
+ * Pattern: Elite Consolidation (Zero Overengineering).
+ * 
+ * Update: Purged manual "Sheet Arbiter" global state. 
+ * Standard Radix/Vaul orchestration is more resilient and prevents hydration loops.
  */
 
 interface ResponsiveSurfaceProps {
@@ -73,44 +55,35 @@ export function ResponsiveSurface({
     lean = false
 }: ResponsiveSurfaceProps) {
     const isMobile = useIsMobile();
-    const componentId = React.useId();
-    const { activeSheetId, setActiveSheetId } = useSheetArbiter();
+    const [mounted, setMounted] = React.useState(false);
 
-    // WYSHKIT 2026: Container Arbitration Lock
-    // Background sheets logically close when a new sheet claims the token.
+    // WYSHKIT 2026: Hydration Barrier
     React.useEffect(() => {
-        if (open) {
-            setActiveSheetId(componentId);
-        } else if (activeSheetId === componentId) {
-            setActiveSheetId(null);
-        }
-    }, [open, componentId, setActiveSheetId]); // Intentionally omitting activeSheetId from deps
-
-    const isActuallyOpen = open && activeSheetId === componentId;
+        setMounted(true);
+    }, []);
 
     const handleOpenChange = React.useCallback((val: boolean) => {
         if (onOpenChange) onOpenChange(val);
-        if (!val && activeSheetId === componentId) {
-            setActiveSheetId(null);
-        }
-    }, [onOpenChange, activeSheetId, componentId, setActiveSheetId]);
+    }, [onOpenChange]);
+
+    if (!mounted) return null;
 
     if (isMobile) {
         return (
-            <Drawer open={isActuallyOpen} onOpenChange={handleOpenChange}>
+            <Drawer open={open} onOpenChange={handleOpenChange}>
                 {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-                <DrawerContent className={cn("flex flex-col max-h-[92vh]", className)}>
+                <DrawerContent className={cn("flex flex-col max-h-[92vh] border-t-0", className)}>
                     {(!lean && (title || description)) && (
-                        <DrawerHeader className="text-left shrink-0">
-                            {title && <DrawerTitle className="text-xl font-black tracking-tight">{title}</DrawerTitle>}
-                            {description && <DrawerDescription>{description}</DrawerDescription>}
+                        <DrawerHeader className="text-left shrink-0 pb-4 border-b border-zinc-100/50">
+                            {title && <DrawerTitle className="text-xl font-black tracking-tight text-zinc-900">{title}</DrawerTitle>}
+                            {description && <DrawerDescription className="text-zinc-500">{description}</DrawerDescription>}
                         </DrawerHeader>
                     )}
                     <div
                         data-vaul-no-drag
                         className={cn(
-                            "flex-1 overflow-y-auto overscroll-contain touch-pan-y",
-                            lean ? "px-0 pb-0" : "px-4 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]"
+                            "flex-1 overflow-y-auto overscroll-contain touch-pan-y scrollbar-none",
+                            lean ? "px-0 pb-0" : "px-4 pt-4 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]"
                         )}
                     >
                         {children}
@@ -121,7 +94,7 @@ export function ResponsiveSurface({
     }
 
     return (
-        <Dialog open={isActuallyOpen} onOpenChange={handleOpenChange}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
             <DialogContent className={cn("sm:max-w-[425px]", lean ? "p-0 overflow-hidden" : "", className)} showCloseButton={showClose && !lean}>
                 {(!lean && (title || description)) && (

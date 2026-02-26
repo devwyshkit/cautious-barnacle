@@ -109,7 +109,10 @@ To maintain hyperlocal velocity, the onboarding funnel is governed by strict tec
 }
 ```
 
-**Maximum 3 fields per product.** Hick's Law applies to vendors too.
+**Maximum 3 fields per product.** Hick's Law applies to vendors too. 
+
+### Swiggy 2026: Anticipatory Personalisation
+Vendors should provide common themes as "Smart Prediction Tokens" (e.g., Birthday, Anniversary) to reduce customer typing effort. These tokens are configured in the `personalization_schema`.
 
 ---
 

@@ -1,31 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ShieldCheck, ChevronDown, ChevronUp, Loader2, Check, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { validateGSTINAction } from '@/lib/actions/commerce/gstin';
+import { executeCommerceIntent } from '@/lib/actions/commerce/intent-engine';
 import { toast } from 'sonner';
 
 interface GstinSectionProps {
     initialGstin?: string;
-    onGstinChange?: (gstin: string) => void;
-    onBusinessNameChange?: (name: string | null) => void;
     disabled?: boolean;
 }
 
-export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameChange, disabled }: GstinSectionProps) {
+export function GstinSection({ initialGstin = '', disabled }: GstinSectionProps) {
+    const router = useRouter();
     const [gstin, setGstin] = useState(initialGstin);
-    const [expanded, setExpanded] = useState(false);
-    const [validation, setValidation] = useState<'idle' | 'validating' | 'valid' | 'invalid'>('idle');
+    const [expanded, setExpanded] = useState(initialGstin.length > 0);
+    const [validation, setValidation] = useState<'idle' | 'validating' | 'valid' | 'invalid'>(initialGstin ? 'valid' : 'idle');
     const [error, setError] = useState<string | null>(null);
     const [businessName, setBusinessName] = useState<string | null>(null);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleBlur = async () => {
         const trimmed = gstin.trim();
         if (!trimmed) {
             setValidation('idle');
             setError(null);
-            onBusinessNameChange?.(null);
+            await executeCommerceIntent({ intent: 'SET_GSTIN', payload: { gstin: null } });
+            router.refresh();
             return;
         }
         setValidation('validating');
@@ -37,7 +44,11 @@ export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameC
                 setValidation('valid');
                 setError(null);
                 setBusinessName(result.businessName ?? null);
-                onBusinessNameChange?.(result.businessName ?? null);
+
+                // Commit to session for Zero Shadow Math
+                await executeCommerceIntent({ intent: 'SET_GSTIN', payload: { gstin: trimmed } });
+                router.refresh();
+
                 if (result.businessName) {
                     toast.success(`Verified: ${result.businessName}`);
                 }
@@ -45,7 +56,6 @@ export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameC
                 setValidation('invalid');
                 setError(result.error ?? 'Invalid GSTIN');
                 setBusinessName(null);
-                onBusinessNameChange?.(null);
             }
         } catch (err) {
             setValidation('invalid');
@@ -56,11 +66,10 @@ export function GstinSection({ initialGstin = '', onGstinChange, onBusinessNameC
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value.toUpperCase();
         setGstin(val);
-        onGstinChange?.(val);
     };
 
     return (
-        <section className={cn("bg-white rounded-[28px] border border-zinc-100 overflow-hidden transition-all duration-300 shadow-sm", disabled && "opacity-50 pointer-events-none")}>
+        <section className={cn("bg-white rounded-[24px] border border-zinc-100 overflow-hidden transition-all duration-300 shadow-sm", disabled && "opacity-50 pointer-events-none")}>
             <button
                 onClick={() => setExpanded(!expanded)}
                 className="w-full px-6 py-5 flex items-center justify-between hover:bg-zinc-50/50 transition-colors"

@@ -46,7 +46,7 @@ type Variant = {
   price: number | null;
   mrp?: number | null;
   stock_quantity?: number | null;
-  sku?: string | null;
+  serial_number?: string | null;
   is_active?: boolean | null;
 };
 
@@ -138,7 +138,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
     name: '',
     price: 0,
     stock_quantity: 100,
-    sku: '',
+    serial_number: '',
   });
 
   const [newPersonalization, setNewPersonalization] = useState<Partial<PersonalizationOption>>({
@@ -202,7 +202,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
               price: v.price ?? 0,
               mrp: v.mrp || undefined,
               stock_quantity: v.stock_quantity ?? 0,
-              sku: v.sku || undefined,
+              serial_number: v.serial_number || undefined,
             });
           } else {
             await createVariant(product.id, {
@@ -210,7 +210,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
               price: v.price ?? 0,
               mrp: v.mrp || undefined,
               stock_quantity: v.stock_quantity ?? 0,
-              sku: v.sku || undefined,
+              serial_number: v.serial_number || undefined,
             });
           }
         }
@@ -230,7 +230,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
               price: v.price ?? 0,
               mrp: v.mrp || undefined,
               stock_quantity: v.stock_quantity ?? 0,
-              sku: v.sku || undefined,
+              serial_number: v.serial_number || undefined,
             });
           }
         }
@@ -253,7 +253,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
       return;
     }
     setVariants([...variants, { ...newVariant, is_active: true }]);
-    setNewVariant({ name: '', price: 0, stock_quantity: 100, sku: '' });
+    setNewVariant({ name: '', price: 0, stock_quantity: 100, serial_number: '' });
   };
 
   const handleUpdateVariantStock = (index: number, quantity: number) => {
@@ -524,7 +524,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
                     <p className="text-sm font-medium text-zinc-900 truncate">{v.name || 'Unnamed Variant'}</p>
                     <p className="text-xs text-zinc-500">
                       {(v.price ?? 0) > 0 ? `+₹${Number(v.price).toLocaleString('en-IN')}` : 'Base price'}
-                      {v.sku && <span className="ml-2 text-zinc-400">SKU: {v.sku}</span>}
+                      {v.serial_number && <span className="ml-2 text-zinc-400">SN: {v.serial_number}</span>}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -579,9 +579,9 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
                 onChange={(e) => setNewVariant({ ...newVariant, stock_quantity: Number(e.target.value) })}
               />
               <Input
-                placeholder="SKU (optional)"
-                value={newVariant.sku || ''}
-                onChange={(e) => setNewVariant({ ...newVariant, sku: e.target.value })}
+                placeholder="Serial number (optional)"
+                value={newVariant.serial_number || ''}
+                onChange={(e) => setNewVariant({ ...newVariant, serial_number: e.target.value })}
               />
             </div>
             <Button size="sm" onClick={handleAddVariant} className="w-full">

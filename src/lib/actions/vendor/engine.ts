@@ -5,6 +5,7 @@ import { getVendorFromSession } from '@/lib/auth/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { ORDER_STATUS } from '@/lib/types/order-status';
+import { logger } from '@/lib/logging/logger';
 
 /**
  * WYSHKIT 2026: Polymorphic Vendor Intent Engine
@@ -132,7 +133,7 @@ export async function executeVendorIntent(intent: VendorIntent) {
 
         return { success: true };
     } catch (error: any) {
-        console.error('[executeVendorIntent] Error:', error);
+        logger.error('[executeVendorIntent] Error:', error);
         return { success: false, error: error.message };
     }
 }
