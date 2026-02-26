@@ -5,7 +5,7 @@ import { Sparkles, Camera, Image as ImageIcon, FileText, Share2, History, Chevro
 import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { toast } from 'sonner';
-import { SubmittedIdentity } from './SubmittedIdentity';
+import { SubmittedPersonalization } from './SubmittedPersonalization';
 import { PreviewSubmission } from '@/lib/types/order';
 import Image from 'next/image';
 import { HistoryTrail } from './HistoryTrail';

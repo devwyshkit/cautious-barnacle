@@ -60,11 +60,11 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   const searchParams = useSearchParams();
 
   const showSuccess = searchParams.get('success') === 'true';
-  const showIdentityParam = searchParams.get('identity') === 'true';
+  const showPersonalizationParam = searchParams.get('personalization') === 'true';
 
   const [showCelebration, setShowCelebration] = useState(showSuccess);
-  const [proactivePersonalizationOpen, setProactivePersonalizationOpen] = useState(showIdentityParam);
-  const [hasAutoOpened, setHasAutoOpened] = useState(showIdentityParam);
+  const [proactivePersonalizationOpen, setProactivePersonalizationOpen] = useState(showPersonalizationParam);
+  const [hasAutoOpened, setHasAutoOpened] = useState(showPersonalizationParam);
   const [isPersonalizationSubmittedOptimistic, setIsPersonalizationSubmittedOptimistic] = useState(false);
 
   const personalizedProductsPending = useMemo(() => {
@@ -132,7 +132,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
       <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker" showHomeButton>
         <div className="mx-auto bg-zinc-50/50 pb-safe transition-all duration-500 overflow-y-auto scrollbar-hide max-w-md min-h-screen">
           <div className="flex flex-col gap-6 p-4">
-            {showIdentityParam ? (
+            {showPersonalizationParam ? (
               <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-white rounded-xl p-1 border border-zinc-100 glass-morphism shadow-sm shadow-zinc-200/50 overflow-hidden relative">
                 <div className="flex flex-col gap-6 p-4">
                   <div className="space-y-6 animate-pulse">
@@ -212,13 +212,13 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                   </div>
                 )}
 
-                {(showPersonalizationForm || (showIdentityParam && !order)) && (
+                {(showPersonalizationForm || (showPersonalizationParam && !order)) && (
                   <div className="p-4 pt-2">
                     <PersonalizationForm
                       orderId={order?.id || orderId}
                       products={personalizedProductsPending.length > 0 ? personalizedProductsPending : (order ? [] : [{ id: 'pending', product_name: 'Order Loading...', is_personalized: true }])}
                       designDeadline={order ? (order as any).design_deadline_at : undefined}
-                      isAutoOpenedForSuccess={showSuccess || showIdentityParam}
+                      isAutoOpenedForSuccess={showSuccess || showPersonalizationParam}
                       onSubmitted={handlePersonalizationSubmitted}
                     />
                   </div>

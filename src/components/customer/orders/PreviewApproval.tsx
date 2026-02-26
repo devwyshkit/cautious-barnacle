@@ -6,7 +6,7 @@ import { XCircle, FileText, ChevronDown, ChevronUp, AlertTriangle } from 'lucide
 import { Textarea } from '@/components/ui/textarea';
 import { ActionSlider } from '@/components/ui/ActionSlider';
 import { PreviewSubmission } from '@/lib/types/order';
-import { SubmittedIdentity } from './tracking/SubmittedIdentity';
+import { SubmittedPersonalization } from './tracking/SubmittedPersonalization';
 
 interface PreviewOrderProductContext {
     personalization_details: Record<string, unknown>;
@@ -71,7 +71,7 @@ export function PreviewApproval({
                     </button>
                     {showContext && (
                         <div className="px-4 pb-4 animate-in slide-in-from-top-2 duration-300">
-                            <SubmittedIdentity
+                            <SubmittedPersonalization
                                 details={orderProduct.personalization_details as any}
                                 itemName={orderProduct.product_name}
                             />
