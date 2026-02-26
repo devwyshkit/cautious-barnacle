@@ -47,7 +47,7 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   y += 15;
   // Products Table Header
   doc.setFont('helvetica', 'bold');
-  doc.text('Item', margin, y);
+  doc.text('Product', margin, y);
   doc.text('Qty', 140, y, { align: 'right' });
   doc.text('Price', 165, y, { align: 'right' });
   doc.text('Total', 190, y, { align: 'right' });
@@ -59,7 +59,7 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   // Products
   doc.setFont('helvetica', 'normal');
   (order.order_products || []).forEach((product: any) => {
-    doc.text((product.product_name || 'Item').substring(0, 40), margin, y);
+    doc.text((product.product_name || 'Product').substring(0, 40), margin, y);
     doc.text((product.quantity || 1).toString(), 140, y, { align: 'right' });
     doc.text(`Rs ${Number(product.unit_price || 0).toFixed(2)}`, 165, y, { align: 'right' });
     doc.text(`Rs ${Number(product.total_price || 0).toFixed(2)}`, 190, y, { align: 'right' });

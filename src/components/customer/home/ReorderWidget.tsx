@@ -92,12 +92,12 @@ export function ReorderWidget({ initialOrders }: ReorderWidgetProps) {
         setRecentOrders(mappedData);
 
         // Fetch current stock for these products
-        const itemIds = Array.from(new Set(mappedData.flatMap(order => order.products.map((i: any) => i.product_id))));
-        if (itemIds.length > 0) {
+        const productIds = Array.from(new Set(mappedData.flatMap(order => order.products.map((i: any) => i.product_id))));
+        if (productIds.length > 0) {
           const { data: stockData } = await supabase
             .from('products')
             .select('id, name, stock_quantity, is_active')
-            .in('id', itemIds);
+            .in('id', productIds);
 
           if (stockData) {
             const availability = (stockData as any[]).reduce((acc, product) => {

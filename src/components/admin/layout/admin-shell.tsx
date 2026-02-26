@@ -27,7 +27,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { AdminSession } from '@/lib/types/admin.types'
 
-const NAV_ITEMS = [
+const NAV_LINKS = [
   { label: 'Overview', href: '/admin', icon: LayoutDashboard },
   { label: 'Insights', href: '/admin/insights', icon: BarChart3 },
   { label: 'Orders', href: '/admin/orders', icon: ShoppingCart },
@@ -72,7 +72,7 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: typeof Layou
 function Sidebar() {
   return (
     <nav className="flex flex-col gap-1 p-3 overflow-y-auto max-h-[calc(100vh-56px)]">
-      {NAV_ITEMS.map((product) => (
+      {NAV_LINKS.map((link) => (
         <NavLink key={product.href} {...product} />
       ))}
     </nav>

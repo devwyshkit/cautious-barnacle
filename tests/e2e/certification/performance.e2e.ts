@@ -36,9 +36,9 @@ test.describe('Swiggy 2026 Certification: Performance Purity', () => {
         if (await categoryRail.isVisible()) {
             const start = Date.now();
             // Click multiple categories in rapid succession
-            const items = await categoryRail.locator('a').all();
-            for (let i = 0; i < Math.min(items.length, 3); i++) {
-                await items[i].click();
+            const products = await categoryRail.locator('a').all();
+            for (let i = 0; i < Math.min(products.length, 3); i++) {
+                await products[i].click();
             }
             const duration = Date.now() - start;
 

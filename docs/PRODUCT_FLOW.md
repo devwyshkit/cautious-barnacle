@@ -14,10 +14,10 @@
 
 ## What Personalisation Means Here
 
-> **Personalisation** = Adding identity to an existing item. "Rahul" engraved on a whiskey glass.
-> **Customisation** = Changing the item's specs. We don't do this.
+> **Personalisation** = Adding identity to an existing product. "Rahul" engraved on a whiskey glass.
+> **Customisation** = Changing the product's specs. We don't do this.
 
-The partner has a glass. The customer adds a name. That's it. The preview shows what the engraving *will look like on* the glass — a digital overlay. Not a photo of the engraved glass. Never confuse the two.
+The vendor has a glass. The customer adds a name. That's it. The preview shows what the engraving *will look like on* the glass — a digital overlay. Not a photo of the engraved glass. Never confuse the two.
 
 Engraving takes 1–5 minutes. Build the SLA accordingly.
 
@@ -27,11 +27,11 @@ Engraving takes 1–5 minutes. Build the SLA accordingly.
 
 | Surface | Pattern | Reason |
 |-|-|-|
-| Item detail | **Sheet** (intercepted route) | Browsing context, no domain shift |
+| Product detail | **Sheet** (intercepted route) | Browsing context, no domain shift |
 | Cart | **Floating bar + Cart Drawer (Sheet)** | Transient; immersive review; no URL needed |
 | Location picker | **Sheet** | Sub-decision within home |
 | Address picker | **Sheet** (within checkout) | Sub-decision within checkout |
-| Partner storefront | **Page** `/partner/[id]` | Domain shift |
+| Vendor storefront | **Page** `/vendor/[id]` | Domain shift |
 | Checkout | **Page** `/checkout` | Money commitment |
 | Order tracking | **Page** `/orders/[id]` | URL-addressable, support deep-links |
 | Preview mockup | **Inline in tracking page** | NOT a new sheet/screen |
@@ -44,35 +44,35 @@ Engraving takes 1–5 minutes. Build the SLA accordingly.
 
 ### Step 1 — HOME FEED `/`
 - Location resolved at session start (not per page)
-- Feed: `BANNER_BENTO → CIRCLE_RAIL (categories) → PARTNER_GROUPED_GRID / INFINITE_GRID`
-- Each item card shows: photo · name · price · **"~40 min"** (ETA chip, never km) · add button
-- First tap on add → opens item sheet
+- Feed: `BANNER_BENTO → CIRCLE_RAIL (categories) → VENDOR_GROUPED_GRID / INFINITE_GRID`
+- Each product card shows: photo · name · price · **"~40 min"** (ETA chip, never km) · add button
+- First tap on add → opens product sheet
 
 ---
 
-### Step 2 — ITEM SHEET (intercepted route, no page reload)
+### Step 2 — PRODUCT SHEET (intercepted route, no page reload)
 
 Content order (mandatory):
 1. **Image carousel** (3–5 product photos)
-2. **Name** · partner badge ("By [Partner], [Area]") · star rating
+2. **Name** · vendor badge ("By [Vendor], [Area]") · star rating
 3. **Price** (large, prominent)
 4. **Variants** — size/colour/material chips (select one)
 5. **Add-ons** — toggles or steppers (gift wrap, express prep, etc.)
 6. **"Add personalisation +₹X"** — toggle only. No input. No design canvas. (Commitment Before Creativity)
 7. **Product info** — dimensions, weight, material (collapsible)
 8. **ETA** — "Arriving by 5:15 PM" (never km)
-9. **Return policy** — "Personalised items: no returns after preview approval | All others: 24 hrs (damaged/wrong only)"
+9. **Return policy** — "Personalised products: no returns after preview approval | All others: 24 hrs (damaged/wrong only)"
 10. **"Add to cart" button** (sticky at bottom)
 
-**Cart switch rule**: If cart has items from a different partner → bottom sheet: two buttons: "Start new order" (destructive) + "Continue with [Previous Partner]".
+**Cart switch rule**: If cart has products from a different vendor → bottom sheet: two buttons: "Start new order" (destructive) + "Continue with [Previous Vendor]".
 
 ---
 
 ### Step 3 — CART (floating bar + expandable mini-sheet)
 
-- Persistent floating bar at bottom of feed showing: item count · total
-- Tap → expands to **CartDrawer** (Sheet): item list · relative quantity controls · subtotal · "Checkout Now"
-- One partner per cart. Always.
+- Persistent floating bar at bottom of feed showing: product count · total
+- Tap → expands to **CartDrawer** (Sheet): product list · relative quantity controls · subtotal · "Checkout Now"
+- One vendor per cart. Always.
 - "Checkout Now" → navigates to `/checkout` (domain shift → full page)
 - Pricing is real-time high-precision, fetched via `v_active_cart_totals` (Database = Single Source of Truth).
 
@@ -80,13 +80,13 @@ Content order (mandatory):
 
 ### Step 4 — CHECKOUT PAGE `/checkout`
 
-**One-trip RPC load.** `get_checkout_context` returns everything: items, addresses, pricing, wallet, coupons.
+**One-trip RPC load.** `get_checkout_context` returns everything: products, addresses, pricing, wallet, coupons.
 
 Section order (BlocksEngine):
-1. **CHECKOUT_ITEMS** — item names, quantities, personalisation flag, add-on flag
+1. **CHECKOUT_ITEMS** — product names, quantities, personalisation flag, add-on flag
 2. **CHECKOUT_ADDRESS** — saved addresses (select) or add new (Google Autocomplete)
 3. **CHECKOUT_SUMMARY** — full bill line by line:
-   - Item total
+   - Product total
    - Personalisation fee(s)
    - Add-on fee(s)
    - Delivery fee (+ ETA)
@@ -134,10 +134,10 @@ No "Design Hub" jargon. No 5-second loaders.
 - Order ref: `#WK-YYYYMMDD-XXXX`
 - ETA: "Arriving by 5:15 PM" (once rider assigned)
 
-#### Section B — IDENTITY FORM (personalised items only)
-Auto-opens if `?success=true` and order has personalised items.
+#### Section B — IDENTITY FORM (personalised products only)
+Auto-opens if `?success=true` and order has personalised products.
 
-Partner-defined fields (schema from `personalization_schema` config):
+Vendor-defined fields (schema from `personalization_schema` config):
 - Text field with character limit + instructions
 - Image/creative upload
 - Select (dropdown choice)
@@ -145,11 +145,11 @@ Partner-defined fields (schema from `personalization_schema` config):
 No design canvas. No Canva. Just input collection.
 
 After submission → `DETAILS_RECEIVED`
-Toast: "Details sent to your partner. Preview coming soon."
+Toast: "Details sent to your vendor. Preview coming soon."
 
-#### Section C — THREE-LAYER PREVIEW HISTORY (per personalised item)
+#### Section C — THREE-LAYER PREVIEW HISTORY (per personalised product)
 
-For each personalised item, shows:
+For each personalised product, shows:
 
 ```
 ┌─ WHAT YOU SENT ─────────────────────────── [timestamp]
@@ -157,7 +157,7 @@ For each personalised item, shows:
 │
 ├─ WHAT YOU RECEIVED ─────────────────────── [timestamp]
 │  [Mockup thumbnail — digital overlay, NOT real product photo]
-│  Partner note (optional message from partner)
+│  Vendor note (optional message from vendor)
 │  
 │  Pre-approval notice:
 │  "This is a digital preview. Minor variations in rendering may occur.
@@ -170,21 +170,21 @@ For each personalised item, shows:
 │
 └─ WHAT CHANGED ──────────────────────────── [timestamp] (if revision)
    Customer's revision request text
-   → New "WHAT YOU RECEIVED" entry when partner uploads next mockup
+   → New "WHAT YOU RECEIVED" entry when vendor uploads next mockup
 ```
 
-**Approval → liability shift**: once customer approves, the item is non-refundable unless the physical product is damaged or factually wrong on delivery.
+**Approval → liability shift**: once customer approves, the product is non-refundable unless the physical product is damaged or factually wrong on delivery.
 
-**Reject flow**: immediate line-item refund. Remaining items in the order continue independently.
+**Reject flow**: immediate line-product refund. Remaining products in the order continue independently.
 
-**SLA Breach** (partner hasn't uploaded mockup after partner-defined window):
+**SLA Breach** (vendor hasn't uploaded mockup after vendor-defined window):
 - Automatic notification (in-app + push)
-- Customer sees: "Partner running late. Wait for free? Or cancel this item for a full refund."
-- **Instant Refund Logic**: Triggered via `cancel_order_item` RPC which handles liability checks and auto-credits WyshKit Wallet.
+- Customer sees: "Vendor running late. Wait for free? Or cancel this product for a full refund."
+- **Instant Refund Logic**: Triggered via `cancel_order_product` RPC which handles liability checks and auto-credits WyshKit Wallet.
 - No auto-cancel. Customer decides.
 
-#### Section D — ORDER ITEMS LIST
-Each item with independent status badge:
+#### Section D — ORDER PRODUCTS LIST
+Each product with independent status badge:
 - Non-personalised: `CONFIRMED → IN_PRODUCTION → PACKED → SHIPPED → DELIVERED`
 - Personalised: `AWAITING_DETAILS → DETAILS_RECEIVED → PREVIEW_READY → IN_PRODUCTION → PACKED → SHIPPED → DELIVERED`
 
@@ -221,25 +221,25 @@ Buttons hidden if env vars missing — no dead links.
 
 ## Handling Mixed Orders (Partial Fulfillment)
 
-Order with 2 items: 1 personalised + 1 non-personalised.
+Order with 2 products: 1 personalised + 1 non-personalised.
 
-| Item | Path |
+| Product | Path |
 |-|-|
 | Non-personalised | Fast-tracks: CONFIRMED → IN_PRODUCTION → PACKED → separate delivery or combined |
 | Personalised | Goes through preview loop independently |
 
-If personalised item is rejected:
-- That line item is instantly refunded
-- Non-personalised item(s) continue unaffected
+If personalised product is rejected:
+- That line product is instantly refunded
+- Non-personalised product(s) continue unaffected
 - Order status stays ACTIVE (not fully cancelled)
 
-If all items cancelled → full order CANCELLED + full refund.
+If all products cancelled → full order CANCELLED + full refund.
 
 ---
 
-## SLA Table (Partner-Configurable)
+## SLA Table (Vendor-Configurable)
 
-| Metric | Default | Partner-Configurable |
+| Metric | Default | Vendor-Configurable |
 |-|-|-|
 | Preview upload time | 2 hours | Yes — up to 6 hours |
 | Free revisions | 2 | Yes — 0 to 5 |
@@ -248,9 +248,9 @@ If all items cancelled → full order CANCELLED + full refund.
 | Total delivery SLA | 60–120 mins | N/A (set by location + 3PL) |
 
 **SLA Breach Protocol**:
-1. **T + 0h** — partner accepts order
-2. **T + (SLA - 30min)** — silent reminder to partner
-3. **T + SLA** — urgent alert to partner + customer notified
+1. **T + 0h** — vendor accepts order
+2. **T + (SLA - 30min)** — silent reminder to vendor
+3. **T + SLA** — urgent alert to vendor + customer notified
 4. **T + SLA + 30min** — customer given choice: wait (no penalty) or cancel + instant refund
 
 ---
@@ -261,15 +261,15 @@ If all items cancelled → full order CANCELLED + full refund.
 |-|-|
 | Cancel before any production starts (non-personalised) | Full refund incl. delivery fee |
 | Cancel after dispatch | No refund (delivery completed) |
-| Preview rejected (any stage) | Full item refund; delivery fee non-refundable if other items shipped |
-| Preview approved, then item delivered damaged | Full refund or replacement |
-| Preview approved, item delivered correctly | No refund (liability shifted on approval) |
-| All items cancelled | Full order refund incl. delivery fee |
-| SLA breach → customer cancels | Full refund incl. delivery fee (partner bears cost) |
+| Preview rejected (any stage) | Full product refund; delivery fee non-refundable if other products shipped |
+| Preview approved, then product delivered damaged | Full refund or replacement |
+| Preview approved, product delivered correctly | No refund (liability shifted on approval) |
+| All products cancelled | Full order refund incl. delivery fee |
+| SLA breach → customer cancels | Full refund incl. delivery fee (vendor bears cost) |
 
 ---
 
-## Partner-Defined Configuration (Per-Item)
+## Vendor-Defined Configuration (Per-Product)
 
 ```json
 {
@@ -306,17 +306,30 @@ Rate configuration: in `platform_settings` DB table (not hardcoded). Current: 2%
 Standard in every major platform. WyshKit supports:
 - GSTIN entry (collapsed accordion at checkout, verified via IDfy in real time)
 - Pro-forma estimate PDF (appears after valid GSTIN is entered)
-- Estimate includes: partner GSTIN, customer GSTIN, line items with HSN, GST breakdown
+- Estimate includes: vendor GSTIN, customer GSTIN, line products with HSN, GST breakdown
 
 ---
 
 ## Naming (Enforced)
 
-| In DB / Code | In UI (customer-facing) |
+### Backend / DB / Code
+| Concept | Symbol |
 |-|-|
-| `partner` | "partner" |
-| `item` | the item name, or "item" |
-| `personalization` | "personalisation" |
-| Order status | Human-readable ("Your partner is making it") |
+| Store | `vendors` table |
+| Line product in order | `order_products` |
+| Cart line | `cart_products` |
+| Personalisation details | `personalization_details` column |
 
-Never in UI: "vendor", "product", "SKU", "customisation", "Design Hub", "Identity".
+### Customer-Facing UI
+| Use | Never use |
+|-|-|
+| "personalisation" | "customisation", "Design Hub", "Identity" |
+| "vendor", "local store" | "partner", "merchant", "SKU", "item" |
+| "Arriving by 5:15 PM" | "2.4 km away", "distance" |
+| "preview" | "mockup", "proof", "design" |
+| Human-readable status ("Your vendor is making it") | Raw DB enum ("IN_PRODUCTION") |
+
+### Vendor-Facing UI
+| Use | Never use |
+|-|-|
+| "orders", "your shop", "earnings" | "vendor panel", "dashboard", "portal", "merchant" |

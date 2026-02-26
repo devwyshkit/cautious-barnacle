@@ -4,7 +4,7 @@ import { Package, ChevronRight, Calendar, MapPin } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { OrderList } from "@/components/customer/orders/OrderList";
-import type { OrderListItem } from "@/lib/types/order";
+import type { OrderProductListItem } from "@/lib/types/order";
 
 export default async function OrdersPage() {
     const supabase = await createClient();
@@ -22,7 +22,7 @@ export default async function OrdersPage() {
         .order('created_at', { ascending: false });
 
 
-    // Map DB orders to OrderListItem for the component
+    // Map DB orders to OrderProductListItem for the component
     const mappedOrders = ((dbOrders as any[]) || []).map((row) => {
         let p_status = null;
         if (row.has_personalization && row.order_products) {
@@ -84,7 +84,7 @@ export default async function OrdersPage() {
                         </Link>
                     </div>
                 ) : (
-                    <OrderList initialOrders={mappedOrders} />
+                    <OrderList initialOrders={mappedOrders as OrderProductListItem[]} />
                 )}
             </div>
         </div>

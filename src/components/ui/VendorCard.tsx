@@ -21,7 +21,7 @@ export function VendorCard({ data, className }: VendorCardProps) {
             : null;
 
     return (
-        <Link href={`/store/${data.id}`}>
+        <Link href={`/vendor/${data.id}`}>
             <Card className={cn(
                 "overflow-hidden border-none shadow-none group flex flex-col gap-2.5 active:scale-[0.98] transition-all duration-200",
                 className

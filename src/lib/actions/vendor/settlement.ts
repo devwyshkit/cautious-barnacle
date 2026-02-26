@@ -33,7 +33,8 @@ export async function trigger_post_delivery_events(order_id: string) {
         }
 
         // Idempotency: Don't process if already settled
-        if (order.net_settlement_amount !== null && order.net_settlement_amount > 0) {
+        const order_data = order as any;
+        if (order_data.net_settlement_amount !== null && order_data.net_settlement_amount > 0) {
             logger.info('Order already settled, skipping post-delivery events', { order_id });
             return { success: true, message: 'Already settled' };
         }

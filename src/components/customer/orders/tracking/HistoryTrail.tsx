@@ -120,7 +120,7 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                                 {preview.vendor_notes && (
                                     <div className="p-4 px-6">
                                         <p className="text-xs font-bold text-zinc-400 tracking-tight mb-1.5 flex items-center gap-1.5">
-                                            <Sparkles className="size-3" /> Designer Notes
+                                            <Sparkles className="size-3" /> Vendor Notes
                                         </p>
                                         <p className="text-xs text-zinc-600 leading-relaxed bg-amber-50/50 p-3 rounded-xl border border-amber-100/50">
                                             {preview.vendor_notes}

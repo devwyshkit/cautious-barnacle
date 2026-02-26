@@ -39,7 +39,7 @@ ALTER VIEW public.v_order_tracking SET (security_invoker = on);
 
 -- 3. Hardened RPC: place_atomic_order
 CREATE OR REPLACE FUNCTION public.place_atomic_order(
-    p_items jsonb, 
+    p_products jsonb, 
     p_address_id uuid, 
     p_razorpay_order_id text, 
     p_payment_id text DEFAULT NULL::text, 
@@ -58,14 +58,14 @@ DECLARE
   v_user_id UUID;
   v_order_id UUID := gen_random_uuid();
   v_order_number TEXT;
-  v_partner_id UUID;
+  v_vendor_id UUID;
   v_pricing JSON;
   v_address_json JSONB;
   v_has_personalization BOOLEAN := false;
-  v_item RECORD;
+  v_product RECORD;
   v_promised_at TIMESTAMPTZ;
-  v_partner_online BOOLEAN;
-  v_partner_open BOOLEAN;
+  v_vendor_online BOOLEAN;
+  v_vendor_open BOOLEAN;
   v_min_shelf_life INT;
 BEGIN
   -- 1. Authentication Check
@@ -81,21 +81,21 @@ BEGIN
     RETURN json_build_object('success', true, 'orderId', v_order_id, 'orderNumber', v_order_number, 'message', 'Order already exists');
   END IF;
 
-  -- 3. Partner & Serviceability Check
-  SELECT partner_id INTO v_partner_id FROM public.items WHERE id = (COALESCE(p_items->0->>'itemId', p_items->0->>'item_id'))::UUID;
+  -- 3. Vendor & Serviceability Check
+  SELECT vendor_id INTO v_vendor_id FROM public.products WHERE id = (COALESCE(p_products->0->>'productId', p_products->0->>'product_id'))::UUID;
   
   SELECT is_online, (CURRENT_TIME BETWEEN opening_time AND closing_time)
-  INTO v_partner_online, v_partner_open
-  FROM public.partners WHERE id = v_partner_id;
+  INTO v_vendor_online, v_vendor_open
+  FROM public.vendors WHERE id = v_vendor_id;
 
-  IF NOT v_partner_online OR NOT v_partner_open THEN
-    RETURN json_build_object('success', false, 'error', 'Partner is currently offline or closed');
+  IF NOT v_vendor_online OR NOT v_vendor_open THEN
+    RETURN json_build_object('success', false, 'error', 'Vendor is currently offline or closed');
   END IF;
 
   -- 4. Perishable & Shelf Life Enforcement
   SELECT MIN(shelf_life_hours) INTO v_min_shelf_life
-  FROM public.items 
-  WHERE id IN (SELECT (COALESCE(val->>'itemId', val->>'item_id'))::UUID FROM jsonb_array_elements(p_items) AS val);
+  FROM public.products 
+  WHERE id IN (SELECT (COALESCE(val->>'productId', val->>'product_id'))::UUID FROM jsonb_array_elements(p_products) AS val);
 
   -- 5. Address & Pricing
   SELECT jsonb_build_object('city', city, 'address', address_line1, 'pincode', pincode, 'name', name, 'phone', phone) 
@@ -106,13 +106,13 @@ BEGIN
     RETURN json_build_object('success', false, 'error', 'Address not found');
   END IF;
 
-  v_pricing := public.calculate_order_total(p_items, NULL, p_address_id, p_coupon_code, p_distance_km, p_use_wallet, v_user_id);
+  v_pricing := public.calculate_order_total(p_products, NULL, p_address_id, p_coupon_code, p_distance_km, p_use_wallet, v_user_id);
   IF (v_pricing->>'error') IS NOT NULL THEN
     RETURN json_build_object('success', false, 'error', v_pricing->>'error');
   END IF;
 
   -- 6. Atomic ETA Lock
-  v_promised_at := NOW() + (COALESCE((SELECT avg_prep_time_mins FROM partners WHERE id = v_partner_id), 20) + 30) * INTERVAL '1 minute';
+  v_promised_at := NOW() + (COALESCE((SELECT avg_prep_time_mins FROM vendors WHERE id = v_vendor_id), 20) + 30) * INTERVAL '1 minute';
 
   IF v_min_shelf_life IS NOT NULL AND v_promised_at > (NOW() + v_min_shelf_life * INTERVAL '1 hour') THEN
     RETURN json_build_object('success', false, 'error', 'Delivery window exceeds product shelf life');
@@ -122,17 +122,17 @@ BEGIN
   v_order_number := 'WSH-' || TO_CHAR(NOW(), 'YYMMDD') || '-' || UPPER(SUBSTRING(gen_random_uuid()::TEXT, 1, 6));
 
   SELECT COALESCE(BOOL_OR((COALESCE(val->>'hasPersonalization', val->>'has_personalization'))::BOOLEAN), false) INTO v_has_personalization
-  FROM jsonb_array_elements(p_items) AS val;
+  FROM jsonb_array_elements(p_products) AS val;
 
   INSERT INTO public.orders (
-    id, user_id, partner_id, order_number, status,
+    id, user_id, vendor_id, order_number, status,
     subtotal, personalization_charges, delivery_fee, platform_fee, tax_amount, discount, total,
     razorpay_order_id, payment_id, payment_status,
     address_id, delivery_address, delivery_instructions,
     has_personalization, gstin, distance_km,
     promised_delivery_at
   ) VALUES (
-    v_order_id, v_user_id, v_partner_id, v_order_number, 'PLACED',
+    v_order_id, v_user_id, v_vendor_id, v_order_number, 'PLACED',
     (v_pricing->>'subtotal')::numeric,
     (v_pricing->>'personalization_charges')::numeric,
     (v_pricing->>'delivery_fee')::numeric,
@@ -146,40 +146,40 @@ BEGIN
     v_promised_at
   );
 
-  -- 8. Populate order_items and Deduct Stock
-  FOR v_item IN SELECT 
-      (COALESCE(val->>'itemId', val->>'item_id'))::UUID as id, 
+  -- 8. Populate order_products and Deduct Stock
+  FOR v_product IN SELECT 
+      (COALESCE(val->>'productId', val->>'product_id'))::UUID as id, 
       (val->>'quantity')::INT as qty,
       (NULLIF(COALESCE(val->>'variantId', val->>'variant_id'), 'null'))::UUID as variant_id,
       (val->'selected_addons') as addons,
       (val->'personalization') as personalization
-    FROM jsonb_array_elements(p_items) AS val LOOP
+    FROM jsonb_array_elements(p_products) AS val LOOP
     
     DECLARE
-      v_item_name TEXT;
-      v_item_image TEXT;
+      v_product_name TEXT;
+      v_product_image TEXT;
       v_unit_price NUMERIC;
     BEGIN
       SELECT name, images[1], 
-        CASE WHEN v_item.variant_id IS NOT NULL THEN (SELECT price FROM item_variants WHERE id = v_item.variant_id) ELSE base_price END
-      INTO v_item_name, v_item_image, v_unit_price
-      FROM public.items WHERE id = v_item.id;
+        CASE WHEN v_product.variant_id IS NOT NULL THEN (SELECT price FROM product_variants WHERE id = v_product.variant_id) ELSE base_price END
+      INTO v_product_name, v_product_image, v_unit_price
+      FROM public.products WHERE id = v_product.id;
 
-      INSERT INTO public.order_items (
-        order_id, item_id, item_name, item_image_url, quantity, unit_price, total_price, 
+      INSERT INTO public.order_products (
+        order_id, product_id, product_name, product_image_url, quantity, unit_price, total_price, 
         selected_variant_id, selected_addons, is_personalized, personalization_details
       ) VALUES (
-        v_order_id, v_item.id, v_item_name, v_item_image, v_item.qty, v_unit_price, (v_unit_price * v_item.qty),
-        v_item.variant_id, v_item.addons, COALESCE((v_item.personalization->>'enabled')::boolean, false), v_item.personalization
+        v_order_id, v_product.id, v_product_name, v_product_image, v_product.qty, v_unit_price, (v_unit_price * v_product.qty),
+        v_product.variant_id, v_product.addons, COALESCE((v_product.personalization->>'enabled')::boolean, false), v_product.personalization
       );
 
-      UPDATE public.items 
-      SET stock_quantity = stock_quantity - v_item.qty,
-          stock_status = CASE WHEN stock_quantity - v_item.qty <= 0 THEN 'out_of_stock' ELSE stock_status END
-      WHERE id = v_item.id AND (stock_quantity >= v_item.qty OR stock_quantity IS NULL);
+      UPDATE public.products 
+      SET stock_quantity = stock_quantity - v_product.qty,
+          stock_status = CASE WHEN stock_quantity - v_product.qty <= 0 THEN 'out_of_stock' ELSE stock_status END
+      WHERE id = v_product.id AND (stock_quantity >= v_product.qty OR stock_quantity IS NULL);
       
       IF NOT FOUND THEN
-        RAISE EXCEPTION 'Insufficient stock for item %', v_item.id;
+        RAISE EXCEPTION 'Insufficient stock for product %', v_product.id;
       END IF;
     END;
   END LOOP;
@@ -204,12 +204,12 @@ SET search_path = public
 AS $$
 DECLARE
     v_current_status order_status;
-    v_partner_id uuid;
+    v_vendor_id uuid;
     v_is_valid boolean;
     v_role text;
 BEGIN
     -- 1. Fetch State
-    SELECT status, partner_id INTO v_current_status, v_partner_id 
+    SELECT status, vendor_id INTO v_current_status, v_vendor_id 
     FROM public.orders WHERE id = p_order_id;
     
     IF NOT FOUND THEN
@@ -219,7 +219,7 @@ BEGIN
     -- 2. Determine Role
     IF EXISTS (SELECT 1 FROM public.users WHERE id = p_user_id AND role = 'admin') THEN
         v_role := 'ADMIN';
-    ELSIF EXISTS (SELECT 1 FROM public.partner_users WHERE partner_id = v_partner_id AND user_id = p_user_id) THEN
+    ELSIF EXISTS (SELECT 1 FROM public.vendor_users WHERE vendor_id = v_vendor_id AND user_id = p_user_id) THEN
         v_role := 'PARTNER';
     ELSIF p_user_id = (SELECT user_id FROM public.orders WHERE id = p_order_id) THEN
         v_role := 'CUSTOMER';
@@ -256,9 +256,9 @@ FOR ALL USING (user_id = (SELECT auth.uid()));
 
 DROP POLICY IF EXISTS "orders_select_policy" ON public.orders;
 CREATE POLICY "orders_select_policy" ON public.orders 
-FOR SELECT USING (user_id = (SELECT auth.uid()) OR EXISTS (SELECT 1 FROM partner_users WHERE partner_id = orders.partner_id AND user_id = (SELECT auth.uid())));
+FOR SELECT USING (user_id = (SELECT auth.uid()) OR EXISTS (SELECT 1 FROM vendor_users WHERE vendor_id = orders.vendor_id AND user_id = (SELECT auth.uid())));
 
 -- 6. Maintenance: Index Cleanup
-DROP INDEX IF EXISTS public.partners_location_gix;
+DROP INDEX IF EXISTS public.vendors_location_gix;
 
 COMMIT;

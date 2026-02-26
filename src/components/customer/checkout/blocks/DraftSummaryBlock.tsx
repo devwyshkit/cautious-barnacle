@@ -15,8 +15,8 @@ const FALLBACK_IMAGE = '/images/logo.png';
 
 interface DraftSummaryBlockProps {
   products: DraftLineItem[];
-  onUpdateQuantity?: (itemId: string, variantId: string | null, quantity: number) => void;
-  onRemoveItem?: (itemId: string, variantId: string | null) => void;
+  onUpdateQuantity?: (productId: string, variantId: string | null, quantity: number) => void;
+  onRemoveItem?: (productId: string, variantId: string | null) => void;
   editable?: boolean;
 }
 
@@ -27,13 +27,13 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
   const router = useRouter();
   if (products.length === 0) return null;
 
-  const handleQuantityChange = (itemId: string, variantId: string | null, currentQty: number, delta: number) => {
+  const handleQuantityChange = (productId: string, variantId: string | null, currentQty: number, delta: number) => {
     triggerHaptic(HapticPattern.ACTION);
     const newQty = Math.max(0, currentQty + delta);
     if (newQty === 0) {
-      onRemoveItem?.(itemId, variantId);
+      onRemoveItem?.(productId, variantId);
     } else {
-      onUpdateQuantity?.(itemId, variantId, newQty);
+      onUpdateQuantity?.(productId, variantId, newQty);
     }
   };
 
@@ -128,7 +128,7 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
                       onClick={() => {
                         const vendorId = product.vendor_id || '';
                         const addonIds = (product.selected_addons || []).map((a: any) => a.id).join(',');
-                        router.push(`/store/${vendorId}/product/${product.product_id}?edit=true&cartItemId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${addonIds}`);
+                        router.push(`/vendor/${vendorId}/product/${product.product_id}?edit=true&cartItemId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${addonIds}`);
                       }}
                       className="text-[11px] font-bold text-[var(--primary)] flex items-center gap-0.5 hover:underline"
                     >

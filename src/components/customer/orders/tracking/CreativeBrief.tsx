@@ -61,7 +61,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                     <Sparkles className="size-3 text-amber-500" />
                                 </div>
                                 <span className="text-xs font-black text-zinc-900 tracking-tight">
-                                    Status: {order.personalization_status === 'preview_ready' ? 'Preview Awaiting Action' : 'Design Hub'}
+                                    Status: {order.personalization_status === 'preview_ready' ? 'Preview Awaiting Action' : 'In Progress'}
                                 </span>
                             </div>
                             {approvalDeadline && (
@@ -117,7 +117,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                     <>
                                         <p className="text-[11px] font-black text-zinc-950 tracking-tight leading-none">Brief Received</p>
                                         <p className="text-xs font-bold text-zinc-400 mt-2 max-w-[220px] mx-auto leading-relaxed">
-                                            Vendor is reviewing your vision. First preview expected shortly.
+                                            Your vendor is reviewing your vision. First preview expected shortly.
                                         </p>
                                     </>
                                 ) : (
@@ -152,7 +152,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
 
             {/* The 3-Layer History Trail */}
             <HistoryTrail
-                orderItems={order.order_products || []}
+                orderProducts={order.order_products || []}
                 previews={previews}
                 timeline={timeline}
             />

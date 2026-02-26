@@ -47,7 +47,7 @@ test.describe('Phase 7: Core System Architecture Audits', () => {
         // Measure INP on rapid clicks (simulating user impatience)
         const startTime = Date.now();
 
-        // Rapidly toggle a filter or interact (e.g., click an item 5 times extremely fast)
+        // Rapidly toggle a filter or interact (e.g., click an product 5 times extremely fast)
         // We look for any card to tap. We don't want navigation, maybe tapping cart.
         const cartButton = page.locator('button').filter({ hasText: 'CART' });
 

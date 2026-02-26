@@ -178,16 +178,16 @@ export function canCancelOrder(status: string): boolean {
   return [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED].includes(status as any);
 }
 // Swiggy 2026: Order Product Status Configuration
-export function getItemStatusConfig(itemStatus: string) {
+export function getProductStatusConfig(productStatus: string) {
   // Map legacy product statuses to the lean model if needed
-  const display = STATUS_DISPLAY[itemStatus] || itemStatus;
-  const color = STATUS_COLORS[itemStatus] || 'bg-zinc-100 text-zinc-600 border-zinc-200';
+  const display = STATUS_DISPLAY[productStatus] || productStatus;
+  const color = STATUS_COLORS[productStatus] || 'bg-zinc-100 text-zinc-600 border-zinc-200';
 
   return {
     label: display,
     color,
-    icon: [ORDER_STATUS.DELIVERED].includes(itemStatus as any) ? CheckCircle2 : Package,
-    isComplete: itemStatus === ORDER_STATUS.DELIVERED,
-    isProcessing: [ORDER_STATUS.CONFIRMED, ORDER_STATUS.IN_PRODUCTION, ORDER_STATUS.PACKED, ORDER_STATUS.OUT_FOR_DELIVERY].includes(itemStatus as any)
+    icon: [ORDER_STATUS.DELIVERED].includes(productStatus as any) ? CheckCircle2 : Package,
+    isComplete: productStatus === ORDER_STATUS.DELIVERED,
+    isProcessing: [ORDER_STATUS.CONFIRMED, ORDER_STATUS.IN_PRODUCTION, ORDER_STATUS.PACKED, ORDER_STATUS.OUT_FOR_DELIVERY].includes(productStatus as any)
   };
 }

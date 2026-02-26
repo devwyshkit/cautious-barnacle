@@ -29,12 +29,12 @@ export async function GET(req: NextRequest) {
         // 3. Cleanup Stale Carts (> 30 mins inactivity)
         const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000);
 
-        // Note: We use raw DELETE on cart_items. Cascade will handle remaining reservations (if any left).
+        // Note: We use raw DELETE on cart_products. Cascade will handle remaining reservations (if any left).
         // We check updated_at OR created_at for legacy rows.
-        // Note: We use raw DELETE on cart_items. 
+        // Note: We use raw DELETE on cart_products. 
         // WYSHKIT 2026: Safety check for active sessions is handled by DB-level foreign keys or left to application-level session expiry.
         const { error: cartError, count: cartCount } = await supabase
-            .from('cart_items')
+            .from('cart_products')
             .delete({ count: 'exact' })
             .lt('updated_at', thirtyMinsAgo.toISOString());
 

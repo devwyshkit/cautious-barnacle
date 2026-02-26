@@ -14,7 +14,7 @@ const CardRail = React.lazy(() => import('./blocks/discovery/CardRail').then(m =
 const BannerBento = React.lazy(() => import('./blocks/discovery/BannerBento').then(m => ({ default: m.BannerBento })));
 const Grid = React.lazy(() => import('./blocks/discovery/Grid').then(m => ({ default: m.Grid })));
 const VendorGroupedGrid = React.lazy(() => import('./blocks/discovery/VendorGroupedGrid').then(m => ({ default: m.VendorGroupedGrid })));
-const StoreHeader = React.lazy(() => import('./blocks/store/StoreHeader').then(m => ({ default: m.StoreHeader })));
+const StoreHeader = React.lazy(() => import('./blocks/vendor/StoreHeader').then(m => ({ default: m.StoreHeader })));
 
 // Checkout Blocks - PURGED as per Wyshkit 2026 Structural Blueprint (SPI Principle)
 

@@ -6,7 +6,7 @@ import { ShoppingBag, Sparkles, Clock, Camera, Package, CheckCircle2, X } from '
 import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/pricing';
-import { ORDER_STATUS, getItemStatusConfig } from '@/lib/types/order-status';
+import { ORDER_STATUS, getProductStatusConfig } from '@/lib/types/order-status';
 import { IdentityForm } from '../IdentityForm';
 import { SubmittedIdentity } from './SubmittedIdentity';
 import { PreviewApproval } from '../PreviewApproval';
@@ -26,7 +26,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
 
     const renderProductStatus = (product: any) => {
         const productStatus = product.status || order.status;
-        const config = getItemStatusConfig(productStatus);
+        const config = getProductStatusConfig(productStatus);
         const Icon = config.icon as any;
 
         return (

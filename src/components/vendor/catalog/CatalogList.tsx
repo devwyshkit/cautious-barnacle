@@ -36,8 +36,8 @@ type Product = Database['public']['Tables']['products']['Row'] & {
 
 interface CatalogListProps {
   products: Product[];
-  onToggleActive: (itemId: string, isActive: boolean) => void;
-  onToggleStock?: (itemId: string, stockStatus: string) => void;
+  onToggleActive: (productId: string, isActive: boolean) => void;
+  onToggleStock?: (productId: string, stockStatus: string) => void;
   onEdit?: (product: Product) => void;
   onDelete?: (product: Product) => void;
 }

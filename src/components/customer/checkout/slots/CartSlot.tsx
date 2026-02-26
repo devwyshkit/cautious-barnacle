@@ -32,18 +32,18 @@ export function CartSlot({ initialHydratedItems = [] }: CartSlotProps) {
     return initialHydratedItems;
   }, [draftOrder.products, initialHydratedItems]);
 
-  const handleUpdateQuantity = async (itemId: string, variantId: string | null, quantity: number) => {
+  const handleUpdateQuantity = async (productId: string, variantId: string | null, quantity: number) => {
     try {
-      await updateQuantity(itemId, variantId, quantity);
+      await updateQuantity(productId, variantId, quantity);
       // No router.refresh needed because useCart is reactive
     } catch (e) {
       toast.error("Failed to update quantity");
     }
   };
 
-  const handleRemoveItem = async (itemId: string, variantId: string | null) => {
+  const handleRemoveItem = async (productId: string, variantId: string | null) => {
     try {
-      await removeFromDraftOrder(itemId, variantId);
+      await removeFromDraftOrder(productId, variantId);
     } catch (e) {
       toast.error("Failed to remove product");
     }

@@ -64,7 +64,7 @@ describe('Checkout Intent Flow Automation', () => {
                 insert: vi.fn().mockImplementation(() => builder),
                 update: vi.fn().mockImplementation(() => builder),
                 delete: vi.fn().mockImplementation(() => builder),
-                single: vi.fn().mockImplementation(() => Promise.resolve({ data: { id: 'session_123', snapshot_items: [] }, error: null })),
+                single: vi.fn().mockImplementation(() => Promise.resolve({ data: { id: 'session_123', snapshot_products: [] }, error: null })),
                 maybeSingle: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
                 match: vi.fn().mockImplementation(() => builder),
                 or: vi.fn().mockImplementation(() => builder),
@@ -95,7 +95,7 @@ describe('Checkout Intent Flow Automation', () => {
     it('creates payment order matching strict DB requirements securely', async () => {
         const payload = {
             address_id: 'address-123',
-            draft_items: [
+            draft_products: [
                 {
                     product_id: 'product-123',
                     selected_variant_id: 'variant-123',
@@ -131,7 +131,7 @@ describe('Checkout Intent Flow Automation', () => {
             data: {
                 id: 'session_123',
                 selected_address_id: 'address-123',
-                snapshot_items: [{ product_id: 'product-123', quantity: 1, variant_id: 'variant-123' }],
+                snapshot_products: [{ product_id: 'product-123', quantity: 1, variant_id: 'variant-123' }],
                 applied_coupon: null,
                 use_wallet: false
             },

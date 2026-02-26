@@ -39,7 +39,7 @@ describe('Swiggy 2026: RLS Certification Suite', () => {
             expect(true).toBe(true); // Placeholder for logic assertion
         });
 
-        it('DENY: Partner cannot read platform_settings secret keys', async () => {
+        it('DENY: Vendor cannot read platform_settings secret keys', async () => {
             const { data } = await anon.from('platform_settings').select('value');
             expect(data || []).toHaveLength(0);
         });

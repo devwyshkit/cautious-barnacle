@@ -1,4 +1,4 @@
-import { OrderListItem } from "@/lib/types/order";
+import { OrderProductListItem } from "@/lib/types/order";
 import { format } from "date-fns";
 import { ChevronRight, Package } from "lucide-react";
 import Image from "next/image";
@@ -9,7 +9,7 @@ import { getOrderStatusDisplay, getOrderStatusColor } from "@/lib/types/order-st
 import { formatCurrency } from "@/lib/utils/pricing";
 
 interface OrderCardProps {
-  order: OrderListItem;
+  order: OrderProductListItem;
 }
 
 export function OrderCard({ order }: OrderCardProps) {

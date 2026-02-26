@@ -24,10 +24,10 @@ test.describe('Swiggy 2026 Certification: Hydration Purity', () => {
         // Swiggy 2026: Zero-Jank engagement. Handler MUST be wired before paint completes.
         const categoryRail = page.locator('[data-testid="category-rail"], [data-testid="category-nav"], .no-scrollbar').first();
         if (await categoryRail.isVisible()) {
-            // Click the first category item (usually "All")
+            // Click the first category product (usually "All")
             // force: false ensures we test real actionability/hydration state
-            const firstItem = categoryRail.locator('a').first();
-            await firstItem.click({ force: false }).catch(() => { /* skip if truly unclickable */ });
+            const firstProduct = categoryRail.locator('a').first();
+            await firstProduct.click({ force: false }).catch(() => { /* skip if truly unclickable */ });
         }
 
         // 4. Verify no hydration errors were logged

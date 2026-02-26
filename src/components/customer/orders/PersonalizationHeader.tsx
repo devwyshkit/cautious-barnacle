@@ -4,12 +4,12 @@ import React from 'react';
 import { CheckCircle2, Sparkles, Clock } from 'lucide-react';
 import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
 
-interface IdentityFormHeaderProps {
+interface PersonalizationHeaderProps {
     orderId: string;
     designDeadline?: string | null;
 }
 
-export function IdentityFormHeader({ orderId, designDeadline }: IdentityFormHeaderProps) {
+export function PersonalizationHeader({ orderId, designDeadline }: PersonalizationHeaderProps) {
     return (
         <div className="bg-zinc-950 rounded-xl p-7 text-white shadow-sm shadow-zinc-950/20 border border-white/10 mb-8 relative overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />

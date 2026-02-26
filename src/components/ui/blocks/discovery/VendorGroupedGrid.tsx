@@ -43,7 +43,7 @@ export function VendorGroupedGrid({ data, title, subtitle, context }: VendorGrou
                                 </h3>
                             </div>
                             <Link
-                                href={`/store/${vId}`}
+                                href={`/vendor/${vId}`}
                                 className="text-[9px] font-black text-zinc-400 tracking-tight hover:text-zinc-950 transition-colors bg-white px-2 py-1 rounded-lg border border-zinc-100 shadow-sm uppercase shrink-0"
                             >
                                 Shop

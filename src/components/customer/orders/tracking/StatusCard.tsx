@@ -91,7 +91,7 @@ export function StatusCard({ order }: StatusCardProps) {
             case ORDER_STATUS.CONFIRMED:
                 return hasPersonalization ? 'Share identity to start crafting' : 'Vendor is securing your products';
             case ORDER_STATUS.IN_PRODUCTION: return 'Your gift is being masterfully prepared';
-            case ORDER_STATUS.PACKED: return 'Waiting for delivery partner';
+            case ORDER_STATUS.PACKED: return 'Waiting for delivery executive';
             case ORDER_STATUS.OUT_FOR_DELIVERY: return 'Delivery agent is navigating to your address';
             case ORDER_STATUS.DELIVERED: return 'Gift successfully delivered';
             default: return 'Processing your order';
@@ -157,7 +157,7 @@ export function StatusCard({ order }: StatusCardProps) {
                             if (order.status === ORDER_STATUS.PLACED && pendingCount > 0) {
                                 return (
                                     <span className="text-[11px] font-black bg-[var(--primary)] text-white px-2 py-0.5 rounded-full animate-pulse tracking-tight whitespace-nowrap">
-                                        Action Req: {pendingCount} {pendingCount === 1 ? 'Item' : 'Products'}
+                                        Action Req: {pendingCount} {pendingCount === 1 ? 'Product' : 'Products'}
                                     </span>
                                 );
                             }
@@ -262,7 +262,7 @@ export function StatusCard({ order }: StatusCardProps) {
                                 address: 'Bangalore, India'
                             },
                             totals: {
-                                item_total: Number(order.subtotal) || 0,
+                                product_total: Number(order.subtotal) || 0,
                                 delivery_fee: Number(order.delivery_fee) || 0,
                                 platform_fee: Number(order.platform_fee) || 0,
                                 gst_amount: Number(order.tax_amount) || 0,
@@ -291,7 +291,7 @@ export function StatusCard({ order }: StatusCardProps) {
                                     address: 'Bangalore, India'
                                 },
                                 totals: {
-                                    item_total: Number(order.subtotal) || 0,
+                                    product_total: Number(order.subtotal) || 0,
                                     delivery_fee: Number(order.delivery_fee) || 0,
                                     platform_fee: Number(order.platform_fee) || 10,
                                     gst_amount: Number(order.tax_amount) || 0,

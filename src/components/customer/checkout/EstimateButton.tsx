@@ -54,7 +54,7 @@ export function EstimateButton({
                     }
                     : { name: 'Vendor', address: 'Bangalore, India' },
                 totals: {
-                    item_total: pricing.subtotal,
+                    product_total: pricing.subtotal,
                     delivery_fee: pricing.delivery_fee,
                     platform_fee: pricing.platform_fee || 0,
                     gst_amount: pricing.gst || 0,

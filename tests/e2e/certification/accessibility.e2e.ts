@@ -18,14 +18,14 @@ test.describe('Swiggy 2026 Certification: Accessibility Purity', () => {
         expect(criticalViolations.length, `Critical accessibility violations detected: ${JSON.stringify(criticalViolations, null, 2)}`).toBe(0);
     });
 
-    test('should have zero critical violations in the item detail sheet', async ({ page }) => {
+    test('should have zero critical violations in the product detail sheet', async ({ page }) => {
         await page.goto('/');
         await page.waitForLoadState('networkidle');
 
-        // Open first item
-        const firstItem = page.locator('a[href*="/product/"]').first();
-        if (await firstItem.count() > 0) {
-            await firstItem.click();
+        // Open first product
+        const firstProduct = page.locator('a[href*="/product/"]').first();
+        if (await firstProduct.count() > 0) {
+            await firstProduct.click();
             await page.waitForSelector('[role="dialog"]');
 
             const accessibilityScanResults = await new AxeBuilder({ page })

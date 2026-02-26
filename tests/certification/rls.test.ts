@@ -7,11 +7,11 @@ describe('Row Level Security (RLS) Certification', () => {
         const { url, key } = getSupabaseEnv();
         const supabase = createBaseClient(url, key, { auth: { persistSession: false } });
 
-        // 1. Attempt to fetch items from restricted tables
+        // 1. Attempt to fetch products from restricted tables
         const { data: usersData, error: usersError } = await supabase.from('users').select('*');
         expect(usersData || []).toHaveLength(0);
-        const { data: partnersData, error: partnersError } = await supabase.from('partner_users').select('*');
-        expect(partnersData || []).toHaveLength(0);
+        const { data: vendorsData, error: vendorsError } = await supabase.from('vendor_users').select('*');
+        expect(vendorsData || []).toHaveLength(0);
 
         // Orders should be empty for a fresh anon client
         const { data: orders, error: ordersError } = await supabase

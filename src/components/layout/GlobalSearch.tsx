@@ -134,7 +134,7 @@ export function GlobalSearch() {
                       className="w-full flex items-center gap-3 p-3 bg-zinc-50 rounded-xl hover:bg-zinc-100 transition-colors text-left"
                     >
                       <div className="size-12 rounded-lg overflow-hidden shrink-0 bg-zinc-50 relative border border-zinc-100">
-                        <Image src={(product as any).image_url || ((product as any).images?.[0]) || '/images/logo.png'} alt={product.name || 'Item'} fill className="object-cover" sizes="48px" />
+                        <Image src={(product as any).image_url || ((product as any).images?.[0]) || '/images/logo.png'} alt={product.name || 'Product'} fill className="object-cover" sizes="48px" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-zinc-900 truncate">{product.name}</p>

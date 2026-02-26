@@ -118,7 +118,7 @@ export async function create_payment_order(
         const sessionId = session?.id || user.id;
 
         // WYSHKIT 2026: Deterministic Webhook Snapshotting
-        // Save the exact cart payload to `snapshot_items` so the webhook doesn't rely on the live cart.
+        // Save the exact cart payload to `snapshot_products` so the webhook doesn't rely on the live cart.
         if (session?.id) {
             const snapshotItems = payload.draft_items.map(product => ({
                 product_id: product.product_id,
@@ -127,7 +127,7 @@ export async function create_payment_order(
                 personalization: product.personalization || null,
                 selected_addons: product.selected_addons || []
             }));
-            await supabase.from('checkout_sessions').update({ snapshot_items: snapshotItems as any }).eq('id', session.id);
+            await supabase.from('checkout_sessions').update({ snapshot_products: snapshotItems as any }).eq('id', session.id);
         }
 
         // 5. RAZORPAY ORDER
@@ -194,9 +194,9 @@ export async function verify_payment_signature(
 
         // WYSHKIT 2026: Deterministic Execution via Session Snapshot
         // Bypassing the mutable `v_active_cart_detailed` to prevent race conditions during transaction settlement.
-        const cart_items = session.snapshot_items as any[];
+        const cart_products = session.snapshot_products as any[];
 
-        if (!cart_items || cart_items.length === 0) {
+        if (!cart_products || cart_products.length === 0) {
             return { error: 'Your checkout session expired or is invalid. Cannot finalize order.', status: 400 };
         }
 
@@ -233,14 +233,14 @@ export async function verify_payment_signature(
         }
 
         // 3. ATOMIC ORDER PLACEMENT
-        const has_pers = cart_items.some(product => (product.personalization as any)?.enabled);
+        const has_pers = cart_products.some(product => (product.personalization as any)?.enabled);
 
         const order_result = await executeCommerceIntent({
             intent: 'PLACE_ORDER',
             payload: {
                 razorpay_order_id: razorpay_order_id,
                 payment_id: razorpay_payment_id,
-                products: cart_items.map(product => ({
+                products: cart_products.map(product => ({
                     product_id: product.product_id ?? '',
                     variant_id: product.variant_id,
                     quantity: product.quantity,

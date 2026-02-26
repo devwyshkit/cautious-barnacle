@@ -53,12 +53,12 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
         }
 
         const data = context as any;
-        const itemRows = data.items || [];  // RPC returns 'items' key from v_active_cart_detailed
+        const productsRows = data.products || data.items || [];  // RPC returns 'products' (Swiggy 2026 Standard)
         const dbRes = data.pricing || {};
         const sessionData = data.session || {};
 
         // 3. Mapping with Purified Logic
-        const products: DraftLineItem[] = itemRows.map((row: any) => {
+        const products: DraftLineItem[] = productsRows.map((row: any) => {
             const quantity = Number(row.quantity) || 1;
             const base_price = Number(row.variant_price ?? row.base_price ?? 0);
             const selected_addons = (row.selected_addons as unknown as SelectedAddon[]) || [];
@@ -70,7 +70,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
             return {
                 id: row.id || '',
                 product_id: row.product_id || '',
-                product_name: row.product_name || 'Item',
+                product_name: row.product_name || 'Product',
                 product_image: (Array.isArray(row.product_images) && row.product_images[0]) || row.product_image || '/images/logo.png',
                 quantity: quantity,
                 unit_price: base_price + addons_price,
@@ -89,7 +89,6 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
                 addons_price: addons_price,
                 is_personalized: !!personalization?.enabled,
                 personalization_options: (row.personalization_options as any[]) || [],
-                item_addons: [],
             };
         });
 

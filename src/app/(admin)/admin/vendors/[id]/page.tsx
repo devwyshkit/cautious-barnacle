@@ -15,7 +15,7 @@ async function getVendor(id: string): Promise<Vendor | null> {
 
 async function getVendorStats(vendorId: string) {
   const supabase = await createClient()
-  const [ordersResult, itemsResult] = await Promise.all([
+  const [ordersResult, productsResult] = await Promise.all([
     supabase.from('orders').select('total').eq('vendor_id', vendorId),
     supabase.from('products').select('id', { count: 'exact' }).eq('vendor_id', vendorId),
   ])
@@ -26,7 +26,7 @@ async function getVendorStats(vendorId: string) {
   return {
     orders: orders.length,
     gmv: orders.reduce((sum, o) => sum + (o.total || 0), 0),
-    products: itemsResult.count || 0,
+    products: productsResult.count || 0,
   }
 }
 

@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const NAV_ITEMS = [
+const NAV_LINKS = [
   { href: '/vendor', label: 'Home', icon: Home },
   { href: '/vendor/orders', label: 'Orders', icon: Package },
   { href: '/vendor/personalization', label: 'Preview', icon: Palette },
@@ -25,7 +25,7 @@ export function VendorMobileNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 lg:hidden z-50 safe-area-pb">
       <div className="flex items-center justify-around h-16 px-2">
-        {NAV_ITEMS.map((product) => {
+        {NAV_LINKS.map((link) => {
           const isActive = pathname === product.href || 
             (product.href !== '/vendor' && pathname.startsWith(product.href));
           const Icon = product.icon;

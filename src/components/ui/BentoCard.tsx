@@ -17,7 +17,7 @@ export function BentoCard({ data, variant = 'small', priority = false }: BentoCa
 
     return (
         <Link
-            href={data.href || `/store/${data.id || data.vendor_id}`}
+            href={data.href || `/vendor/${data.id || data.vendor_id}`}
             className={cn(
                 "relative overflow-hidden rounded-2xl group active:scale-[0.98] transition-all duration-300",
                 isLarge ? "col-span-2 aspect-[16/9]" : "aspect-square"

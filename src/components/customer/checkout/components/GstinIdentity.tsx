@@ -97,7 +97,7 @@ export function GstinIdentity({
                 }
                 : { name: 'Vendor', address: 'Bangalore, India' },
             totals: {
-                item_total: pricing.subtotal,
+                product_total: pricing.subtotal,
                 delivery_fee: pricing.delivery_fee,
                 platform_fee: pricing.platform_fee || 0,
                 gst_amount: pricing.gst || 0,
@@ -107,7 +107,7 @@ export function GstinIdentity({
             order_products: products.map(it => ({
                 id: it.id || '',
                 product_id: it.product_id || '',
-                product_name: it.product_name || 'Item',
+                product_name: it.product_name || 'Product',
                 quantity: it.quantity,
                 quantity_number: it.quantity,
                 unit_price: it.unit_price,

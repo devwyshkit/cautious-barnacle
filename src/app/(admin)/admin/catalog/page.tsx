@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { CatalogTable } from './catalog-table'
 
-async function getItems() {
+async function getProducts() {
   const supabase = await createClient()
   const { data } = await supabase
     .from('products')
@@ -12,7 +12,7 @@ async function getItems() {
 }
 
 export default async function CatalogPage() {
-  const products = await getItems()
+  const products = await getProducts()
 
   return (
     <div className="space-y-6">

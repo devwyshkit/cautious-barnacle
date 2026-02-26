@@ -29,12 +29,12 @@ test.describe('Phase 9: Flow Completeness Certifications', () => {
             await addBtn.click();
 
             // The UI MUST NOT freeze. Navigate away immediately.
-            const partnerLink = page.locator('a[href*="/partner/"]').first();
-            if (await partnerLink.count() > 0) {
+            const vendorLink = page.locator('a[href*="/vendor/"]').first();
+            if (await vendorLink.count() > 0) {
                 // Should be able to eagerly navigate away while a Server Action is deadlocked.
                 // This proves the absence of "Ghost Interactions" blocking the main thread.
-                await partnerLink.click();
-                await expect(page).toHaveURL(/.*partner.*/);
+                await vendorLink.click();
+                await expect(page).toHaveURL(/.*vendor.*/);
             }
         }
     });
@@ -43,7 +43,7 @@ test.describe('Phase 9: Flow Completeness Certifications', () => {
         await page.goto('/');
         await page.waitForLoadState('networkidle');
 
-        // Open the global bottom sheet (e.g., Cart or an Item detail)
+        // Open the global bottom sheet (e.g., Cart or an Product detail)
         const cartTrigger = page.locator('button').filter({ hasText: 'CART' });
 
         if (await cartTrigger.count() > 0) {
@@ -91,7 +91,7 @@ test.describe('Phase 9: Flow Completeness Certifications', () => {
     });
 
     // NOTE: Multi-Role Realtime Sync Audit requires two separate authenticated contexts 
-    // (one Customer, one Partner) running concurrently in Playwright, which exceeds single-page scope.
+    // (one Customer, one Vendor) running concurrently in Playwright, which exceeds single-page scope.
     // However, architecturally, using Supabase Realtime Channels directly tied to React Server Components
     // or `useEffect` subscriptions guarantees sync without Zustand.
 });

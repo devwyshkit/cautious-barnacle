@@ -31,7 +31,7 @@ export async function calculateOrderTotalRPC(
     const supabase = await createClient();
 
     const { data, error } = await supabase.rpc('calculate_order_total', {
-      p_items: cartItems.map(product => ({
+      p_products: cartItems.map(product => ({
         product_id: product.product_id,
         quantity: product.quantity,
         variant_id: product.variant_id ?? null,

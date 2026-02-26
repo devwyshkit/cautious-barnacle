@@ -4,11 +4,7 @@ import React from 'react';
 import { Check, Sparkles } from 'lucide-react';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
-interface IdentitySuccessStateProps {
-    onClose: () => void;
-}
-
-export function IdentitySuccessState({ onClose }: IdentitySuccessStateProps) {
+export function PersonalizationSuccess({ onClose }: { onClose: () => void }) {
     return (
         <div className="flex flex-col items-center justify-center p-12 space-y-6 text-center animate-in fade-in zoom-in duration-500 min-h-[400px]">
             <div className="relative">

@@ -11,9 +11,9 @@ import { submit_order_personalization } from '@/lib/actions/commerce/orders';
 import imageCompression from 'browser-image-compression';
 
 import { PersonalizationConfig, SelectedPersonalization, SelectedAddon } from '@/lib/types/personalization';
-import { IdentityFormHeader } from './IdentityFormHeader';
-import { IdentityProductField } from './IdentityProductField';
-import { PersonalizationSuccess as IdentitySuccessState } from './PersonalizationSuccess';
+import { PersonalizationHeader } from './PersonalizationHeader';
+import { PersonalizationField } from './PersonalizationField';
+import { PersonalizationSuccess } from './PersonalizationSuccess';
 
 interface OrderProduct {
     id: string;
@@ -26,7 +26,7 @@ interface OrderProduct {
     personalization_schema?: any[];
 }
 
-interface IdentityFormProps {
+interface PersonalizationFormProps {
     orderId: string;
     products: OrderProduct[];
     onSubmitted: () => void;
@@ -35,14 +35,14 @@ interface IdentityFormProps {
     isAutoOpenedForSuccess?: boolean;
 }
 
-export function IdentityForm({
+export function PersonalizationForm({
     orderId,
     products,
     onSubmitted,
     onSkip,
     designDeadline,
     isAutoOpenedForSuccess
-}: IdentityFormProps) {
+}: PersonalizationFormProps) {
     const [formData, setFormData] = useState<Record<string, { text?: string; image_url?: string }>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isOptimisticSuccess, setIsOptimisticSuccess] = useState(false);
@@ -199,14 +199,14 @@ export function IdentityForm({
     };
 
     if (isOptimisticSuccess) {
-        return <IdentitySuccessState onClose={onSubmitted} />;
+        return <PersonalizationSuccess onClose={onSubmitted} />;
     }
 
     if (personalizedProducts.length === 0) return null;
 
     return (
         <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-            {isAutoOpenedForSuccess && <IdentityFormHeader orderId={orderId} designDeadline={designDeadline} />}
+            {isAutoOpenedForSuccess && <PersonalizationHeader orderId={orderId} designDeadline={designDeadline} />}
 
             <div className="space-y-6">
                 {personalizedProducts.map((product, idx) => {
@@ -216,7 +216,7 @@ export function IdentityForm({
                         text_required: true,
                         allow_text: true,
                         allow_image: true,
-                        text_label: addons.length === 1 ? `Details for ${addons[0].name}` : `Identity Details`,
+                        text_label: addons.length === 1 ? `Details for ${addons[0].name}` : `Personalisation Details`,
                         placeholder: "e.g. Name: 'Prateek', Date: '20th Oct'..."
                     } : {
                         ...legacyConfig,
@@ -226,7 +226,7 @@ export function IdentityForm({
                     };
 
                     return (
-                        <IdentityProductField
+                        <PersonalizationField
                             key={product.id}
                             product={product}
                             productIndex={idx}

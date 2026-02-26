@@ -18,7 +18,7 @@ import {
 export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusKm: number = 5) => {
     const supabase = await createClient();
 
-    const { data: nearbyItems, error } = await supabase.rpc('get_nearby_products', {
+    const { data: nearbyProducts, error } = await supabase.rpc('get_nearby_products', {
         user_lat: lat,
         user_lng: lng,
         radius_km: radiusKm,
@@ -30,10 +30,10 @@ export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusK
         return { products: [], error: error.message };
     }
 
-    const validated = z.array(WyshkitProductSchema).safeParse(nearbyItems);
+    const validated = z.array(WyshkitProductSchema).safeParse(nearbyProducts);
     if (!validated.success) {
         logger.error('Validation failed for nearby products', validated.error);
-        return { products: nearbyItems as any, error: null };
+        return { products: nearbyProducts as any, error: null };
     }
 
     return {

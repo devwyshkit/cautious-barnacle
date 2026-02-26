@@ -18,7 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
-const NAV_ITEMS = [
+const NAV_LINKS = [
   { href: '/vendor', label: 'Home', icon: Home },
   { href: '/vendor/orders', label: 'Orders', icon: Package },
   { href: '/vendor/personalization', label: 'Preview queue', icon: Palette },
@@ -63,7 +63,7 @@ export function VendorSidebar() {
 
       <nav className="flex-1 p-3">
         <ul className="space-y-1">
-          {NAV_ITEMS.map((product) => {
+          {NAV_LINKS.map((link) => {
             const isActive = pathname === product.href ||
               (product.href !== '/vendor' && pathname.startsWith(product.href));
             const Icon = product.icon;

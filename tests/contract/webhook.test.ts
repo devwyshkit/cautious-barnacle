@@ -54,7 +54,7 @@ describe('Razorpay Webhook Contract Test', () => {
                 data: {
                     id: 'draft_123',
                     address_id: 'addr_123',
-                    items: [{ item_id: 'item_1', quantity: 1 }],
+                    products: [{ product_id: 'product_1', quantity: 1 }],
                     metadata: { coupon_code: 'SAVE10', use_wallet: true }
                 },
                 error: null

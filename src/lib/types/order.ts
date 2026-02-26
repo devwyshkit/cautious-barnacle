@@ -14,10 +14,10 @@ import type { PersonalizationConfig, SelectedPersonalization, SelectedAddon } fr
 export type ViewOrderDetailed = Views<'v_order_tracking'>;
 
 /**
- * OrderListItem: Unified shape for order lists.
+ * OrderProductListItem: Unified shape for order lists.
  * Derives directly from v_order_tracking view.
  */
-export interface OrderListItem extends Omit<Views<'v_order_tracking'>, 'personalization_status' | 'first_product_name' | 'vendor_name'> {
+export interface OrderProductListItem extends Omit<Views<'v_order_tracking'>, 'personalization_status' | 'first_product_name' | 'vendor_name'> {
   // Any extra UI fields NOT in the view can be added here
   // But for WYSHKIT 2026, we prefer view-authority
   products?: any[]; // Keep for compatibility if needed, though view uses first_product_name

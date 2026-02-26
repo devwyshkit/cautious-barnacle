@@ -34,7 +34,7 @@ export interface SelectedAddon {
  * NOTE: We no longer extend the view type directly to avoid optional/non-optional conflicts.
  */
 export interface DraftProductItem {
-  // Cart item identity
+  // Cart product identity
   id: string;
   product_id: string;
   product_name: string;
@@ -74,6 +74,8 @@ export interface DraftProductItem {
   product_addons_meta?: any;
   personalization_options?: any[];
 }
+
+export type DraftLineItem = DraftProductItem;
 
 
 export interface DraftTransaction extends PricingBreakdown {

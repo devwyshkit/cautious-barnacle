@@ -20,7 +20,7 @@ It's 4 PM. Someone forgot an anniversary.
 
 - Amazon: 2 days.
 - Local print shop: physical visit, no guarantee, prays they don't misspell the name.
-- WyshKit: Open the app. See a local partner. Select a whiskey glass. Tap "Personalise." Pay ₹600. In 2 minutes, approve a digital preview on your phone. In 5 minutes, the glass is engraved. A Shadowfax rider delivers it by 5:15 PM.
+- WyshKit: Open the app. See a local vendor. Select a whiskey glass. Tap "Personalise." Pay ₹600. In 2 minutes, approve a digital preview on your phone. In 5 minutes, the glass is engraved. A Shadowfax rider delivers it by 5:15 PM.
 
 We sell salvation for procrastinators and emotional buyers. That commands a 20–30% premium — easily.
 
@@ -48,11 +48,11 @@ Simple. Emotional. Urgent.
 - *"See a preview before we make it. If you don't like it — instant refund. Zero risk."*
 - *"Last-minute. Lifetime memory."*
 
-**Words we use**: "personalised", "minutes", "preview", "local partner", "delivered", "approved."
+**Words we use**: "personalised", "minutes", "preview", "local vendor", "delivered", "approved."
 
 **Words we never use**: "vendor", "e-commerce", "hyperlocal", "SKU", "customisation", "platform", "marketplace."
 
-### To Partners
+### To Vendors
 
 Practical. Respectful. Clear ROI.
 
@@ -78,13 +78,13 @@ Practical. Respectful. Clear ROI.
 
 **Acquisition**:
 - Instagram/Meta hyperlocal ads targeting 25–40yo professionals in these pin codes.
-- Creative: "Your partner loves personalised gifts. You have 3 hours. We can help."
-- Zero generic ads. Every ad shows a real partner, real item, real ETA.
+- Creative: "Your vendor loves personalised gifts. You have 3 hours. We can help."
+- Zero generic ads. Every ad shows a real vendor, real product, real ETA.
 
-**Partner acquisition**:
+**Vendor acquisition**:
 - Direct BD: visit local trophy shops, print studios, engraving shops.
 - Pitch: "You already have the machine. We bring you paying customers. Zero commission on first 10 orders."
-- Onboarding: IDfy KYC (takes minutes), partner app walkthrough, first dummy order test.
+- Onboarding: IDfy KYC (takes minutes), vendor app walkthrough, first dummy order test.
 
 ---
 
@@ -92,11 +92,11 @@ Practical. Respectful. Clear ROI.
 
 Traditional personalised e-commerce has a secret: *returns destroy margins.*
 
-A customer receives a mug, claims "the text is too small," demands a refund. The item is unsellable.
+A customer receives a mug, claims "the text is too small," demands a refund. The product is unsellable.
 
-**WyshKit's answer**: The customer approves a digital mockup *before* production begins. Once approved, the sale is final. Return rate for personalised items approaches zero.
+**WyshKit's answer**: The customer approves a digital mockup *before* production begins. Once approved, the sale is final. Return rate for personalised products approaches zero.
 
-Non-personalised items follow standard 24-hour return policy (damaged/wrong only).
+Non-personalised products follow standard 24-hour return policy (damaged/wrong only).
 
 This is the moat. This is why we can command premium pricing. This is the Fiverr model applied to physical goods.
 

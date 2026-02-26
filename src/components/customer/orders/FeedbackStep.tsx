@@ -94,12 +94,12 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
         try {
             const supabase = createClient();
 
-            // WYSHKIT 2026: Atomic loop through item reviews
+            // WYSHKIT 2026: Atomic loop through product reviews
             const promises = Object.values(itemReviews).map(review =>
-                supabase.rpc('add_item_review' as any, {
+                supabase.rpc('add_product_review' as any, {
                     p_product_id: review.productId,
                     p_order_id: orderId,
-                    p_order_item_id: review.orderProductId,
+                    p_order_product_id: review.orderProductId,
                     p_rating: review.rating,
                     p_comment: review.comment || (review.orderProductId === Object.keys(itemReviews)[0] ? `Overall order: ${overallRating}` : ''),
                     p_personalization_rating: review.fidelityRating,

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useCartValidation } from '@/hooks/useCartValidation';
 import { AlertCircle } from 'lucide-react';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-import { StoreHeader } from '@/components/ui/blocks/store/StoreHeader';
+import { StoreHeader } from '@/components/ui/blocks/vendor/StoreHeader';
 import { CircleRail } from '@/components/ui/blocks/discovery/CircleRail';
 import { WyshkitProduct } from '@/lib/types/product';
 import { ProductCard } from '@/components/ui/ProductCard';
@@ -43,7 +43,7 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
         <div className="px-4 py-3 bg-amber-50 border-b border-amber-100 flex items-center justify-between gap-3 sticky top-0 z-[60]">
           <div className="flex items-center gap-2">
             <AlertCircle className="size-3.5 text-amber-600" />
-            <p className="text-[10px] font-black text-amber-900 tracking-widest">Active cart at another store</p>
+            <p className="text-[10px] font-black text-amber-900 tracking-widest">Active cart at another vendor</p>
           </div>
           <Button
             variant="outline"
@@ -80,7 +80,7 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
               <div className="flex items-center gap-3">
                 <h2 className="text-lg font-black text-zinc-950 tracking-tighter capitalize">{category}</h2>
                 <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-50 px-2 py-0.5 rounded-full border border-zinc-100">
-                  {categoryItems.length} {categoryItems.length === 1 ? 'Item' : 'Products'}
+                  {categoryItems.length} {categoryItems.length === 1 ? 'Product' : 'Products'}
                 </span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">

@@ -74,7 +74,7 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                     <div className="flex gap-2 pb-1">
                         <ShareButton
                             title={data.name}
-                            url={`/store/${data.id}`}
+                            url={`/vendor/${data.id}`}
                             className="bg-zinc-50 size-9 rounded-xl flex items-center justify-center text-zinc-900 border border-zinc-100 hover:bg-zinc-100 transition-all"
                         />
                         {data.rating && (

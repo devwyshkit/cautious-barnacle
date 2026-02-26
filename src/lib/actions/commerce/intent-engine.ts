@@ -214,7 +214,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
 
                 case 'PLACE_ORDER': {
                     const { data, error } = await supabase.rpc('place_atomic_order', {
-                        p_items: validated.payload.products as any,
+                        p_products: validated.payload.products as any,
                         p_address_id: validated.payload.address_id!,
                         p_razorpay_order_id: validated.payload.razorpay_order_id,
                         p_payment_id: validated.payload.payment_id ?? undefined,
@@ -266,7 +266,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                 case 'CLEAR_CART': {
                     const match = user ? { user_id: user.id } : { session_id: sessionId };
                     await Promise.all([
-                        supabase.from('cart_items').delete().match(match),
+                        supabase.from('cart_products').delete().match(match),
                         supabase.from('checkout_sessions').delete().match(match)
                     ]);
                     break;

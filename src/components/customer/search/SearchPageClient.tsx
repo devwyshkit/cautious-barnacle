@@ -190,7 +190,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                     ).map(([vId, group]) => (
                       <div key={vId} className="space-y-3">
                         <div className="flex items-center justify-between px-1">
-                          <Link href={`/store/${vId}`} className="text-xs font-black text-zinc-900 tracking-tight hover:text-[var(--primary)] transition-colors">
+                          <Link href={`/vendor/${vId}`} className="text-xs font-black text-zinc-900 tracking-tight hover:text-[var(--primary)] transition-colors">
                             No results found for &apos;{searchParamsHook.get('q')}&apos;
                           </Link>
                           <span className="text-[11px] font-bold text-zinc-400 tracking-tight">{group.products.length} Match{group.products.length > 1 ? 'es' : ''}</span>

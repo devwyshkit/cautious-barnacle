@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { OrderListItem } from "@/lib/types/order";
+import { OrderProductListItem } from "@/lib/types/order";
 import { OrderStatus } from "@/lib/types/order-status";
 import { OrderCard } from "./OrderCard";
 import { Loader2, PackageOpen } from "lucide-react";
@@ -11,12 +11,12 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useRouter } from "next/navigation";
 
 interface OrderListProps {
-  initialOrders?: OrderListItem[];
+  initialOrders?: OrderProductListItem[];
 }
 
 export function OrderList({ initialOrders }: OrderListProps) {
   // Use initialOrders if provided, otherwise default to empty array or fetch
-  const [orders, setOrders] = useState<OrderListItem[]>(initialOrders || []);
+  const [orders, setOrders] = useState<OrderProductListItem[]>(initialOrders || []);
   const [loading, setLoading] = useState(!initialOrders);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();

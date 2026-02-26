@@ -40,8 +40,8 @@ interface CartContextType {
         quantity?: number,
         optimistic_data?: any
     ) => Promise<CartActionResult>;
-    removeFromDraftOrder: (itemId: string, variantId?: string | null) => Promise<void>;
-    updateQuantity: (itemId: string, variantId: string | null, quantity: number) => Promise<void>;
+    removeFromDraftOrder: (productId: string, variantId?: string | null) => Promise<void>;
+    updateQuantity: (productId: string, variantId: string | null, quantity: number) => Promise<void>;
     clearDraftOrder: () => Promise<void>;
 }
 
@@ -167,10 +167,10 @@ export function CartProvider({
         });
     };
 
-    const removeFromDraftOrder = async (itemId: string, variantId?: string | null) => {
+    const removeFromDraftOrder = async (productId: string, variantId?: string | null) => {
         const normalizedVariantId = variantId ?? null;
         const cartItem = optimisticCart.products.find(
-            (i: DraftLineItem) => i.product_id === itemId && (i.variant_id ?? null) === normalizedVariantId
+            (i: DraftLineItem) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
         );
         if (!cartItem) return;
 
@@ -191,10 +191,10 @@ export function CartProvider({
         });
     };
 
-    const updateQuantity = async (itemId: string, variantId: string | null, quantity: number) => {
+    const updateQuantity = async (productId: string, variantId: string | null, quantity: number) => {
         const normalizedVariantId = variantId ?? null;
         const cartItem = optimisticCart.products.find(
-            (i: DraftLineItem) => i.product_id === itemId && (i.variant_id ?? null) === normalizedVariantId
+            (i: DraftLineItem) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
         );
         if (!cartItem) return;
 

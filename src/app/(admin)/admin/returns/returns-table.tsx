@@ -136,32 +136,32 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              filtered.map((returnItem) => (
-                <TableRow key={returnItem.id} className={processing === returnItem.id ? 'opacity-50' : ''}>
+              filtered.map((returnProduct) => (
+                <TableRow key={returnProduct.id} className={processing === returnProduct.id ? 'opacity-50' : ''}>
                   <TableCell className="font-medium">
-                    #{returnItem.orders?.order_number || '-'}
+                    #{returnProduct.orders?.order_number || '-'}
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-zinc-500">
-                    {returnItem.orders?.vendors?.business_name || '-'}
+                    {returnProduct.orders?.vendors?.business_name || '-'}
                   </TableCell>
-                  <TableCell className="max-w-[200px] truncate" title={returnItem.reason ?? undefined}>
-                    {returnItem.reason}
+                  <TableCell className="max-w-[200px] truncate" title={returnProduct.reason ?? undefined}>
+                    {returnProduct.reason}
                   </TableCell>
                   <TableCell className="font-semibold">
-                    {returnItem.refund_amount ? formatCurrency(returnItem.refund_amount) : formatCurrency(returnItem.orders?.total || 0)}
+                    {returnProduct.refund_amount ? formatCurrency(returnProduct.refund_amount) : formatCurrency(returnProduct.orders?.total || 0)}
                   </TableCell>
-                  <TableCell>{getStatusBadge(returnItem.status)}</TableCell>
+                  <TableCell>{getStatusBadge(returnProduct.status)}</TableCell>
                   <TableCell className="hidden lg:table-cell text-zinc-500">
-                    {formatDate(returnItem.created_at)}
+                    {formatDate(returnProduct.created_at)}
                   </TableCell>
                   <TableCell className="text-right">
-                    {returnItem.status === 'pending' && (
+                    {returnProduct.status === 'pending' && (
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => handleApprove(returnItem.id, returnItem.orders?.total || 0)}
-                          disabled={processing === returnItem.id}
+                          onClick={() => handleApprove(returnProduct.id, returnProduct.orders?.total || 0)}
+                          disabled={processing === returnProduct.id}
                           className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                         >
                           <Check className="size-4" />
@@ -169,8 +169,8 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => handleReject(returnItem.id)}
-                          disabled={processing === returnItem.id}
+                          onClick={() => handleReject(returnProduct.id)}
+                          disabled={processing === returnProduct.id}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
                           <X className="size-4" />

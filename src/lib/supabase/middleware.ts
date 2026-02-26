@@ -45,7 +45,7 @@ export async function updateSession(request: NextRequest) {
 
     // WYSHKIT 2026: Strict Prefix Routing
     // All vendor admin routes now exclusively own the /vendor prefix.
-    // Customer facing stores have been moved to /store/[id].
+    // Customer facing stores have been moved to /vendor/[id].
     const isVendorAdminRoute = pathname.startsWith('/vendor');
 
     // Path-based fallback for local dev

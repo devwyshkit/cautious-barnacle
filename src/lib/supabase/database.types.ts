@@ -62,7 +62,7 @@ export type Database = {
           },
         ]
       }
-      cart_items: {
+      cart_products: {
         Row: {
           cart_id: string | null
           created_at: string | null
@@ -107,28 +107,28 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cart_items_cart_id_fkey"
+            foreignKeyName: "cart_products_cart_id_fkey"
             columns: ["cart_id"]
             isOneToOne: false
             referencedRelation: "carts"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_items_product_id_fkey"
+            foreignKeyName: "cart_products_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_items_selected_variant_id_fkey"
+            foreignKeyName: "cart_products_selected_variant_id_fkey"
             columns: ["selected_variant_id"]
             isOneToOne: false
             referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_items_user_id_fkey"
+            foreignKeyName: "cart_products_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -216,7 +216,7 @@ export type Database = {
           id: string
           selected_address_id: string | null
           session_id: string | null
-          snapshot_items: Json | null
+          snapshot_products: Json | null
           updated_at: string | null
           use_wallet: boolean | null
           user_id: string | null
@@ -232,7 +232,7 @@ export type Database = {
           id?: string
           selected_address_id?: string | null
           session_id?: string | null
-          snapshot_items?: Json | null
+          snapshot_products?: Json | null
           updated_at?: string | null
           use_wallet?: boolean | null
           user_id?: string | null
@@ -248,7 +248,7 @@ export type Database = {
           id?: string
           selected_address_id?: string | null
           session_id?: string | null
-          snapshot_items?: Json | null
+          snapshot_products?: Json | null
           updated_at?: string | null
           use_wallet?: boolean | null
           user_id?: string | null
@@ -1210,7 +1210,7 @@ export type Database = {
           is_anonymous: boolean | null
           is_personalised_review: boolean | null
           order_id: string
-          order_item_id: string | null
+          order_product_id: string | null
           personalization_rating: number | null
           product_id: string | null
           rating: number
@@ -1235,7 +1235,7 @@ export type Database = {
           is_anonymous?: boolean | null
           is_personalised_review?: boolean | null
           order_id: string
-          order_item_id?: string | null
+          order_product_id?: string | null
           personalization_rating?: number | null
           product_id?: string | null
           rating: number
@@ -1260,7 +1260,7 @@ export type Database = {
           is_anonymous?: boolean | null
           is_personalised_review?: boolean | null
           order_id?: string
-          order_item_id?: string | null
+          order_product_id?: string | null
           personalization_rating?: number | null
           product_id?: string | null
           rating?: number
@@ -1289,8 +1289,8 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "reviews_order_item_id_fkey"
-            columns: ["order_item_id"]
+            foreignKeyName: "reviews_order_product_id_fkey"
+            columns: ["order_product_id"]
             isOneToOne: false
             referencedRelation: "order_products"
             referencedColumns: ["id"]
@@ -1936,14 +1936,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cart_items_product_id_fkey"
+            foreignKeyName: "cart_products_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cart_items_user_id_fkey"
+            foreignKeyName: "cart_products_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -2093,7 +2093,7 @@ export type Database = {
           p_comment: string
           p_fidelity_tags?: string[]
           p_order_id: string
-          p_order_item_id: string
+          p_order_product_id: string
           p_personalization_rating?: number
           p_product_id: string
           p_rating: number
@@ -2145,7 +2145,7 @@ export type Database = {
           p_coupon_code?: string
           p_delivery_fee_override?: number
           p_distance_km?: number
-          p_items: Json
+          p_products: Json
           p_session_id?: string
           p_use_wallet?: boolean
           p_user_id?: string
@@ -2392,7 +2392,7 @@ export type Database = {
           p_delivery_instructions?: string
           p_distance_km?: number
           p_gstin?: string
-          p_items: Json
+          p_products: Json
           p_payment_id?: string
           p_razorpay_order_id: string
           p_use_wallet?: boolean

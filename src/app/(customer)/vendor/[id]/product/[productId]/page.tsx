@@ -34,7 +34,7 @@ export default async function ProductFullPage({
 
       <InterceptedProductSheet
         product={product}
-        onCloseOverride={`/store/${id}`}
+        onCloseOverride={`/vendor/${id}`}
       />
     </div>
   );

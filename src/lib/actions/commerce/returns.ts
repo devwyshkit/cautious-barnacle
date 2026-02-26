@@ -12,7 +12,7 @@ import { Json } from '@/lib/supabase/database.types';
 import { refund_payment } from '@/lib/services/razorpay';
 import { logger } from '@/lib/logging/logger';
 
-export type ReturnReason = 'wrong_item' | 'damaged' | 'defective' | 'not_as_described' | 'other';
+export type ReturnReason = 'wrong_product' | 'damaged' | 'defective' | 'not_as_described' | 'other';
 
 interface InitiateReturnParams {
   orderId: string;
@@ -62,7 +62,7 @@ export async function initiateReturn({ orderId, reason, description, images }: I
     const isPersonalized = orderHasPersonalizedProducts(order as Order);
 
     // Enforce return policy: No refund for personalized products unless wrong or damaged
-    if (isPersonalized && !['wrong_item', 'damaged'].includes(reason)) {
+    if (isPersonalized && !['wrong_product', 'damaged'].includes(reason)) {
       return {
         error: 'Personalized products cannot be returned unless wrong or damaged',
         code: 'PERSONALIZED_RETURN_RESTRICTION'

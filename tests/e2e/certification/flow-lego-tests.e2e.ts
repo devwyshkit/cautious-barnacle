@@ -64,7 +64,7 @@ test.describe('Phase 10: Silent Failure & The Lego Test', () => {
 
         // 1. Add to Cart (Lego Piece 1: EntityCard -> Cart Action)
         const addBtn = page.locator('button', { hasText: 'ADD' }).first();
-        if (await addBtn.count() === 0) return; // Skip gracefully if no items
+        if (await addBtn.count() === 0) return; // Skip gracefully if no products
 
         await addBtn.click();
         await page.waitForTimeout(500); // Allow optimistic UI to settle

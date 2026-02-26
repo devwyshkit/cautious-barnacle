@@ -31,10 +31,10 @@ test.describe('Phase 8: Edge Case & Anti-Pattern Certification', () => {
         await page.goto('/');
         await page.waitForLoadState('networkidle');
 
-        // The page should still render the standard "Discover Items" block
+        // The page should still render the standard "Discover Products" block
         // proving that the BlocksEngine gracefully delegates unknown types to `null`
         // without tearing down the React tree.
-        const header = page.locator('h2', { hasText: /Discover Items/i });
+        const header = page.locator('h2', { hasText: /Discover Products/i });
         await expect(header).toBeVisible({ timeout: 5000 });
     });
 
