@@ -83,6 +83,13 @@ const CommerceIntentSchema = z.discriminatedUnion('intent', [
     z.object({ intent: z.literal('SET_GUEST_LOCATION'), payload: SetGuestLocationSchema }),
     z.object({ intent: z.literal('TRANSITION_ORDER'), payload: TransitionOrderSchema }),
     z.object({ intent: z.literal('PLACE_ORDER'), payload: PlaceOrderSchema }),
+    z.object({
+        intent: z.literal('REORDER'),
+        payload: z.object({
+            order_id: z.string().uuid(),
+            reuse_personalization: z.boolean().default(false)
+        })
+    }),
     z.object({ intent: z.literal('CLEAR_CART'), payload: z.object({}).optional() }),
 ]);
 
@@ -112,6 +119,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
             'SET_GSTIN',
             'SET_GUEST_LOCATION',
             'PLACE_ORDER',
+            'REORDER',
             'CLEAR_CART'
         ].includes(intentAction.intent);
 
@@ -214,7 +222,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
 
                 case 'PLACE_ORDER': {
                     const { data, error } = await supabase.rpc('place_atomic_order', {
-                        p_products: validated.payload.products as any,
+                        p_items: validated.payload.products as any,
                         p_address_id: validated.payload.address_id!,
                         p_razorpay_order_id: validated.payload.razorpay_order_id,
                         p_payment_id: validated.payload.payment_id ?? undefined,
@@ -263,12 +271,24 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     return { success: true, data };
                 }
 
+                case 'REORDER': {
+                    const { data, error } = await supabase.rpc('reorder_products', {
+                        p_order_id: validated.payload.order_id,
+                        p_user_id: user?.id ?? undefined,
+                        p_session_id: sessionId ?? undefined,
+                        p_reuse_personalization: validated.payload.reuse_personalization
+                    });
+                    if (error) throw error;
+                    revalidateTag('cart');
+                    return { success: true, data };
+                }
+
                 case 'CLEAR_CART': {
-                    const match = user ? { user_id: user.id } : { session_id: sessionId };
-                    await Promise.all([
-                        supabase.from('cart_products').delete().match(match),
-                        supabase.from('checkout_sessions').delete().match(match)
-                    ]);
+                    const { error } = await supabase.rpc('clear_cart', {
+                        p_user_id: user?.id ?? undefined,
+                        p_session_id: sessionId ?? undefined
+                    });
+                    if (error) throw error;
                     break;
                 }
             }

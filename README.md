@@ -1,8 +1,8 @@
 # WyshKit 2026
 
-**Last-minute gifts, personalised. Delivered in minutes.**
+**Hyper-personalization at Blinkit Speeds.**
 
-> *"We are what Swiggy would be if they delivered personalised gifts instead of biryani."*
+> *"We are what Swiggy would be if they delivered personalised gifts instead of biryani. Personalization is an edge service on local stock, not a manufacturing process."*
 
 ---
 
@@ -10,14 +10,12 @@
 
 ```
 Swiggy Food   = Restaurant → Cooks food → 3PL Delivery
-WyshKit       = Local vendor → Personalises product → 3PL Delivery
+WyshKit       = Local vendor → Personalises stock → 3PL Delivery
 ```
 
 One local vendor. One cart. One delivery. Always.
 
-We are **not** a gifting marketplace. We are **not** quick commerce. We are **not** a design tool.
-
-We are a **hyperlocal product marketplace** where local vendors sell physical goods with optional personalisation, and we handle digital discovery and last-mile delivery.
+We are a **hyperlocal product utility** where local vendors provide high-speed personalization services on blank inventory, and we handle the discovery-to-delivery loop.
 
 ---
 
@@ -438,3 +436,7 @@ npm run build         # Production build
 8. **No COD.** Ever.
 9. **No empty `search_path` on SECURITY DEFINER functions.** Always `SET search_path TO 'public', 'extensions'`.
 10. **No unindexed foreign keys.** Every FK column has a covering index.
+11. **No silent `EXCEPTION WHEN OTHERS` that returns success-shaped JSON.** If a mutation fails mid-transaction, RAISE the exception. Let Postgres roll back. Swallowing errors creates phantom state.
+12. **No raw `SQLERRM` in API responses.** Return structured error codes (`ORDER_ALREADY_EXISTS`, `VENDOR_OFFLINE`, `INSUFFICIENT_STOCK`). See `docs/PRINCIPLES_AND_MENTAL_MODELS.md` for the full error code table.
+13. **Accessibility is non-negotiable.** WCAG 2.1 AA minimum. 4.5:1 contrast ratio. 44px tap targets. `alt` text on all images. Semantic HTML. No exceptions.
+14. **No ghost push notifications.** Every push must deep-link to a specific entity (`/orders/[id]`, `/vendor/earnings`). Never link to the home feed. Never send a push without a destination.

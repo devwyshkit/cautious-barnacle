@@ -266,12 +266,13 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                     <p className="text-sm text-zinc-900">
                       {product.quantity}× {product.product_name}
                     </p>
-                    {/* WYSHKIT 2026: Variant options not available in current OrderItem schema. TODO: Add join or JSON column. */}
-                    {/* {product.selected_variant_options && (
-                      <p className="text-xs text-zinc-500 mt-0.5">
-                        {Object.values(product.selected_variant_options as Record<string, string>).join(' · ')}
+                    {product.selected_variant_options && (
+                      <p className="text-xs text-zinc-500 mt-0.5 font-medium italic">
+                        {Object.entries(product.selected_variant_options as Record<string, string>)
+                          .map(([key, value]) => `${key}: ${value}`)
+                          .join(' · ')}
                       </p>
-                    )} */}
+                    )}
                     {product.is_personalized && (
                       <Badge variant="outline" className="mt-1 text-xs bg-blue-50 text-blue-700 border-blue-200">
                         Personalization

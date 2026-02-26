@@ -13,6 +13,7 @@ export interface PricingBreakdown {
     discount: number;
     wallet_discount: number;
     total: number;
+    cashback_amount: number;
     wyshkit_money_earned: number;
     total_savings: number;
 }

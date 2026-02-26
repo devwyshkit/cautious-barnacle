@@ -27,7 +27,7 @@ const VendorIntentSchema = z.discriminatedUnion('entity', [
     }),
     z.object({
         entity: z.literal('vendor'),
-        action: z.enum(['TOGGLE_ONLINE']),
+        action: z.enum(['TOGGLE_ONLINE', 'SUBMIT_KYC']),
         id: z.string().uuid(),
         metadata: z.any().optional()
     })
@@ -109,6 +109,22 @@ export async function executeVendorIntent(intent: VendorIntent) {
 
                 if (validated.action === 'TOGGLE_ONLINE') {
                     await supabase.from('vendors').update({ is_online: validated.metadata.isOnline }).eq('id', validated.id);
+                } else if (validated.action === 'SUBMIT_KYC') {
+                    /**
+                     * WYSHKIT 2026: Docs-First Onboarding (IDFC First Bank Pattern)
+                     * 1. Docs submitted (metadata.docs)
+                     * 2. Trigger IDfy Extraction (deferred/async)
+                     * 3. Set status to UNDER_REVIEW
+                     */
+                    const { extraction_results } = validated.metadata;
+
+                    await supabase.from('vendors').update({
+                        kyc_status: 'UNDER_REVIEW',
+                        kyc_data_json: extraction_results || {}, // Results from IDfy OCR extraction
+                        updated_at: new Date().toISOString()
+                    }).eq('id', validated.id);
+
+                    revalidatePath('/vendor/profile');
                 }
                 break;
             }

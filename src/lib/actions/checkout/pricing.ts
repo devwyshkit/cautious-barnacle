@@ -31,7 +31,7 @@ export async function calculateOrderTotalRPC(
     const supabase = await createClient();
 
     const { data, error } = await supabase.rpc('calculate_order_total', {
-      p_products: cartProducts.map(product => ({
+      p_items: cartProducts.map(product => ({
         product_id: product.product_id,
         quantity: product.quantity,
         variant_id: product.variant_id ?? null,
@@ -77,6 +77,7 @@ export async function calculateOrderTotalRPC(
         discount: discount,
         wallet_discount: wallet_discount,
         total: Number(result.total) || 0,
+        cashback_amount: Number(result.cashback_amount) || 0,
         wyshkit_money_earned: Number(result.cashback_amount) || 0,
         total_savings: discount + wallet_discount
       },

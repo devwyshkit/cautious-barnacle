@@ -50,13 +50,6 @@ export type Database = {
             foreignKeyName: "addon_groups_vendor_id_fkey"
             columns: ["vendor_id"]
             isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["vendor_id"]
-          },
-          {
-            foreignKeyName: "addon_groups_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
             referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
@@ -330,13 +323,6 @@ export type Database = {
           used_count?: number | null
         }
         Relationships: [
-          {
-            foreignKeyName: "coupons_created_by_vendor_id_fkey"
-            columns: ["created_by_vendor_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["vendor_id"]
-          },
           {
             foreignKeyName: "coupons_created_by_vendor_id_fkey"
             columns: ["created_by_vendor_id"]
@@ -728,13 +714,6 @@ export type Database = {
             foreignKeyName: "orders_vendor_id_fkey"
             columns: ["vendor_id"]
             isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["vendor_id"]
-          },
-          {
-            foreignKeyName: "orders_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
             referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
@@ -891,13 +870,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "product_submissions_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["vendor_id"]
           },
           {
             foreignKeyName: "product_submissions_vendor_id_fkey"
@@ -1121,13 +1093,6 @@ export type Database = {
             foreignKeyName: "products_vendor_id_fkey"
             columns: ["vendor_id"]
             isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["vendor_id"]
-          },
-          {
-            foreignKeyName: "products_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
             referencedRelation: "vendors"
             referencedColumns: ["id"]
           },
@@ -1308,13 +1273,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["vendor_id"]
           },
           {
             foreignKeyName: "reviews_vendor_id_fkey"
@@ -1603,13 +1561,6 @@ export type Database = {
           vendor_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "vendor_payouts_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["vendor_id"]
-          },
           {
             foreignKeyName: "vendor_payouts_vendor_id_fkey"
             columns: ["vendor_id"]
@@ -1916,30 +1867,44 @@ export type Database = {
       v_active_cart_detailed: {
         Row: {
           base_price: number | null
+          cart_id: string | null
+          created_at: string | null
+          expires_at: string | null
           id: string | null
-          line_total: number | null
           personalization: Json | null
-          personalization_fee: number | null
           product_id: string | null
-          product_images: string[] | null
+          product_image_url: string | null
           product_name: string | null
           quantity: number | null
           selected_addons: Json | null
+          selected_variant_id: string | null
           session_id: string | null
+          updated_at: string | null
           user_id: string | null
-          variant_name: string | null
-          variant_price: number | null
-          vendor_city: string | null
           vendor_id: string | null
+          vendor_is_online: boolean | null
           vendor_name: string | null
-          vendor_prep_mins: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "cart_products_cart_id_fkey"
+            columns: ["cart_id"]
+            isOneToOne: false
+            referencedRelation: "carts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "cart_products_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_products_selected_variant_id_fkey"
+            columns: ["selected_variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
             referencedColumns: ["id"]
           },
           {
@@ -1949,43 +1914,87 @@ export type Database = {
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
         ]
       }
       v_order_tracking: {
         Row: {
+          address_id: string | null
+          awb_number: string | null
+          billing_address: Json | null
+          cancellation_reason: string | null
+          cancelled_by: string | null
+          cashback_amount: number | null
+          cashback_credited: boolean | null
+          change_request_count: number | null
+          courier_tracking_id: string | null
+          courier_vendor: string | null
           created_at: string | null
+          delivery_address: Json | null
           delivery_fee: number | null
+          delivery_instructions: string | null
+          discount: number | null
           distance_km: number | null
+          estimate_downloaded: boolean | null
           first_product_name: string | null
+          gstin: string | null
+          gstin_verified: boolean | null
           has_personalization: boolean | null
           id: string | null
+          idempotency_key: string | null
+          max_change_requests: number | null
           order_number: string | null
+          payment_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          payout_id: string | null
+          personalization_charges: number | null
+          platform_fee: number | null
+          price_locked_until: string | null
           product_count: number | null
           promised_delivery_at: string | null
+          razorpay_order_id: string | null
+          refunded_amount: number | null
+          return_deadline: string | null
+          shadowfax_tracking_url: string | null
           status: Database["public"]["Enums"]["order_status"] | null
           subtotal: number | null
+          tax_amount: number | null
           total: number | null
+          updated_at: string | null
           user_id: string | null
-          vendor_city: string | null
           vendor_id: string | null
-          vendor_image: string | null
-          vendor_location: unknown
+          vendor_image_url: string | null
           vendor_name: string | null
+          vendor_phone: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "orders_address_id_fkey"
+            columns: ["address_id"]
+            isOneToOne: false
+            referencedRelation: "user_addresses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_payout_id_fkey"
+            columns: ["payout_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_payouts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "orders_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "v_active_cart_detailed"
-            referencedColumns: ["vendor_id"]
           },
           {
             foreignKeyName: "orders_vendor_id_fkey"
@@ -2087,7 +2096,7 @@ export type Database = {
         Returns: unknown
       }
       _st_within: { Args: { geom1: unknown; geom2: unknown }; Returns: boolean }
-      add_item_review: {
+      add_product_review: {
         Args: {
           p_approved_mockup_url?: string
           p_comment: string
@@ -2145,7 +2154,7 @@ export type Database = {
           p_coupon_code?: string
           p_delivery_fee_override?: number
           p_distance_km?: number
-          p_products: Json
+          p_items: Json
           p_session_id?: string
           p_use_wallet?: boolean
           p_user_id?: string
@@ -2158,6 +2167,10 @@ export type Database = {
       }
       calculate_return_refund: {
         Args: { p_order_id: string; p_reason: string }
+        Returns: Json
+      }
+      clear_cart: {
+        Args: { p_session_id?: string; p_user_id?: string }
         Returns: Json
       }
       credit_cashback: {
@@ -2332,18 +2345,31 @@ export type Database = {
         Args: { p_session_id?: string; p_user_id?: string }
         Returns: Json
       }
-      get_checkout_context: {
-        Args: {
-          p_applied_coupon?: string
-          p_guest_lat?: number
-          p_guest_lng?: number
-          p_selected_address_id?: string
-          p_session_id?: string
-          p_use_wallet?: boolean
-          p_user_id?: string
-        }
-        Returns: Json
-      }
+      get_checkout_context:
+        | {
+            Args: {
+              p_applied_coupon?: string
+              p_guest_lat?: number
+              p_guest_lng?: number
+              p_selected_address_id?: string
+              p_session_id?: string
+              p_use_wallet?: boolean
+              p_user_id?: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_applied_coupon?: string
+              p_guest_lat?: number
+              p_guest_lng?: number
+              p_selected_address_id?: string
+              p_session_id?: string
+              p_use_wallet?: boolean
+              p_user_id?: string
+            }
+            Returns: Json
+          }
       get_home_surface: {
         Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
         Returns: Json
@@ -2381,18 +2407,18 @@ export type Database = {
             Returns: Json
           }
       longtransactionsenabled: { Args: never; Returns: boolean }
-      merge_guest_to_user: {
-        Args: { p_session_id: string; p_user_id: string }
-        Returns: Json
-      }
+      merge_guest_to_user:
+        | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
+        | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
+        | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
       place_atomic_order: {
         Args: {
-          p_address_id: string
+          p_address_id?: string
           p_coupon_code?: string
           p_delivery_instructions?: string
           p_distance_km?: number
           p_gstin?: string
-          p_products: Json
+          p_items?: Json
           p_payment_id?: string
           p_razorpay_order_id: string
           p_use_wallet?: boolean
@@ -2451,6 +2477,15 @@ export type Database = {
       recalculate_order_total: {
         Args: { p_order_id: string }
         Returns: undefined
+      }
+      reorder_products: {
+        Args: {
+          p_order_id: string
+          p_reuse_personalization?: boolean
+          p_session_id?: string
+          p_user_id?: string
+        }
+        Returns: Json
       }
       resolve_user_permissions: { Args: { p_user_id: string }; Returns: Json }
       st_3dclosestpoint: {
