@@ -14,12 +14,7 @@ Wyshkit is not an app; it is a **Stateless Projection** of the communal commerce
 
 ---
 
-## 🏛️ The Operational Equation
-```
-WyshKit = [Logistics Purity] + [Curated Substrate] + [Auth Layer]
-```
 
----
 
 ## 🦉 The Swiggy 2026 Mental Model
 
@@ -386,7 +381,7 @@ Customer submits details
 | UI | Next.js 15 + shadcn/ui |
 | Observability | OpenTelemetry (traces on every commerce intent) |
 | Validation | Zod (all mutations validated before RPC) |
-| Testing | Vitest (unit) + Playwright (E2E) |
+| Testing | Vitest (unit) |
 
 ---
 
@@ -420,7 +415,6 @@ NEXT_PUBLIC_SUPPORT_PHONE       # Optional
 ```bash
 npm run dev           # Local dev (Turbopack)
 npm test              # Vitest unit tests
-npm run test:e2e      # Playwright E2E
 npm run build         # Production build
 ```
 

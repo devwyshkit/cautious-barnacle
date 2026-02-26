@@ -143,7 +143,7 @@ See `docs/PRINCIPLES_AND_MENTAL_MODELS.md` for full implementation tables.
 ## 🧪 Testing Standards
 
 - **Unit tests** (Vitest): All RPC caller functions in `src/lib/actions/` must have unit tests. Coverage gate: 80%.
-- **E2E tests** (Playwright): Happy path coverage mandatory — browse → add to cart → checkout → payment → order tracking.
+- **E2E tests**: Playwright was removed in Round 4 (multi-framework bloat). E2E happy-path coverage (browse → cart → checkout → payment → tracking) is a **known gap** and a priority for the next engineering cycle.
 - **Mutation testing**: Commerce intent functions must be tested for all error branches (vendor offline, insufficient stock, vendor mismatch).
 
 ---

@@ -100,11 +100,14 @@ SELECT recover_payment_atomic(
 
 ## Emergency Infrastructure Controls
 
-| Action | RPC / Command | Risk |
+> [!CAUTION]
+> **Zero Manual SQL** applies here too. Never run raw `UPDATE` or `DELETE` on production tables — not even in an emergency. Partial writes without the state machine and audit trail create phantom state that is harder to debug than the original incident.
+
+| Action | Correct Approach | Risk |
 |---|---|---|
-| **Suspend Vendor** | `UPDATE vendors SET is_active = false...` | High (Immediate de-listing) |
-| **System Lockdown** | `UPDATE platform_settings SET orders_enabled = false` | Critical (Halts all commerce) |
-| **Clear Cart** | `DELETE FROM cart_products WHERE user_id = '...'` | Low (Session purge) |
+| **Suspend Vendor** | Ops Dashboard → Vendor → Deactivate (calls `suspend_vendor_atomic` RPC internally) | High — immediate de-listing |
+| **System Lockdown** | Ops Dashboard → Settings → Disable new orders (sets `platform_settings.orders_enabled = false` atomically) | Critical — halts all commerce |
+| **Clear Cart** | Use `execute_cart_mutation(p_mode='CLEAR')` RPC with the user's session | Low — session purge |
 
 ---
 
