@@ -1,0 +1,36 @@
+{
+  "name": "Wyshkit - Hyperlocal Item Marketplace",
+  "short_name": "Wyshkit",
+  "description": "Hyperlocal item marketplace with optional personalization",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#D91B24",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Search",
+      "short_name": "Search",
+      "description": "Search for items and partners",
+      "url": "/search",
+      "icons": [{ "src": "/images/icon.png", "sizes": "any" }]
+    },
+    {
+      "name": "Orders",
+      "short_name": "Orders",
+      "description": "View your orders",
+      "url": "/orders",
+      "icons": [{ "src": "/images/icon.png", "sizes": "any" }]
+    }
+  ]
+}
