@@ -1,0 +1,104 @@
+-- =============================================================================
+-- WYSHKIT 2026: Complete Table Schema with Columns
+-- Generated from database.types.ts - Reference only (tables likely already exist)
+-- =============================================================================
+
+-- ENUMS
+CREATE TYPE public.order_status AS ENUM (
+  'PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED',
+  'RIDER_ASSIGNED', 'ARRIVED_PICKUP', 'OUT_FOR_DELIVERY', 'ARRIVED_DROP',
+  'DELIVERED', 'CANCELLED', 'REFUNDED'
+);
+
+-- ==================== TABLES ====================
+
+-- addon_groups
+-- id UUID PK, created_at TIMESTAMPTZ, description TEXT, is_required BOOLEAN, max_select INT, min_select INT, name TEXT NOT NULL, vendor_id UUID FK(vendors)
+
+-- cart_products  
+-- id UUID PK, cart_id UUID FK(carts), created_at TIMESTAMPTZ, expires_at TIMESTAMPTZ, personalization JSONB, product_id UUID NOT NULL FK(products), quantity INT, selected_addons JSONB, selected_variant_id UUID FK(product_variants), session_id TEXT, updated_at TIMESTAMPTZ, user_id UUID FK(users)
+
+-- carts
+-- id UUID PK, created_at TIMESTAMPTZ, session_id TEXT, updated_at TIMESTAMPTZ, user_id UUID
+
+-- categories
+-- id UUID PK, created_at TIMESTAMPTZ, display_order INT, image_url TEXT, is_active BOOLEAN, name TEXT NOT NULL, parent_id UUID FK(categories), slug TEXT NOT NULL, updated_at TIMESTAMPTZ
+
+-- checkout_sessions
+-- id UUID PK, applied_coupon TEXT FK(coupons.code), created_at TIMESTAMPTZ, expires_at TIMESTAMPTZ, gstin TEXT, guest_lat NUMERIC, guest_lng NUMERIC, guest_location_name TEXT, selected_address_id UUID FK(user_addresses), session_id TEXT, snapshot_products JSONB, updated_at TIMESTAMPTZ, use_wallet BOOLEAN, user_id UUID FK(users)
+
+-- coupons
+-- id UUID PK, code TEXT NOT NULL UNIQUE, created_at TIMESTAMPTZ, created_by_vendor_id UUID FK(vendors), description TEXT, discount_type TEXT NOT NULL, discount_value NUMERIC NOT NULL, end_date TIMESTAMPTZ, is_active BOOLEAN, is_platform_coupon BOOLEAN, max_discount_amount NUMERIC, min_order_value NUMERIC, start_date TIMESTAMPTZ, usage_limit INT, used_count INT
+
+-- notifications
+-- id UUID PK, body TEXT NOT NULL, created_at TIMESTAMPTZ, is_read BOOLEAN, metadata JSONB, title TEXT NOT NULL, type TEXT NOT NULL, user_id UUID NOT NULL FK(users)
+
+-- order_products
+-- id UUID PK, created_at TIMESTAMPTZ, final_approved_mockup_url TEXT, gst_percentage NUMERIC, height_cm NUMERIC, hsn_code TEXT, is_personalized BOOLEAN, length_cm NUMERIC, liability_shifted_at TIMESTAMPTZ, order_id UUID NOT NULL FK(orders), personalization_details JSONB, personalization_revision_count INT, personalization_schema JSONB, product_id UUID NOT NULL FK(products), product_image_url TEXT, product_name TEXT, quantity INT NOT NULL, selected_addons JSONB, selected_variant_id UUID FK(product_variants), selected_variant_options JSONB, status order_status, stock_deducted BOOLEAN, total_price NUMERIC NOT NULL, unit_price NUMERIC NOT NULL, vendor_production_notes TEXT, weight_kg NUMERIC, width_cm NUMERIC
+
+-- order_status_history
+-- id UUID PK, changed_at TIMESTAMPTZ, metadata JSONB, order_id UUID NOT NULL FK(orders), status order_status
+
+-- order_valid_transitions
+-- id UUID PK, created_at TIMESTAMPTZ, from_status order_status, required_personalization_approval BOOLEAN, to_status order_status NOT NULL
+
+-- orders
+-- id UUID PK, address_id UUID FK(user_addresses), awb_number TEXT, billing_address JSONB, cancellation_reason TEXT, cancelled_by TEXT, cashback_amount NUMERIC, cashback_credited BOOLEAN, change_request_count INT, courier_tracking_id TEXT, courier_vendor TEXT, created_at TIMESTAMPTZ, delivery_address JSONB, delivery_fee NUMERIC, delivery_instructions TEXT, discount NUMERIC, distance_km NUMERIC, estimate_downloaded BOOLEAN, gstin TEXT, gstin_verified BOOLEAN, has_personalization BOOLEAN, idempotency_key TEXT, max_change_requests INT, order_number TEXT NOT NULL, payment_id TEXT, payment_method TEXT, payment_status TEXT, payout_id UUID FK(vendor_payouts), personalization_charges NUMERIC, platform_fee NUMERIC, price_locked_until TIMESTAMPTZ, promised_delivery_at TIMESTAMPTZ, razorpay_order_id TEXT, refunded_amount NUMERIC, return_deadline TIMESTAMPTZ, shadowfax_tracking_url TEXT, status order_status, subtotal NUMERIC NOT NULL, tax_amount NUMERIC, total NUMERIC NOT NULL, updated_at TIMESTAMPTZ, user_id UUID NOT NULL FK(users), vendor_id UUID NOT NULL FK(vendors)
+
+-- platform_settings
+-- key TEXT PK, updated_at TIMESTAMPTZ, value JSONB NOT NULL
+
+-- product_addon_groups (junction)
+-- addon_group_id UUID FK(addon_groups), display_order INT, product_id UUID FK(products), PRIMARY KEY(addon_group_id, product_id)
+
+-- product_addons
+-- id UUID PK, created_at TIMESTAMPTZ, group_id UUID FK(addon_groups), is_available BOOLEAN, name TEXT NOT NULL, price NUMERIC
+
+-- product_submissions
+-- id UUID PK, base_price NUMERIC, category_id UUID FK(categories), created_at TIMESTAMPTZ, description TEXT, gst_percentage NUMERIC, has_personalization BOOLEAN, hsn_code TEXT, images TEXT[], is_perishable BOOLEAN, material TEXT, mrp NUMERIC, name TEXT NOT NULL, personalization_schema JSONB, status TEXT, updated_at TIMESTAMPTZ, vendor_id UUID FK(vendors)
+
+-- product_variants
+-- id UUID PK, attributes JSONB, created_at TIMESTAMPTZ, images TEXT[], is_active BOOLEAN, mrp NUMERIC, name TEXT, price NUMERIC, product_id UUID FK(products), serial_number TEXT, sort_order INT, stock_quantity INT, updated_at TIMESTAMPTZ, video_url TEXT
+
+-- products
+-- id UUID PK, available_for_order BOOLEAN, base_price NUMERIC NOT NULL, brand TEXT, care_instructions TEXT, category_id UUID FK(categories), country_of_origin TEXT, created_at TIMESTAMPTZ, description TEXT, dimensions JSONB, fragile BOOLEAN, fts TSVECTOR, gst_percentage NUMERIC, has_personalization BOOLEAN, hsn_code TEXT, images TEXT[], is_active BOOLEAN, is_perishable BOOLEAN, low_stock_threshold INT, manufacturer_info TEXT, material TEXT, max_change_requests INT, max_order_quantity INT, min_order_quantity INT, mrp NUMERIC, name TEXT NOT NULL, packaging_type TEXT, personalization_fee NUMERIC, personalization_options JSONB, personalization_schema JSONB, preview_time_minutes INT, production_time_minutes INT, rating NUMERIC, shelf_life_hours INT, sku TEXT, slug TEXT NOT NULL, sort_order INT, stock_quantity INT, stock_status TEXT, tags TEXT[], total_ratings INT, updated_at TIMESTAMPTZ, vendor_id UUID NOT NULL FK(vendors), video_url TEXT, weight_kg NUMERIC
+
+-- returns
+-- id UUID PK, created_at TIMESTAMPTZ, description TEXT, images TEXT[], order_id UUID NOT NULL FK(orders), reason TEXT NOT NULL, refund_amount NUMERIC, return_delivery_fee NUMERIC, status TEXT, updated_at TIMESTAMPTZ, user_id UUID NOT NULL FK(users)
+
+-- reviews
+-- id UUID PK, approved_mockup_url TEXT, created_at TIMESTAMPTZ, delivered_photo_url TEXT, delivery_rating NUMERIC, fidelity_rating NUMERIC, fidelity_tags TEXT[], images TEXT[], is_anonymous BOOLEAN, is_personalised_review BOOLEAN, order_id UUID NOT NULL FK(orders), order_product_id UUID FK(order_products), personalization_rating NUMERIC, product_id UUID FK(products), rating NUMERIC NOT NULL, review_text TEXT, revision_count INT, tags TEXT[], user_id UUID NOT NULL FK(users), vendor_id UUID NOT NULL FK(vendors), vendor_replied_at TIMESTAMPTZ, vendor_reply TEXT, vendor_response_time_rating NUMERIC
+
+-- user_addresses
+-- id UUID PK, address_line1 TEXT NOT NULL, address_line2 TEXT, city TEXT, country TEXT, created_at TIMESTAMPTZ, gstin TEXT, is_default BOOLEAN, latitude NUMERIC, location GEOMETRY, longitude NUMERIC, name TEXT NOT NULL, phone TEXT NOT NULL, pincode TEXT, state TEXT, type TEXT NOT NULL, updated_at TIMESTAMPTZ, user_id UUID NOT NULL FK(users)
+
+-- user_roles
+-- id UUID PK, created_at TIMESTAMPTZ, role TEXT NOT NULL, user_id UUID NOT NULL FK(users)
+
+-- user_wallets (wyshkit_money)
+-- user_id UUID PK FK(users), balance NUMERIC, total_earned NUMERIC, total_withdrawn NUMERIC, updated_at TIMESTAMPTZ
+
+-- users
+-- id UUID PK (references auth.users), avatar_url TEXT, created_at TIMESTAMPTZ, email TEXT, full_name TEXT, phone TEXT, status TEXT, updated_at TIMESTAMPTZ
+
+-- vendor_applications
+-- id UUID PK, address_line1 TEXT, bank_details JSONB, business_name TEXT NOT NULL, category TEXT, city TEXT, contact_name TEXT NOT NULL, created_at TIMESTAMPTZ, email TEXT, gstin TEXT, pan_number TEXT, phone TEXT NOT NULL, pincode TEXT, status TEXT, updated_at TIMESTAMPTZ
+
+-- vendor_payouts
+-- id UUID PK, amount NUMERIC NOT NULL, created_at TIMESTAMPTZ, razorpay_payout_id TEXT, settlement_period_end TIMESTAMPTZ, settlement_period_start TIMESTAMPTZ, status TEXT NOT NULL, updated_at TIMESTAMPTZ, vendor_id UUID NOT NULL FK(vendors)
+
+-- vendors
+-- id UUID PK, address_line1 TEXT, address_line2 TEXT, agreed_to_contract BOOLEAN, avg_prep_time_mins INT, badge TEXT, bank_details JSONB, banner_url TEXT, base_delivery_charge NUMERIC, business_name TEXT, business_type TEXT, city TEXT, closing_time TIME, commission_percentage NUMERIC, created_at TIMESTAMPTZ, description TEXT, email TEXT, fixed_packaging_charge NUMERIC, fts TSVECTOR, gstin TEXT, has_outlet BOOLEAN, image_url TEXT, is_active BOOLEAN, is_online BOOLEAN, is_promoted BOOLEAN, kyc_data_json JSONB, kyc_status TEXT, kyc_verified_at TIMESTAMPTZ, location GEOMETRY(Point), minimum_order_amount NUMERIC, name TEXT NOT NULL, onboarding_fee_paid BOOLEAN, opening_time TIME, packaging_charge_type TEXT, pan_number TEXT, payout_contact_id TEXT, payout_fund_account_id TEXT, personalization_commission_percentage NUMERIC, pincode TEXT, promotion_rank INT, rating NUMERIC, razorpay_account_id TEXT, registered_name TEXT, serviceability_radius_km NUMERIC, settlement_days INT, slug TEXT NOT NULL, state TEXT, tagline TEXT, total_orders INT, total_ratings INT, updated_at TIMESTAMPTZ, vendor_external_id TEXT, vendor_tier TEXT, vendor_type TEXT, whatsapp_number TEXT, working_days TEXT[]
+
+-- vendor_users (partner linking - may need to be created)
+-- id UUID PK, user_id UUID NOT NULL FK(auth.users), vendor_id UUID NOT NULL FK(vendors), role TEXT DEFAULT 'partner', created_at TIMESTAMPTZ, UNIQUE(user_id, vendor_id)
+
+-- wallet_transactions
+-- id UUID PK, amount NUMERIC NOT NULL, balance_after NUMERIC NOT NULL, created_at TIMESTAMPTZ, order_id UUID FK(orders), reason TEXT NOT NULL, type TEXT NOT NULL, user_id UUID NOT NULL FK(users)
+
+-- webhook_logs
+-- id UUID PK, created_at TIMESTAMPTZ, external_id TEXT, payload JSONB, processed_at TIMESTAMPTZ, source TEXT NOT NULL
+
+-- ==================== VIEWS ====================
+-- v_active_cart_detailed (cart_products join products, vendors)
+-- v_order_tracking (orders join vendors, order_products)

@@ -1,0 +1,194 @@
+-- =============================================================================
+-- WYSHKIT 2026: App Queries Backup
+-- Documents all GET (SELECT) and POST (INSERT/UPDATE/DELETE) operations
+-- Used by the Next.js app via Supabase client
+-- =============================================================================
+
+-- ==================== DISCOVERY / HOME ====================
+-- Source: src/lib/actions/discovery/home.ts
+
+-- get_nearby_products RPC (requires lat, lng)
+-- Args: user_lat, user_lng, radius_km, include_out_of_stock
+-- SELECT via RPC: get_nearby_products
+
+-- get_home_surface RPC (requires p_lat, p_lng for vendors/products)
+-- Args: p_lat, p_lng, p_user_id, p_session_id
+-- SELECT via RPC: get_home_surface
+
+-- getCategories (deprecated)
+-- SELECT * FROM categories ORDER BY name;
+
+-- ==================== DISCOVERY / VENDORS ====================
+-- Source: src/lib/actions/discovery/vendors.ts
+
+-- getVendorStoreData - Vendor detail + products
+/*
+SELECT id, name, image_url, rating, city, avg_prep_time_mins, base_delivery_charge,
+       slug, business_type, is_online, description, gstin
+FROM vendors WHERE id = :vendorId;
+SELECT * FROM products WHERE vendor_id = :vendorId AND ...;
+*/
+
+-- ==================== DISCOVERY / SEARCH ====================
+-- Source: src/lib/actions/discovery/search.ts
+-- RPC: search_products_atomic(p_query, p_category_id, p_lat, p_lng, p_limit, p_offset)
+
+-- ==================== CART / CHECKOUT ====================
+-- Source: src/lib/actions/commerce/intent-engine.ts
+
+-- execute_cart_mutation RPC - Add/remove/update cart
+-- Args: p_product_id, p_quantity, p_variant_id, p_user_id, p_session_id, p_mode, p_personalization, p_selected_addons, p_clear_other_vendors
+
+-- update_checkout_session RPC
+-- Args: p_user_id, p_session_id, p_selected_address_id, p_applied_coupon, p_use_wallet, p_gstin, p_guest_lat, p_guest_lng
+
+-- get_checkout_context RPC
+-- Args: p_user_id, p_session_id, p_selected_address_id, p_applied_coupon, p_use_wallet, p_guest_lat, p_guest_lng
+
+-- calculate_order_total RPC
+-- Args: p_items (JSONB), p_address_id, p_coupon_code, p_distance_km, p_use_wallet, p_user_id
+
+-- place_atomic_order RPC - See 20240224_hardening_and_certification.sql
+
+-- clear_cart RPC - Args: p_user_id, p_session_id
+
+-- merge_guest_to_user RPC - Args: p_session_id, p_user_id
+
+-- ==================== ORDERS ====================
+-- Source: src/lib/actions/commerce/orders.ts, vendor-actions.ts
+
+-- transition_order RPC - Change order status
+-- Args: p_order_id, p_target_status, p_metadata, p_user_id
+
+-- log_order_status_history RPC
+-- Args: p_order_id, p_status, p_description, p_metadata, p_title
+
+-- submit_order_personalization RPC
+-- approve_order_preview RPC
+-- request_change RPC (p_order_id, p_feedback)
+-- cancel_order_product_atomic RPC (admin)
+-- reorder_products RPC
+
+-- get_vendor_orders
+/*
+SELECT id, status, total, subtotal, order_number, created_at, has_personalization, payment_id, delivery_fee, platform_fee, tax_amount, discount, vendor_id,
+       order_products (*)
+FROM orders WHERE vendor_id = :vendor_id [AND status IN (...)]
+ORDER BY created_at DESC;
+*/
+
+-- get_personalization_queue
+/*
+SELECT ... FROM orders WHERE vendor_id = :id AND has_personalization = true
+AND status IN ('CONFIRMED','PREPARING','READY');
+*/
+
+-- ==================== VENDOR / PARTNER ====================
+-- Source: src/lib/actions/vendor/vendor-actions.ts, catalog.ts, engine.ts
+
+-- get_vendor_products
+/*
+SELECT *, product_variants(*) FROM products WHERE vendor_id = :vendor_id ORDER BY created_at DESC;
+*/
+
+-- get_vendor_financials_v2 RPC - Args: p_vendor_id
+
+-- get_vendor_profile
+/*
+SELECT id, name, business_name, owner_name, email, phone, rating, commission_percentage,
+       is_online, is_active, address, city, pincode, base_delivery_charge, gstin, pan_number
+FROM vendors WHERE id = :vendor_id;
+*/
+
+-- update_vendor_online_status
+-- UPDATE vendors SET is_online = :is_online WHERE id = :vendor_id;
+
+-- createProduct
+/*
+INSERT INTO products (vendor_id, name, slug, description, base_price, mrp, category_id, images,
+  has_personalization, is_active, production_time_minutes, preview_time_minutes, material, weight_kg,
+  dimensions, hsn_code, gst_percentage, personalization_options)
+VALUES (...);
+*/
+
+-- updateProduct
+-- UPDATE products SET ... WHERE id = :productId;
+
+-- deleteProduct
+-- DELETE FROM product_variants WHERE product_id = :productId;
+-- DELETE FROM products WHERE id = :productId;
+
+-- createVariant
+/*
+INSERT INTO product_variants (product_id, name, price, mrp, attributes, stock_quantity, serial_number, is_active)
+VALUES (...);
+*/
+
+-- updateVariant
+-- UPDATE product_variants SET ... WHERE id = :variantId;
+
+-- updateVariantStock
+-- UPDATE product_variants SET stock_quantity = :quantity, updated_at = NOW() WHERE id = :variant_id;
+
+-- upload_preview (order_products)
+/*
+UPDATE order_products SET personalization_details = jsonb_set(COALESCE(personalization_details,'{}'), '{preview_url}', '"..."')
+WHERE id = :order_product_id;
+*/
+
+-- SUBMIT_KYC (vendor engine)
+/*
+UPDATE vendors SET kyc_status = 'UNDER_REVIEW', kyc_data_json = :extraction_results, updated_at = NOW()
+WHERE id = :vendor_id;
+*/
+
+-- ==================== USER / ADDRESSES ====================
+-- Source: src/lib/actions/user/addresses.ts
+
+-- createAddress
+/*
+INSERT INTO user_addresses (user_id, type, name, phone, address_line1, address_line2, city, state, pincode, country, latitude, longitude, is_default, gstin)
+VALUES (...);
+*/
+
+-- updateAddress
+-- UPDATE user_addresses SET ... WHERE id = :addressId AND user_id = auth.uid();
+
+-- set default address
+-- UPDATE user_addresses SET is_default = false WHERE user_id = :userId;
+-- UPDATE user_addresses SET is_default = true WHERE id = :addressId;
+
+-- ==================== USER / PROFILE ====================
+-- Source: src/lib/actions/user/profile.ts
+-- UPDATE users SET full_name, phone, avatar_url, updated_at WHERE id = auth.uid();
+
+-- ==================== AUTH ====================
+-- resolve_user_permissions RPC - See 01_partner_flow.fsql
+-- get_vendor_from_session RPC - See 01_partner_flow.fsql
+
+-- ==================== ADMIN ====================
+-- Source: src/lib/actions/admin/engine.ts
+-- execute_admin_intent RPC - Args: p_intent (JSON)
+
+-- ==================== REVIEWS ====================
+-- add_product_review RPC - Args: p_product_id, p_rating, p_comment, p_user_id (from auth)
+
+-- ==================== CASHBACK ====================
+-- credit_cashback RPC - Args: p_order_id
+
+-- ==================== RETURNS ====================
+-- process_order_return RPC
+-- UPDATE returns SET status = 'failed' WHERE ...
+-- log_order_status_history
+
+-- ==================== WEBHOOKS ====================
+-- Razorpay: UPDATE orders SET payment_status, ... ; DELETE checkout_sessions
+-- Shadowfax: transition_order RPC
+-- order_status_history insert
+
+-- ==================== TABLES REFERENCE ====================
+-- Core: users, user_roles, user_addresses, user_wallets, vendor_users
+-- Commerce: vendors, products, product_variants, categories, cart_products, carts
+-- Orders: orders, order_products, order_status_history, checkout_sessions
+-- Returns: returns
+-- Misc: order_valid_transitions, wallet_transactions, webhook_logs

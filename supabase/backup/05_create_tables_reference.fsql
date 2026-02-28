@@ -1,0 +1,331 @@
+-- =============================================================================
+-- WYSHKIT 2026: CREATE TABLE Reference (schema only, no data)
+-- Use for documentation or fresh DB setup. Existing DB may have different structure.
+-- =============================================================================
+
+-- Note: Run in order. Some FKs depend on earlier tables.
+-- Skip tables that already exist (use IF NOT EXISTS where supported).
+
+BEGIN;
+
+-- Enum (create if not exists)
+DO $$ BEGIN
+  CREATE TYPE public.order_status AS ENUM (
+    'PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED',
+    'RIDER_ASSIGNED', 'ARRIVED_PICKUP', 'OUT_FOR_DELIVERY', 'ARRIVED_DROP',
+    'DELIVERED', 'CANCELLED', 'REFUNDED'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Core tables (simplified - assumes auth.users exists)
+CREATE TABLE IF NOT EXISTS public.users (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  email TEXT,
+  full_name TEXT,
+  phone TEXT,
+  status TEXT DEFAULT 'active',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  display_order INT,
+  image_url TEXT,
+  is_active BOOLEAN DEFAULT true,
+  name TEXT NOT NULL,
+  parent_id UUID REFERENCES public.categories(id),
+  slug TEXT NOT NULL UNIQUE,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.vendors (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  address_line1 TEXT,
+  address_line2 TEXT,
+  agreed_to_contract BOOLEAN,
+  avg_prep_time_mins INT,
+  badge TEXT,
+  bank_details JSONB,
+  banner_url TEXT,
+  base_delivery_charge NUMERIC DEFAULT 0,
+  business_name TEXT,
+  business_type TEXT,
+  city TEXT,
+  closing_time TIME,
+  commission_percentage NUMERIC DEFAULT 18,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  description TEXT,
+  email TEXT,
+  fixed_packaging_charge NUMERIC,
+  gstin TEXT,
+  has_outlet BOOLEAN,
+  image_url TEXT,
+  is_active BOOLEAN DEFAULT true,
+  is_online BOOLEAN DEFAULT false,
+  is_promoted BOOLEAN DEFAULT false,
+  kyc_data_json JSONB DEFAULT '{}',
+  kyc_status TEXT DEFAULT 'PENDING_KYC',
+  kyc_verified_at TIMESTAMPTZ,
+  minimum_order_amount NUMERIC DEFAULT 0,
+  name TEXT NOT NULL,
+  onboarding_fee_paid BOOLEAN,
+  opening_time TIME,
+  pan_number TEXT,
+  pincode TEXT,
+  rating NUMERIC DEFAULT 0,
+  registered_name TEXT,
+  serviceability_radius_km NUMERIC DEFAULT 5,
+  settlement_days INT DEFAULT 7,
+  slug TEXT NOT NULL UNIQUE,
+  state TEXT,
+  tagline TEXT,
+  total_orders INT DEFAULT 0,
+  total_ratings INT DEFAULT 0,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  vendor_tier TEXT DEFAULT '1',
+  vendor_type TEXT,
+  whatsapp_number TEXT,
+  working_days TEXT[]
+);
+
+CREATE TABLE IF NOT EXISTS public.vendor_users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  vendor_id UUID NOT NULL REFERENCES public.vendors(id) ON DELETE CASCADE,
+  role TEXT DEFAULT 'partner',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, vendor_id)
+);
+CREATE INDEX IF NOT EXISTS idx_vendor_users_user ON public.vendor_users(user_id);
+CREATE INDEX IF NOT EXISTS idx_vendor_users_vendor ON public.vendor_users(vendor_id);
+
+CREATE TABLE IF NOT EXISTS public.user_roles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  role TEXT NOT NULL,
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS public.user_addresses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  address_line1 TEXT NOT NULL,
+  address_line2 TEXT,
+  city TEXT,
+  country TEXT DEFAULT 'India',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  gstin TEXT,
+  is_default BOOLEAN DEFAULT false,
+  latitude NUMERIC,
+  longitude NUMERIC,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  pincode TEXT,
+  state TEXT,
+  type TEXT NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS public.user_wallets (
+  user_id UUID PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
+  balance NUMERIC DEFAULT 0,
+  total_earned NUMERIC DEFAULT 0,
+  total_withdrawn NUMERIC DEFAULT 0,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  available_for_order BOOLEAN DEFAULT true,
+  base_price NUMERIC NOT NULL,
+  category_id UUID REFERENCES public.categories(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  description TEXT,
+  has_personalization BOOLEAN DEFAULT false,
+  images TEXT[] DEFAULT '{}',
+  is_active BOOLEAN DEFAULT true,
+  is_perishable BOOLEAN DEFAULT false,
+  name TEXT NOT NULL,
+  personalization_options JSONB DEFAULT '[]',
+  personalization_schema JSONB DEFAULT '{"fields":[]}',
+  slug TEXT NOT NULL,
+  stock_quantity INT,
+  stock_status TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  vendor_id UUID NOT NULL REFERENCES public.vendors(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS public.product_variants (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  attributes JSONB DEFAULT '{}',
+  is_active BOOLEAN DEFAULT true,
+  name TEXT,
+  price NUMERIC,
+  product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
+  stock_quantity INT,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.carts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  session_id TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS public.cart_products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  cart_id UUID REFERENCES public.carts(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ,
+  personalization JSONB,
+  product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+  quantity INT NOT NULL DEFAULT 1,
+  selected_addons JSONB,
+  selected_variant_id UUID REFERENCES public.product_variants(id),
+  session_id TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS public.orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  address_id UUID REFERENCES public.user_addresses(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  delivery_address JSONB,
+  delivery_fee NUMERIC DEFAULT 0,
+  delivery_instructions TEXT,
+  discount NUMERIC DEFAULT 0,
+  has_personalization BOOLEAN DEFAULT false,
+  order_number TEXT NOT NULL UNIQUE,
+  payment_id TEXT,
+  payment_status TEXT,
+  personalization_charges NUMERIC DEFAULT 0,
+  platform_fee NUMERIC DEFAULT 0,
+  promised_delivery_at TIMESTAMPTZ,
+  razorpay_order_id TEXT,
+  status public.order_status DEFAULT 'PLACED',
+  subtotal NUMERIC NOT NULL,
+  tax_amount NUMERIC DEFAULT 0,
+  total NUMERIC NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  vendor_id UUID NOT NULL REFERENCES public.vendors(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS public.order_products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  is_personalized BOOLEAN DEFAULT false,
+  order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
+  personalization_details JSONB,
+  product_id UUID NOT NULL REFERENCES public.products(id),
+  product_name TEXT NOT NULL,
+  quantity INT NOT NULL,
+  total_price NUMERIC NOT NULL,
+  unit_price NUMERIC NOT NULL,
+  status public.order_status DEFAULT 'PLACED'
+);
+
+CREATE TABLE IF NOT EXISTS public.order_status_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  changed_at TIMESTAMPTZ DEFAULT NOW(),
+  metadata JSONB,
+  order_id UUID NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
+  status public.order_status NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.order_valid_transitions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  from_status public.order_status,
+  to_status public.order_status NOT NULL,
+  required_personalization_approval BOOLEAN DEFAULT false,
+  UNIQUE(from_status, to_status)
+);
+
+CREATE TABLE IF NOT EXISTS public.checkout_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ,
+  selected_address_id UUID REFERENCES public.user_addresses(id),
+  session_id TEXT,
+  snapshot_products JSONB,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS public.coupons (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  code TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  discount_type TEXT NOT NULL,
+  discount_value NUMERIC NOT NULL,
+  is_active BOOLEAN DEFAULT true
+);
+
+CREATE TABLE IF NOT EXISTS public.returns (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  order_id UUID NOT NULL REFERENCES public.orders(id),
+  reason TEXT NOT NULL,
+  refund_amount NUMERIC,
+  status TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID NOT NULL REFERENCES public.users(id)
+);
+
+CREATE TABLE IF NOT EXISTS public.reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  order_id UUID NOT NULL REFERENCES public.orders(id),
+  order_product_id UUID REFERENCES public.order_products(id),
+  product_id UUID REFERENCES public.products(id),
+  rating NUMERIC NOT NULL,
+  review_text TEXT,
+  user_id UUID NOT NULL REFERENCES public.users(id),
+  vendor_id UUID NOT NULL REFERENCES public.vendors(id)
+);
+
+CREATE TABLE IF NOT EXISTS public.vendor_payouts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  amount NUMERIC NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  status TEXT NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  vendor_id UUID NOT NULL REFERENCES public.vendors(id)
+);
+
+CREATE TABLE IF NOT EXISTS public.wallet_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  amount NUMERIC NOT NULL,
+  balance_after NUMERIC NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  order_id UUID REFERENCES public.orders(id),
+  reason TEXT NOT NULL,
+  type TEXT NOT NULL,
+  user_id UUID NOT NULL REFERENCES public.users(id)
+);
+
+CREATE TABLE IF NOT EXISTS public.platform_settings (
+  key TEXT PRIMARY KEY,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  value JSONB NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.webhook_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  external_id TEXT,
+  payload JSONB,
+  processed_at TIMESTAMPTZ,
+  source TEXT NOT NULL
+);
+
+COMMIT;

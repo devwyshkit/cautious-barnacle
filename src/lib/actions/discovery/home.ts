@@ -89,6 +89,25 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
         // WYSHKIT 2026: Deterministic Category Resolution
         // We trust the RPC, but keep fallback logic for safety during transition
         let resolvedCategories = raw?.categories || [];
+        let featuredVendors = raw.vendors || raw.sections_data?.vendors || [];
+        let trendingProducts = raw.featured_products || raw.sections_data?.best_sellers || [];
+
+        // Fallback: RPC often returns empty vendors/products due to location/opening-hours filters.
+        // When empty, fetch directly from tables so customer sees data.
+        if (featuredVendors.length === 0 || trendingProducts.length === 0) {
+            const [vendorsRes, productsRes] = await Promise.all([
+                supabase.from('vendors').select('id, name, image_url, rating, city, avg_prep_time_mins, base_delivery_charge, slug, business_type, is_online, description').eq('is_active', true).limit(12),
+                supabase.from('products').select('*, vendors(name, city)').eq('is_active', true).limit(24)
+            ]);
+            if (featuredVendors.length === 0 && vendorsRes.data?.length) {
+                featuredVendors = (vendorsRes.data as any[]).map(v => ({ ...v, prep_mins: v.avg_prep_time_mins || 45, delivery_fee: Number(v.base_delivery_charge || 0) }));
+                logger.info('GetHomeSurface: Fallback fetched vendors', { count: featuredVendors.length });
+            }
+            if (trendingProducts.length === 0 && productsRes.data?.length) {
+                trendingProducts = productsRes.data as any[];
+                logger.info('GetHomeSurface: Fallback fetched products', { count: trendingProducts.length });
+            }
+        }
 
         const sections = raw.sections || [];
         const sectionsData = raw.sections_data || {};
@@ -96,9 +115,9 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
         return {
             sections,
             categories: resolvedCategories,
-            trendingProducts: raw.featured_products || sectionsData.best_sellers || [],
+            trendingProducts,
             newArrivals: sectionsData.new_arrivals || [],
-            featuredVendors: raw.vendors || sectionsData.vendors || [],
+            featuredVendors,
             activeOrders: raw.active_orders || [],
             recentOrders: raw.recent_orders || [],
             cartCount: raw.cart_count || 0,

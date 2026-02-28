@@ -1,0 +1,119 @@
+-- =============================================================================
+-- WYSHKIT 2026: Partner Flow SQL Backup
+-- Run this in Supabase Dashboard > SQL Editor to restore partner/vendor linking
+-- =============================================================================
+
+-- 1. Ensure vendor_users table exists (links users to vendors for partner access)
+-- Check: \d vendor_users in psql, or create if missing:
+/*
+CREATE TABLE IF NOT EXISTS public.vendor_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    vendor_id UUID NOT NULL REFERENCES public.vendors(id) ON DELETE CASCADE,
+    role TEXT DEFAULT 'partner',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, vendor_id)
+);
+CREATE INDEX IF NOT EXISTS idx_vendor_users_user ON public.vendor_users(user_id);
+CREATE INDEX IF NOT EXISTS idx_vendor_users_vendor ON public.vendor_users(vendor_id);
+*/
+
+-- 2. resolve_user_permissions RPC (used by AuthProvider / auth/core.ts)
+-- Returns: { roles: string[], vendorIds: string[] }
+-- Lookup: user_roles.role for admin; vendor_users.vendor_id for partner
+CREATE OR REPLACE FUNCTION public.resolve_user_permissions(p_user_id UUID)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_roles TEXT[] := ARRAY[]::TEXT[];
+    v_vendor_ids UUID[] := ARRAY[]::UUID[];
+BEGIN
+    -- Admin: from user_roles where role = 'admin'
+    IF EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = p_user_id AND role = 'admin') THEN
+        v_roles := array_append(v_roles, 'admin');
+    END IF;
+
+    -- Partner: from vendor_users
+    SELECT COALESCE(array_agg(vendor_id), ARRAY[]::UUID[])
+    INTO v_vendor_ids
+    FROM public.vendor_users
+    WHERE user_id = p_user_id;
+
+    IF array_length(v_vendor_ids, 1) > 0 THEN
+        v_roles := array_append(v_roles, 'vendor');
+    END IF;
+
+    RETURN json_build_object(
+        'roles', v_roles,
+        'vendorIds', COALESCE((SELECT json_agg(vid::text) FROM unnest(v_vendor_ids) AS vid), '[]'::json)
+    );
+END;
+$$;
+
+-- 3. get_vendor_from_session RPC (used by auth/server.ts getVendorFromSession)
+-- Returns vendor row for current partner, or null
+-- Lookup order: 1) vendor_users 2) user_roles/is_admin 3) app_metadata.vendor_id
+CREATE OR REPLACE FUNCTION public.get_vendor_from_session(
+    p_user_id UUID,
+    p_email TEXT DEFAULT NULL,
+    p_app_metadata JSONB DEFAULT '{}'
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_vendor_id UUID;
+    v_vendor RECORD;
+BEGIN
+    -- 1. vendor_users (primary: user linked to vendor)
+    SELECT vu.vendor_id INTO v_vendor_id
+    FROM public.vendor_users vu
+    WHERE vu.user_id = p_user_id
+    LIMIT 1;
+
+    -- 2. app_metadata.vendor_id (fallback: set during onboarding)
+    IF v_vendor_id IS NULL AND p_app_metadata ? 'vendor_id' THEN
+        v_vendor_id := (p_app_metadata->>'vendor_id')::UUID;
+    END IF;
+
+    IF v_vendor_id IS NULL THEN
+        RETURN NULL;
+    END IF;
+
+    -- Fetch vendor row
+    SELECT v.* INTO v_vendor
+    FROM public.vendors v
+    WHERE v.id = v_vendor_id AND v.is_active = true;
+
+    IF NOT FOUND THEN
+        RETURN NULL;
+    END IF;
+
+    RETURN row_to_json(v_vendor);
+END;
+$$;
+
+-- 4. Add partner to vendor (manual link for onboarding)
+-- Usage: Call after creating vendor and user
+/*
+INSERT INTO public.vendor_users (user_id, vendor_id, role)
+VALUES (
+    'USER_UUID_HERE'::UUID,
+    'VENDOR_UUID_HERE'::UUID,
+    'partner'
+)
+ON CONFLICT (user_id, vendor_id) DO NOTHING;
+*/
+
+-- 5. RLS for vendor_users (partners can read their own links)
+/*
+ALTER TABLE public.vendor_users ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Partners read own vendor links" ON public.vendor_users;
+CREATE POLICY "Partners read own vendor links" ON public.vendor_users
+    FOR SELECT USING (user_id = auth.uid());
+*/

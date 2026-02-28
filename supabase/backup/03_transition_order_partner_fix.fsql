@@ -1,0 +1,57 @@
+-- =============================================================================
+-- WYSHKIT 2026: transition_order Partner/Role Fix
+-- Use if transition_order fails with "column users.role does not exist"
+-- The app uses user_roles table for roles, not users.role
+-- =============================================================================
+
+-- Updated transition_order - uses user_roles for admin check
+CREATE OR REPLACE FUNCTION public.transition_order(
+    p_order_id uuid,
+    p_target_status order_status,
+    p_metadata jsonb DEFAULT NULL,
+    p_user_id uuid DEFAULT auth.uid()
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_current_status order_status;
+    v_vendor_id uuid;
+    v_is_valid boolean;
+    v_role text;
+BEGIN
+    SELECT status, vendor_id INTO v_current_status, v_vendor_id 
+    FROM public.orders WHERE id = p_order_id;
+    
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('success', false, 'error', 'Order not found');
+    END IF;
+
+    -- Role check: user_roles for admin; vendor_users for partner
+    IF EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = p_user_id AND role = 'admin') THEN
+        v_role := 'ADMIN';
+    ELSIF EXISTS (SELECT 1 FROM public.vendor_users WHERE vendor_id = v_vendor_id AND user_id = p_user_id) THEN
+        v_role := 'PARTNER';
+    ELSIF p_user_id = (SELECT user_id FROM public.orders WHERE id = p_order_id) THEN
+        v_role := 'CUSTOMER';
+    ELSE
+        v_role := 'SYSTEM';
+    END IF;
+
+    SELECT EXISTS (
+        SELECT 1 FROM public.order_valid_transitions 
+        WHERE from_status = v_current_status AND to_status = p_target_status
+    ) INTO v_is_valid;
+
+    IF v_role = 'ADMIN' THEN v_is_valid := TRUE; END IF;
+
+    IF NOT v_is_valid THEN
+        RETURN jsonb_build_object('success', false, 'error', format('Invalid transition: %s -> %s', v_current_status, p_target_status));
+    END IF;
+
+    UPDATE public.orders SET status = p_target_status, updated_at = NOW() WHERE id = p_order_id;
+    RETURN jsonb_build_object('success', true, 'status', p_target_status);
+END;
+$$;
