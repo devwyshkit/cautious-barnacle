@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { getVendorFromSession } from '@/lib/auth/server';
 import { VendorLayoutShell } from '@/components/vendor/layout/VendorLayoutShell';
@@ -11,11 +10,7 @@ export default async function VendorLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = (await headers()).get('x-pathname') || '';
-  if (pathname === '/vendor/login') {
-    return <>{children}</>;
-  }
-
+  // /vendor/login lives in (vendor-auth) route group - never hits this layout
   const vendor = await getVendorFromSession();
   if (!vendor) {
     redirect('/vendor/login');

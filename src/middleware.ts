@@ -14,7 +14,6 @@ export async function middleware(request: NextRequest) {
 
     // WYSHKIT 2026: Edge Context Injection (Request Patching)
     const requestHeaders = new Headers(request.headers)
-    requestHeaders.set('x-pathname', request.nextUrl.pathname)
     if (lat && lng) {
       requestHeaders.set('x-wyshkit-location-lat', lat)
       requestHeaders.set('x-wyshkit-location-lng', lng)
