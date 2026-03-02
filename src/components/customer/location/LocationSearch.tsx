@@ -49,7 +49,7 @@ export function LocationSearch({ query, onQueryChange, results, searching, onSel
                             onClick={() => onSelectPlace(result.place_id)}
                             className="w-full flex items-start gap-4 p-4 rounded-[var(--radius-xl)] hover:bg-[var(--surface)] hover:shadow-[var(--shadow-sm)] transition-all text-left group"
                         >
-                            <div className="size-10 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center shrink-0 group-hover:bg-[var(--primary)]/5 transition-colors">
+                            <div className="size-10 rounded-[var(--radius-lg)] bg-[var(--surface-muted)] flex items-center justify-center shrink-0 group-hover:bg-[var(--primary)]/5 transition-colors">
                                 <MapPin className="size-4 text-[var(--text-tertiary)] group-hover:text-[var(--primary)]" />
                             </div>
                             <div className="flex flex-col min-w-0 flex-1 pt-0.5">
