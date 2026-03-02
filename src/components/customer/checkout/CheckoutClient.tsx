@@ -62,7 +62,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
             <div className="flex-1 overflow-y-auto px-4 pb-32 space-y-3">
 
                 {/* ITEMS SECTION - Anchoring Commitment */}
-                <section className="bg-[var(--surface)] rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
+                <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
                         <ShieldCheck className="size-3.5 text-[var(--primary)]" />
                         <span className="text-xs font-bold text-[var(--text-secondary)] tracking-widest uppercase">Your Order</span>
@@ -83,7 +83,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                                         <p className="text-sm font-bold text-[var(--text-primary)] truncate">{product.product_name}</p>
                                         <Link
                                             href={`/vendor/${product.vendor_id}/product/${product.product_id}?edit=true&cartProductId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${product.selected_addons?.map((a: any) => a.id).join(',') || ''}&returnUrl=/checkout`}
-                                            className="text-xs font-bold text-[var(--primary)] uppercase tracking-tight px-2 py-1 bg-rose-50 rounded-md hover:bg-rose-100 transition-colors"
+                                            className="text-xs font-bold text-[var(--primary)] uppercase tracking-tight px-2 py-1 bg-[var(--well-destructive)] rounded-md hover:opacity-80 transition-colors"
                                         >
                                             Edit
                                         </Link>
@@ -104,7 +104,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                 </section>
 
                 {/* DELIVERY SECTION */}
-                <section className="bg-[var(--surface)] rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
+                <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
                         <MapPin className="size-3.5 text-[var(--primary)]" />
                         <span className="text-xs font-bold text-[var(--text-secondary)] tracking-widest uppercase">Delivery</span>
@@ -162,7 +162,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                 />
 
                 {/* BILL SECTION */}
-                <section className="bg-[var(--surface)] rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
+                <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
                         <FileText className="size-3.5 text-[var(--primary)]" />
                         <span className="text-xs font-bold text-[var(--text-secondary)] tracking-widest uppercase">Bill</span>
@@ -219,7 +219,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                 </section>
 
                 {/* PAYMENT SECTION */}
-                <section className="bg-[var(--surface)] rounded-[24px] border border-[var(--surface-border)] overflow-hidden shadow-sm">
+                <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
                         <CreditCard className="size-3.5 text-[var(--primary)]" />
                         <span className="text-xs font-bold text-[var(--text-secondary)] tracking-widest">Payment</span>

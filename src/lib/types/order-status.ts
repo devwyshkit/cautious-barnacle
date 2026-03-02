@@ -142,6 +142,11 @@ const STATUS_COLORS: Record<string, string> = {
   DELIVERED: 'bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20',
   CANCELLED: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
   REFUNDED: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
+  // Personalization Statuses (v_order_tracking maps these)
+  pending: 'bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20',
+  preview_ready: 'bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20',
+  change_requested: 'bg-[var(--well-destructive)] text-[var(--destructive)] border-[var(--destructive)]/20',
+  approved: 'bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20',
 };
 
 export function getOrderStatusDisplay(status: string): string {
