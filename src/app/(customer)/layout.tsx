@@ -58,6 +58,7 @@ async function AsyncLayoutContent({
   let location: LocationData = { name: 'Select location', address: '', pincode: '' };
   let user: User | null = null;
   let permissions: AuthCoreLib.UserPermissions | null = null;
+  let activeOrders: any[] = [];
 
   try {
     // Stage 1: Resolve Auth (Zero-Trip Strategy)
@@ -106,13 +107,14 @@ async function AsyncLayoutContent({
     ]);
 
     location = locRes;
-    const { cart: mappedCartResult } = globalInit;
+    const { cart: mappedCartResult, home } = globalInit;
     cartResult = {
       cart: mappedCartResult.cart,
       cartSessionId: mappedCartResult.cartSessionId,
       guestSessionId: null // Handled by RPC internally
     };
     permissions = permsRes;
+    activeOrders = home?.activeOrders || [];
   } catch (error) {
     logger.error('AsyncLayoutContent Error:', error);
   }
@@ -131,7 +133,7 @@ async function AsyncLayoutContent({
         <FloatingCartBar key={cartResult.cartSessionId} />
         <CartDrawer />
       </CartErrorBoundary>
-      <OrderTrackingBar />
+      <OrderTrackingBar initialOrders={activeOrders} />
     </CartProvider>
   );
 }

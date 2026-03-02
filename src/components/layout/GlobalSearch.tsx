@@ -23,20 +23,14 @@ export function GlobalSearch() {
     router.back();
   };
   const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(query), 200);
-    return () => clearTimeout(timer);
-  }, [query]);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
   const { data: searchResults, isLoading, error } = useSearch({
-    q: debouncedQuery.trim().length >= 2 ? debouncedQuery.trim() : undefined,
+    q: query.trim().length >= 2 ? query.trim() : undefined,
   });
 
   // WYSHKIT 2026: React 19 Compiler handles memoization automatically

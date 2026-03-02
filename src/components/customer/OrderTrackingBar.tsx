@@ -9,8 +9,8 @@ import { ORDER_STATUS, PERSONALIZATION_STATUS, getStatusConfig } from '@/lib/typ
 import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
-export function OrderTrackingBar() {
-    const { activeOrders, loading } = useActiveOrders();
+export function OrderTrackingBar({ initialOrders = [] }: { initialOrders?: any[] }) {
+    const { activeOrders, loading } = useActiveOrders(initialOrders);
     const { draftOrder } = useCart();
     const pathname = usePathname();
     const router = useRouter();

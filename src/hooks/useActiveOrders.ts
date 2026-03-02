@@ -22,11 +22,11 @@ export interface ActiveOrder {
  * WYSHKIT 2026: Hook to monitor active orders for a user.
  * Reuses the shared Realtime channel to prevent proliferation.
  */
-export function useActiveOrders() {
+export function useActiveOrders(initialOrders: ActiveOrder[] = []) {
     const { user, loading: authLoading } = useAuth();
     const { channel } = useRealtime(); // WYSHKIT 2026: Shared Pulse
-    const [activeOrders, setActiveOrders] = useState<ActiveOrder[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [activeOrders, setActiveOrders] = useState<ActiveOrder[]>(initialOrders);
+    const [loading, setLoading] = useState(initialOrders.length === 0);
     const supabase = createClient();
 
     const fetchActiveOrders = async (uid: string) => {
