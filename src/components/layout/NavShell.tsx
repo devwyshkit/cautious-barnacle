@@ -36,12 +36,14 @@ export function NavShell({ initialLocation, children }: NavShellProps) {
         pathname.startsWith('/category/') ||
         pathname.startsWith('/collection/');
 
+    const hideHeader = isImmersive || pathname === '/search';
+
     return (
         <div data-immersive={isImmersive} className="flex flex-col min-h-[100dvh]">
-            {!isImmersive && <TopHeader initialLocation={initialLocation} />}
+            {!hideHeader && <TopHeader initialLocation={initialLocation} />}
             <main className={cn(
                 "flex-1 transition-all duration-300",
-                !isImmersive && "pt-[var(--top-header-height-mobile)] md:pt-[var(--top-header-height)]"
+                !hideHeader && "pt-[var(--top-header-height-mobile)] md:pt-[var(--top-header-height)]"
             )}>
                 {children}
                 {/* Legal Footer (Desktop/Mobile - Bottom of page content) */}

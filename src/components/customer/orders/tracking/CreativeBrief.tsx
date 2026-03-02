@@ -36,9 +36,9 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
 
     // WYSHKIT 2026: Align with single status truth
     const hasSubmittedBrief = isOptimisticSubmitted ||
-        personalizedProducts.some(i =>
-            ['submitted', 'preview_ready', 'revision_requested', 'approved'].includes((i as any).personalization_status || order.personalization_status || '') ||
-            i.personalization_details
+        personalizedProducts.some(item =>
+            ['submitted', 'preview_ready', 'revision_requested', 'approved'].includes(item.personalization_status || order.personalization_status || '') ||
+            item.personalization_details
         );
 
     // Calculate Approval SLA (15 mins from preview ready)
@@ -130,10 +130,10 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                 )}
                             </div>
 
-                            {onOpenPersonalization && personalizedProducts.some(i => {
-                                const s = (i.status || ORDER_STATUS.PLACED).toUpperCase();
+                            {onOpenPersonalization && personalizedProducts.some(p => {
+                                const s = (p.status || ORDER_STATUS.PLACED).toUpperCase();
                                 const activeStates: string[] = [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED];
-                                return activeStates.includes(s) && !i.personalization_details && !isOptimisticSubmitted;
+                                return activeStates.includes(s) && !p.personalization_details && !isOptimisticSubmitted;
                             }) && (
                                     <button
                                         onClick={() => {

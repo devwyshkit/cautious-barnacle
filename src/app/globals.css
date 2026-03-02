@@ -93,8 +93,8 @@
   --star-rating: #f59e0b;
 
   /* Layout Tokens */
-  --top-header-height-mobile: 104px;
-  /* Optimized for High Density Header (72px + 32px safe) */
+  --top-header-height-mobile: 132px;
+  /* High Density Header (72px + 48px + gaps) */
   --top-header-height: 64px;
   --bottom-nav-height: 64px;
   /* Increased for better thumb ergonomics */
@@ -122,6 +122,30 @@
   --well-neutral-text: var(--text-secondary);
   --well-destructive: color-mix(in srgb, var(--destructive) 12%, white);
   --well-destructive-text: var(--destructive);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #09090B;
+    --foreground: #F8F8F8;
+    --surface: #121214;
+    --surface-muted: #1A1A1D;
+    --surface-raised: #1C1C1F;
+    --surface-glass: rgba(18, 18, 20, 0.8);
+    --border: #27272A;
+    --input: #1A1A1D;
+    --text-primary: #F8F8F8;
+    --text-secondary: #A1A1AA;
+    --text-tertiary: #71717A;
+    --text-inverse: #09090B;
+    
+    --primary-muted: color-mix(in srgb, #D91B24 20%, #121214);
+    --well-success: color-mix(in srgb, var(--success) 20%, #121214);
+    --well-warning: color-mix(in srgb, var(--warning) 20%, #121214);
+    --well-info: color-mix(in srgb, var(--info) 20%, #121214);
+    --well-brand: var(--primary-muted);
+    --well-destructive: color-mix(in srgb, var(--destructive) 20%, #121214);
+  }
 }
 
 

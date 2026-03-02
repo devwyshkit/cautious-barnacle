@@ -5,10 +5,29 @@
  * UI-authority is the v_order_detail view.
  */
 
-import type { Tables, Views } from '@/lib/supabase/database.types';
+import type { Database } from '@/lib/supabase/database.types';
+
+type PublicSchema = Database['public'];
+
+export type Tables<T extends keyof PublicSchema['Tables']> = PublicSchema['Tables'][T]['Row'];
+export type Views<T extends keyof PublicSchema['Views']> = PublicSchema['Views'][T]['Row'];
 
 // WYSHKIT 2026: V_ORDER_DETAIL is the "God-Level" single-trip source.
-export type OrderDetail = Views<'v_order_detail'>;
+// We cast Json fields to their specific interfaces for UI safety.
+export interface OrderDetail extends Omit<Views<'v_order_detail'>, 'order_products' | 'previews' | 'timeline' | 'status'> {
+  order_products: OrderProductDetail[] | null;
+  previews: PreviewSubmission[] | null;
+  timeline: OrderStatusHistory[] | null;
+  status: string | null;
+
+  // Tracking & Status extensions (ensure these are synced in the View)
+  personalization_status?: string | null;
+  awb_number?: string | null;
+  courier_vendor?: string | null;
+  tracking_url?: string | null;
+  max_change_requests?: number | null;
+  change_request_count?: number | null;
+}
 
 export interface OrderProductListItem extends Omit<Views<'v_order_tracking'>, 'personalization_status' | 'first_product_name' | 'vendor_name'> {
   products?: any[];
@@ -65,7 +84,9 @@ export interface OrderProductDetail {
   total_price: number;
   is_personalized: boolean;
   status: string;
+  personalization_status?: string | null;
   personalization_details?: any;
+  product_image_url?: string | null;
   final_approved_mockup_url?: string | null;
 }
 
@@ -74,6 +95,7 @@ export interface PreviewSubmission {
   order_product_id: string;
   preview_url: string;
   status: string;
+  vendor_notes?: string | null;
   submitted_at: string;
 }
 

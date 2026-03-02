@@ -9,7 +9,7 @@ import { PreviewSubmission } from '@/lib/types/order';
 import { SubmittedPersonalization } from './tracking/SubmittedPersonalization';
 
 interface PreviewOrderProductContext {
-    personalization_details: Record<string, unknown>;
+    personalization_details?: Record<string, unknown> | null;
     product_name: string;
 }
 

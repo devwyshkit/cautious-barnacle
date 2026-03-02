@@ -118,7 +118,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                     onApprove={async () => {
                                         setIsApproving(true);
                                         try {
-                                            const result = await approve_preview(productPreviews[selectedPreviewProduct.id].id, order.id);
+                                            const result = await approve_preview(productPreviews[selectedPreviewProduct.id].id, order.id!);
                                             if (result.success) {
                                                 toast.success('Product approved! Production has started.');
                                                 setSelectedPreviewProduct(null);
@@ -136,7 +136,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                     onRequestChange={async (feedback: string) => {
                                         setIsRequestingChange(true);
                                         try {
-                                            const result = await request_change(productPreviews[selectedPreviewProduct.id].id, order.id, feedback);
+                                            const result = await request_change(productPreviews[selectedPreviewProduct.id].id, order.id!, feedback);
                                             if (result.success) {
                                                 toast.success('Feedback sent. Vendor will upload a new preview.');
                                                 setSelectedPreviewProduct(null);
