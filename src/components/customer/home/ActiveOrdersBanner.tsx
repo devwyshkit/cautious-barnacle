@@ -58,15 +58,15 @@ export function ActiveOrdersBanner({ orders }: ActiveOrdersBannerProps) {
 
                     <div className="flex-1 text-left">
                         <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Active Order #{order.order_number}</span>
+                            <span className="text-xs font-bold text-[var(--text-inverse)]/40 uppercase tracking-widest">Active Order #{order.order_number}</span>
                             <div className="h-1 w-1 rounded-full bg-[var(--success)] animate-pulse" />
                         </div>
-                        <h3 className="text-xl font-bold text-white tracking-tighter leading-tight mt-0.5">
+                        <h3 className="text-xl font-bold text-[var(--text-inverse)] tracking-tighter leading-tight mt-0.5">
                             {displayLabel}
                         </h3>
                     </div>
 
-                    <div className="size-10 rounded-full bg-[var(--surface-muted)]/20 flex items-center justify-center text-white group-hover:bg-[var(--surface-muted)]/40 transition-colors">
+                    <div className="size-10 rounded-full bg-[var(--surface-muted)]/20 flex items-center justify-center text-[var(--text-inverse)] group-hover:bg-[var(--surface-muted)]/40 transition-colors">
                         <ChevronRight className="size-5" />
                     </div>
                 </div>

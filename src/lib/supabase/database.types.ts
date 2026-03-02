@@ -375,9 +375,14 @@ export type Database = {
         Row: {
           body: string
           created_at: string | null
+          expires_at: string | null
           id: string
+          image_url: string | null
+          is_persistent: boolean | null
           is_read: boolean | null
           metadata: Json | null
+          priority: string | null
+          read_at: string | null
           title: string
           type: string
           user_id: string
@@ -385,9 +390,14 @@ export type Database = {
         Insert: {
           body: string
           created_at?: string | null
+          expires_at?: string | null
           id?: string
+          image_url?: string | null
+          is_persistent?: boolean | null
           is_read?: boolean | null
           metadata?: Json | null
+          priority?: string | null
+          read_at?: string | null
           title: string
           type: string
           user_id: string
@@ -395,9 +405,14 @@ export type Database = {
         Update: {
           body?: string
           created_at?: string | null
+          expires_at?: string | null
           id?: string
+          image_url?: string | null
+          is_persistent?: boolean | null
           is_read?: boolean | null
           metadata?: Json | null
+          priority?: string | null
+          read_at?: string | null
           title?: string
           type?: string
           user_id?: string
@@ -434,7 +449,7 @@ export type Database = {
           selected_addons: Json | null
           selected_variant_id: string | null
           selected_variant_options: Json | null
-          status: Database["public"]["Enums"]["order_status"]
+          status: Database["public"]["Enums"]["order_product_status"]
           stock_deducted: boolean | null
           total_price: number
           unit_price: number
@@ -463,7 +478,7 @@ export type Database = {
           selected_addons?: Json | null
           selected_variant_id?: string | null
           selected_variant_options?: Json | null
-          status?: Database["public"]["Enums"]["order_status"]
+          status?: Database["public"]["Enums"]["order_product_status"]
           stock_deducted?: boolean | null
           total_price: number
           unit_price: number
@@ -492,7 +507,7 @@ export type Database = {
           selected_addons?: Json | null
           selected_variant_id?: string | null
           selected_variant_options?: Json | null
-          status?: Database["public"]["Enums"]["order_status"]
+          status?: Database["public"]["Enums"]["order_product_status"]
           stock_deducted?: boolean | null
           total_price?: number
           unit_price?: number
@@ -506,6 +521,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_products_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "v_order_detail"
             referencedColumns: ["id"]
           },
           {
@@ -559,6 +581,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "v_order_detail"
             referencedColumns: ["id"]
           },
           {
@@ -1195,6 +1224,13 @@ export type Database = {
             foreignKeyName: "returns_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "v_order_detail"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "v_order_tracking"
             referencedColumns: ["id"]
           },
@@ -1289,6 +1325,13 @@ export type Database = {
             columns: ["order_id"]
             isOneToOne: false
             referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "v_order_detail"
             referencedColumns: ["id"]
           },
           {
@@ -1835,6 +1878,13 @@ export type Database = {
             foreignKeyName: "wallet_transactions_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
+            referencedRelation: "v_order_detail"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wallet_transactions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
             referencedRelation: "v_order_tracking"
             referencedColumns: ["id"]
           },
@@ -1973,6 +2023,60 @@ export type Database = {
           },
           {
             foreignKeyName: "products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_order_detail: {
+        Row: {
+          billing_address: Json | null
+          cancellation_reason: string | null
+          created_at: string | null
+          customer_email: string | null
+          customer_name: string | null
+          delivery_address: Json | null
+          delivery_fee: number | null
+          delivery_instructions: string | null
+          discount: number | null
+          gstin: string | null
+          has_personalization: boolean | null
+          id: string | null
+          order_number: string | null
+          order_products: Json | null
+          payment_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          personalization_charges: number | null
+          platform_fee: number | null
+          previews: Json | null
+          promised_delivery_at: string | null
+          razorpay_order_id: string | null
+          status: Database["public"]["Enums"]["order_status"] | null
+          subtotal: number | null
+          tax_amount: number | null
+          timeline: Json | null
+          total: number | null
+          total_savings: number | null
+          updated_at: string | null
+          user_id: string | null
+          vendor_id: string | null
+          vendor_image: string | null
+          vendor_name: string | null
+          vendor_prep_mins: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_vendor_id_fkey"
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors"
@@ -2457,10 +2561,20 @@ export type Database = {
         Args: { p_app_metadata?: Json; p_email?: string; p_user_id: string }
         Returns: Json
       }
-      get_vendor_surface: {
-        Args: { p_category_slug?: string; p_vendor_id_or_slug: string }
-        Returns: Json
-      }
+      get_vendor_surface:
+        | {
+            Args: { p_category_slug?: string; p_vendor_id_or_slug: string }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_category_slug?: string
+              p_lat?: number
+              p_lng?: number
+              p_vendor_id_or_slug: string
+            }
+            Returns: Json
+          }
       gettransactionid: { Args: never; Returns: unknown }
       issue_wallet_credit_atomic: {
         Args: {
@@ -3263,6 +3377,15 @@ export type Database = {
       }
     }
     Enums: {
+      order_product_status:
+        | "PENDING_PERSONALIZATION"
+        | "MOCKUP_READY"
+        | "MOCKUP_REJECTED"
+        | "MOCKUP_APPROVED"
+        | "IN_PRODUCTION"
+        | "PACKED"
+        | "READY_FOR_PICKUP"
+        | "CANCELLED"
       order_status:
         | "PLACED"
         | "CONFIRMED"
@@ -3411,6 +3534,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      order_product_status: [
+        "PENDING_PERSONALIZATION",
+        "MOCKUP_READY",
+        "MOCKUP_REJECTED",
+        "MOCKUP_APPROVED",
+        "IN_PRODUCTION",
+        "PACKED",
+        "READY_FOR_PICKUP",
+        "CANCELLED",
+      ],
       order_status: [
         "PLACED",
         "CONFIRMED",

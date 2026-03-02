@@ -92,8 +92,8 @@ export function FloatingCartBar() {
                 </span>
                 {hasPersonalization && (
                   <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[var(--surface)]/20">
-                    <Sparkles className="size-2 text-white" />
-                    <span className="text-xs font-bold text-white tracking-tight leading-none uppercase">Personalized</span>
+                    <Sparkles className="size-2 text-[var(--text-inverse)]" />
+                    <span className="text-xs font-bold text-[var(--text-inverse)] tracking-tight leading-none uppercase">Personalized</span>
                   </div>
                 )}
               </div>
@@ -104,7 +104,7 @@ export function FloatingCartBar() {
             <span className="text-sm font-bold text-[var(--primary-foreground)] tabular-nums">
               {formatCurrency(displayTotal)}
             </span>
-            <div className="flex items-center gap-1 bg-[var(--surface)]/20 px-2.5 py-1 rounded-full text-white font-bold text-xs">
+            <div className="flex items-center gap-1 bg-[var(--surface)]/20 px-2.5 py-1 rounded-full text-[var(--text-inverse)] font-bold text-xs">
               View
               <ChevronRight className="size-3 stroke-[3]" />
             </div>

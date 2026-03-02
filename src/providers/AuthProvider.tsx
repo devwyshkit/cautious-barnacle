@@ -42,11 +42,16 @@ export function AuthProvider({
     const supabase = useMemo(() => createClient(), []);
     const fetchingRef = useRef<string | null>(null);
     const userIdRef = useRef<string | null>(null);
+    const permissionsRef = useRef<AuthCoreLib.UserPermissions | null>(permissions);
 
-    // Sync ref with state
+    // Sync refs with state
     useEffect(() => {
         userIdRef.current = user?.id || null;
     }, [user?.id]);
+
+    useEffect(() => {
+        permissionsRef.current = permissions;
+    }, [permissions]);
 
     const updatePermissions = useCallback(async (userId: string) => {
         if (fetchingRef.current === userId) return;
@@ -57,6 +62,7 @@ export function AuthProvider({
             const perms = await AuthCoreLib.resolveUserPermissions(supabase, userId);
             setPermissions(perms);
             setError(null);
+            permissionsRef.current = perms;
         } catch (innerErr) {
             logger.error('[AuthProvider] resolveUserPermissions failed', innerErr as Error);
         } finally {
@@ -103,7 +109,7 @@ export function AuthProvider({
                 } else {
                     setPermissions(null);
                 }
-            } else if (currentUser && !permissions && !fetchingRef.current) {
+            } else if (currentUser && !permissionsRef.current && !fetchingRef.current) {
                 updatePermissions(currentUser.id);
             }
 

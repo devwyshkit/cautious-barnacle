@@ -175,7 +175,7 @@ export function AuthPageClient({
             disabled={loading || phone.length !== 10}
             className={cn(
               "w-full h-14 rounded-xl font-bold text-base transition-all shadow-none",
-              phone.length === 10 ? "bg-[var(--text-primary)] hover:opacity-90 active:scale-95 text-white" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)]"
+              phone.length === 10 ? "bg-[var(--text-primary)] hover:opacity-90 active:scale-95 text-[var(--text-inverse)]" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)]"
             )}
           >
             {loading ? "Sending..." : "Continue"}

@@ -80,7 +80,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <div id="discovery-error-well" className="mx-[var(--space-4)] md:mx-[var(--space-8)] mb-[var(--space-8)] p-[var(--space-6)] bg-[var(--primary-muted)] border border-[var(--primary-ring)] rounded-[var(--radius-3xl)] text-[var(--text-primary)] flex flex-col gap-[var(--space-3)] animate-in fade-in slide-in-from-top-2 duration-500">
                 <div className="flex items-center gap-3 font-black tracking-tight">
                   <div className="size-8 rounded-full bg-[var(--destructive)] flex items-center justify-center">
-                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                    <span className="w-2 h-2 bg-[var(--surface)] rounded-full animate-pulse" />
                   </div>
                   Discovery Engine: {(discovery as any).error_code || 'CONNECTION_FAILURE'}
                 </div>

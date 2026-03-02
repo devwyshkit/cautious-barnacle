@@ -96,7 +96,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
 
             // WYSHKIT 2026: Atomic loop through product reviews
             const promises = Object.values(productReviews).map(review =>
-                supabase.rpc('add_product_review' as any, {
+                supabase.rpc('add_product_review', {
                     p_product_id: review.productId,
                     p_order_id: orderId,
                     p_order_product_id: review.orderProductId,
@@ -194,7 +194,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                                         <div className="size-full flex items-center justify-center"><ImageIcon className="size-6 text-[var(--text-tertiary)]" /></div>
                                     )}
                                     <div className="absolute inset-0 bg-[var(--foreground)]/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <p className="text-[8px] font-bold text-white uppercase tracking-wider">Preview</p>
+                                        <p className="text-[8px] font-bold text-[var(--text-inverse)] uppercase tracking-wider">Preview</p>
                                     </div>
                                 </div>
                                 <div className="flex-1 space-y-2">
@@ -229,7 +229,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                                         className={cn(
                                             "whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all flex items-center gap-1.5",
                                             productReviews[product.orderProductId].tags.includes(tag.label)
-                                                ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-white"
+                                                ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--text-inverse)]"
                                                 : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)]"
                                         )}
                                     >
@@ -261,7 +261,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                         label="Slide to submit reviews"
                         successLabel="Verified"
                         variant="amber"
-                        className="bg-[var(--foreground)] text-white"
+                        className="bg-[var(--foreground)] text-[var(--text-inverse)]"
                     />
                 </div>
             )}

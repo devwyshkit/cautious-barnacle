@@ -1,11 +1,6 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { DraftTransaction as Cart, DraftProduct } from '@/lib/types/personalization';
 import { Address } from '@/lib/types/address';
 import { OrderProductDetail } from '@/lib/types/order';
-
-// Initialize autoTable
-const _autoTable = autoTable;
 
 interface DocumentData {
     order_number?: string;
@@ -33,7 +28,13 @@ interface DocumentData {
     };
 }
 
-const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) => {
+const generateBasePDF = async (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) => {
+    // Dynamic imports for heavy PDF libraries to optimize bundle size (H6 Fix)
+    const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable')
+    ]);
+
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     let y = 20;
@@ -106,14 +107,15 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     // Table
     const products = data.order_products || data.cart?.products || [];
     const tableBody = products.map(product => {
-        const productName = (product as any).product_name || (product as any).product_name || 'Product';
-        const quantity = product.quantity || 1;
-        const unitPrice = product.unit_price || 0;
-        const totalPrice = (product as any).total_price || (product as any).line_total || 0;
+        const p = product as OrderProductDetail;
+        const productName = p.product_name || 'Product';
+        const quantity = p.quantity || 1;
+        const unitPrice = p.unit_price || 0;
+        const totalPrice = p.total_price || 0;
 
         return [
             productName,
-            (product as any).hsn_code || '6912',
+            (p as any).hsn_code || '6912',
             quantity,
             `₹${unitPrice}`,
             `₹${totalPrice}`
@@ -177,12 +179,12 @@ const generateBasePDF = (type: 'ESTIMATE' | 'TAX INVOICE', data: DocumentData) =
     return doc;
 };
 
-export const generateEstimatePDF = (data: DocumentData): void => {
-    const doc = generateBasePDF('ESTIMATE', data);
+export const generateEstimatePDF = async (data: DocumentData): Promise<void> => {
+    const doc = await generateBasePDF('ESTIMATE', data);
     doc.save(`WyshKit_Estimate_${data.order_number || 'Draft'}_${Date.now()}.pdf`);
 };
 
-export const generateTaxInvoicePDF = (data: DocumentData): void => {
-    const doc = generateBasePDF('TAX INVOICE', data);
+export const generateTaxInvoicePDF = async (data: DocumentData): Promise<void> => {
+    const doc = await generateBasePDF('TAX INVOICE', data);
     doc.save(`WyshKit_Invoice_${data.order_number}_${Date.now()}.pdf`);
 };

@@ -36,7 +36,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: 
             <div className={cn(
                 "flex items-center justify-between p-4 rounded-xl border transition-all duration-300",
                 useWalletBalance
-                    ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-white shadow-lg shadow-[var(--shadow-sm)]"
+                    ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--text-inverse)] shadow-lg shadow-[var(--shadow-sm)]"
                     : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] shadow-sm"
             )}>
                 <div className="flex items-center gap-3">
@@ -44,7 +44,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: 
                         "size-10 rounded-xl flex items-center justify-center transition-colors",
                         useWalletBalance ? "bg-[var(--surface)]/10" : "bg-[var(--surface)] border border-[var(--border)] shadow-sm"
                     )}>
-                        <Wallet className={cn("size-5", useWalletBalance ? "text-white" : "text-[var(--text-secondary)]")} />
+                        <Wallet className={cn("size-5", useWalletBalance ? "text-[var(--text-inverse)]" : "text-[var(--text-secondary)]")} />
                     </div>
                     <div>
                         <p className="text-sm font-bold tracking-tight">
@@ -52,7 +52,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: 
                         </p>
                         <p className={cn(
                             "text-xs font-bold tracking-tight mt-0.5",
-                            useWalletBalance ? "text-white/60" : "text-[var(--text-tertiary)]"
+                            useWalletBalance ? "text-[var(--text-inverse)]/60" : "text-[var(--text-tertiary)]"
                         )}>
                             Balance: {formatCurrency(walletInfo.balance)}
                         </p>
@@ -61,7 +61,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: 
 
                 <div className="flex items-center gap-3">
                     {useWalletBalance && (
-                        <span className="text-xs font-bold text-white/90">
+                        <span className="text-xs font-bold text-[var(--text-inverse)]/90">
                             -{formatCurrency(pricing.wallet_discount)}
                         </span>
                     )}

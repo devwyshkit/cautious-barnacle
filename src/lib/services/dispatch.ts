@@ -87,23 +87,17 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
 
         // 5. Update Intent Status
         if (dispatch_result.success) {
-            await Promise.all([
-                supabase.rpc('transition_order', {
-                    p_order_id: payload.order_id,
-                    p_target_status: 'RIDER_ASSIGNED',
-                    p_metadata: {
-                        awb_number: dispatch_result.awbNumber,
-                        courier_vendor: 'Shadowfax',
-                        tracking_url: dispatch_result.trackingUrl
-                    } as any
-                }),
-                supabase.from('orders').update({
+            // WYSHKIT 2026: Atomic Dispatch (Status + Logistics Metadata in one trip)
+            await supabase.rpc('transition_order', {
+                p_order_id: payload.order_id,
+                p_target_status: 'RIDER_ASSIGNED',
+                p_metadata: {
                     awb_number: dispatch_result.awbNumber,
                     courier_vendor: 'Shadowfax',
                     tracking_url: dispatch_result.trackingUrl,
-                    updated_at: new Date().toISOString()
-                }).eq('id', payload.order_id)
-            ]);
+                    dispatched_at: new Date().toISOString()
+                } as any
+            });
 
             return { success: true };
         } else {

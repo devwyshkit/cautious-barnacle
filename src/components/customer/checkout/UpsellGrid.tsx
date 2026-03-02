@@ -68,7 +68,7 @@ export const UpsellGrid: React.FC<UpsellGridProps> = ({
                     className={cn(
                       "absolute bottom-2 right-2 size-9 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-all",
                       isAdded
-                        ? "bg-[var(--success)] text-white"
+                        ? "bg-[var(--success)] text-[var(--text-inverse)]"
                         : "bg-[var(--surface)] text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
                     )}
                   >

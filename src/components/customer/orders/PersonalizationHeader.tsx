@@ -11,14 +11,14 @@ interface PersonalizationHeaderProps {
 
 export function PersonalizationHeader({ orderId, designDeadline }: PersonalizationHeaderProps) {
     return (
-        <div className="bg-[var(--foreground)] rounded-xl p-7 text-white shadow-sm shadow-[var(--text-primary)]/20 border border-white/10 mb-8 relative overflow-hidden">
+        <div className="bg-[var(--foreground)] rounded-xl p-7 text-[var(--text-inverse)] shadow-sm shadow-[var(--text-primary)]/20 border border-[var(--text-inverse)]/10 mb-8 relative overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
 
             <div className="flex items-start justify-between relative z-10 mb-4">
                 <div className="space-y-1">
                     <div className="flex items-center gap-3">
                         <div className="size-10 rounded-xl bg-[var(--success)] flex items-center justify-center shadow-lg shadow-[var(--success)]/20">
-                            <CheckCircle2 className="size-6 text-white" />
+                            <CheckCircle2 className="size-6 text-[var(--text-inverse)]" />
                         </div>
                         <h3 className="text-xl font-bold tracking-tight">Mission Started</h3>
                     </div>
@@ -42,7 +42,7 @@ export function PersonalizationHeader({ orderId, designDeadline }: Personalizati
                             <Clock className="size-4 text-rose-500" />
                         </div>
                         <div>
-                            <p className="text-xs font-bold tracking-tight text-white/40 mb-0.5">Approval SLA Baseline</p>
+                            <p className="text-xs font-bold tracking-tight text-[var(--text-inverse)]/40 mb-0.5">Approval SLA Baseline</p>
                             <HyperlocalTimer
                                 deadline={designDeadline}
                                 variant="minimal"
@@ -51,7 +51,7 @@ export function PersonalizationHeader({ orderId, designDeadline }: Personalizati
                         </div>
                     </div>
                     <div className="px-3 py-1 bg-[var(--surface-muted)]/40 rounded-full border border-[var(--border)]/20">
-                        <span className="text-xs font-bold text-white/60 tracking-tight">Priority</span>
+                        <span className="text-xs font-bold text-[var(--text-inverse)]/60 tracking-tight">Priority</span>
                     </div>
                 </div>
             )}

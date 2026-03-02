@@ -67,7 +67,7 @@ export function FinancialsOverview({ vendor, stats }: FinancialsOverviewProps) {
 
         <div className="bg-[var(--text-primary)] p-5 rounded-xl">
           <p className="text-xs text-[var(--text-tertiary)] mb-1">Your take rate</p>
-          <h2 className="text-2xl font-semibold text-white">{100 - (vendor.commission_percentage || 20)}%</h2>
+          <h2 className="text-2xl font-semibold text-[var(--text-inverse)]">{100 - (vendor.commission_percentage || 20)}%</h2>
           <div className="mt-3">
             <Badge className="bg-[var(--text-primary)] text-[var(--text-tertiary)] border-none text-xs">
               {vendor.vendor_tier || 'Vendor Plus'}

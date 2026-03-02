@@ -3,8 +3,10 @@
 import React from 'react';
 import { MapPin, Package } from 'lucide-react';
 
+import { OrderDetail } from '@/lib/types/order';
+
 interface DeliveryInfoProps {
-    order: any;
+    order: OrderDetail;
 }
 
 export function DeliveryInfo({ order }: DeliveryInfoProps) {
@@ -28,7 +30,7 @@ export function DeliveryInfo({ order }: DeliveryInfoProps) {
                             href={order.tracking_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="h-10 px-5 rounded-xl bg-[var(--foreground)] text-white text-xs font-bold tracking-tight flex items-center justify-center active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10 border border-[var(--text-primary)]"
+                            className="h-10 px-5 rounded-xl bg-[var(--foreground)] text-[var(--text-inverse)] text-xs font-bold tracking-tight flex items-center justify-center active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10 border border-[var(--text-primary)]"
                         >
                             Track
                         </a>
@@ -48,10 +50,10 @@ export function DeliveryInfo({ order }: DeliveryInfoProps) {
                                 ? `${(order.delivery_address as Record<string, any>).name || ''} • ${(order.delivery_address as Record<string, any>).address_line1 || (order.delivery_address as Record<string, any>).line1 || ''}`
                                 : 'Address on file'}
                         </p>
-                        {((order as any).gstin || (order.delivery_address as any)?.gstin) && (
+                        {(order.gstin) && (
                             <div className="mt-3 flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[var(--surface-muted)] border border-[var(--border)] w-fit">
                                 <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">GSTIN:</span>
-                                <span className="text-xs font-bold text-[var(--text-secondary)]">{(order as any).gstin || (order.delivery_address as any).gstin}</span>
+                                <span className="text-xs font-bold text-[var(--text-secondary)]">{order.gstin}</span>
                             </div>
                         )}
                     </div>

@@ -87,9 +87,9 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                         className="object-cover"
                                     />
                                     {/* Iteration Badge */}
-                                    <div className="absolute top-4 left-4 px-3 py-1 bg-[var(--foreground)]/40 backdrop-blur-md rounded-full border border-white/20 flex items-center gap-1.5">
+                                    <div className="absolute top-4 left-4 px-3 py-1 bg-[var(--foreground)]/40 backdrop-blur-md rounded-full border border-[var(--text-inverse)]/20 flex items-center gap-1.5">
                                         <div className={cn("size-1.5 rounded-full", idx === 0 ? "bg-[var(--warning)] animate-pulse" : "bg-[var(--text-tertiary)]")} />
-                                        <p className="text-xs font-bold text-white tracking-tight">
+                                        <p className="text-xs font-bold text-[var(--text-inverse)] tracking-tight">
                                             {idx === 0 ? 'Latest' : `Ver. ${previews.length - idx}`}
                                         </p>
                                     </div>
@@ -140,7 +140,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                             triggerHaptic(HapticPattern.ACTION);
                                             onOpenPersonalization();
                                         }}
-                                        className="px-8 py-3 bg-[var(--text-primary)] text-white rounded-xl text-xs font-bold tracking-tight hover:bg-[var(--foreground)] active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10"
+                                        className="px-8 py-3 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-xl text-xs font-bold tracking-tight hover:bg-[var(--foreground)] active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10"
                                     >
                                         Complete Brief
                                     </button>

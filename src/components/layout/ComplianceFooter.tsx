@@ -21,7 +21,7 @@ export function ComplianceFooter({ className }: ComplianceFooterProps) {
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
                             <span className="text-xl font-bold tracking-tighter text-[var(--text-primary)]">WYSHKIT</span>
-                            <span className="text-xs font-bold px-1.5 py-0.5 bg-[var(--text-primary)] text-white rounded tracking-tight">Startup India</span>
+                            <span className="text-xs font-bold px-1.5 py-0.5 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded tracking-tight">Startup India</span>
                         </div>
                         <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-sm">
                             Last-minute personalised gifts delivered fast from local vendors near you.

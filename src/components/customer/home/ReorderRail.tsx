@@ -185,7 +185,7 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
                   )}
                   {hasPersonalization && (
                     <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-[var(--radius-xs)] bg-[var(--warning)] shadow-lg shadow-[var(--warning)]/20">
-                      <Sparkles className="size-3 text-white fill-white" />
+                      <Sparkles className="size-3 text-[var(--text-inverse)] fill-[var(--text-inverse)]" />
                     </div>
                   )}
                 </div>
@@ -218,7 +218,7 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
                         ? "bg-[var(--well-success)] text-[var(--well-success-text)]"
                         : !isOrderAvailable
                           ? "bg-[var(--well-destructive)] text-[var(--well-destructive-text)]"
-                          : "bg-[var(--surface-muted)] text-[var(--text-primary)] group-hover:bg-[var(--foreground)] group-hover:text-white"
+                          : "bg-[var(--surface-muted)] text-[var(--text-primary)] group-hover:bg-[var(--foreground)] group-hover:text-[var(--text-inverse)]"
                     )}>
                       {isReordering ? (
                         <>
@@ -265,7 +265,7 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
           <AlertDialogFooter className="flex flex-col sm:flex-col w-full space-y-3 pt-2">
             <AlertDialogAction
               onClick={() => personalizationChoiceOrder && handleReorder(personalizationChoiceOrder, true)}
-              className="w-full h-16 bg-[var(--foreground)] text-white rounded-[var(--radius-xl)] font-[900] uppercase tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-[var(--shadow-md)] shadow-[var(--foreground)]/10"
+              className="w-full h-16 bg-[var(--foreground)] text-[var(--text-inverse)] rounded-[var(--radius-xl)] font-[900] uppercase tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-[var(--shadow-md)] shadow-[var(--foreground)]/10"
             >
               <RotateCcw className="size-5 text-[var(--primary)]" />
               Repeat design

@@ -120,7 +120,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="size-12 rounded-xl bg-[var(--primary)] flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-xl">W</span>
+            <span className="text-[var(--text-inverse)] font-bold text-xl">W</span>
           </div>
           <h1 className="text-xl font-bold text-[var(--text-primary)]">
             {step === 'phone' ? 'Admin Control' : 'Verify code'}
@@ -156,7 +156,7 @@ export default function AdminLoginPage() {
             <Button
               onClick={handleSendOTP}
               disabled={loading || phone.length !== 10}
-              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium shadow-brand"
+              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--text-inverse)] font-medium shadow-brand"
             >
               {loading ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -186,7 +186,7 @@ export default function AdminLoginPage() {
             <Button
               onClick={handleVerifyOTP}
               disabled={loading || otp.length !== 6}
-              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium shadow-brand"
+              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--text-inverse)] font-medium shadow-brand"
             >
               {loading ? (
                 <Loader2 className="size-4 animate-spin" />

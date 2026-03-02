@@ -13,20 +13,22 @@ import { PreviewApproval } from '../PreviewApproval';
 import { approve_preview, request_change } from '@/lib/actions/commerce/orders';
 import { toast } from 'sonner';
 
+import { OrderDetail, PreviewSubmission, OrderProductDetail } from '@/lib/types/order';
+
 interface OrderProductsListProps {
-    order: any;
-    productPreviews: Record<string, any>;
+    order: OrderDetail;
+    productPreviews: Record<string, PreviewSubmission>;
     onPersonalizationSubmitted: () => void;
 }
 
 export function OrderProductsList({ order, productPreviews, onPersonalizationSubmitted }: OrderProductsListProps) {
-    const [selectedPreviewProduct, setSelectedPreviewProduct] = useState<any | null>(null);
+    const [selectedPreviewProduct, setSelectedPreviewProduct] = useState<OrderProductDetail | null>(null);
     const [isApproving, setIsApproving] = useState(false);
     const [isRequestingChange, setIsRequestingChange] = useState(false);
 
-    const renderProductStatus = (product: any) => {
+    const renderProductStatus = (product: OrderProductDetail) => {
         const productStatus = product.status || order.status;
-        const config = getProductStatusConfig(productStatus);
+        const config = getProductStatusConfig(productStatus || 'PLACED');
         const Icon = config.icon as any;
 
         return (
@@ -45,7 +47,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                     <span className="text-xs font-bold text-[var(--text-tertiary)] tabular-nums">#{order.order_number}</span>
                 </div>
                 <div className="divide-y divide-[var(--surface-muted)]">
-                    {(order.order_products || []).map((product: any) => (
+                    {(order.order_products as unknown as OrderProductDetail[] || []).map((product) => (
                         <div key={product.id} className="group/product">
                             <button
                                 onClick={(e) => {

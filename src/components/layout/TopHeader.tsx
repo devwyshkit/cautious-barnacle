@@ -100,7 +100,7 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
               className="h-10 px-[var(--space-4)] rounded-[var(--radius-md)] hover:bg-[var(--surface-muted)] gap-[var(--space-2)] font-bold text-sm text-[var(--text-primary)] active:scale-95 transition-all"
             >
               {loading ? (
-                <div className="flex items-center gap-[var(--space-25)]">
+                <div className="flex items-center gap-[var(--space-2-5)]">
                   <div className="size-8 rounded-full bg-[var(--surface-muted)] animate-pulse" />
                   <div className="w-12 h-4 bg-[var(--surface-muted)] rounded-[var(--radius-sm)] animate-pulse" />
                 </div>

@@ -132,29 +132,29 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
                   <Logo variant="minimal" className="size-32" />
                 </div>
                 <div className="relative z-10 space-y-3">
-                  <h3 className="text-xs font-bold text-white/40 tracking-[0.3em] mb-4">Professional Access</h3>
+                  <h3 className="text-xs font-bold text-[var(--text-inverse)]/40 tracking-[0.3em] mb-4">Professional Access</h3>
                   {permissions.isVendor && (
-                    <Link href="/vendor" className="flex items-center gap-4 p-4 bg-[var(--surface)]/10 rounded-[var(--radius-xl)] hover:bg-[var(--surface)]/15 transition-all border border-white/5 group">
-                      <div className="size-12 rounded-[var(--radius-lg)] bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
-                        <Store className="size-6 text-white" />
+                    <Link href="/vendor" className="flex items-center gap-4 p-4 bg-[var(--surface)]/10 rounded-[var(--radius-xl)] hover:bg-[var(--surface)]/15 transition-all border border-[var(--text-inverse)]/5 group">
+                      <div className="size-12 rounded-[var(--radius-lg)] bg-[var(--text-inverse)]/10 flex items-center justify-center shrink-0 border border-[var(--text-inverse)]/10">
+                        <Store className="size-6 text-[var(--text-inverse)]" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-bold">Vendor Dashboard</p>
-                        <p className="text-xs font-medium text-white/50 mt-0.5">Manage your catalog & orders</p>
+                        <h4 className="text-sm font-bold text-[var(--text-inverse)] tracking-tight">Vendor Portal</h4>
+                        <p className="text-xs font-medium text-[var(--text-inverse)]/50 mt-0.5">Manage your catalog & orders</p>
                       </div>
-                      <ChevronRight className="size-4 text-white/30 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="size-4 text-[var(--text-inverse)]/30 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   )}
                   {permissions.isAdmin && (
-                    <Link href="/admin" className="flex items-center gap-4 p-4 bg-[var(--surface)]/10 rounded-[var(--radius-xl)] hover:bg-[var(--surface)]/15 transition-all border border-white/5 group">
-                      <div className="size-12 rounded-[var(--radius-lg)] bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
-                        <ShieldCheck className="size-6 text-white" />
+                    <Link href="/admin" className="flex items-center gap-4 p-4 bg-[var(--surface)]/10 rounded-[var(--radius-xl)] hover:bg-[var(--surface)]/15 transition-all border border-[var(--text-inverse)]/5 group">
+                      <div className="size-12 rounded-[var(--radius-lg)] bg-[var(--text-inverse)]/10 flex items-center justify-center shrink-0 border border-[var(--text-inverse)]/10">
+                        <ShieldCheck className="size-6 text-[var(--text-inverse)]" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-bold">Admin Control</p>
-                        <p className="text-xs font-medium text-white/50 mt-0.5">Platform operations & overrides</p>
+                        <h4 className="text-sm font-bold text-[var(--text-inverse)] tracking-tight">Admin Console</h4>
+                        <p className="text-xs font-medium text-[var(--text-inverse)]/50 mt-0.5">Platform operations & overrides</p>
                       </div>
-                      <ChevronRight className="size-4 text-white/30 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="size-4 text-[var(--text-inverse)]/30 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   )}
                 </div>

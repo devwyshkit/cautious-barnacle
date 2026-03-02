@@ -10,14 +10,15 @@ import { toast } from 'sonner';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 
-import { OrderDetail } from '@/lib/types/order';
+import { OrderDetail, OrderProductDetail } from '@/lib/types/order';
 import { formatArrivalTime } from '@/lib/utils/sla';
 
 interface StatusCardProps {
     order: OrderDetail;
+    orderProducts: OrderProductDetail[];
 }
 
-export function StatusCard({ order }: StatusCardProps) {
+export function StatusCard({ order, orderProducts }: StatusCardProps) {
     // WYSHKIT 2026: The "Live Pulse" SLA Logic
     const [deadline, setDeadline] = React.useState<string | null>(null);
 
@@ -33,11 +34,11 @@ export function StatusCard({ order }: StatusCardProps) {
             return;
         }
 
-        // Fallback to createdAt based SLA: use prep_mins if available from vendor
+        // Fallback to createdAt based SLA: use vendor_prep_mins if available
         const createdAt = new Date(order.created_at || Date.now()).getTime();
-        const prepMins = (order as any).vendors?.prep_mins || (order.has_personalization ? 120 : 30);
+        const prepMins = order.vendor_prep_mins || (order.has_personalization ? 120 : 30);
         setDeadline(new Date(createdAt + prepMins * 60000).toISOString());
-    }, [order?.status, order?.created_at, order?.has_personalization, order?.promised_delivery_at]);
+    }, [order?.status, order?.created_at, order?.has_personalization, order?.promised_delivery_at, order?.vendor_prep_mins]);
 
     const handleShare = async () => {
         if (!navigator.share) {
@@ -118,7 +119,7 @@ export function StatusCard({ order }: StatusCardProps) {
                         <span className={cn("absolute inline-flex h-full w-full animate-ping rounded-full opacity-75", isBreached ? "bg-[var(--surface)]" : "bg-[var(--success)]/70")}></span>
                         <span className={cn("relative inline-flex size-1.5 rounded-full shadow-[0_0_8px_rgba(var(--success-rgb),0.5)]", isBreached ? "bg-[var(--surface)]" : "bg-[var(--success)]")}></span>
                     </div>
-                    <span className="text-xs font-bold text-white tracking-tight">
+                    <span className="text-xs font-bold text-[var(--text-inverse)] tracking-tight">
                         {isBreached ? 'SLA Breach' : 'Live Pulse'}
                     </span>
                 </div>
@@ -147,7 +148,7 @@ export function StatusCard({ order }: StatusCardProps) {
                             {isBreached ? 'Vendor is Running Late' : getStatusText(order.status || '')}
                         </h2>
                         {(() => {
-                            const pendingCount = (order.order_products || []).filter((product: any) => {
+                            const pendingCount = orderProducts.filter((product) => {
                                 if (!product.is_personalized) return false;
                                 const s = (product.status || 'pending').toLowerCase();
                                 const blocked = ['submitted', 'details_received', 'preview_ready', 'approved', 'in_production', 'packed', 'shipped', 'delivered', 'cancelled'];
@@ -156,7 +157,7 @@ export function StatusCard({ order }: StatusCardProps) {
 
                             if (order.status === ORDER_STATUS.PLACED && pendingCount > 0) {
                                 return (
-                                    <span className="text-xs font-bold bg-[var(--primary)] text-white px-2 py-0.5 rounded-full animate-pulse tracking-tight whitespace-nowrap">
+                                    <span className="text-xs font-bold bg-[var(--primary)] text-[var(--text-inverse)] px-2 py-0.5 rounded-full animate-pulse tracking-tight whitespace-nowrap">
                                         Action Req: {pendingCount} {pendingCount === 1 ? 'Product' : 'Products'}
                                     </span>
                                 );
@@ -204,7 +205,7 @@ export function StatusCard({ order }: StatusCardProps) {
                     <div className="flex gap-2">
                         <button
                             onClick={() => window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`}
-                            className="flex-1 py-3 bg-[var(--destructive)] text-white rounded-[var(--radius-xl)] text-xs font-bold tracking-tight active:scale-95 transition-all shadow-[var(--shadow-glow-destructive)]"
+                            className="flex-1 py-3 bg-[var(--destructive)] text-[var(--text-inverse)] rounded-[var(--radius-xl)] text-xs font-bold tracking-tight active:scale-95 transition-all shadow-[var(--shadow-glow-destructive)]"
                         >
                             Priority Call
                         </button>
@@ -213,7 +214,7 @@ export function StatusCard({ order }: StatusCardProps) {
                                 triggerHaptic(HapticPattern.ACTION);
                                 toast.info("Requesting automated refund status...");
                             }}
-                            className="flex-1 py-3 bg-[var(--surface-muted)] border border-[var(--destructive)]/10 text-[var(--destructive)] rounded-[var(--radius-xl)] text-xs font-bold tracking-tight active:scale-95 transition-all"
+                            className="flex-1 py-3 bg-[var(--surface-muted)] border border-[var(--destructive)]/10 text-[var(--destructive)] rounded-[var(--radius-xl)] text-xs font-bold tracking-tight active:scale-95 transition-all shadow-[var(--shadow-md)]"
                         >
                             Instant Refund
                         </button>
@@ -251,13 +252,12 @@ export function StatusCard({ order }: StatusCardProps) {
             {/* WYSHKIT 2026: B2B Documents (Estimate/Invoice) */}
             <div className="mt-6 flex flex-wrap gap-2 pt-5 border-t border-[var(--surface-muted)]">
                 <button
-                    onClick={() => {
-                        const orderData = order as any;
-                        generateEstimatePDF({
+                    onClick={async () => {
+                        await generateEstimatePDF({
                             order_number: order.order_number || '',
                             date: new Date(order.created_at || Date.now()).toLocaleDateString(),
-                            order_products: order.order_products,
-                            customer_name: order.users?.full_name || 'Valued Customer',
+                            order_products: orderProducts,
+                            customer_name: order.customer_name || 'Valued Customer',
                             billing_address: order.delivery_address as any,
                             gstin: order.gstin || undefined,
                             vendor: {
@@ -280,13 +280,12 @@ export function StatusCard({ order }: StatusCardProps) {
                 </button>
                 {order.status === ORDER_STATUS.DELIVERED && (
                     <button
-                        onClick={() => {
-                            const orderData = order as any;
-                            generateTaxInvoicePDF({
+                        onClick={async () => {
+                            await generateTaxInvoicePDF({
                                 order_number: order.order_number || '',
                                 date: new Date().toLocaleDateString(),
-                                order_products: order.order_products,
-                                customer_name: order.users?.full_name || 'Valued Customer',
+                                order_products: orderProducts,
+                                customer_name: order.customer_name || 'Valued Customer',
                                 billing_address: order.delivery_address as any,
                                 gstin: order.gstin || undefined,
                                 vendor: {
@@ -310,7 +309,7 @@ export function StatusCard({ order }: StatusCardProps) {
                 )}
                 <button
                     onClick={handleShare}
-                    className="flex-1 h-11 bg-[var(--text-primary)] text-white rounded-xl flex items-center justify-center gap-2 text-xs font-bold tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[var(--shadow-sm)]"
+                    className="flex-1 h-11 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-xl flex items-center justify-center gap-2 text-xs font-bold tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[var(--shadow-sm)]"
                 >
                     <Share2 className="size-3.5" />
                     Share Track

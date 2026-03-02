@@ -211,7 +211,7 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
                   className={cn(
                     "px-3 py-1.5 rounded-full text-xs font-bold transition-all border",
                     selectedTags.includes(tag.label)
-                      ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-white shadow-sm"
+                      ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--text-inverse)] shadow-sm"
                       : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
                   )}
                 >
@@ -233,7 +233,7 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
           <Button
             type="submit"
             disabled={submitting}
-            className="w-full h-11 bg-[var(--text-primary)] hover:bg-[var(--text-primary)] text-white rounded-xl font-bold shadow-lg shadow-black/5 active:scale-[0.98] transition-transform"
+            className="w-full h-11 bg-[var(--text-primary)] hover:bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-xl font-bold shadow-lg shadow-black/5 active:scale-[0.98] transition-transform"
           >
             {submitting ? <Loader2 className="size-4 animate-spin" /> : "Submit Review"}
           </Button>

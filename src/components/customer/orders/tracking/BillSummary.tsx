@@ -22,28 +22,28 @@ export function BillSummary({ order }: BillSummaryProps) {
 
     if (!order) return null;
 
-    const handleDownloadInvoice = () => {
+    const handleDownloadInvoice = async () => {
         try {
             const data = {
                 order_number: order.order_number || '',
                 date: new Date(order.created_at || Date.now()).toLocaleDateString(),
-                order_products: order.order_products,
+                order_products: order.order_products as any,
                 vendor: {
                     name: order.vendor_name || 'WyshKit Vendor',
                     address: 'Bangalore, India', // Placeholder if address missing
                     gstin: order.gstin || undefined
                 },
-                customer_name: order.users?.full_name || 'Valued Customer',
+                customer_name: order.customer_name || 'Valued Customer',
                 totals: {
                     item_total: order.subtotal || 0,
                     delivery_fee: order.delivery_fee || 0,
                     platform_fee: order.platform_fee || 0,
-                    gst_amount: order.gst || 0,
+                    gst_amount: order.tax_amount || 0,
                     grand_total: order.total || 0,
                     discount: order.total_savings || 0
                 }
             };
-            generateTaxInvoicePDF(data as any);
+            await generateTaxInvoicePDF(data as any);
             toast.success('Invoice downloaded');
         } catch (error) {
             logger.error('Invoice generation failed', error as Error);
@@ -115,11 +115,11 @@ export function BillSummary({ order }: BillSummaryProps) {
 
                         <div className="flex justify-between text-xs font-bold text-[var(--text-primary)]">
                             <span>GST & Taxes</span>
-                            <span>{formatCurrency(order.gst || 0)}</span>
+                            <span>{formatCurrency(order.tax_amount || 0)}</span>
                         </div>
 
                         {(order.total_savings && order.total_savings > 0) && (
-                            <div className="flex justify-between items-center py-2 px-3 bg-[var(--well-success)] rounded-xl border border-[var(--success)]/10">
+                            <div className="flex justify-between items-center py-2 px-3 bg-[var(--well-success)] rounded-xl border border-[var(--border-success)]/10">
                                 <span className="text-xs font-bold text-[var(--success)] tracking-tight">WyshKit Money & Discounts</span>
                                 <span className="text-sm font-bold text-[var(--success)]">-{formatCurrency(order.total_savings)}</span>
                             </div>

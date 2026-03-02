@@ -138,7 +138,7 @@ export function SlideToPay({
     if (isProcessing) {
         return (
             <div className="w-full h-16 bg-[var(--primary)] rounded-xl flex items-center justify-center shadow-[var(--shadow-brand)]">
-                <div className="size-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <div className="size-6 border-2 border-[var(--text-inverse)]/20 border-t-[var(--text-inverse)] rounded-full animate-spin" />
             </div>
         );
     }
@@ -204,7 +204,7 @@ export function SlideToPay({
                 onPointerUp={handlePointerUp}
                 onPointerCancel={handlePointerUp}
                 className={cn(
-                    "relative z-10 size-13 bg-[var(--surface)] rounded-[18px] shadow-sm flex items-center justify-center cursor-grab active:cursor-grabbing transition-transform duration-150",
+                    "relative z-10 size-13 bg-[var(--surface)] rounded-[var(--radius-xl)] shadow-sm flex items-center justify-center cursor-grab active:cursor-grabbing transition-transform duration-150",
                     isDragging && "scale-95",
                     isSuccess && "scale-90 opacity-0 transition-all duration-300"
                 )}
@@ -213,7 +213,7 @@ export function SlideToPay({
                     touchAction: 'none',
                 }}
             >
-                <div className="size-10 rounded-[14px] bg-[var(--surface-muted)] flex items-center justify-center border border-[var(--border)]">
+                <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center border border-[var(--border)]">
                     <ChevronRight className="size-6 text-[var(--text-primary)]" />
                 </div>
             </div>

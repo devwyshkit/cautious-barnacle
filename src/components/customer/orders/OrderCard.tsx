@@ -92,8 +92,8 @@ export function OrderCard({ order }: OrderCardProps) {
         <div className={cn(
           "px-4 py-1.5 rounded-full text-xs font-bold tracking-tight transition-all",
           isActive
-            ? "bg-[var(--primary)] text-white shadow-[var(--shadow-brand)] active:scale-95"
-            : "bg-[var(--surface-muted)] text-[var(--text-secondary)] group-hover:bg-[var(--text-primary)] group-hover:text-white"
+            ? "bg-[var(--primary)] text-[var(--text-inverse)] shadow-[var(--shadow-brand)] active:scale-95"
+            : "bg-[var(--surface-muted)] text-[var(--text-secondary)] group-hover:bg-[var(--text-primary)] group-hover:text-[var(--text-inverse)]"
         )}>
           {isActive ? 'Track Order' : 'Details'}
         </div>

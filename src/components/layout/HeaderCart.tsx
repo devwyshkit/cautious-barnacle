@@ -66,7 +66,7 @@ export function HeaderCart() {
                     <ShoppingBag className={cn("size-5", shouldBounce ? "text-[var(--primary)]" : "text-[var(--text-primary)]")} />
                     {visualCount > 0 && (
                         <span className={cn(
-                            "absolute -top-2 -right-2 size-4 rounded-full flex items-center justify-center text-xs text-white font-bold transition-colors",
+                            "absolute -top-2 -right-2 size-4 rounded-full flex items-center justify-center text-xs text-[var(--text-inverse)] font-bold transition-colors",
                             shouldBounce ? "bg-[var(--primary)]" : "bg-[var(--primary)]" // Consistent brand red
                         )}>
                             {visualCount}

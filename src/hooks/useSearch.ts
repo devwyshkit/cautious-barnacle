@@ -56,8 +56,8 @@ export function useSearch(params: SearchParams) {
 
         if (!cancelled) {
           setResults({
-            products: (result.products || []) as any[],
-            vendors: (result.vendors || []) as any[],
+            products: result.products || [],
+            vendors: result.vendors || [],
             total: result.total || (result.products?.length || 0) + (result.vendors?.length || 0),
           });
         }

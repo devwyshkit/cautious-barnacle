@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     try {
         // Basic Security: Check for CRON_SECRET to prevent public abuse
         const authHeader = req.headers.get('Authorization');
-        if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+        if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 

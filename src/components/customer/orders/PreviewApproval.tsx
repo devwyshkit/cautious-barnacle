@@ -52,7 +52,7 @@ export function PreviewApproval({
                 </div>
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--text-primary)] rounded-full shadow-sm">
                     <div className="size-1.5 rounded-full bg-[var(--success)]/70 animate-pulse" />
-                    <span className="text-xs text-white font-bold tracking-tight">Review</span>
+                    <span className="text-xs text-[var(--text-inverse)] font-bold tracking-tight">Review</span>
                 </div>
             </div>
 
@@ -93,7 +93,7 @@ export function PreviewApproval({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 {preview.vendor_notes && (
-                    <div className="absolute bottom-4 left-4 right-4 bg-[var(--surface)]/95 backdrop-blur-xl p-4 rounded-xl shadow-lg border border-white/20">
+                    <div className="absolute bottom-4 left-4 right-4 bg-[var(--surface)]/95 backdrop-blur-xl p-4 rounded-xl shadow-lg border border-[var(--text-inverse)]/20">
                         <div className="flex items-start gap-3">
                             <div className="size-8 rounded-full bg-[var(--surface-muted)] flex items-center justify-center shrink-0">
                                 <span className="text-xs">🧑‍🎨</span>
@@ -132,7 +132,7 @@ export function PreviewApproval({
                         <button
                             onClick={() => onRequestChange(feedback)}
                             disabled={isApproving || !feedback.trim()}
-                            className="w-full h-12 bg-[var(--text-primary)] text-white rounded-xl font-bold text-xs tracking-tight disabled:opacity-50"
+                            className="w-full h-12 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-xl font-bold text-xs tracking-tight disabled:opacity-50"
                         >
                             {isApproving ? 'Sending Request...' : 'Send Feedback'}
                         </button>
@@ -173,7 +173,7 @@ export function PreviewApproval({
                                     <button
                                         onClick={() => { setConfirmReject(false); onReject(); }}
                                         disabled={isApproving || isRejecting}
-                                        className="flex-1 py-3 text-xs font-bold text-white bg-rose-500 hover:bg-rose-600 rounded-xl tracking-tight disabled:opacity-50 flex items-center justify-center gap-1.5"
+                                        className="flex-1 py-3 text-xs font-bold text-[var(--text-inverse)] bg-rose-500 hover:bg-rose-600 rounded-xl tracking-tight disabled:opacity-50 flex items-center justify-center gap-1.5"
                                     >
                                         <AlertTriangle className="size-3" />
                                         {isRejecting ? 'Processing...' : 'Confirm & Refund'}

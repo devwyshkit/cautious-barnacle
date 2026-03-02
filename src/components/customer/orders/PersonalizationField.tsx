@@ -40,7 +40,7 @@ export function PersonalizationField({
             {totalProducts > 1 && (
                 <div className="flex items-center gap-3 mb-4 px-2">
                     <div className="size-8 rounded-xl bg-[var(--text-primary)] flex items-center justify-center shadow-lg shadow-[var(--text-primary)]/10">
-                        <ShoppingBag className="size-4 text-white" />
+                        <ShoppingBag className="size-4 text-[var(--text-inverse)]" />
                     </div>
                     <div className="flex-1 min-w-0">
                         <h4 className="text-[12px] font-bold text-[var(--text-primary)] tracking-tight truncate leading-none">
@@ -179,8 +179,8 @@ export function PersonalizationField({
                                         onClick={() => cameraRef.current?.click()}
                                         className="flex flex-col items-center justify-center gap-2 py-5 bg-[var(--text-primary)] rounded-xl hover:bg-[var(--foreground)] transition-all active:scale-[0.98] disabled:opacity-50 group/btn shadow-lg shadow-[var(--shadow-sm)]"
                                     >
-                                        <Camera className="size-5 text-white/60 group-hover/btn:text-white group-hover/btn:scale-110 transition-all" />
-                                        <span className="text-xs font-bold text-white/60 tracking-tight group-hover/btn:text-white transition-colors">Capture</span>
+                                        <Camera className="size-5 text-[var(--text-inverse)]/60 group-hover/btn:text-[var(--text-inverse)] group-hover/btn:scale-110 transition-all" />
+                                        <span className="text-xs font-bold text-[var(--text-inverse)]/60 tracking-tight group-hover/btn:text-[var(--text-inverse)] transition-colors">Capture</span>
                                     </button>
                                 </div>
 

@@ -37,7 +37,7 @@ export function Masthead({
                 };
             case 'capacity':
                 return {
-                    bg: 'bg-[var(--warning-foreground)] border-b border-[var(--warning-border)]',
+                    bg: 'bg-[var(--well-warning)] border-b border-[var(--warning-border)]',
                     text: 'text-[var(--warning)]',
                     icon: <Clock className="size-3.5 text-[var(--warning)] shrink-0" />,
                     label: message || 'More orders than usual. Allow a few extra minutes.',
@@ -78,7 +78,7 @@ export function Masthead({
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/40 dark:bg-black/20 backdrop-blur-sm border border-white/20">
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-[var(--surface-glass)] backdrop-blur-sm border border-[var(--text-inverse)]/20">
                         <div className={cn(
                             "size-1.5 rounded-full animate-pulse shadow-[0_0_8px_currentColor]",
                             status === 'normal' ? 'bg-[var(--success)] text-[var(--success)]' : status === 'delayed' ? 'bg-[var(--destructive)] text-[var(--destructive)]' : 'bg-[var(--warning)] text-[var(--warning)]'

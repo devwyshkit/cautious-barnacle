@@ -26,26 +26,29 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import Image from 'next/image';
 import { useOrderRealtime } from '@/hooks/useOrderRealtime';
 import { ORDER_STATUS } from '@/lib/types/order-status';
-import { OrderDetail } from '@/lib/types/order';
+import { OrderDetail, PreviewSubmission, OrderProductDetail } from '@/lib/types/order';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PersonalizationForm } from './PersonalizationForm';
-import { PreviewApproval } from './PreviewApproval';
-import { approve_preview, request_change } from '@/lib/actions/commerce/orders';
-import { generateEstimatePDF, generateTaxInvoicePDF } from '@/lib/services/pdf-service';
 import { toast } from 'sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FeedbackStep } from './FeedbackStep';
-import { formatCurrency } from '@/lib/utils/pricing';
 import { SurfaceErrorBoundaryWithRouter } from '@/components/error/SurfaceErrorBoundary';
 import { hasProductPersonalization } from '@/lib/utils/personalization';
+import dynamic from 'next/dynamic';
 
-import { StatusCard } from './tracking/StatusCard';
-import { OrderTimeline } from './tracking/OrderTimeline';
-import { DeliveryInfo } from './tracking/DeliveryInfo';
-import { OrderProductsList } from './tracking/OrderProductsList';
-import { BillSummary } from './tracking/BillSummary';
-import { CreativeBrief } from './tracking/CreativeBrief';
+const PersonalizationForm = dynamic(() => import('./PersonalizationForm').then(mod => mod.PersonalizationForm), {
+  loading: () => <div className="h-48 w-full bg-[var(--surface-muted)]/50 rounded-xl animate-pulse" />
+});
+
+const FeedbackStep = dynamic(() => import('./FeedbackStep').then(mod => mod.FeedbackStep), {
+  ssr: false
+});
+
+const StatusCard = dynamic(() => import('./tracking/StatusCard').then(mod => mod.StatusCard));
+const OrderTimeline = dynamic(() => import('./tracking/OrderTimeline').then(mod => mod.OrderTimeline));
+const DeliveryInfo = dynamic(() => import('./tracking/DeliveryInfo').then(mod => mod.DeliveryInfo));
+const OrderProductsList = dynamic(() => import('./tracking/OrderProductsList').then(mod => mod.OrderProductsList));
+const BillSummary = dynamic(() => import('./tracking/BillSummary').then(mod => mod.BillSummary));
+const CreativeBrief = dynamic(() => import('./tracking/CreativeBrief').then(mod => mod.CreativeBrief));
 
 interface OrderTrackerProps {
   orderId: string;
@@ -53,9 +56,10 @@ interface OrderTrackerProps {
 
 /**
  * WYSHKIT 2026: The "Order Heartbeat" Component (REFACTORED)
+ * Uses God-Level view v_order_detail via useOrderRealtime.
  */
 export function OrderTracker({ orderId }: OrderTrackerProps) {
-  const { order, timelineEvents, previews, isConnected, error, refetch } = useOrderRealtime({ orderId });
+  const { order, timelineEvents, previews, orderProducts, isConnected, error, refetch } = useOrderRealtime({ orderId });
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -68,13 +72,13 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   const [isPersonalizationSubmittedOptimistic, setIsPersonalizationSubmittedOptimistic] = useState(false);
 
   const personalizedProductsPending = useMemo(() => {
-    return (order?.order_products || []).filter((product: any) => {
+    return (orderProducts || []).filter((product) => {
       if (!product.is_personalized) return false;
       const s = (product.status || 'pending').toLowerCase();
       const blocked = ['submitted', 'details_received', 'preview_ready', 'approved', 'in_production', 'packed', 'shipped', 'delivered', 'cancelled'];
       return !blocked.includes(s) && !product.personalization_details;
     });
-  }, [order?.order_products]);
+  }, [orderProducts]);
 
   useEffect(() => {
     if (order && showSuccess && personalizedProductsPending.length > 0 && !hasAutoOpened) {
@@ -95,8 +99,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
     toast.success("Details shared with vendor!");
     setIsPersonalizationSubmittedOptimistic(true);
     setProactivePersonalizationOpen(false);
-    // WYSHKIT 2026: Force a local refetch if channel is slow, 
-    // but the setIsPersonalizationSubmittedOptimistic(true) handles the immediate UI toggle.
+    // WYSHKIT 2026: Force a local refetch if channel is slow
     setTimeout(() => refetch(), 1500);
   };
 
@@ -108,7 +111,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
     type: e.type
   })), [timelineEvents]);
 
-  const itemPreviews = useMemo(() => (previews || []).reduce((acc: any, p: any) => {
+  const itemPreviews = useMemo(() => (previews || []).reduce((acc: Record<string, PreviewSubmission>, p) => {
     if (p.order_product_id && !acc[p.order_product_id]) {
       acc[p.order_product_id] = p;
     }
@@ -120,7 +123,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
       <div className="p-8 text-center bg-rose-50 rounded-xl border border-rose-100">
         <AlertCircle className="size-12 text-[var(--primary)] mx-auto mb-4" />
         <p className="text-[var(--text-secondary)] text-sm mb-8">Something went wrong while tracking your order</p>
-        <button onClick={() => refetch()} className="px-6 py-2 bg-[var(--primary)] text-white rounded-full font-bold">
+        <button onClick={() => refetch()} className="px-6 py-2 bg-[var(--primary)] text-[var(--text-inverse)] rounded-full font-bold">
           Try Again
         </button>
       </div>
@@ -162,7 +165,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
     <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker" showHomeButton>
       <div className="mx-auto bg-[var(--surface-muted)]/50 pb-safe transition-all duration-500 overflow-y-auto scrollbar-hide overscroll-contain max-w-md min-h-[100dvh]">
         {!isConnected && (
-          <div className="glass-morphism bg-[var(--primary)] text-white text-xs font-bold tracking-tight py-3 px-4 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-300 z-[var(--z-nav)] sticky top-0">
+          <div className="glass-morphism bg-[var(--primary)] text-[var(--text-inverse)] text-xs font-bold tracking-tight py-3 px-4 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-300 z-[var(--z-nav)] sticky top-0">
             <RefreshCw className="size-3 animate-spin" />
             Reconnecting to order pulse...
           </div>
@@ -172,15 +175,15 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
             {(showSuccess || showPersonalizationForm) && (
               <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-[var(--surface)] rounded-xl p-1 border border-[var(--border)] shadow-sm shadow-[var(--shadow-sm)]/50 overflow-hidden relative">
                 {showSuccess && !showPersonalizationForm && (
-                  <div className="gradient-vibrant p-7 text-white rounded-[30px] mb-1 relative overflow-hidden">
+                  <div className="gradient-vibrant p-7 text-[var(--text-inverse)] rounded-[var(--radius-3xl)] mb-1 relative overflow-hidden">
                     {showCelebration && <Confetti />}
                     <div className="absolute top-0 right-0 p-4 opacity-10">
-                      <Sparkles className="size-20 text-white rotate-12" />
+                      <Sparkles className="size-20 text-[var(--text-inverse)] rotate-12" />
                     </div>
                     <div className="relative z-10">
                       <div className="flex items-center gap-3 mb-1.5">
                         <div className="size-9 rounded-xl bg-[var(--success)] flex items-center justify-center shadow-lg shadow-[var(--success)]/20">
-                          <CheckCircle2 className="size-5 text-white" />
+                          <CheckCircle2 className="size-5 text-[var(--text-inverse)]" />
                         </div>
                         <h3 className="text-lg font-bold tracking-tight">Payment Successful</h3>
                       </div>
@@ -210,8 +213,8 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                   <div className="p-4 pt-2">
                     <PersonalizationForm
                       orderId={order?.id || orderId}
-                      products={personalizedProductsPending.length > 0 ? personalizedProductsPending : (order ? [] : [{ id: 'pending', product_name: 'Order Loading...', is_personalized: true }])}
-                      designDeadline={order ? (order as any).design_deadline_at : undefined}
+                      products={personalizedProductsPending.length > 0 ? personalizedProductsPending : (order ? [] : [{ id: 'pending', product_name: 'Order Loading...', is_personalized: true } as any])}
+                      designDeadline={order?.promised_delivery_at || undefined}
                       isAutoOpenedForSuccess={showSuccess || showPersonalizationParam}
                       onSubmitted={handlePersonalizationSubmitted}
                     />
@@ -222,14 +225,14 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
           </SurfaceErrorBoundaryWithRouter>
 
           <SurfaceErrorBoundaryWithRouter surfaceName="Order Status">
-            <StatusCard order={order as OrderDetail} />
+            <StatusCard order={order as OrderDetail} orderProducts={orderProducts} />
           </SurfaceErrorBoundaryWithRouter>
 
           {!showPersonalizationForm && (
             <SurfaceErrorBoundaryWithRouter surfaceName="Creative Brief">
               <CreativeBrief
                 order={order as OrderDetail}
-                previews={previews || []}
+                previews={previews}
                 timeline={events}
                 isOptimisticSubmitted={isPersonalizationSubmittedOptimistic}
                 onOpenPersonalization={() => setProactivePersonalizationOpen(true)}
@@ -246,7 +249,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
           </SurfaceErrorBoundaryWithRouter>
 
           {order.status === ORDER_STATUS.DELIVERED && (() => {
-            const deliveryTime = new Date(order.updated_at).getTime();
+            const deliveryTime = new Date(order.updated_at || '').getTime();
             const now = Date.now();
             const isPersonalized = order.has_personalization;
             const delayMinutes = isPersonalized ? 30 : 10;
@@ -257,13 +260,13 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
             return (
               <FeedbackStep
                 orderId={orderId}
-                products={order.order_products?.map((product: any) => ({
+                products={orderProducts.map((product) => ({
                   id: product.product_id,
                   orderProductId: product.id,
                   name: product.product_name,
                   is_personalized: product.is_personalized,
                   mockup_url: itemPreviews[product.id]?.preview_url
-                })) || []}
+                }))}
                 onComplete={() => { }}
               />
             );
@@ -312,3 +315,4 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
     </SurfaceErrorBoundaryWithRouter>
   );
 }
+

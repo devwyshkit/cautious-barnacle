@@ -69,7 +69,7 @@ export function GstinSection({ initialGstin = '', disabled }: GstinSectionProps)
     };
 
     return (
-        <section className={cn("bg-[var(--surface)] rounded-[24px] border border-[var(--border)] overflow-hidden transition-all duration-300 shadow-sm", disabled && "opacity-50 pointer-events-none")}>
+        <section className={cn("bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden transition-all duration-300 shadow-sm", disabled && "opacity-50 pointer-events-none")}>
             <button
                 onClick={() => setExpanded(!expanded)}
                 className="w-full px-6 py-5 flex items-center justify-between hover:bg-[var(--surface-muted)]/50 transition-colors"

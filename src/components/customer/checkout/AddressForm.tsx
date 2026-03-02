@@ -352,7 +352,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 </Button>
                 <Button
                     type="submit"
-                    className="flex-[2] rounded-xl h-12 font-bold bg-[var(--text-primary)] text-white hover:bg-[var(--text-primary)]"
+                    className="flex-[2] rounded-xl h-12 font-bold bg-[var(--text-primary)] text-[var(--text-inverse)] hover:bg-[var(--text-primary)]"
                     disabled={
                         isSubmitting ||
                         (entryMode === 'search' ? !placeData : false) ||

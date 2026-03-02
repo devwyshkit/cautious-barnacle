@@ -51,7 +51,7 @@ export function EmptyState({
 
         {/* Glass Icon Container */}
         <div className={cn(
-          "relative size-28 rounded-[28px] flex items-center justify-center shadow-2xl transition-all duration-700",
+          "relative size-28 rounded-[var(--radius-3xl)] flex items-center justify-center shadow-2xl transition-all duration-700",
           "hover:scale-110 hover:-rotate-3 active:scale-95",
           "glass-morphism border-2",
           variant === 'premium'
@@ -64,13 +64,13 @@ export function EmptyState({
             ) : (
               <IconOrEmoji className={cn(
                 "size-12 animate-float",
-                variant === 'premium' ? "text-white" : "text-[var(--text-primary)]"
+                variant === 'premium' ? "text-[var(--text-inverse)]" : "text-[var(--text-primary)]"
               )} />
             )
           ) : (
             <ShoppingBag className={cn(
               "size-12 animate-float",
-              variant === 'premium' ? "text-white" : "text-[var(--text-primary)]"
+              variant === 'premium' ? "text-[var(--text-inverse)]" : "text-[var(--text-primary)]"
             )} />
           )}
 

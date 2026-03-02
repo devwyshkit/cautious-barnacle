@@ -338,7 +338,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                               href={data.image_url}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-white text-xs font-bold underline"
+                              className="text-[var(--text-inverse)] text-xs font-bold underline"
                             >
                               VIEW FULL
                             </a>

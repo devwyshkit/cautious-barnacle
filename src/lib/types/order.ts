@@ -2,25 +2,16 @@
  * Order Types - Wyshkit 2026: Zero Data Mismatch
  * 
  * All types derive directly from Supabase database types.
- * UI-only types are kept for display transformations.
- * 
- * Hyperlocal Product Marketplace with Optional Personalization
+ * UI-authority is the v_order_detail view.
  */
 
-import type { Tables, Views } from '@/lib/supabase/types';
-import type { PersonalizationConfig, SelectedPersonalization, SelectedAddon } from './personalization';
+import type { Tables, Views } from '@/lib/supabase/database.types';
 
-// View type from Supabase
-export type ViewOrderDetailed = Views<'v_order_tracking'>;
+// WYSHKIT 2026: V_ORDER_DETAIL is the "God-Level" single-trip source.
+export type OrderDetail = Views<'v_order_detail'>;
 
-/**
- * OrderProductListItem: Unified shape for order lists.
- * Derives directly from v_order_tracking view.
- */
 export interface OrderProductListItem extends Omit<Views<'v_order_tracking'>, 'personalization_status' | 'first_product_name' | 'vendor_name'> {
-  // Any extra UI fields NOT in the view can be added here
-  // But for WYSHKIT 2026, we prefer view-authority
-  products?: any[]; // Keep for compatibility if needed, though view uses first_product_name
+  products?: any[];
   personalization_status?: string | null;
   product_count: number | null;
   first_product_name?: string | null;
@@ -56,37 +47,8 @@ export interface VendorForPDF {
   pan_number?: string;
 }
 
-export interface PreviewSubmission {
-  id: string;
-  order_id: string;
-  order_product_id: string;
-  preview_url: string;
-  status: 'pending' | 'approved' | 'change_requested';
-  vendor_notes?: string;
-  customer_feedback?: string;
-  submitted_at: string;
-  reviewed_at?: string;
-}
-
-export interface OrderProductDetail {
-  id: string;
-  product_id: string;
-  product_name: string;
-  quantity: number;
-  quantity_number: number;
-  unit_price: number;
-  total_price: number;
-  is_personalized: boolean;
-  status: string;
-  personalization_config?: any;
-  personalization_details?: any;
-  selected_addons?: any[];
-
-}
-
 export interface OrderStatusHistory {
   id: string;
-  order_id: string;
   type: string;
   title: string;
   description: string;
@@ -94,20 +56,24 @@ export interface OrderStatusHistory {
   metadata?: Record<string, unknown>;
 }
 
-export interface OrderDetail extends Tables<'orders'> {
-  order_personalization?: PreviewSubmission[];
-  personalizations?: any[];
-  order_products?: OrderProductDetail[];
-  status_history?: Record<string, any>[] | null;
-
-  // Composite/Joins
-  vendors?: Pick<Tables<'vendors'>, 'name' | 'image_url'> | null;
-  users?: Pick<Tables<'users'>, 'full_name' | 'email'> | null;
-
-  // Mapped for UI Convenience (snake_case)
-  vendor_name: string | null;
-  vendor_image: string | null;
-  personalization_status?: string | null;
-  gst?: number | null;
-  total_savings: number | null;
+export interface OrderProductDetail {
+  id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  is_personalized: boolean;
+  status: string;
+  personalization_details?: any;
+  final_approved_mockup_url?: string | null;
 }
+
+export interface PreviewSubmission {
+  id: string;
+  order_product_id: string;
+  preview_url: string;
+  status: string;
+  submitted_at: string;
+}
+

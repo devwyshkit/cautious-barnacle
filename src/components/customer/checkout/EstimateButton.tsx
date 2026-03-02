@@ -40,7 +40,7 @@ export function EstimateButton({
             if (!vendorId) throw new Error("Vendor ID missing");
             const { data: vendor } = await getVendorInfo(vendorId);
 
-            generateEstimatePDF({
+            await generateEstimatePDF({
                 date: new Date().toLocaleDateString(),
                 customer_name: customerName,
                 business_name: businessName,

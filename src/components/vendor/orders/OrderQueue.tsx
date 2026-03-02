@@ -150,9 +150,9 @@ export function OrderQueue({ initialOrders, vendorId }: OrderQueueProps) {
                   <span className={cn(
                     "ml-1.5 inline-flex items-center justify-center min-w-[18px] px-1 py-0.5 text-xs font-medium rounded-full",
                     activeTab === tab.id
-                      ? "bg-[var(--text-primary)] text-white"
+                      ? "bg-[var(--text-primary)] text-[var(--text-inverse)]"
                       : tab.id === 'new'
-                        ? "bg-[var(--primary)] text-white"
+                        ? "bg-[var(--primary)] text-[var(--text-inverse)]"
                         : "bg-[var(--border)] text-[var(--text-secondary)]"
                   )}>
                     {count}

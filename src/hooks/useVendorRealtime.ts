@@ -58,7 +58,7 @@ export function useVendorRealtime({
 
         const enrichedOrder = {
             ...row,
-            latest_preview: (row.order_products as any[])?.find((i: any) => i.personalization_details?.preview_url)?.personalization_details || null
+            latest_preview: (row.order_products as { personalization_details?: { preview_url: string } }[])?.find((i) => i.personalization_details?.preview_url)?.personalization_details || null
         } as unknown as VendorOrder;
 
         return enrichedOrder;

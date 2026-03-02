@@ -23,8 +23,8 @@ export function Badge({ type, value, className }: BadgeProps) {
 
   const variants = {
     rating: "bg-[var(--surface-muted)] text-[var(--text-primary)] border border-[var(--border)]",
-    discount: "bg-[var(--primary)] text-white",
-    fulfillment: "bg-[var(--text-primary)] text-white",
+    discount: "bg-[var(--primary)] text-[var(--text-inverse)]",
+    fulfillment: "bg-[var(--text-primary)] text-[var(--text-inverse)]",
     delivery: "bg-[var(--primary)]/10 text-[var(--primary)] border border-red-200",
     status: "bg-[var(--surface-muted)] text-[var(--text-secondary)] border border-[var(--border)]",
   };

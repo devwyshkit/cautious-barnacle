@@ -184,18 +184,18 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
                   >
                     <div className={cn(
                       "size-3.5 rounded-full border-2 flex items-center justify-center mt-0.5 shrink-0",
-                      isSelected ? "border-white" : "border-[var(--border)]"
+                      isSelected ? "border-[var(--text-inverse)]" : "border-[var(--border)]"
                     )}>
                       {isSelected && <div className="size-1.5 rounded-full bg-[var(--surface)]" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-0.5">
-                        <Icon className={cn("size-3", isSelected ? "text-white/70" : "text-[var(--text-tertiary)]")} />
-                        <p className={cn("text-sm font-semibold", isSelected ? "text-white" : "text-[var(--text-primary)]")}>
+                        <Icon className={cn("size-3", isSelected ? "text-[var(--text-inverse)]/70" : "text-[var(--text-tertiary)]")} />
+                        <p className={cn("text-sm font-semibold", isSelected ? "text-[var(--text-inverse)]" : "text-[var(--text-primary)]")}>
                           {addr.name}
                         </p>
                       </div>
-                      <p className={cn("text-xs leading-relaxed", isSelected ? "text-white/60" : "text-[var(--text-secondary)]")}>
+                      <p className={cn("text-xs leading-relaxed", isSelected ? "text-[var(--text-inverse)]/60" : "text-[var(--text-secondary)]")}>
                         {addr.address_line1}{addr.city ? `, ${addr.city}` : ''}
                       </p>
                     </div>

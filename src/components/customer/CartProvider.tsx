@@ -281,7 +281,7 @@ export function CartProvider({
                             </AlertDialogCancel>
                             <AlertDialogAction
                                 onClick={handleReplaceCart}
-                                className="flex-1 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white font-bold"
+                                className="flex-1 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-[var(--text-inverse)] font-bold"
                             >
                                 Replace
                             </AlertDialogAction>

@@ -4,16 +4,12 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Database } from '@/lib/supabase/database.types';
 import { useRealtime } from '@/providers/RealtimeProvider';
-import { OrderStatus } from '@/lib/types/order-status';
-import { OrderProductDetail, OrderDetail, PreviewSubmission } from '@/lib/types/order';
+import { PreviewSubmission, OrderProductDetail } from '@/lib/types/order';
 
 export type RequirementStatus = 'pending' | 'submitted' | 'accepted' | 'clarification_needed' | 'approved' | 'rejected' | null;
 
-interface OrderUpdate extends Partial<OrderDetail> {
-  id: string;
-  status: Database["public"]["Enums"]["order_status"];
-  updated_at: string;
-}
+// WYSHKIT 2026: Direct mapping to God-Level View
+type OrderDetailRow = Database['public']['Views']['v_order_detail']['Row'];
 
 interface TimelineEvent {
   id: string;
@@ -27,7 +23,7 @@ interface TimelineEvent {
 
 interface UseOrderRealtimeOptions {
   orderId: string;
-  onStatusChange?: (newStatus: string, oldStatus: string | null) => void;
+  onStatusChange?: (newStatus: Database["public"]["Enums"]["order_status"], oldStatus: Database["public"]["Enums"]["order_status"] | null) => void;
   onRequirementStatusChange?: (newStatus: RequirementStatus, oldStatus: RequirementStatus | null) => void;
   onTimelineEvent?: (event: TimelineEvent) => void;
   onPreviewUploaded?: (preview: PreviewSubmission) => void;
@@ -37,18 +33,16 @@ interface UseOrderRealtimeOptions {
  * WYSHKIT 2026: Single-trip order hook.
  * Uses v_order_detail view (1 query) instead of 4 separate fetches.
  * Realtime listeners trigger targeted re-fetches on logical events only.
+ * No 'as any' math; full type authority.
  */
 export function useOrderRealtime({
   orderId,
   onStatusChange,
-  onRequirementStatusChange,
   onTimelineEvent,
   onPreviewUploaded,
 }: UseOrderRealtimeOptions) {
   const { isConnected } = useRealtime();
-  const [order, setOrder] = useState<OrderUpdate | null>(null);
-  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
-  const [previews, setPreviews] = useState<PreviewSubmission[]>([]);
+  const [order, setOrder] = useState<OrderDetailRow | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
 
@@ -66,9 +60,7 @@ export function useOrderRealtime({
     try {
       if (retryCount > 0) setIsPolling(true);
 
-      // WYSHKIT 2026: v_order_detail is created by migration 20260221163000.
-      // Types are cast until `supabase gen types` is re-run post-migration.
-      const { data, error: fetchError } = await (supabase as any)
+      const { data, error: fetchError } = await supabase
         .from('v_order_detail')
         .select('*')
         .eq('id', orderId)
@@ -91,10 +83,7 @@ export function useOrderRealtime({
       }
 
       if (data) {
-        const orderData = data as unknown as OrderUpdate;
-        setOrder(orderData);
-        setTimelineEvents((data as any).timeline ?? []);
-        setPreviews((data as any).previews ?? []);
+        setOrder(data);
         setError(null);
       } else {
         setError('Order not found');
@@ -120,7 +109,6 @@ export function useOrderRealtime({
   }, [orderId, fetchOrderData]);
 
   // WYSHKIT 2026: Re-fetch ONLY on reconnection (transition from false → true).
-  // Do NOT re-fetch on first render to prevent double-fire.
   useEffect(() => {
     if (prevConnectedRef.current === false && isConnected === true) {
       fetchOrderData();
@@ -140,7 +128,7 @@ export function useOrderRealtime({
       'postgres_changes',
       { event: '*', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` },
       (payload) => {
-        const newData = payload.new as OrderUpdate;
+        const newData = payload.new as { status: Database["public"]["Enums"]["order_status"] };
         setOrder(prev => {
           if (prev && newData.status !== prev.status) {
             import('@/lib/utils/haptic').then(({ triggerHaptic, HapticPattern }) => {
@@ -153,68 +141,45 @@ export function useOrderRealtime({
           if (payload.eventType === 'INSERT') {
             fetchOrderData();
           }
-          return { ...prev, ...newData };
+          return prev; // View will be updated by fetchOrderData
         });
       }
     );
 
-    // 2. Timeline — optimistic prepend + notify callback; no need to re-fetch
+    // 2. Timeline — INSERT triggers re-fetch to update view-authority
     orderChannel.on(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'order_status_history', filter: `order_id=eq.${orderId}` },
       (payload) => {
         const newEvent = payload.new as TimelineEvent;
-        setTimelineEvents(prev => {
-          if (prev.some(e => e.id === newEvent.id)) return prev;
-          onTimelineEvent?.(newEvent);
-          return [newEvent, ...prev];
-        });
+        onTimelineEvent?.(newEvent);
+        fetchOrderData();
       }
     );
 
-    // 3. Previews — optimistic insert/update
+    // 3. Previews — any change triggers re-fetch to sync JSON aggregation in view
     orderChannel.on(
       'postgres_changes',
-      { event: '*', schema: 'public', table: 'order_personalization', filter: `order_id=eq.${orderId}` },
+      { event: '*', schema: 'public', table: 'order_products', filter: `order_id=eq.${orderId}` },
       (payload) => {
-        if (payload.eventType === 'INSERT') {
-          const newPreview = payload.new as PreviewSubmission;
-          setPreviews(prev => {
-            if (prev.some(p => p.id === newPreview.id)) return prev;
-            onPreviewUploaded?.(newPreview);
-            return [newPreview, ...prev];
-          });
-        } else if (payload.eventType === 'UPDATE') {
-          const updated = payload.new as PreviewSubmission;
-          setPreviews(prev => prev.map(p => p.id === updated.id ? updated : p));
+        if (payload.eventType === 'UPDATE') {
+          // Check for final_approved_mockup_url change which indicates a preview update
+          const oldProduct = payload.old as OrderProductDetail;
+          const newProduct = payload.new as OrderProductDetail;
+
+          if (newProduct.final_approved_mockup_url !== oldProduct.final_approved_mockup_url) {
+            // Preview status changed
+            fetchOrderData();
+          }
         }
       }
     );
 
-    // 4. Order products — optimistic update only (full re-fetch on status change covers the rest)
-    orderChannel.on(
-      'postgres_changes',
-      { event: 'UPDATE', schema: 'public', table: 'order_products', filter: `order_id=eq.${orderId}` },
-      (payload) => {
-        const updatedProduct = payload.new as OrderProductDetail;
-        setOrder(prev => {
-          if (!prev || !prev.order_products) return prev;
-          return {
-            ...prev,
-            order_products: prev.order_products.map(product =>
-              product.id === updatedProduct.id ? { ...product, ...updatedProduct } : product
-            ),
-          };
-        });
-      }
-    );
-
-    // 5. Dispatch Heartbeat — targeted re-fetch on logistical movement
+    // 4. Dispatch Heartbeat — targeted re-fetch on logistical movement
     orderChannel.on(
       'postgres_changes',
       { event: '*', schema: 'public', table: 'dispatch_attempts', filter: `order_id=eq.${orderId}` },
       () => {
-        // Logistical attempts are critical; full re-fetch ensures v_order_detail is fresh
         fetchOrderData();
       }
     );
@@ -224,15 +189,22 @@ export function useOrderRealtime({
     return () => {
       supabase.removeChannel(orderChannel);
     };
-  }, [orderId, fetchOrderData, onStatusChange, onRequirementStatusChange, onTimelineEvent, onPreviewUploaded]);
+  }, [orderId, fetchOrderData, onStatusChange, onTimelineEvent, onPreviewUploaded]);
+
+  // Derived getters for UI convenience with strict typing
+  const timelineEvents = (order?.timeline as unknown as TimelineEvent[]) || [];
+  const previews = (order?.previews as unknown as PreviewSubmission[]) || [];
+  const orderProducts = (order?.order_products as unknown as OrderProductDetail[]) || [];
 
   return {
     order,
     timelineEvents,
     previews,
+    orderProducts,
     isConnected,
     error,
     isPolling,
     refetch: fetchOrderData,
   };
 }
+

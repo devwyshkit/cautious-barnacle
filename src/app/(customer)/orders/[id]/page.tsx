@@ -1,8 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { OrderTracker } from "@/components/customer/orders/OrderTracker";
 import { SurfaceErrorBoundaryWithRouter as ErrorBoundary } from "@/components/error/SurfaceErrorBoundary";
+import { OrderTracker } from "@/components/customer/orders/OrderTracker";
+import { OrderTrackerSkeleton } from "@/components/customer/orders/OrderTrackerSkeleton";
+
 
 /**
  * WYSHKIT 2026: Order Details Page
@@ -31,11 +33,7 @@ export default async function OrderDetailsPage({
   return (
     <div className="min-h-[100dvh]">
       <ErrorBoundary surfaceName="Order Details">
-        <Suspense fallback={
-          <div className="flex items-center justify-center py-20">
-            <div className="text-sm text-[var(--text-secondary)]">Loading order...</div>
-          </div>
-        }>
+        <Suspense fallback={<OrderTrackerSkeleton />}>
           <OrderTracker orderId={id} />
         </Suspense>
       </ErrorBoundary>

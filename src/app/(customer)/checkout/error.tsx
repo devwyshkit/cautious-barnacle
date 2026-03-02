@@ -21,7 +21,7 @@ export default function CheckoutError({
 
     return (
         <div className="min-h-[100dvh] bg-[var(--surface-muted)] flex flex-col items-center justify-center p-6 text-center">
-            <div className="bg-[var(--surface)] rounded-[40px] p-10 shadow-sm border border-[var(--border)] max-w-sm w-full space-y-6">
+            <div className="bg-[var(--surface)] rounded-[var(--radius-3xl)] p-10 shadow-sm border border-[var(--border)] max-w-sm w-full space-y-6">
                 <div className="size-20 rounded-full bg-[var(--well-destructive)] flex items-center justify-center mx-auto">
                     <AlertCircle className="size-10 text-[var(--destructive)]" />
                 </div>
@@ -36,7 +36,7 @@ export default function CheckoutError({
                 <div className="space-y-3 pt-2">
                     <Button
                         onClick={() => reset()}
-                        className="w-full h-12 rounded-xl bg-[var(--foreground)] hover:bg-[var(--text-primary)] text-white font-bold"
+                        className="w-full h-12 rounded-xl bg-[var(--foreground)] hover:bg-[var(--text-primary)] text-[var(--text-inverse)] font-bold"
                     >
                         <RefreshCcw className="size-4 mr-2" />
                         Try Again

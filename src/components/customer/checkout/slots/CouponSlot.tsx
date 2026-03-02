@@ -50,7 +50,7 @@ export function CouponSlot({ initialCoupon, disabled }: CouponSlotProps) {
     };
 
     return (
-        <section className={cn("bg-[var(--surface)] rounded-[24px] border border-[var(--surface-border)] overflow-hidden transition-all duration-300", disabled && "opacity-50 pointer-events-none")}>
+        <section className={cn("bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--surface-border)] overflow-hidden transition-all duration-300", disabled && "opacity-50 pointer-events-none")}>
             <button
                 onClick={() => setExpanded(!expanded)}
                 className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[var(--surface-muted)]/50 transition-colors"
@@ -90,7 +90,7 @@ export function CouponSlot({ initialCoupon, disabled }: CouponSlotProps) {
                             "h-10 px-4 rounded-xl text-xs font-bold transition-all active:scale-95 disabled:opacity-50",
                             initialCoupon
                                 ? "bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:bg-[var(--border)]"
-                                : "bg-[var(--text-primary)] text-white hover:bg-[var(--foreground)]"
+                                : "bg-[var(--text-primary)] text-[var(--text-inverse)] hover:bg-[var(--foreground)]"
                         )}
                     >
                         {isApplying ? <Loader2 className="size-3.5 animate-spin" /> : (initialCoupon ? 'Remove' : 'Apply')}

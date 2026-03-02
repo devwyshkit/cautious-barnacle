@@ -94,7 +94,7 @@ export default function ErrorReporter({ error, reset }: ReporterProps) {
             {reset && (
                 <button
                     onClick={() => reset()}
-                    className="h-11 px-8 rounded-full bg-[var(--foreground)] text-white font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]"
+                    className="h-11 px-8 rounded-full bg-[var(--foreground)] text-[var(--text-inverse)] font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]"
                 >
                     Try Again
                 </button>

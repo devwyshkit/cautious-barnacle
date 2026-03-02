@@ -29,7 +29,7 @@ export default function NotFound() {
         {/* Diagnostic Box - Terminal Grade (Light Refined) */}
         <div className="bg-[var(--surface-muted)] rounded-xl p-6 text-left font-mono space-y-3 border border-[var(--border)] shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-            <Server className="size-20 text-white" />
+            <Server className="size-20 text-[var(--text-inverse)]" />
           </div>
 
           <div className="flex items-center justify-between border-b border-[var(--text-secondary)]/20 pb-3 mb-1">
@@ -77,7 +77,7 @@ export default function NotFound() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link href="/" className="w-full sm:w-auto">
-            <Button className="w-full h-12 bg-[var(--text-primary)] text-white px-10 rounded-xl font-black text-xs tracking-tight flex items-center gap-3 shadow-sm hover:bg-[var(--text-primary)] transition-all active:scale-95">
+            <Button className="w-full h-12 bg-[var(--text-primary)] text-[var(--text-inverse)] px-10 rounded-xl font-black text-xs tracking-tight flex items-center gap-3 shadow-sm hover:bg-[var(--text-primary)] transition-all active:scale-95">
               <ArrowLeft className="size-4" /> Return to Command
             </Button>
           </Link>

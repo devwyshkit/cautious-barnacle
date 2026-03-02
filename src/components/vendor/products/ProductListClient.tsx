@@ -203,7 +203,7 @@ export function ProductListClient({ initialProducts, vendorId }: ProductListClie
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteProduct}
-              className="bg-[var(--destructive)] hover:bg-[var(--destructive-hover)] text-white shadow-brand"
+              className="bg-[var(--destructive)] hover:bg-[var(--destructive-hover)] text-[var(--text-inverse)] shadow-brand"
             >
               Delete
             </AlertDialogAction>

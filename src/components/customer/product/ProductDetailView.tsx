@@ -177,7 +177,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                 <div className="sticky top-0 left-0 right-0 z-[var(--z-nav)] p-4 pointer-events-none">
                     <button
                         onClick={handleBack}
-                        className="size-11 rounded-full bg-[var(--surface)]/80 backdrop-blur-md shadow-sm flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-black/5"
+                        className="size-11 rounded-full bg-[var(--surface)]/80 backdrop-blur-md shadow-sm flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-[var(--border)]"
                         aria-label="Back"
                     >
                         <Plus className="size-5 rotate-45 text-[var(--text-primary)]" />
@@ -315,7 +315,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                             <span className="text-xs font-semibold leading-tight mb-1">{v.name}</span>
                                             <span className={cn(
                                                 "text-xs font-bold tabular-nums",
-                                                isSelected ? "text-white/80" : isOutOfStock ? "text-[var(--text-tertiary)]" : "text-[var(--text-tertiary)]"
+                                                isSelected ? "text-[var(--text-inverse)]/80" : isOutOfStock ? "text-[var(--text-tertiary)]" : "text-[var(--text-tertiary)]"
                                             )}>
                                                 {formatCurrency(v.price || 0)}
                                             </span>
@@ -376,7 +376,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                             </div>
                                             <span className={cn(
                                                 "text-xs font-bold tabular-nums",
-                                                isSelected ? "text-white/60" : "text-[var(--text-tertiary)]"
+                                                isSelected ? "text-[var(--text-inverse)]/60" : "text-[var(--text-tertiary)]"
                                             )}>
                                                 +{formatCurrency(p.price || 0)}
                                             </span>
@@ -428,7 +428,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                                 <div className="flex flex-col items-start">
                                                     <span className="text-sm font-semibold">{addon.name}</span>
                                                     {isSelected && (
-                                                        <p className="text-xs font-bold text-white/80 leading-tight tracking-tight">
+                                                        <p className="text-xs font-bold text-[var(--text-inverse)]/80 leading-tight tracking-tight">
                                                             Added to your gift
                                                         </p>
                                                     )}
@@ -436,7 +436,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                             </div>
                                             <span className={cn(
                                                 "text-xs font-bold tabular-nums",
-                                                isSelected ? "text-white/80" : "text-[var(--text-tertiary)]"
+                                                isSelected ? "text-[var(--text-inverse)]/80" : "text-[var(--text-tertiary)]"
                                             )}>
                                                 +{formatCurrency(addon.price || 0)}
                                             </span>

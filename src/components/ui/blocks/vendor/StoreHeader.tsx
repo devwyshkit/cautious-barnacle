@@ -18,14 +18,12 @@ interface StoreHeaderProps {
         city?: string;
         prep_mins?: number;
         eta_minutes?: number;
-        distance_km?: number;
     };
 }
 
 export function StoreHeader({ data }: StoreHeaderProps) {
     const router = useRouter();
     const etaText = data.eta_minutes ? `~${data.eta_minutes} MIN` : formatPrepTime(data.prep_mins || 45);
-    const distanceText = data.distance_km != null ? `${data.distance_km.toFixed(1)} KM` : null;
 
     return (
         <div className="relative w-full bg-[var(--surface)] pb-4">
@@ -83,10 +81,10 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                         {data.rating && (
                             <div className="bg-[var(--foreground)] px-2.5 py-1.5 rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] flex flex-col items-center min-w-[44px]">
                                 <div className="flex items-center gap-0.5">
-                                    <span className="text-sm font-black text-white leading-none">{data.rating.toFixed(1)}</span>
-                                    <Star className="size-2.5 fill-white text-white" />
+                                    <span className="text-sm font-black text-[var(--text-inverse)] leading-none">{data.rating.toFixed(1)}</span>
+                                    <Star className="size-2.5 fill-[var(--text-inverse)] text-[var(--text-inverse)]" />
                                 </div>
-                                <span className="text-[var(--text-tiny)] font-black text-white/60 uppercase tracking-tighter mt-0.5 whitespace-nowrap">Rating</span>
+                                <span className="text-[var(--text-tiny)] font-black text-[var(--text-inverse)]/60 uppercase tracking-tighter mt-0.5 whitespace-nowrap">Rating</span>
                             </div>
                         )}
                     </div>
@@ -97,11 +95,7 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                         <Clock className="size-3 text-[var(--success)]" />
                         <span className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest">{etaText}</span>
                     </div>
-                    {distanceText && (
-                        <div className="px-2.5 py-1.5 rounded-[var(--radius-md)] bg-[var(--surface-muted)] border border-[var(--border)]">
-                            <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">{distanceText}</span>
-                        </div>
-                    )}
+
                 </div>
             </div>
 

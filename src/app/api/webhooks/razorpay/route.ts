@@ -213,18 +213,15 @@ export async function POST(req: NextRequest) {
         .maybeSingle();
 
       if (order && !orderError) {
-        await supabase.from('orders').update({
-          payment_status: 'REFUNDED',
-          status: 'REFUNDED',
-          updated_at: new Date().toISOString()
-        }).eq('id', order.id);
-
-        await supabase.rpc('log_order_status_history', {
+        // WYSHKIT 2026: Atomic State Transition (State Machine First)
+        await supabase.rpc('transition_order', {
           p_order_id: order.id,
-          p_status: 'REFUNDED',
-          p_title: 'Refund Processed',
-          p_description: `Payment refund (ID: ${refundId}) has been successfully processed.`,
-          p_metadata: { paymentId, refundId } as unknown as Json
+          p_target_status: 'REFUNDED',
+          p_metadata: {
+            payment_id: String(paymentId),
+            refund_id: String(refundId),
+            event: 'refund.processed'
+          } as unknown as Json
         });
       }
 

@@ -62,21 +62,21 @@ export function SavedAddresses({
                                     isSelected ? "bg-[var(--background)]/10" : "bg-[var(--surface-muted)]"
                                 )}>
                                     {isLoading ? (
-                                        <Loader2 className={cn("size-4 animate-spin", isSelected ? "text-white" : "text-[var(--text-tertiary)]")} />
+                                        <Loader2 className={cn("size-4 animate-spin", isSelected ? "text-[var(--text-inverse)]" : "text-[var(--text-tertiary)]")} />
                                     ) : (
-                                        <Icon className={cn("size-4", isSelected ? "text-white text-[var(--text-primary)]" : "text-[var(--text-secondary)]")} />
+                                        <Icon className={cn("size-4", isSelected ? "text-[var(--text-inverse)]" : "text-[var(--text-secondary)]")} />
                                     )}
                                 </div>
                                 <div className="flex flex-col min-w-0 flex-1">
                                     <div className="flex items-center gap-2">
-                                        <span className={cn("text-sm font-bold", isSelected ? "text-white" : "text-[var(--text-primary)]")}>
+                                        <span className={cn("text-sm font-bold", isSelected ? "text-[var(--text-inverse)]" : "text-[var(--text-primary)]")}>
                                             {addr.name}
                                         </span>
                                         {addr.is_default && !isSelected && (
                                             <span className="text-xs font-bold px-1.5 py-0.5 rounded-[var(--radius-xs)] bg-[var(--surface-muted)] text-[var(--text-secondary)]">Default</span>
                                         )}
                                     </div>
-                                    <span className={cn("text-xs truncate mt-0.5 font-medium", isSelected ? "text-white/60" : "text-[var(--text-secondary)]")}>
+                                    <span className={cn("text-xs truncate mt-0.5 font-medium", isSelected ? "text-[var(--text-inverse)]/60" : "text-[var(--text-secondary)]")}>
                                         {addr.address_line1}{addr.city ? `, ${addr.city}` : ''}
                                     </span>
                                 </div>

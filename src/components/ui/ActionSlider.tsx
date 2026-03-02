@@ -133,7 +133,7 @@ export function ActionSlider({
                 onClick={handleConfirm}
                 className={cn(
                     "relative h-14 w-full rounded-xl font-bold tracking-tight transition-all duration-300",
-                    isSuccess ? "bg-[var(--success)] text-white" : "text-white bg-[var(--primary)] shadow-brand hover:bg-[var(--primary-hover)]",
+                    isSuccess ? "bg-[var(--success)] text-[var(--text-inverse)]" : "text-[var(--text-inverse)] bg-[var(--primary)] shadow-brand hover:bg-[var(--primary-hover)]",
                     "border-none",
                     (disabled || isLoading) && "opacity-60 cursor-not-allowed",
                     className
@@ -212,7 +212,7 @@ export function ActionSlider({
                         touchAction: 'none',
                     }}
                 >
-                    <ChevronRight className="size-5 text-white stroke-[3]" />
+                    <ChevronRight className="size-5 text-[var(--text-inverse)] stroke-[3]" />
                 </div>
             )}
 

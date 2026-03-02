@@ -28,9 +28,9 @@ export function HeroCarousel() {
               priority={slide.id === '1'}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent flex flex-col justify-center pl-6 pr-4">
-              <h3 className="text-lg md:text-xl font-bold text-white tracking-tight mb-0.5">{slide.title}</h3>
-              <p className="text-xs md:text-sm text-white/90 mb-3">{slide.subtitle}</p>
-              <span className="inline-flex items-center gap-1 text-sm font-bold text-white">
+              <h3 className="text-lg md:text-xl font-bold text-[var(--text-inverse)] tracking-tight mb-0.5">{slide.title}</h3>
+              <p className="text-xs md:text-sm text-[var(--text-inverse)]/90 mb-3">{slide.subtitle}</p>
+              <span className="inline-flex items-center gap-1 text-sm font-bold text-[var(--text-inverse)]">
                 {slide.ctaText}
                 <ChevronRight className="size-4" />
               </span>

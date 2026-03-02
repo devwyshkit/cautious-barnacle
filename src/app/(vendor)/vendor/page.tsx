@@ -110,7 +110,7 @@ export default async function VendorDashboard() {
 
       {/* Financial Summary */}
       <div className="grid grid-cols-1 gap-3">
-        <Card className="bg-[var(--text-primary)] text-white border-[var(--text-secondary)]/20">
+        <Card className="bg-[var(--text-primary)] text-[var(--text-inverse)] border-[var(--text-secondary)]/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-bold tracking-tight text-[var(--text-secondary)]">Earnings Summary</CardTitle>
           </CardHeader>

@@ -232,7 +232,7 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="absolute top-3 right-3 size-10 rounded-full bg-white/80 backdrop-blur"
+                  className="absolute top-3 right-3 size-10 rounded-full bg-[var(--surface)]/80 backdrop-blur"
                   onClick={switchCamera}
                 >
                   <SwitchCamera className="size-5" />

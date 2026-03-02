@@ -134,7 +134,7 @@ export function OrderDetail({ order }: OrderDetailProps) {
                   <div className="absolute left-[9px] top-1 bottom-1 w-px bg-[var(--border)]" />
                   {timeline.map((entry, i) => (
                     <div key={entry.id} className="relative">
-                      <div className={`absolute -left-6 top-1 size-[18px] rounded-full border-2 ${i === timeline.length - 1 ? 'bg-[var(--success)] border-[var(--success)]' : 'bg-white border-[var(--border)]'}`} />
+                      <div className={`absolute -left-6 top-1 size-[18px] rounded-full border-2 ${i === timeline.length - 1 ? 'bg-[var(--success)] border-[var(--success)]' : 'bg-[var(--surface)] border-[var(--border)]'}`} />
                       <div>
                         <p className="font-medium capitalize">{entry.status.toLowerCase().replace(/_/g, ' ')}</p>
                         <p className="text-xs text-[var(--text-secondary)]">{formatDate(entry.changed_at)}</p>

@@ -62,7 +62,7 @@ async function AsyncOrderList({ userId }: { userId: string }) {
                 <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">No orders yet</h3>
                 <p className="text-xs font-medium text-[var(--text-tertiary)] mb-8 max-w-[200px] mx-auto">Start exploring the best premium stores in your city!</p>
                 <Link href="/">
-                    <button className="bg-[var(--text-primary)] text-white rounded-2xl px-10 py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]">
+                    <button className="bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-2xl px-10 py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]">
                         Browse Stores
                     </button>
                 </Link>

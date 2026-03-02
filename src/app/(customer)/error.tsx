@@ -36,7 +36,7 @@ export default function CustomerError({
             <div className="flex flex-col gap-3 w-full max-w-xs">
                 <button
                     onClick={() => reset()}
-                    className="flex items-center justify-center gap-2 w-full bg-[var(--text-primary)] text-white rounded-2xl py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]"
+                    className="flex items-center justify-center gap-2 w-full bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-2xl py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]"
                 >
                     <RefreshCcw className="size-4" />
                     Try Again

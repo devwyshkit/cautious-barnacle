@@ -21,6 +21,8 @@ import { resolveUserPermissionsWithTimeout } from "@/lib/auth/core";
 /**
  * WYSHKIT 2026: Customer Layout - Singleton State & Route-Based Navigation
  */
+export const dynamic = 'force-dynamic';
+
 
 export default function CustomerLayout({
   children,
@@ -58,7 +60,7 @@ async function AsyncLayoutContent({
   let location: LocationData = { name: 'Select location', address: '', pincode: '' };
   let user: User | null = null;
   let permissions: AuthCoreLib.UserPermissions | null = null;
-  let activeOrders: any[] = [];
+  let activeOrders: any[] = []; // Default fallback
 
   try {
     // Stage 1: Resolve Auth (Zero-Trip Strategy)

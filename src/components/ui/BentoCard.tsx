@@ -43,13 +43,13 @@ export function BentoCard({ data, variant = 'small', priority = false }: BentoCa
 
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--foreground)]/40 via-[var(--foreground)]/10 to-transparent p-4 flex flex-col justify-end">
                     <h3 className={cn(
-                        "font-bold text-white tracking-tight leading-tight",
+                        "font-bold text-[var(--text-inverse)] tracking-tight leading-tight",
                         isLarge ? "text-lg" : "text-sm"
                     )}>
                         {data.title || data.name}
                     </h3>
                     {data.subtitle && (
-                        <p className="text-xs font-medium text-white/80 line-clamp-1">
+                        <p className="text-xs font-medium text-[var(--text-inverse)]/80 line-clamp-1">
                             {data.subtitle}
                         </p>
                     )}

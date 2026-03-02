@@ -77,7 +77,7 @@ export default function RootLayout({
         <body>
           <div className="p-10 text-[var(--destructive)] bg-[var(--well-destructive)] min-h-screen font-mono">
             <h1 className="text-xl font-bold mb-4">Root Layout Error (Debug)</h1>
-            <pre className="whitespace-pre-wrap text-xs bg-white p-4 rounded border border-red-100 shadow-sm">
+            <pre className="whitespace-pre-wrap text-xs bg-[var(--surface)] p-4 rounded border border-red-100 shadow-sm">
               {err.stack || err.message || String(err)}
             </pre>
           </div>
