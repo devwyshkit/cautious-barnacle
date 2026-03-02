@@ -49,14 +49,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
     return (
       <div className="min-h-[100dvh] animate-in font-sans selection:bg-[#D91B24]/10 bg-[var(--background)]">
+        <Masthead
+          status={discovery.metadata?.system_status as 'normal' | 'delayed' | 'capacity'}
+          locationName={displayLocationName}
+          etaMinutes={discovery.metadata?.eta_minutes}
+        />
         <main className="pb-24">
           <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
-
-          <Masthead
-            status={discovery.metadata?.system_status as 'normal' | 'delayed' | 'capacity'}
-            locationName={displayLocationName}
-            etaMinutes={discovery.metadata?.eta_minutes}
-          />
 
           <div className="max-w-[1440px] mx-auto">
             {!category && (

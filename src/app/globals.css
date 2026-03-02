@@ -93,16 +93,19 @@
   --star-rating: #f59e0b;
 
   /* Layout Tokens */
-  --top-header-height-mobile: 120px;
+  --top-header-height-mobile: 104px;
+  /* Optimized for High Density Header (72px + 32px safe) */
   --top-header-height: 64px;
-  --bottom-nav-height: 56px;
+  --bottom-nav-height: 64px;
+  /* Increased for better thumb ergonomics */
   --floating-cart-bottom: calc(var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom, 0px));
 
   /* Swiggy 2026 Z-Index Architecture */
   --z-base: 0;
   --z-elevated: 10;
-  --z-nav: 40;
-  --z-overlay: 50;
+  --z-nav: 50;
+  --z-overlay: 60;
+  --z-floating: 70;
   --z-modal: 100;
   --z-toast: 150;
 

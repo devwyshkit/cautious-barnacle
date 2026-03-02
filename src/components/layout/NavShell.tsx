@@ -5,6 +5,7 @@ import { TopHeader } from './TopHeader';
 import { BottomNav } from './BottomNav';
 import { LocationData } from '@/lib/actions/discovery/location';
 import { ComplianceFooter } from './ComplianceFooter';
+import { cn } from '@/lib/utils';
 
 interface NavShellProps {
     initialLocation: LocationData;
@@ -36,13 +37,16 @@ export function NavShell({ initialLocation, children }: NavShellProps) {
         pathname.startsWith('/collection/');
 
     return (
-        <div data-immersive={isImmersive}>
+        <div data-immersive={isImmersive} className="flex flex-col min-h-[100dvh]">
             {!isImmersive && <TopHeader initialLocation={initialLocation} />}
-            <div className={!isImmersive ? "pt-[var(--top-header-height-mobile)] md:pt-[var(--top-header-height)] min-h-[100dvh]" : "min-h-[100dvh]"}>
+            <main className={cn(
+                "flex-1 transition-all duration-300",
+                !isImmersive && "pt-[var(--top-header-height-mobile)] md:pt-[var(--top-header-height)]"
+            )}>
                 {children}
                 {/* Legal Footer (Desktop/Mobile - Bottom of page content) */}
                 {!isImmersive && showFooter && <ComplianceFooter className="hidden md:block" />}
-            </div>
+            </main>
             {!isImmersive && <BottomNav />}
         </div>
     );

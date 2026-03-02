@@ -29,7 +29,7 @@ export function Masthead({
         switch (status) {
             case 'delayed':
                 return {
-                    bg: 'bg-[var(--destructive-foreground)] border-[var(--destructive)]/20',
+                    bg: 'bg-[var(--destructive-muted)] border-b border-[var(--destructive)]/10',
                     text: 'text-[var(--destructive)]',
                     icon: <AlertTriangle className="size-3.5 text-[var(--destructive)] shrink-0" />,
                     label: message || 'High rain in your area. Deliveries might be slightly delayed.',
@@ -37,7 +37,7 @@ export function Masthead({
                 };
             case 'capacity':
                 return {
-                    bg: 'bg-[var(--warning-foreground)] border-[var(--warning)]/20',
+                    bg: 'bg-[var(--warning-foreground)] border-b border-[var(--warning-border)]',
                     text: 'text-[var(--warning)]',
                     icon: <Clock className="size-3.5 text-[var(--warning)] shrink-0" />,
                     label: message || 'More orders than usual. Allow a few extra minutes.',
@@ -45,9 +45,9 @@ export function Masthead({
                 };
             default:
                 return {
-                    bg: 'bg-[var(--success-foreground)] border-[var(--success)]/10',
+                    bg: 'bg-[var(--primary-muted)] border-b border-[var(--primary)]/5',
                     text: 'text-[var(--text-primary)]',
-                    icon: <Zap className="size-3.5 text-[var(--success)] fill-[var(--success)]/20 shrink-0" />,
+                    icon: <Zap className="size-3.5 text-[var(--primary)] fill-[var(--primary)]/20 shrink-0" />,
                     label: message || `~${etaMinutes} min delivery to ${locationName}`,
                     tag: 'On Time'
                 };
@@ -58,18 +58,19 @@ export function Masthead({
 
     return (
         <div
+            id="global-masthead"
             className={cn(
-                "px-[var(--space-4)] md:px-[var(--space-8)] py-[var(--space-3)] border-b transition-all duration-500 animate-in slide-in-from-top-4",
+                "w-full px-4 md:px-8 py-2.5 transition-all duration-700 ease-in-out",
                 config.bg,
                 className
             )}
             suppressHydrationWarning
         >
-            <div className="flex items-center justify-between gap-[var(--space-4)] max-w-[1440px] mx-auto">
-                <div className="flex items-center gap-[var(--space-2-5)] overflow-hidden">
+            <div className="flex items-center justify-between gap-4 max-w-[1440px] mx-auto">
+                <div className="flex items-center gap-2 overflow-hidden">
                     {config.icon}
                     <span className={cn(
-                        "text-xs font-bold tracking-tight truncate",
+                        "text-[10px] md:text-xs font-black uppercase tracking-tight truncate",
                         config.text
                     )}>
                         {config.label}
@@ -77,13 +78,13 @@ export function Masthead({
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/40 dark:bg-black/20 backdrop-blur-sm border border-white/20">
                         <div className={cn(
-                            "size-1.5 rounded-full animate-pulse",
-                            status === 'normal' ? 'bg-[var(--success)]' : status === 'delayed' ? 'bg-[var(--destructive)]' : 'bg-[var(--warning)]'
+                            "size-1.5 rounded-full animate-pulse shadow-[0_0_8px_currentColor]",
+                            status === 'normal' ? 'bg-[var(--success)] text-[var(--success)]' : status === 'delayed' ? 'bg-[var(--destructive)] text-[var(--destructive)]' : 'bg-[var(--warning)] text-[var(--warning)]'
                         )} />
                         <span className={cn(
-                            "text-xs font-bold tracking-tight",
+                            "text-[9px] font-black uppercase tracking-wider",
                             status === 'normal' ? 'text-[var(--success)]' : status === 'delayed' ? 'text-[var(--destructive)]' : 'text-[var(--warning)]'
                         )}>
                             {config.tag}

@@ -10,6 +10,7 @@ import { Logo } from '@/components/ui/Logo';
 import { HeaderCart } from './HeaderCart';
 import { LocationData } from '@/lib/actions/discovery/location';
 import { LocationSheet } from '@/components/customer/LocationSheet';
+import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 
 interface TopHeaderProps {
@@ -58,7 +59,10 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
             <button
               id="location-trigger"
               aria-label="Delivery Location"
-              onClick={() => setIsLocationOpen(true)}
+              onClick={() => {
+                triggerHaptic(HapticPattern.ACTION);
+                setIsLocationOpen(true);
+              }}
               className="flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)] hover:bg-[var(--surface-muted)] rounded-[var(--radius-md)] transition-all group"
             >
               <div className="size-8 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center group-hover:bg-[var(--surface)] transition-all">
@@ -75,7 +79,10 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
 
           <div className="flex-1 max-w-xl">
             <button
-              onClick={() => router.push('/search')}
+              onClick={() => {
+                triggerHaptic(HapticPattern.ACTION);
+                router.push('/search');
+              }}
               className="w-full flex items-center gap-[var(--space-3)] h-11 px-[var(--space-4)] bg-[var(--surface-muted)] rounded-[var(--radius-md)] hover:bg-[var(--input)] transition-all group"
             >
               <Search className="size-4 text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)]" />
@@ -86,7 +93,10 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
           <div className="flex items-center gap-4">
             <HeaderCart />
             <Button
-              onClick={() => user ? router.push('/profile') : router.push('/auth')}
+              onClick={() => {
+                triggerHaptic(HapticPattern.ACTION);
+                user ? router.push('/profile') : router.push('/auth');
+              }}
               className="h-10 px-[var(--space-4)] rounded-[var(--radius-md)] hover:bg-[var(--surface-muted)] gap-[var(--space-2)] font-bold text-sm text-[var(--text-primary)] active:scale-95 transition-all"
             >
               {loading ? (
@@ -117,7 +127,10 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
           <div className="flex items-center justify-between gap-4">
             <button
               id="location-trigger-mobile"
-              onClick={() => setIsLocationOpen(true)}
+              onClick={() => {
+                triggerHaptic(HapticPattern.ACTION);
+                setIsLocationOpen(true);
+              }}
               className="flex items-center gap-[var(--space-2)] group overflow-hidden"
             >
               <MapPin className="size-5 text-[var(--primary)] shrink-0" />
@@ -131,14 +144,18 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
             </button>
             <Link
               href="/profile"
-              className="size-9 rounded-full bg-[var(--surface-muted)] border border-[var(--border)] flex items-center justify-center shrink-0"
+              onClick={() => triggerHaptic(HapticPattern.ACTION)}
+              className="size-9 rounded-full bg-[var(--surface-muted)] border border-[var(--border)] flex items-center justify-center shrink-0 active:scale-95 transition-transform"
             >
               <User className="size-4.5 text-[var(--text-secondary)]" />
             </Link>
           </div>
 
           <button
-            onClick={() => router.push('/search')}
+            onClick={() => {
+              triggerHaptic(HapticPattern.ACTION);
+              router.push('/search');
+            }}
             className="flex items-center gap-[var(--space-3)] h-12 px-[var(--space-4)] bg-[var(--surface-muted)] rounded-[var(--radius-lg)] border border-[var(--border)] active:scale-[0.98] transition-all"
           >
             <Search className="size-4.5 text-[var(--primary)]" />
