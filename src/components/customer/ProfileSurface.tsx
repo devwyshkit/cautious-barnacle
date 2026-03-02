@@ -92,7 +92,7 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
           </div>
           {permissions?.isAdmin && (
             <Link href="/admin">
-              <Button size="default" variant="outline" className="h-12 px-4 text-xs font-bold tracking-tight rounded-xl border-[var(--border)]">
+              <Button size="default" variant="outline" className="h-12 px-4 text-xs font-bold tracking-tight rounded-[var(--radius-xl)] border-[var(--border)]">
                 Admin
               </Button>
             </Link>
@@ -115,7 +115,7 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
               <tab.icon className={cn("size-5", activeTab === tab.id ? "fill-[var(--text-primary)]/5" : "")} />
               <span className="text-xs font-bold tracking-tight">{tab.label}</span>
               {activeTab === tab.id && (
-                <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-[var(--text-primary)] rounded-t-full" />
+                <div className="absolute bottom-0 left-4 right-4 h-0.5 bg-[var(--text-primary)] rounded-full" />
               )}
             </button>
           ))}
@@ -134,27 +134,27 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
                 <div className="relative z-10 space-y-3">
                   <h3 className="text-xs font-bold text-white/40 tracking-[0.3em] mb-4">Professional Access</h3>
                   {permissions.isVendor && (
-                    <Link href="/vendor" className="flex items-center gap-4 p-4 bg-[var(--surface)]/10 rounded-xl hover:bg-[var(--surface)]/15 transition-all border border-white/5 group">
-                      <div className="size-12 rounded-xl bg-indigo-500 flex items-center justify-center shrink-0">
+                    <Link href="/vendor" className="flex items-center gap-4 p-4 bg-[var(--surface)]/10 rounded-[var(--radius-xl)] hover:bg-[var(--surface)]/15 transition-all border border-white/5 group">
+                      <div className="size-12 rounded-[var(--radius-lg)] bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
                         <Store className="size-6 text-white" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-bold">Vendor Dashboard</p>
                         <p className="text-xs font-medium text-white/50 mt-0.5">Manage your catalog & orders</p>
                       </div>
-                      <ChevronRight className="size-4 text-white/30" />
+                      <ChevronRight className="size-4 text-white/30 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   )}
                   {permissions.isAdmin && (
-                    <Link href="/admin" className="flex items-center gap-4 p-4 bg-[var(--surface)]/10 rounded-xl hover:bg-[var(--surface)]/15 transition-all border border-white/5 group">
-                      <div className="size-12 rounded-xl bg-rose-500 flex items-center justify-center shrink-0">
+                    <Link href="/admin" className="flex items-center gap-4 p-4 bg-[var(--surface)]/10 rounded-[var(--radius-xl)] hover:bg-[var(--surface)]/15 transition-all border border-white/5 group">
+                      <div className="size-12 rounded-[var(--radius-lg)] bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
                         <ShieldCheck className="size-6 text-white" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-bold">Admin Control</p>
                         <p className="text-xs font-medium text-white/50 mt-0.5">Platform operations & overrides</p>
                       </div>
-                      <ChevronRight className="size-4 text-white/30" />
+                      <ChevronRight className="size-4 text-white/30 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   )}
                 </div>
@@ -164,27 +164,27 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
             <section>
               <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-4">Quick Actions</h3>
               <div className="grid grid-cols-3 gap-3">
-                <button onClick={() => setActiveTab('orders')} className="p-4 bg-[var(--surface-muted)] rounded-xl flex flex-col items-center gap-2 border border-[var(--border)]">
-                  <Package className="size-5" />
+                <button onClick={() => setActiveTab('orders')} className="p-4 bg-[var(--surface)] rounded-[var(--radius-xl)] flex flex-col items-center gap-2 border border-[var(--border)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-muted)] transition-colors">
+                  <Package className="size-5 text-[var(--text-secondary)]" />
                   <span className="text-xs font-bold tracking-tight">Orders</span>
                 </button>
-                <button onClick={() => setActiveTab('orders')} className="p-4 bg-[var(--primary)] rounded-[var(--radius-lg)] flex flex-col items-center gap-2 border border-[var(--primary-hover)]/30 text-[var(--primary-foreground)] shadow-[var(--shadow-brand)]">
+                <button onClick={() => setActiveTab('orders')} className="p-4 bg-[var(--primary)] rounded-[var(--radius-xl)] flex flex-col items-center gap-2 border border-[var(--primary-hover)]/30 text-[var(--primary-foreground)] shadow-[var(--shadow-brand)] hover:opacity-90 transition-opacity">
                   <Sparkles className="size-5 text-[var(--warning)]" />
                   <span className="text-xs font-bold tracking-tight">Briefs</span>
                 </button>
-                <button onClick={() => setActiveTab('addresses')} className="p-4 bg-[var(--surface-muted)] rounded-xl flex flex-col items-center gap-2 border border-[var(--border)]">
-                  <MapPin className="size-5" />
+                <button onClick={() => setActiveTab('addresses')} className="p-4 bg-[var(--surface)] rounded-[var(--radius-xl)] flex flex-col items-center gap-2 border border-[var(--border)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-muted)] transition-colors">
+                  <MapPin className="size-5 text-[var(--text-secondary)]" />
                   <span className="text-xs font-bold tracking-tight">Address</span>
                 </button>
               </div>
             </section>
 
-            <button onClick={() => signOut()} className="w-full p-4 mt-6 flex items-center justify-between text-[var(--text-primary)] font-semibold hover:bg-[var(--surface-muted)] rounded-xl transition-colors border-t border-[var(--surface-muted)]">
+            <button onClick={() => signOut()} className="w-full p-4 mt-6 flex items-center justify-between text-[var(--text-primary)] font-semibold hover:bg-[var(--well-destructive)] rounded-[var(--radius-xl)] transition-colors border border-transparent">
               <div className="flex items-center gap-3">
-                <LogOut className="size-5 text-[var(--text-tertiary)]" />
-                <span>Logout</span>
+                <LogOut className="size-5 text-[var(--destructive)]" />
+                <span className="text-[var(--destructive)]">Logout</span>
               </div>
-              <ChevronRight className="size-4 text-[var(--text-tertiary)]" />
+              <ChevronRight className="size-4 text-[var(--destructive)]/50" />
             </button>
           </div>
         )}
@@ -200,7 +200,7 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
         {activeTab === 'settings' && (
           <div className="p-6">
             <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-4">Settings</h3>
-            <div className="p-4 bg-[var(--surface-muted)] rounded-xl border border-[var(--border)] text-[var(--text-tertiary)] font-medium">
+            <div className="p-4 bg-[var(--surface-muted)] rounded-[var(--radius-xl)] border border-[var(--border)] text-[var(--text-tertiary)] font-bold text-xs tabular-nums">
               +91 {user.phone}
             </div>
           </div>

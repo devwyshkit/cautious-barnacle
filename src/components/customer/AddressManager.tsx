@@ -95,18 +95,18 @@ export function AddressManager({ initialAddresses, isAdding, onToggleAdding }: A
                         const Icon = addr.type === 'home' ? Home : addr.type === 'work' ? Briefcase : MapPin;
                         return (
                             <div key={addr.id} className={cn(
-                                "p-4 rounded-[var(--radius-lg)] border transition-all",
-                                addr.is_default ? "bg-[var(--surface-muted)] border-[var(--border)]" : "border-[var(--border)]"
+                                "p-4 rounded-[var(--radius-xl)] border transition-all shadow-[var(--shadow-sm)]",
+                                addr.is_default ? "bg-[var(--surface)] border-[var(--primary)]/10 shadow-[var(--shadow-md)]" : "bg-[var(--surface)] border-[var(--border)]"
                             )}>
                                 <div className="flex items-start gap-3">
-                                    <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center shrink-0">
-                                        <Icon className="size-4 text-[var(--text-secondary)]" />
+                                    <div className="size-10 rounded-[var(--radius-lg)] bg-[var(--surface-muted)] flex items-center justify-center shrink-0 border border-[var(--border)]">
+                                        <Icon className="size-4 text-[var(--text-tertiary)]" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
-                                            <h4 className="font-bold text-[var(--text-primary)]">{addr.name}</h4>
+                                            <h4 className="font-bold text-[var(--text-primary)] text-sm tracking-tight">{addr.name}</h4>
                                             {addr.is_default && (
-                                                <span className="text-xs font-bold px-1.5 py-0.5 rounded-[var(--radius-xs)] bg-[var(--text-primary)] text-[var(--background)]">Default</span>
+                                                <span className="text-[var(--text-tiny)] font-bold px-1.5 py-0.5 rounded-[var(--radius-xs)] bg-[var(--text-primary)] text-[var(--background)] uppercase tracking-tighter">Default</span>
                                             )}
                                         </div>
                                         <p className="text-sm text-[var(--text-secondary)] mt-1 line-clamp-2">

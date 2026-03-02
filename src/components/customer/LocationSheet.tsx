@@ -13,6 +13,7 @@ import { useAuth } from '@/providers/AuthProvider';
 import { getAddresses, setDefaultAddress, deleteAddress } from '@/lib/actions/user/addresses';
 import { setLocationFromCoords, setLocationCookies, searchPlaces, setLocationFromPlaceId } from '@/lib/actions/discovery/location';
 import type { Address } from '@/lib/types/address';
+import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { LocationSearch } from './location/LocationSearch';
 import { SavedAddresses } from './location/SavedAddresses';
 import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
@@ -111,12 +112,14 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
       return;
     }
     setUsingGeolocation(true);
+    triggerHaptic(HapticPattern.ACTION);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
         const result = await setLocationFromCoords(latitude, longitude);
         if (result.success) {
           if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('locationUpdate'));
+          triggerHaptic(HapticPattern.SUCCESS);
           toast.success(`Location set: ${result.name}`);
           goBack();
         } else {
@@ -125,6 +128,7 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
         setUsingGeolocation(false);
       },
       () => {
+        triggerHaptic(HapticPattern.ERROR);
         toast.error('Location access denied');
         setUsingGeolocation(false);
       }
@@ -158,7 +162,7 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
           <button
             onClick={handleUseCurrentLocation}
             disabled={usingGeolocation}
-            className="w-full flex items-center gap-4 p-4 rounded-xl border border-[var(--border)] hover:bg-[var(--surface-muted)] hover:border-[var(--border)] transition-all text-left group"
+            className="w-full flex items-center gap-4 p-4 rounded-[var(--radius-xl)] border border-[var(--border)] hover:bg-[var(--surface-muted)] hover:border-[var(--border)] transition-all text-left group shadow-[var(--shadow-sm)]"
           >
             <div className="size-10 rounded-xl bg-[var(--primary)]/5 flex items-center justify-center shrink-0 border border-[var(--primary)]/10 group-hover:bg-[var(--primary)]/10 transition-colors">
               {usingGeolocation ? <Loader2 className="size-4 animate-spin text-[var(--primary)]" /> : <Locate className="size-4 text-[var(--primary)]" />}
@@ -189,8 +193,8 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
           )}
 
           {(!user || addresses.length === 0) && (
-            <div className="py-8 px-6 rounded-xl bg-[var(--surface-muted)]/50 border border-[var(--border)] text-center space-y-4">
-              <div className="size-10 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center mx-auto">
+            <div className="py-8 px-6 rounded-[var(--radius-xl)] bg-[var(--surface-muted)]/50 border border-[var(--border)] text-center space-y-4">
+              <div className="size-10 rounded-[var(--radius-xl)] bg-[var(--primary)]/10 flex items-center justify-center mx-auto shadow-[var(--shadow-sm)]">
                 <Navigation className="size-5 text-[var(--primary)]" />
               </div>
               <div className="space-y-1">
@@ -199,7 +203,13 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
                   {user ? 'Add your delivery addresses for a faster checkout.' : 'Log in to access your saved home and work addresses.'}
                 </p>
               </div>
-              <button onClick={() => user ? router.push('/profile?tab=addresses&action=add') : router.push('/auth')} className="mt-2 px-6 py-2.5 rounded-xl bg-[var(--text-primary)] text-[var(--text-inverse)] text-xs font-bold active:scale-95 transition-all">
+              <button
+                onClick={() => {
+                  triggerHaptic(HapticPattern.ACTION);
+                  user ? router.push('/profile?tab=addresses&action=add') : router.push('/auth');
+                }}
+                className="mt-2 px-6 py-2.5 rounded-[var(--radius-xl)] bg-[var(--text-primary)] text-[var(--text-inverse)] text-xs font-bold active:scale-95 transition-all shadow-[var(--shadow-lg)]"
+              >
                 {user ? 'Add Address' : 'Sign In'}
               </button>
             </div>
