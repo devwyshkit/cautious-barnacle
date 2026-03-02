@@ -1,4 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient, User } from '@supabase/supabase-js';
+import { logger } from '@/lib/logging/logger';
 
 export type UserRole = 'admin' | 'vendor' | 'customer';
 
@@ -9,7 +10,6 @@ export interface UserPermissions {
   vendorIds: string[];
 }
 
-import { logger } from '@/lib/logging/logger';
 
 /**
  * Shared redirect logic (Unified Auth Model)
@@ -90,5 +90,6 @@ export async function resolveUserPermissionsWithTimeout(
     };
   });
 }
+
 
 

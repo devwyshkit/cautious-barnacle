@@ -114,7 +114,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                             initialAddresses={checkoutData.addresses}
                             currentAddress={checkoutData.addresses?.find(a => a.id === checkoutData.selected_address_id)}
                             disabled={paymentFlow.isProcessing}
-                            etaMinutes={checkoutData.eta_minutes || 45}
+                            etaMinutes={checkoutData.eta_minutes}
                         />
                         <div className="mt-3">
                             <label className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-widest">

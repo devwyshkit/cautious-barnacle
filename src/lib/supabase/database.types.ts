@@ -2623,7 +2623,6 @@ export type Database = {
       merge_guest_to_user:
         | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
         | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
-        | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
       place_atomic_order:
         | {
             Args: {

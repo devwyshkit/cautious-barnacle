@@ -46,7 +46,7 @@ async function AsyncOrderList({ userId }: { userId: string }) {
     const supabase = await createClient();
 
     // WYSHKIT 2026: One-Trip Orders Surface
-    const { data: orders, error } = await supabase.rpc('get_user_orders_v1' as any);
+    const { data: orders, error } = await supabase.rpc('get_user_orders_v1');
 
     if (error) {
         logger.error('Failed to fetch orders in AsyncOrderList', error);

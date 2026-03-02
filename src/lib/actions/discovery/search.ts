@@ -46,11 +46,11 @@ export async function searchFiltered(options: {
         // WYSHKIT 2026: Atomic Search & Hyperlocal Sort via Kernel RPC
         const { data: results, error } = await supabase.rpc('search_products_atomic', {
             p_query: q || '',
-            p_category_id: p_category_id,
-            p_lat: lat || null,
-            p_lng: lng || null,
+            p_category_id: p_category_id || undefined,
+            p_lat: lat || undefined,
+            p_lng: lng || undefined,
             p_limit: limit
-        } as any);
+        });
 
         if (error) {
             if (error.message?.includes('fetch failed')) {
@@ -62,18 +62,18 @@ export async function searchFiltered(options: {
 
         // Results from RPC are already sorted by proximity and relevance
         const rawResults = {
-            products: (results || []).map((p: any) => ({
+            products: (results as any[] || []).map((p: any) => ({
                 ...p,
                 image_url: p.images?.[0] || '/images/logo.png'
             })),
             vendors: [], // We'll handle vendor separation if needed, but the unified list is better for the UI
-            total: results?.[0]?.total_count || 0
+            total: (results as any[] || []).length > 0 ? (results as any[])[0].total_count : 0
         };
 
         const validated = SearchResultsSchema.safeParse(rawResults);
         if (!validated.success) {
             logger.error('Zod Validation Failed: searchFiltered', validated.error);
-            return rawResults as any;
+            return rawResults;
         }
 
         return validated.data;
@@ -104,12 +104,12 @@ export async function getFilteredProducts(options: {
         // WYSHKIT 2026: Atomic Discovery Fetcher (Zero Shadow Math)
         const { data, error } = await supabase.rpc('search_products_atomic', {
             p_query: search || '',
-            p_category_id: category || null,
-            p_lat: lat || null,
-            p_lng: lng || null,
+            p_category_id: category || undefined,
+            p_lat: lat || undefined,
+            p_lng: lng || undefined,
             p_limit: limit,
             p_offset: offset
-        } as any);
+        });
 
         if (error) {
             if (error.message?.includes('fetch failed')) {
@@ -118,8 +118,8 @@ export async function getFilteredProducts(options: {
             throw error;
         }
 
-        const total = data?.[0]?.total_count || 0;
-        const productsRaw = (data || []).map((p: any) => ({
+        const totalCount = (data as any[] || [])[0]?.total_count || 0;
+        const productsRaw = (data as any[] || []).map((p: any) => ({
             ...p,
             image_url: p.images?.[0] || '/images/logo.png',
             vendors: {
@@ -133,10 +133,10 @@ export async function getFilteredProducts(options: {
         const validated = z.array(WyshkitProductSchema).safeParse(productsRaw);
         if (!validated.success) {
             logger.error('Zod Validation Failed: getFilteredProducts', validated.error);
-            return { data: { products: productsRaw as any, total } };
+            return { data: { products: productsRaw as unknown as WyshkitProduct[], total: totalCount } };
         }
 
-        return { data: { products: validated.data as unknown as WyshkitProduct[], total } };
+        return { data: { products: validated.data as unknown as WyshkitProduct[], total: totalCount } };
     } catch (error: any) {
         logger.error('Failed to fetch filtered products in Discovery', error, { options });
         return { error: error.message || 'Failed to fetch products' };

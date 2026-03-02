@@ -16,7 +16,8 @@ import { PersonalizationField } from './PersonalizationField';
 import { PersonalizationSuccess } from './PersonalizationSuccess';
 
 interface OrderProduct {
-    id: string;
+    id: string; // order_product_id
+    product_id?: string; // actual product reference
     product_name: string;
     is_personalized?: boolean;
     personalization_config?: PersonalizationConfig;
@@ -72,7 +73,7 @@ export function PersonalizationForm({
                 const { data } = await supabase
                     .from('order_products')
                     .select('final_approved_mockup_url, orders!inner(created_at)')
-                    .eq('product_id', (product as any).product_id || product.id)
+                    .eq('product_id', product.product_id || product.id)
                     .not('final_approved_mockup_url', 'is', null)
                     .order('orders(created_at)', { ascending: false })
                     .limit(1)

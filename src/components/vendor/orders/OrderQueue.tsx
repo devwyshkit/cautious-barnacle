@@ -72,7 +72,7 @@ export function OrderQueue({ initialOrders, vendorId }: OrderQueueProps) {
 
       if (result.success) {
         setOrders(prev => prev.map(o =>
-          o.id === orderId ? { ...o, status: ORDER_STATUS.CONFIRMED as any } : o
+          o.id === orderId ? { ...o, status: ORDER_STATUS.CONFIRMED } : o
         ));
         toast.success('Order accepted');
       } else {
@@ -96,7 +96,7 @@ export function OrderQueue({ initialOrders, vendorId }: OrderQueueProps) {
       });
       if (result.success) {
         setOrders(prev => prev.map(o =>
-          o.id === orderId ? { ...o, status: ORDER_STATUS.CANCELLED as any } : o
+          o.id === orderId ? { ...o, status: ORDER_STATUS.CANCELLED } : o
         ));
         toast.success('Order rejected');
       } else {
@@ -120,7 +120,7 @@ export function OrderQueue({ initialOrders, vendorId }: OrderQueueProps) {
       });
       if (result.success) {
         setOrders(prev => prev.map(o =>
-          o.id === orderId ? { ...o, status: newStatus as any } : o
+          o.id === orderId ? { ...o, status: newStatus } : o
         ));
         toast.success('Order updated');
       } else {

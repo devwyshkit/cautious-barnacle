@@ -112,7 +112,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
   const OrderQueueCard = ({ order, showUpload = false }: { order: VendorOrder; showUpload?: boolean }) => {
     const [showHistory, setShowHistory] = useState(false);
     // Note: order.previews is provided via realtime/initial state
-    const designHistory = (order as any).previews || [];
+    const designHistory = order.previews || [];
 
     return (
       <Card key={order.id}>
@@ -274,7 +274,8 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                 delivery_address: freshOrderData.delivery_address as any,
                 order_products,
                 latest_preview,
-                personalization_status: p_status
+                personalization_status: p_status,
+                previews: (freshOrderData as any).previews
               };
 
               setOrders(prev => {

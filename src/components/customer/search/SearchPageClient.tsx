@@ -136,7 +136,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                 triggerHaptic(HapticPattern.ACTION);
                 handleSearchUpdate(inputValue, "");
               }}
-              className="ml-auto text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors"
+              className="ml-auto text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors active:scale-95"
             >
               Clear
             </button>

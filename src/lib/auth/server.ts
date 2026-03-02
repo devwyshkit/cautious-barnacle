@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import type { User } from '@supabase/supabase-js';
 import { type UserRole, type UserPermissions, resolveUserPermissions } from './core';
 import type { Database } from '@/lib/supabase/database.types';
@@ -35,9 +36,9 @@ export async function getVendorFromSession(): Promise<Vendor | null> {
   if (!user) return null;
 
   // WYSHKIT 2026: Single-Trip Vendor Resolution via RPC
-  const { data: vendor, error } = await (supabase as any).rpc('get_vendor_from_session', {
+  const { data: vendor, error } = await supabase.rpc('get_vendor_from_session', {
     p_user_id: user.id,
-    p_email: user.email || null,
+    p_email: user.email || undefined,
     p_app_metadata: user.app_metadata || {}
   });
 
@@ -46,4 +47,22 @@ export async function getVendorFromSession(): Promise<Vendor | null> {
   }
 
   return vendor as unknown as Vendor;
+}
+
+/**
+ * WYSHKIT 2026: Zero-Trip Auth Resolution
+ * Resolves the current user via injected headers from Middleware (Proxy).
+ * This eliminates the standard Supabase `getUser()` round-trip for already-authenticated requests.
+ */
+export async function getZeroTripUser(): Promise<User | null> {
+  const headerList = await headers();
+  const injectedUserId = headerList.get('x-wyshkit-user-id');
+  const injectedUserEmail = headerList.get('x-wyshkit-user-email');
+
+  if (!injectedUserId) return null;
+
+  return {
+    id: injectedUserId,
+    email: injectedUserEmail
+  } as User;
 }

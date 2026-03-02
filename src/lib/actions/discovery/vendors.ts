@@ -12,6 +12,13 @@ import { WyshkitProduct } from '@/lib/types/product';
  * WYSHKIT 2026: Vendor & Store Actions
  */
 
+interface RawVendorSurface {
+    vendor?: MappedVendor;
+    products?: any[];
+    categories?: any[];
+    error?: string;
+}
+
 /**
  * Deduplicated Vendor Fetcher
  * Wrapped in React cache() to prevent double-hydration flicker
@@ -27,9 +34,9 @@ export const getVendorStoreData = cache(async (vendorIdOrSlug: string, category?
         const location = await getServerLocation(user);
 
         // WYSHKIT 2026: One-Trip Vendor Surface - Now with Law 10 ETA
-        const { data, error } = await supabase.rpc('get_vendor_surface' as any, {
+        const { data, error } = await supabase.rpc('get_vendor_surface', {
             p_vendor_id_or_slug: vendorIdOrSlug,
-            p_category_slug: category,
+            p_category_slug: category || undefined,
             p_lat: location?.lat,
             p_lng: location?.lng
         });
@@ -42,11 +49,11 @@ export const getVendorStoreData = cache(async (vendorIdOrSlug: string, category?
             return { vendor: null, products: [], categories: [], error: error.message };
         }
 
-        if (!data || (data as any).error) {
-            return { vendor: null, products: [], categories: [], error: (data as any).error || 'Vendor not found' };
+        const raw = data as unknown as RawVendorSurface;
+        if (!raw || raw.error) {
+            return { vendor: null, products: [], categories: [], error: raw?.error || 'Vendor not found' };
         }
 
-        const raw = data as any;
         const products = (raw.products || []) as unknown as WyshkitProduct[];
 
         // Group by Category Name for the UI
@@ -69,7 +76,7 @@ export const getVendorStoreData = cache(async (vendorIdOrSlug: string, category?
         ];
 
         return {
-            vendor: raw.vendor as MappedVendor,
+            vendor: raw.vendor || null,
             products,
             productsGroupedByCategory: groupedProducts,
             categories: categoryFilters,

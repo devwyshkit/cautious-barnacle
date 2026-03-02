@@ -15,11 +15,9 @@ interface VendorCardProps {
 }
 
 export function VendorCard({ data, className }: VendorCardProps) {
-    const prepTime = (data as any).prep_hours
-        ? formatPrepTime((data as any).prep_hours)
-        : data.avg_prep_time_mins
-            ? formatPrepTime(data.avg_prep_time_mins / 60)
-            : null;
+    const prepTime = data.avg_prep_time_mins
+        ? formatPrepTime(data.avg_prep_time_mins / 60)
+        : null;
 
     return (
         <Link href={`/vendor/${data.id}`}>

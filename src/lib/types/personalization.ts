@@ -67,12 +67,12 @@ export interface DraftProduct {
   vendor_prep_mins?: number | null;
 
   // UI-only computed extensions
-  product_addons: any[];
+  product_addons: SelectedAddon[];
   addons_price?: number | null;
   base_price?: number;
   variant_price?: number | null;
-  product_addons_meta?: any;
-  personalization_options?: any[];
+  product_addons_meta?: Record<string, unknown>;
+  personalization_options?: PersonalizationConfig[];
 }
 
 export type CartProduct = DraftProduct;

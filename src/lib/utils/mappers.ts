@@ -8,7 +8,34 @@ import { EMPTY_CART } from '@/lib/constants/cart';
  * Zero Shadow Math: Mapping only, no calculations.
  */
 
-export function mapCartContext(data: any): { cart: DraftTransaction, cartSessionId: string } {
+interface RawHomeSurface {
+    categories?: any[];
+    featured_products?: any[];
+    vendors?: any[];
+    active_orders?: any[];
+    recent_orders?: any[];
+    cart_count?: number;
+    system_status?: string;
+    sections_data?: {
+        best_sellers?: any[];
+        new_arrivals?: any[];
+        vendors?: any[];
+    };
+    metadata?: {
+        location_name?: string;
+        resolved_lat?: number;
+        resolved_lng?: number;
+        eta_minutes?: number;
+    };
+}
+
+interface RawCartContext {
+    products?: any[];
+    pricing?: any;
+    session?: any;
+}
+
+export function mapCartContext(data: RawCartContext | null): { cart: DraftTransaction, cartSessionId: string } {
     if (!data) return { cart: EMPTY_CART, cartSessionId: 'empty' };
 
     const productsRows = data.products || [];
@@ -41,6 +68,7 @@ export function mapCartContext(data: any): { cart: DraftTransaction, cartSession
             addons_price: Number(row.addons_price || 0),
             is_personalized: !!personalization?.enabled,
             personalization_options: (row.personalization_options as any[]) || [],
+            product_addons: [], // Required by DraftProduct interface
         };
     });
 
@@ -74,7 +102,7 @@ export function mapCartContext(data: any): { cart: DraftTransaction, cartSession
     };
 }
 
-export function mapHomeSurface(data: any) {
+export function mapHomeSurface(data: RawHomeSurface | null) {
     if (!data) return {
         categories: [],
         trendingProducts: [],
@@ -84,7 +112,7 @@ export function mapHomeSurface(data: any) {
         metadata: { system_status: 'normal' }
     };
 
-    const raw = Array.isArray(data) ? (data[0]?.get_home_surface || data[0]) : data;
+    const raw = data;
     const sectionsData = raw.sections_data || {};
 
     return {

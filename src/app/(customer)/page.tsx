@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server';
 import { getGlobalInitSurface } from "@/lib/actions/discovery/init";
 import { getServerLocation } from "@/lib/actions/discovery/location";
 import { HomeSkeleton } from "@/components/customer/home/HomeSkeleton";
-import { Masthead } from "@/components/customer/home/Masthead";
 import { ReorderRail } from "@/components/customer/home/ReorderRail";
 import { ActiveOrdersBanner } from '@/components/customer/home/ActiveOrdersBanner';
 import { cn } from "@/lib/utils";
@@ -14,7 +13,8 @@ import { CardRail } from "@/components/ui/blocks/discovery/CardRail";
 import { Grid } from "@/components/ui/blocks/discovery/Grid";
 import { BannerBento } from "@/components/ui/blocks/discovery/BannerBento";
 
-import { headers, cookies } from 'next/headers';
+import { getZeroTripUser } from '@/lib/auth/server';
+import { cookies } from 'next/headers';
 
 interface HomePageProps {
   searchParams: Promise<{ category?: string }>;
@@ -26,34 +26,22 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   try {
     const { category = null } = await searchParams;
 
-    // WYSHKIT 2026: One-Trip Promise - Resolve Auth via Injected Headers (Zero-Trip)
-    const headerList = await headers();
-    const injectedUserId = headerList.get('x-wyshkit-user-id');
-    const injectedUserEmail = headerList.get('x-wyshkit-user-email');
+    // WYSHKIT 2026: Zero-Trip Auth Resolution
+    const user = await getZeroTripUser();
 
-    // Zero-Trip Auth Resolution
-    const user = injectedUserId ? { id: injectedUserId, email: injectedUserEmail } : null;
-
-    // WYSHKIT 2026: One-Trip Promise - Resolve Auth & Discovery Context consolidated
+    // WYSHKIT 2026: One-Trip Promise - Home data is fetched in Layout.
+    // React.cache handles deduplication for concurrent RSC execution.
     const [location, globalInit] = await Promise.all([
       getServerLocation(user),
       getGlobalInitSurface(undefined, undefined, user?.id)
     ]);
 
     const discovery = globalInit.home;
-
-    // Use RPC-resolved location if local resolution was missing
-    const displayLocationName = location.lat && location.lng
-      ? (location.name || 'Your Area')
-      : (discovery.metadata?.location_name || location.name || 'Your Area');
+    const error = (globalInit as any).error;
+    const displayLocationName = location.name || 'Your Area';
 
     return (
       <div className="min-h-[100dvh] animate-in font-sans selection:bg-[#D91B24]/10 bg-[var(--background)]">
-        <Masthead
-          status={discovery.metadata?.system_status as 'normal' | 'delayed' | 'capacity'}
-          locationName={displayLocationName}
-          etaMinutes={discovery.metadata?.eta_minutes}
-        />
         <main className="pb-24">
           <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
 
@@ -76,22 +64,22 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             )}
 
             {/* Error Handling (Hardened for Production) */}
-            {(discovery as any).error && (
+            {error && (
               <div id="discovery-error-well" className="mx-[var(--space-4)] md:mx-[var(--space-8)] mb-[var(--space-8)] p-[var(--space-6)] bg-[var(--primary-muted)] border border-[var(--primary-ring)] rounded-[var(--radius-3xl)] text-[var(--text-primary)] flex flex-col gap-[var(--space-3)] animate-in fade-in slide-in-from-top-2 duration-500">
                 <div className="flex items-center gap-3 font-black tracking-tight">
                   <div className="size-8 rounded-full bg-[var(--destructive)] flex items-center justify-center">
                     <span className="w-2 h-2 bg-[var(--surface)] rounded-full animate-pulse" />
                   </div>
-                  Discovery Engine: {(discovery as any).error_code || 'CONNECTION_FAILURE'}
+                  Discovery Engine: {String(error)}
                 </div>
                 <p className="text-sm font-medium opacity-80 leading-relaxed max-w-lg">
-                  {(discovery as any).error_message || "We're having trouble reaching our stores. Please try refreshing or checking your location settings."}
+                  We're having trouble reaching our stores. Please try refreshing or checking your location settings.
                 </p>
                 {process.env.NODE_ENV === 'development' && (
                   <div className="flex flex-col gap-2 mt-2">
                     <p className="text-xs font-bold uppercase tracking-widest text-[var(--destructive)] opacity-40">Technical Details (Dev Only)</p>
                     <pre className="text-xs bg-[var(--surface)]/60 p-4 rounded-[var(--radius-md)] font-mono overflow-auto border border-[var(--destructive)]/10">
-                      {String((discovery as any).error)}
+                      {String(error)}
                     </pre>
                   </div>
                 )}
@@ -122,7 +110,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                     <Grid data={discovery.featuredVendors} />
                   </div>
                 </section>
-              ) : !(discovery as any).error && (
+              ) : !error && (
                 <section className="px-[var(--space-4)] md:px-[var(--space-8)] py-[var(--space-20)] text-center border-2 border-dashed border-[var(--border)] rounded-[var(--radius-3xl)] mx-[var(--space-4)]">
                   <div className="max-w-xs mx-auto flex flex-col gap-2">
                     <p className="font-bold text-[var(--text-primary)]">No stores found nearby</p>

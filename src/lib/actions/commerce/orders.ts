@@ -27,6 +27,7 @@ export type VendorOrder = Omit<Order, 'delivery_address' | 'vendor'> & {
   vendor?: Vendor | Vendor[] | null;
   personalization_status?: string | null; // Mapped for UI
   latest_preview?: any; // Mapped for UI
+  previews?: any[]; // For design history
 };
 
 async function log_order_status_history(order_id: string, type: string, title: string, description: string, metadata: Record<string, unknown> = {}) {
@@ -87,7 +88,7 @@ export async function update_order_status(
     }
 
     // 4. ATOMIC Transition via DB RPC (SINGLE SOURCE OF TRUTH)
-    const { data: result, error: rpc_error } = await supabase.rpc('transition_order' as any, {
+    const { data: result, error: rpc_error } = await supabase.rpc('transition_order', {
       p_order_id: order_id,
       p_target_status: target_status as OrderStatus,
       p_metadata: {
@@ -98,7 +99,7 @@ export async function update_order_status(
 
     if (rpc_error) throw rpc_error;
 
-    const transition_result = result as any;
+    const transition_result = result as { success: boolean; error?: string };
     if (!transition_result.success) {
       return { success: false, error: transition_result.error };
     }
@@ -136,14 +137,14 @@ export async function submit_order_personalization(order_id: string, personaliza
       const supabase = await createClient();
 
       // WYSHKIT 2026: Atomic Submission via RPC (Single Trip)
-      const { data, error: rpc_error } = await supabase.rpc('submit_order_personalization' as any, {
+      const { data, error: rpc_error } = await supabase.rpc('submit_order_personalization', {
         p_order_id: order_id,
-        p_personalization_input: personalization_input as any
+        p_personalization_input: personalization_input as Json
       });
 
       if (rpc_error) throw rpc_error;
 
-      const result = data as any;
+      const result = data as { success: boolean; error?: string };
       if (!result.success) {
         return { success: false, error: result.error };
       }
@@ -191,13 +192,13 @@ export async function approve_preview(preview_submission_id: string, order_id: s
     const supabase = await createClient();
 
     // WYSHKIT 2026: Atomic Preview Approval via RPC
-    const { data, error: rpc_error } = await supabase.rpc('approve_order_preview' as any, {
+    const { data, error: rpc_error } = await supabase.rpc('approve_order_preview', {
       p_order_id: order_id
     });
 
     if (rpc_error) throw rpc_error;
 
-    const result = data as any;
+    const result = data as { success: boolean; error?: string };
     if (!result.success) {
       return { success: false, error: result.error };
     }
@@ -224,7 +225,7 @@ export async function cancel_order_product(order_product_id: string, order_id: s
     });
 
     if (rpc_error) throw rpc_error;
-    const result = rpc_data as any;
+    const result = rpc_data as { success: boolean; error?: string; payment_id?: string; refund_amount?: number };
 
     if (!result.success) {
       return { success: false, error: result.error };
@@ -235,7 +236,7 @@ export async function cancel_order_product(order_product_id: string, order_id: s
     if (result.success && result.payment_id) {
       try {
         const { refund_payment } = await import('@/lib/services/razorpay');
-        await refund_payment(result.payment_id, result.refund_amount * 100, {
+        await refund_payment(result.payment_id, result.refund_amount ? result.refund_amount * 100 : undefined, {
           reason: `Partial cancellation: ${reason}`,
           order_product_id: order_product_id
         });
@@ -266,7 +267,7 @@ export async function request_change(preview_submission_id: string, order_id: st
 
     if (rpc_error) throw rpc_error;
 
-    const result = rpc_data as any;
+    const result = rpc_data as { success: boolean; error?: string; new_count?: number };
     if (!result.success) {
       return { success: false, error: result.error };
     }

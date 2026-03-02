@@ -62,7 +62,7 @@ export default function RootLayout({
 }>) {
   try {
     return (
-      <html lang="en" className={cn("min-h-screen w-full selection:bg-[var(--primary-muted)] selection:text-[var(--primary)]", inter.variable)}>
+      <html lang="en" style={{ colorScheme: 'light' }} className={cn("min-h-screen w-full selection:bg-[var(--primary-muted)] selection:text-[var(--primary)]", inter.variable)}>
         <body className="font-sans antialiased min-h-screen w-full bg-[var(--background)]">
           <ErrorReporter />
           <Providers>
@@ -73,7 +73,7 @@ export default function RootLayout({
     );
   } catch (err: any) {
     return (
-      <html lang="en">
+      <html lang="en" style={{ colorScheme: 'light' }}>
         <body>
           <div className="p-10 text-[var(--destructive)] bg-[var(--well-destructive)] min-h-screen font-mono">
             <h1 className="text-xl font-bold mb-4">Root Layout Error (Debug)</h1>

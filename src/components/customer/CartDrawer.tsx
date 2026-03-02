@@ -4,6 +4,7 @@ import React from 'react';
 import { ShoppingBag, X, Plus, Minus, ArrowRight, Sparkles, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/AuthProvider';
 import {
     Drawer,
     DrawerContent,
@@ -33,6 +34,7 @@ export function CartDrawer() {
         updateQuantity,
         removeFromDraftOrder
     } = useCart();
+    const { user } = useAuth();
 
     const products = draftOrder?.products || [];
     const hasProducts = products.length > 0;
@@ -40,6 +42,10 @@ export function CartDrawer() {
     const handleCheckout = () => {
         triggerHaptic(HapticPattern.ACTION);
         setDrawerOpen(false);
+        if (!user) {
+            router.push('/auth?returnUrl=/checkout');
+            return;
+        }
         router.push('/checkout');
     };
 

@@ -11,10 +11,16 @@ import { HeaderCart } from './HeaderCart';
 import { LocationData } from '@/lib/actions/discovery/location';
 import { LocationSheet } from '@/components/customer/LocationSheet';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
+import { Masthead } from '@/components/customer/home/Masthead';
 
 
 interface TopHeaderProps {
   initialLocation?: LocationData;
+  mastheadProps?: {
+    status?: 'normal' | 'delayed' | 'capacity';
+    etaMinutes?: number;
+    locationName?: string;
+  };
 }
 
 /**
@@ -25,7 +31,8 @@ interface TopHeaderProps {
  * - Zero useEffect for initial load
  * - No localStorage reliance
  */
-export function TopHeader({ initialLocation }: TopHeaderProps) {
+export function TopHeader({ initialLocation, mastheadProps }: TopHeaderProps) {
+  const { status, etaMinutes, locationName } = mastheadProps || {};
   const router = useRouter();
   const { user, loading } = useAuth();
   const [isLocationOpen, setIsLocationOpen] = useState(false);
@@ -156,13 +163,22 @@ export function TopHeader({ initialLocation }: TopHeaderProps) {
               triggerHaptic(HapticPattern.ACTION);
               router.push('/search');
             }}
-            className="flex items-center gap-[var(--space-3)] h-12 px-[var(--space-4)] bg-[var(--surface-muted)] rounded-[var(--radius-lg)] border border-[var(--border)] active:scale-[0.98] transition-all"
+            className="w-full flex items-center gap-[var(--space-3)] h-11 px-[var(--space-4)] bg-[var(--surface-muted)] rounded-[var(--radius-md)] hover:bg-[var(--input)] transition-all group"
           >
             <Search className="size-4.5 text-[var(--primary)]" />
             <span className="text-sm font-bold text-[var(--text-tertiary)]">Search &quot;Best Birthday Cakes&quot;</span>
           </button>
+
+          {(status || etaMinutes || locationName) && (
+            <Masthead
+              status={status}
+              etaMinutes={etaMinutes}
+              locationName={locationName}
+              className="py-1.5 px-0 border-none bg-transparent"
+            />
+          )}
         </div>
-      </header>
+      </header >
 
       <LocationSheet
         isOpen={isLocationOpen}

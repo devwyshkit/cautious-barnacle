@@ -17,24 +17,28 @@ export default async function VendorLayout({
 
   const vendor = await getVendorFromSession();
 
-  if (!vendor && !isLoginPage) {
-    redirect('/vendor/login');
+  if (!vendor) {
+    if (!isLoginPage) {
+      redirect('/vendor/login');
+    }
+    return <>{children}</>;
   }
 
-  // If we are on login page, we don't need the shell or active checks
+  // If we are on login page but already have a vendor session, we can still show children or redirect to dashboard
+  // For now, if it's login page, we just return children as requested by the flow
   if (isLoginPage) {
     return <>{children}</>;
   }
 
   // HARD GATE: Non-ACTIVE vendors can only access onboarding
-  const isActive = (vendor as any).is_active === true || (vendor as any).kyc_status === 'VERIFIED';
-  if (!isActive) {
+  const isActive = vendor.is_active === true || vendor.kyc_status === 'VERIFIED';
+  if (!isActive && !pathname.includes('/onboarding')) {
     redirect('/vendor/onboarding');
   }
 
 
   return (
-    <VendorLayoutShell vendor={vendor as any}>
+    <VendorLayoutShell vendor={vendor}>
       {children}
     </VendorLayoutShell>
   );

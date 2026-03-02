@@ -15,6 +15,7 @@ import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
 
 interface ProductReviewsProps {
   productId: string;
+  orderId?: string; // WYSHKIT 2026: The order this review is associated with
   orderProductId?: string; // WYSHKIT 2026: Link to the specific order product
   approvedMockupUrl?: string; // WYSHKIT 2026: Pass the mockup seen by customer
   initialReviews?: Array<{
@@ -32,7 +33,7 @@ interface ProductReviewsProps {
   }>;
 }
 
-export function ProductReviews({ productId, orderProductId, approvedMockupUrl, initialReviews }: ProductReviewsProps) {
+export function ProductReviews({ productId, orderId, orderProductId, approvedMockupUrl, initialReviews }: ProductReviewsProps) {
   const { user } = useAuth();
 
   // WYSHKIT 2026: Use server-provided initial reviews (data comes to user)
@@ -87,10 +88,10 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
       const supabase = createClient();
 
       // WYSHKIT 2026: Atomic Review Submission via RPC (Single Trip)
-      const { data, error: rpc_error } = await (supabase.rpc as any)('add_product_review', {
+      const { data, error: rpc_error } = await supabase.rpc('add_product_review', {
         p_product_id: productId,
-        p_order_id: (reviews[0]?.order_id || null), // We should ideally pass this in props if available
-        p_order_product_id: orderProductId,
+        p_order_id: orderId || "", // Passed from parent context
+        p_order_product_id: orderProductId || "", // Required string in schema
         p_rating: rating,
         p_comment: comment.trim(),
         p_personalization_rating: personalizationRating,
@@ -100,9 +101,9 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
 
       if (rpc_error) throw rpc_error;
 
-      const result = data as any;
+      const result = data as { success: boolean; error?: string };
       if (!result.success) {
-        throw new Error(result.error);
+        throw new Error(result.error || "Submission failed");
       }
 
       toast.success("Review submitted! Thank you for the feedback.");

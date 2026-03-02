@@ -57,7 +57,7 @@ export function OrderCard({ order }: OrderCardProps) {
           <div className="mt-3 flex flex-wrap gap-2">
             <span className={cn(
               "px-2 py-0.5 rounded-[var(--radius-md)] text-xs font-bold tracking-tight",
-              status === 'DELIVERED' ? "bg-[var(--well-success)] text-[var(--success)]" :
+              status === ORDER_STATUS.DELIVERED ? "bg-[var(--well-success)] text-[var(--success)]" :
                 isActive ? "bg-[var(--well-warning)] text-[var(--primary)]" :
                   "bg-[var(--surface-muted)] text-[var(--text-secondary)]"
             )}>

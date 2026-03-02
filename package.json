@@ -10,7 +10,6 @@
     "start": "next start",
     "lint": "next lint",
     "lint:nomenclature": "bash scripts/nomenclature-guard.sh",
-    "seed": "echo 'Run this SQL file in your Supabase SQL editor: supabase/seed.sql'",
     "test": "vitest run",
     "test:watch": "vitest",
     "gen:types": "supabase gen types typescript --project-id hlvwfzickwpobjaxsbcc --schema public > src/lib/supabase/database.types.ts"

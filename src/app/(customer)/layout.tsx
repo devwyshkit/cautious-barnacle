@@ -14,9 +14,9 @@ import { LocationData } from "@/lib/actions/discovery/location";
 import { EMPTY_CART } from "@/lib/constants/cart";
 import { headers, cookies } from "next/headers";
 import { User } from "@supabase/supabase-js";
-import * as AuthCoreLib from "@/lib/auth/core";
+import { resolveUserPermissionsWithTimeout, UserPermissions } from "@/lib/auth/core";
+import { getZeroTripUser } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/server";
-import { resolveUserPermissionsWithTimeout } from "@/lib/auth/core";
 
 /**
  * WYSHKIT 2026: Customer Layout - Singleton State & Route-Based Navigation
@@ -59,7 +59,8 @@ async function AsyncLayoutContent({
   };
   let location: LocationData = { name: 'Select location', address: '', pincode: '' };
   let user: User | null = null;
-  let permissions: AuthCoreLib.UserPermissions | null = null;
+  let permissions: UserPermissions | null = null;
+  let home: any = null;
   let activeOrders: any[] = []; // Default fallback
 
   try {
@@ -78,13 +79,11 @@ async function AsyncLayoutContent({
 
     const supabase = await createClient();
 
-    if (injectedUserId) {
-      user = { id: injectedUserId, email: injectedUserEmail } as User;
-    } else if (!hasAuthCookie) {
-      // Zero-Trip Guest Path: No cookie = No user.
-      user = null;
-    } else {
-      // Fallback Path: Standard resolution (only if cookie exists but header missing)
+    // WYSHKIT 2026: Zero-Trip Auth Resolution
+    user = await getZeroTripUser();
+
+    // Fallback Path: Standard resolution (only if cookie exists but header missing)
+    if (!user && hasAuthCookie) {
       const { data: { user: fetchedUser } } = await supabase.auth.getUser();
       user = fetchedUser;
     }
@@ -109,7 +108,8 @@ async function AsyncLayoutContent({
     ]);
 
     location = locRes;
-    const { cart: mappedCartResult, home } = globalInit;
+    const { cart: mappedCartResult, home: homeData } = globalInit;
+    home = homeData;
     cartResult = {
       cart: mappedCartResult.cart,
       cartSessionId: mappedCartResult.cartSessionId,
@@ -127,7 +127,14 @@ async function AsyncLayoutContent({
 
   return (
     <CartProvider initialCart={initialCart} guestSessionId={guestSessionId}>
-      <NavShell initialLocation={location}>
+      <NavShell
+        initialLocation={location}
+        mastheadProps={{
+          status: (home as any)?.metadata?.system_status ?? undefined,
+          etaMinutes: (home as any)?.metadata?.eta_minutes ?? undefined,
+          locationName: location.name
+        }}
+      >
         {children}
         {modal}
       </NavShell>

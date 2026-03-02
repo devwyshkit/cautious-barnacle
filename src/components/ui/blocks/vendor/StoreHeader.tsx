@@ -23,7 +23,7 @@ interface StoreHeaderProps {
 
 export function StoreHeader({ data }: StoreHeaderProps) {
     const router = useRouter();
-    const etaText = data.eta_minutes ? `~${data.eta_minutes} MIN` : formatPrepTime(data.prep_mins || 45);
+    const etaText = data.eta_minutes ? `~${data.eta_minutes} MIN` : data.prep_mins ? formatPrepTime(data.prep_mins) : null;
 
     return (
         <div className="relative w-full bg-[var(--surface)] pb-4">
