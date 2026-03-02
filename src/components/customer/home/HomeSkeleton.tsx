@@ -22,7 +22,7 @@ export function HomeSkeleton() {
           {/* BannerBento Skeleton */}
           <div className="flex flex-col gap-[var(--space-3)]">
             <div className="flex items-center gap-[var(--space-2)] mb-[var(--space-3)]">
-              <Skeleton className="size-10 rounded-xl" />
+              <Skeleton className="size-10 rounded-[var(--radius-md)]" />
               <div className="space-y-[var(--space-1)]">
                 <Skeleton className="h-4 w-32 rounded-full" />
                 <Skeleton className="h-3 w-24 rounded-full" />
@@ -55,7 +55,7 @@ export function HomeSkeleton() {
             <div className="flex gap-[var(--space-4)] overflow-hidden">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="shrink-0 w-[200px] sm:w-[240px] space-y-[var(--space-3)]">
-                  <Skeleton className="aspect-square rounded-xl" />
+                  <Skeleton className="aspect-square rounded-[var(--radius-md)]" />
                   <Skeleton className="h-4 w-3/4 rounded-full" />
                   <Skeleton className="h-4 w-1/4 rounded-full" />
                 </div>
@@ -70,7 +70,7 @@ export function HomeSkeleton() {
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[var(--space-4)]">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="space-y-[var(--space-3)]">
-                <Skeleton className="aspect-[4/3] rounded-2xl" />
+                <Skeleton className="aspect-[4/3] rounded-[var(--radius-lg)]" />
                 <div className="space-y-[var(--space-1-5)]">
                   <Skeleton className="h-4 w-3/4 rounded-full" />
                   <Skeleton className="h-3 w-1/4 rounded-full" />

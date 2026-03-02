@@ -115,7 +115,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
         </Select>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-[var(--radius-sm)]">
         <Table>
           <TableHeader>
             <TableRow>

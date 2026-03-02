@@ -70,7 +70,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                     <div className="px-4 py-3 space-y-3">
                         {checkoutData.products.map(product => (
                             <div key={product.id} className="flex items-center gap-3">
-                                <div className="relative size-12 rounded-xl bg-[var(--surface-muted)] overflow-hidden shrink-0">
+                                <div className="relative size-12 rounded-[var(--radius-md)] bg-[var(--surface-muted)] overflow-hidden shrink-0">
                                     <Image
                                         src={product.product_image || '/images/logo.png'}
                                         alt={product.product_name}

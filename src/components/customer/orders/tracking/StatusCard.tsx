@@ -167,7 +167,7 @@ export function StatusCard({ order, orderProducts }: StatusCardProps) {
                     </div>
 
                     {order.status === ORDER_STATUS.CANCELLED && order.cancellation_reason ? (
-                        <div className="mt-2 p-3 bg-[var(--well-warning)] rounded-xl border border-[var(--warning)]/20 flex items-start gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                        <div className="mt-2 p-3 bg-[var(--well-warning)] rounded-[var(--radius-md)] border border-[var(--warning)]/20 flex items-start gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
                             <AlertCircle className="size-3.5 text-[var(--warning)] shrink-0 mt-0.5" />
                             <p className="text-xs font-bold text-[var(--text-primary)]/80 leading-relaxed italic">
                                 &quot;{order.cancellation_reason}&quot;
@@ -273,7 +273,7 @@ export function StatusCard({ order, orderProducts }: StatusCardProps) {
                             }
                         });
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[var(--surface-muted)] border border-[var(--border)] rounded-xl text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] active:scale-95 transition-all"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius-md)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] active:scale-95 transition-all"
                 >
                     <FileText className="size-3.5" />
                     Estimate
@@ -301,7 +301,7 @@ export function StatusCard({ order, orderProducts }: StatusCardProps) {
                                 }
                             });
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[var(--well-success)] border border-[var(--success)]/20 rounded-xl text-xs font-bold text-[var(--success)] hover:bg-[var(--success)]/10 active:scale-95 transition-all"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[var(--well-success)] border border-[var(--success)]/20 rounded-[var(--radius-md)] text-xs font-bold text-[var(--success)] hover:bg-[var(--success)]/10 active:scale-95 transition-all"
                     >
                         <Download className="size-3.5" />
                         Invoice
@@ -309,7 +309,7 @@ export function StatusCard({ order, orderProducts }: StatusCardProps) {
                 )}
                 <button
                     onClick={handleShare}
-                    className="flex-1 h-11 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-xl flex items-center justify-center gap-2 text-xs font-bold tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[var(--shadow-sm)]"
+                    className="flex-1 h-11 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-md)] flex items-center justify-center gap-2 text-xs font-bold tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[var(--shadow-sm)]"
                 >
                     <Share2 className="size-3.5" />
                     Share Track

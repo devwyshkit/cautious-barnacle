@@ -39,7 +39,7 @@ export function PhoneInput({ value, onChange, onFocus, disabled, error }: PhoneI
             placeholder="Enter phone number"
             disabled={disabled}
             className={cn(
-              "w-full pl-12 h-14 text-base font-semibold transition-all duration-200 rounded-xl border-none focus-visible:ring-1",
+              "w-full pl-12 h-14 text-base font-semibold transition-all duration-200 rounded-[var(--radius-md)] border-none focus-visible:ring-1",
               error
                 ? "bg-rose-50 text-rose-900 focus-visible:ring-rose-200"
                 : "bg-[var(--surface-muted)] text-[var(--text-primary)] focus-visible:ring-[var(--primary-ring)]"

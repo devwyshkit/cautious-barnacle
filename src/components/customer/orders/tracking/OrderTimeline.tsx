@@ -20,7 +20,7 @@ export function OrderTimeline({ events }: OrderTimelineProps) {
     if (!events.length) return null;
 
     return (
-        <section className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+        <section className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] overflow-hidden">
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-full px-5 py-4 flex items-center justify-between hover:bg-[var(--surface-muted)]/50 transition-colors"

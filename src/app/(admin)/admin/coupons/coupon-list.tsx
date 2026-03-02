@@ -91,7 +91,7 @@ export function CouponList({ coupons }: CouponListProps) {
         </Dialog>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-[var(--radius-sm)]">
         <Table>
           <TableHeader>
             <TableRow>

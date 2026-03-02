@@ -79,7 +79,7 @@ export function AuditLogTable({ logs, totalCount, currentPage, pageSize }: Audit
         </Select>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-[var(--radius-sm)]">
         <Table>
           <TableHeader>
             <TableRow>

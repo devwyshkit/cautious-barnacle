@@ -9,8 +9,8 @@ export function SearchSkeleton() {
     <div className="flex flex-col h-full bg-[var(--surface)]">
       {/* Header Skeleton */}
       <div className="p-4 border-b border-[var(--border)] flex items-center gap-3">
-        <Skeleton className="size-9 rounded-lg shrink-0" />
-        <Skeleton className="flex-1 h-10 rounded-lg" />
+        <Skeleton className="size-9 rounded-[var(--radius-sm)] shrink-0" />
+        <Skeleton className="flex-1 h-10 rounded-[var(--radius-sm)]" />
       </div>
 
       {/* Results Skeleton */}
@@ -23,7 +23,7 @@ export function SearchSkeleton() {
           <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="min-w-[140px] space-y-3">
-                <div className="aspect-square rounded-xl bg-[var(--surface-muted)] overflow-hidden relative">
+                <div className="aspect-square rounded-[var(--radius-md)] bg-[var(--surface-muted)] overflow-hidden relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--surface-muted)]/50 to-transparent animate-shimmer" />
                 </div>
                 <div className="space-y-2">
@@ -40,9 +40,9 @@ export function SearchSkeleton() {
           <Skeleton className="h-4 w-16 rounded-full" />
           <div className="space-y-3">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="flex items-center gap-4 p-3 bg-[var(--surface-muted)]/50 rounded-xl border border-[var(--border)]/50 relative overflow-hidden">
+              <div key={i} className="flex items-center gap-4 p-3 bg-[var(--surface-muted)]/50 rounded-[var(--radius-md)] border border-[var(--border)]/50 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer -translate-x-full" />
-                <Skeleton className="size-16 rounded-xl shrink-0" />
+                <Skeleton className="size-16 rounded-[var(--radius-md)] shrink-0" />
                 <div className="flex-1 space-y-2.5">
                   <Skeleton className="h-3.5 w-2/3 rounded-full" />
                   <div className="flex gap-2">
@@ -50,7 +50,7 @@ export function SearchSkeleton() {
                     <Skeleton className="h-3 w-12 rounded-full opacity-40" />
                   </div>
                 </div>
-                <Skeleton className="h-8 w-16 rounded-lg shrink-0" />
+                <Skeleton className="h-8 w-16 rounded-[var(--radius-sm)] shrink-0" />
               </div>
             ))}
           </div>

@@ -199,7 +199,7 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setMode('upload')}
-                className="flex flex-col items-center gap-3 p-6 border-2 border-dashed border-[var(--border)] rounded-xl hover:border-[var(--border)] hover:bg-[var(--surface-muted)] transition-colors"
+                className="flex flex-col items-center gap-3 p-6 border-2 border-dashed border-[var(--border)] rounded-[var(--radius-md)] hover:border-[var(--border)] hover:bg-[var(--surface-muted)] transition-colors"
               >
                 <div className="size-12 rounded-full bg-[var(--surface-muted)] flex items-center justify-center">
                   <Upload className="size-5 text-[var(--text-secondary)]" />
@@ -208,7 +208,7 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
               </button>
               <button
                 onClick={startCamera}
-                className="flex flex-col items-center gap-3 p-6 border-2 border-dashed border-[var(--border)] rounded-xl hover:border-[var(--border)] hover:bg-[var(--surface-muted)] transition-colors"
+                className="flex flex-col items-center gap-3 p-6 border-2 border-dashed border-[var(--border)] rounded-[var(--radius-md)] hover:border-[var(--border)] hover:bg-[var(--surface-muted)] transition-colors"
               >
                 <div className="size-12 rounded-full bg-[var(--surface-muted)] flex items-center justify-center">
                   <Camera className="size-5 text-[var(--text-secondary)]" />
@@ -221,7 +221,7 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
           {/* Camera View */}
           {mode === 'camera' && (
             <div className="space-y-3">
-              <div className="relative aspect-square rounded-xl overflow-hidden bg-[var(--foreground)]">
+              <div className="relative aspect-square rounded-[var(--radius-md)] overflow-hidden bg-[var(--foreground)]">
                 <video
                   ref={videoRef}
                   autoPlay
@@ -255,7 +255,7 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
             <div
               {...getRootProps()}
               className={cn(
-                "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors",
+                "border-2 border-dashed rounded-[var(--radius-md)] p-8 text-center cursor-pointer transition-colors",
                 isDragActive ? "border-[var(--primary)] bg-[var(--surface-muted)]" : "border-[var(--border)] hover:border-[var(--primary-ring)]"
               )}
             >
@@ -274,7 +274,7 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
 
           {/* Preview */}
           {preview && (
-            <div className="relative aspect-square rounded-xl overflow-hidden bg-[var(--surface-muted)]">
+            <div className="relative aspect-square rounded-[var(--radius-md)] overflow-hidden bg-[var(--surface-muted)]">
               <Image
                 src={preview}
                 alt="Preview"

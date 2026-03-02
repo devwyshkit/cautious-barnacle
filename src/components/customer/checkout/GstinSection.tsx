@@ -77,7 +77,7 @@ export function GstinSection({ initialGstin = '', disabled }: GstinSectionProps)
                 disabled={disabled}
             >
                 <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center text-[var(--text-tertiary)]">
+                    <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center text-[var(--text-tertiary)]">
                         <ShieldCheck className={cn("size-5", validation === 'valid' && "text-[var(--success)]")} />
                     </div>
                     <div className="text-left">
@@ -101,7 +101,7 @@ export function GstinSection({ initialGstin = '', disabled }: GstinSectionProps)
                             disabled={disabled || validation === 'validating'}
                             placeholder="Enter 15-digit GSTIN"
                             className={cn(
-                                "w-full h-14 bg-[var(--surface-muted)] rounded-xl px-5 text-sm font-bold border-2 transition-all outline-none",
+                                "w-full h-14 bg-[var(--surface-muted)] rounded-[var(--radius-md)] px-5 text-sm font-bold border-2 transition-all outline-none",
                                 validation === 'idle' && "border-transparent focus:border-[var(--border)]",
                                 validation === 'validating' && "border-[var(--border)]",
                                 validation === 'valid' && "border-[var(--success)]/20 text-[var(--text-primary)] bg-[var(--well-success)]",

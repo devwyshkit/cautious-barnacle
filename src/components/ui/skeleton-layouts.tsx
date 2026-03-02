@@ -54,8 +54,8 @@ export function ProductSurfaceSkeleton() {
           </div>
           <Skeleton className="h-10 w-32 rounded-full" />
           <div className="grid grid-cols-2 gap-3 pt-2">
-            <Skeleton className="h-12 rounded-xl" />
-            <Skeleton className="h-12 rounded-xl" />
+            <Skeleton className="h-12 rounded-[var(--radius-md)]" />
+            <Skeleton className="h-12 rounded-[var(--radius-md)]" />
           </div>
         </div>
         <div className="space-y-4">
@@ -82,7 +82,7 @@ export function VendorSheetSkeleton() {
               <Skeleton className="h-7 w-3/4 rounded-full" />
               <Skeleton className="h-4 w-1/4 rounded-full" />
             </div>
-            <Skeleton className="size-12 rounded-xl" />
+            <Skeleton className="size-12 rounded-[var(--radius-md)]" />
           </div>
           <Skeleton className="h-4 w-full rounded-full" />
           <div className="flex gap-4 pt-4 border-t border-[var(--surface-muted)]">

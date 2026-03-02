@@ -101,7 +101,7 @@ export function EmptyState({
         <Button
           onClick={onAction}
           className={cn(
-            "mt-12 rounded-2xl px-12 font-bold tracking-tight h-16 shadow-xl active:scale-95 transition-all duration-500",
+            "mt-12 rounded-[var(--radius-lg)] px-12 font-bold tracking-tight h-16 shadow-xl active:scale-95 transition-all duration-500",
             "border-b-4",
             variant === 'premium'
               ? "bg-[var(--primary)] hover:bg-[var(--primary)]/90 border-rose-900 text-[var(--primary-foreground)] shadow-[var(--primary)]/30"

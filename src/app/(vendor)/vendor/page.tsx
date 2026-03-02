@@ -175,7 +175,7 @@ export default async function VendorDashboard() {
                 <Link
                   key={order.id}
                   href="/vendor/orders"
-                  className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-muted)] -mx-2 px-2 rounded-lg transition-colors"
+                  className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-muted)] -mx-2 px-2 rounded-[var(--radius-sm)] transition-colors"
                 >
                   <div>
                     <p className="text-sm font-medium text-[var(--text-primary)]">

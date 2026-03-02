@@ -52,7 +52,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
         return () => {
             supabase.removeChannel(userChannel);
         };
-    }, [user?.id, authLoading, supabase]);
+    }, [user, authLoading, supabase, channel]);
 
     return (
         <RealtimeContext.Provider value={{ channel, isConnected }}>

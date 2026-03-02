@@ -36,7 +36,7 @@ import { hasProductPersonalization } from '@/lib/utils/personalization';
 import dynamic from 'next/dynamic';
 
 const PersonalizationForm = dynamic(() => import('./PersonalizationForm').then(mod => mod.PersonalizationForm), {
-  loading: () => <div className="h-48 w-full bg-[var(--surface-muted)]/50 rounded-xl animate-pulse" />
+  loading: () => <div className="h-48 w-full bg-[var(--surface-muted)]/50 rounded-[var(--radius-md)] animate-pulse" />
 });
 
 const FeedbackStep = dynamic(() => import('./FeedbackStep').then(mod => mod.FeedbackStep), {
@@ -120,7 +120,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
 
   if (error) {
     return (
-      <div className="p-8 text-center bg-rose-50 rounded-xl border border-rose-100">
+      <div className="p-8 text-center bg-rose-50 rounded-[var(--radius-md)] border border-rose-100">
         <AlertCircle className="size-12 text-[var(--primary)] mx-auto mb-4" />
         <p className="text-[var(--text-secondary)] text-sm mb-8">Something went wrong while tracking your order</p>
         <button onClick={() => refetch()} className="px-6 py-2 bg-[var(--primary)] text-[var(--text-inverse)] rounded-full font-bold">
@@ -136,20 +136,20 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
         <div className="mx-auto bg-[var(--surface-muted)]/50 pb-safe transition-all duration-500 overflow-y-auto scrollbar-hide max-w-md min-h-[100dvh]">
           <div className="flex flex-col gap-6 p-4">
             {showPersonalizationParam ? (
-              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-[var(--surface)] rounded-xl p-1 border border-[var(--border)] glass-morphism shadow-sm shadow-[var(--shadow-sm)]/50 overflow-hidden relative">
+              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-[var(--surface)] rounded-[var(--radius-md)] p-1 border border-[var(--border)] glass-morphism shadow-sm shadow-[var(--shadow-sm)]/50 overflow-hidden relative">
                 <div className="flex flex-col gap-6 p-4">
                   <div className="space-y-6 animate-pulse">
                     <div className="h-10 w-24 bg-[var(--surface-muted)]/50 rounded-full" />
-                    <div className="h-32 w-full bg-[var(--surface)]/30 rounded-xl border border-[var(--border)]" />
-                    <div className="h-48 w-full bg-[var(--surface)]/50 rounded-xl border border-[var(--border)]" />
+                    <div className="h-32 w-full bg-[var(--surface)]/30 rounded-[var(--radius-md)] border border-[var(--border)]" />
+                    <div className="h-48 w-full bg-[var(--surface)]/50 rounded-[var(--radius-md)] border border-[var(--border)]" />
                   </div>
                 </div>
               </div>
             ) : (
               <div className="space-y-6 animate-in fade-in duration-500">
-                <div className="h-[180px] w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl animate-pulse" />
-                <div className="h-[120px] w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl animate-pulse" />
-                <div className="h-[300px] w-full bg-[var(--surface)] border border-[var(--border)] rounded-xl animate-pulse" />
+                <div className="h-[180px] w-full bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] animate-pulse" />
+                <div className="h-[120px] w-full bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] animate-pulse" />
+                <div className="h-[300px] w-full bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] animate-pulse" />
               </div>
             )}
           </div>
@@ -173,7 +173,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
         <div className="flex flex-col gap-4 p-4 pb-20">
           <SurfaceErrorBoundaryWithRouter surfaceName="Success & Auth Overlay">
             {(showSuccess || showPersonalizationForm) && (
-              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-[var(--surface)] rounded-xl p-1 border border-[var(--border)] shadow-sm shadow-[var(--shadow-sm)]/50 overflow-hidden relative">
+              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-[var(--surface)] rounded-[var(--radius-md)] p-1 border border-[var(--border)] shadow-sm shadow-[var(--shadow-sm)]/50 overflow-hidden relative">
                 {showSuccess && !showPersonalizationForm && (
                   <div className="gradient-vibrant p-7 text-[var(--text-inverse)] rounded-[var(--radius-3xl)] mb-1 relative overflow-hidden">
                     {showCelebration && <Confetti />}
@@ -182,7 +182,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                     </div>
                     <div className="relative z-10">
                       <div className="flex items-center gap-3 mb-1.5">
-                        <div className="size-9 rounded-xl bg-[var(--success)] flex items-center justify-center shadow-lg shadow-[var(--success)]/20">
+                        <div className="size-9 rounded-[var(--radius-md)] bg-[var(--success)] flex items-center justify-center shadow-lg shadow-[var(--success)]/20">
                           <CheckCircle2 className="size-5 text-[var(--text-inverse)]" />
                         </div>
                         <h3 className="text-lg font-bold tracking-tight">Payment Successful</h3>
@@ -198,7 +198,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                 {!showSuccess && showPersonalizationForm && (
                   <div className="flex items-center justify-between p-6 pb-2">
                     <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-xl bg-[var(--text-primary)] flex items-center justify-center shadow-lg shadow-[var(--text-primary)]/10">
+                      <div className="size-10 rounded-[var(--radius-md)] bg-[var(--text-primary)] flex items-center justify-center shadow-lg shadow-[var(--text-primary)]/10">
                         <Sparkles className="size-5 text-[var(--warning)]" />
                       </div>
                       <div>
@@ -213,7 +213,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                   <div className="p-4 pt-2">
                     <PersonalizationForm
                       orderId={order?.id || orderId}
-                      products={personalizedProductsPending.length > 0 ? personalizedProductsPending : (order ? [] : [{ id: 'pending', product_name: 'Order Loading...', is_personalized: true } as any])}
+                      products={personalizedProductsPending.length > 0 ? (personalizedProductsPending as OrderProductDetail[]) : (order ? [] : [{ id: 'pending', product_name: 'Order Loading...', is_personalized: true } as unknown as OrderProductDetail])}
                       designDeadline={order?.promised_delivery_at || undefined}
                       isAutoOpenedForSuccess={showSuccess || showPersonalizationParam}
                       onSubmitted={handlePersonalizationSubmitted}
@@ -290,7 +290,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                     triggerHaptic(HapticPattern.ACTION);
                     window.open(`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP}`, '_blank');
                   }}
-                  className="flex-1 h-14 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text-secondary)] active:scale-95 transition-all hover:bg-[var(--surface-muted)]"
+                  className="flex-1 h-14 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text-secondary)] active:scale-95 transition-all hover:bg-[var(--surface-muted)]"
                 >
                   <MessageSquare className="size-4" />
                   Chat
@@ -302,7 +302,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                     triggerHaptic(HapticPattern.ACTION);
                     window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`;
                   }}
-                  className="flex-1 h-14 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text-secondary)] active:scale-95 transition-all hover:bg-[var(--surface-muted)]"
+                  className="flex-1 h-14 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text-secondary)] active:scale-95 transition-all hover:bg-[var(--surface-muted)]"
                 >
                   <Phone className="size-4" />
                   Call

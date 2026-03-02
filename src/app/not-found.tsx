@@ -8,10 +8,10 @@ export default function NotFound() {
       <div className="w-full max-w-lg text-center space-y-8 animate-in fade-in zoom-in duration-500">
         {/* Command Center Icon */}
         <div className="relative inline-block">
-          <div className="size-24 bg-[var(--primary-muted)] rounded-xl flex items-center justify-center shadow-[0_20px_50px_rgb(0_0_0/0.05)]">
+          <div className="size-24 bg-[var(--primary-muted)] rounded-[var(--radius-md)] flex items-center justify-center shadow-[0_20px_50px_rgb(0_0_0/0.05)]">
             <ShieldAlert className="size-10 text-[var(--primary)]" />
           </div>
-          <div className="absolute -bottom-2 -right-2 size-8 bg-[var(--surface)] rounded-lg border-4 border-[#F8F9FA] flex items-center justify-center shadow-sm">
+          <div className="absolute -bottom-2 -right-2 size-8 bg-[var(--surface)] rounded-[var(--radius-sm)] border-4 border-[#F8F9FA] flex items-center justify-center shadow-sm">
             <span className="text-xs font-black text-[var(--text-primary)]">404</span>
           </div>
         </div>
@@ -27,7 +27,7 @@ export default function NotFound() {
         </div>
 
         {/* Diagnostic Box - Terminal Grade (Light Refined) */}
-        <div className="bg-[var(--surface-muted)] rounded-xl p-6 text-left font-mono space-y-3 border border-[var(--border)] shadow-sm relative overflow-hidden group">
+        <div className="bg-[var(--surface-muted)] rounded-[var(--radius-md)] p-6 text-left font-mono space-y-3 border border-[var(--border)] shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
             <Server className="size-20 text-[var(--text-inverse)]" />
           </div>
@@ -77,11 +77,11 @@ export default function NotFound() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link href="/" className="w-full sm:w-auto">
-            <Button className="w-full h-12 bg-[var(--text-primary)] text-[var(--text-inverse)] px-10 rounded-xl font-black text-xs tracking-tight flex items-center gap-3 shadow-sm hover:bg-[var(--text-primary)] transition-all active:scale-95">
+            <Button className="w-full h-12 bg-[var(--text-primary)] text-[var(--text-inverse)] px-10 rounded-[var(--radius-md)] font-black text-xs tracking-tight flex items-center gap-3 shadow-sm hover:bg-[var(--text-primary)] transition-all active:scale-95">
               <ArrowLeft className="size-4" /> Return to Command
             </Button>
           </Link>
-          <Button variant="outline" className="w-full sm:w-auto h-12 border-[var(--border)] rounded-xl px-10 font-black text-xs tracking-tight text-[var(--text-tertiary)] hover:bg-[var(--surface-muted)] transition-all">
+          <Button variant="outline" className="w-full sm:w-auto h-12 border-[var(--border)] rounded-[var(--radius-md)] px-10 font-black text-xs tracking-tight text-[var(--text-tertiary)] hover:bg-[var(--surface-muted)] transition-all">
             Contact Ops
           </Button>
         </div>

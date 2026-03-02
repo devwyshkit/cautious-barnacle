@@ -120,7 +120,7 @@ export function AuthProvider({
         return () => {
             subscription.unsubscribe();
         };
-    }, [supabase, initialUser]);
+    }, [supabase, initialUser, refreshSession, updatePermissions]);
 
     const signInWithPhone = useCallback(async (phone: string) => {
         try {

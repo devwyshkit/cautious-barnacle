@@ -89,7 +89,7 @@ export function DeliveryTable({ deliveries, currentStatus }: DeliveryTableProps)
         </Select>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-[var(--radius-sm)]">
         <Table>
           <TableHeader>
             <TableRow>

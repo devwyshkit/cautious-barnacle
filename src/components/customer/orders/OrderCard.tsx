@@ -25,19 +25,19 @@ export function OrderCard({ order }: OrderCardProps) {
   return (
     <Link
       href={`/orders/${orderId}`}
-      className="block bg-[var(--surface)] p-5 rounded-xl border border-[var(--border)] active:scale-[0.98] transition-all hover:border-[var(--border)] shadow-sm hover:shadow-sm hover:shadow-[var(--shadow-sm)]/40 cursor-pointer group"
+      className="block bg-[var(--surface)] p-5 rounded-[var(--radius-md)] border border-[var(--border)] active:scale-[0.98] transition-all hover:border-[var(--border)] shadow-sm hover:shadow-sm hover:shadow-[var(--shadow-sm)]/40 cursor-pointer group"
       prefetch={false}
     >
       <div className="flex items-start gap-4">
         {/* Vendor Avatar / Image */}
-        <div className="size-14 rounded-xl bg-[var(--surface-muted)] border border-[var(--border)] overflow-hidden shrink-0 flex items-center justify-center relative">
+        <div className="size-14 rounded-[var(--radius-md)] bg-[var(--surface-muted)] border border-[var(--border)] overflow-hidden shrink-0 flex items-center justify-center relative">
           {order.first_product_name ? (
             <img src={order.first_product_name} alt={order.vendor_name || 'Store'} className="size-full object-cover" />
           ) : (
             <Package className="size-6 text-[var(--text-tertiary)]" />
           )}
           {isActive && (
-            <div className="absolute top-1 right-1 size-2 bg-[var(--primary)] rounded-full ring-2 ring-white animate-pulse" />
+            <div className="absolute top-1 right-1 size-2 bg-[var(--primary)] rounded-full ring-2 ring-[var(--surface)] animate-pulse" />
           )}
         </div>
 
@@ -56,7 +56,7 @@ export function OrderCard({ order }: OrderCardProps) {
 
           <div className="mt-3 flex flex-wrap gap-2">
             <span className={cn(
-              "px-2 py-0.5 rounded-md text-xs font-bold tracking-tight",
+              "px-2 py-0.5 rounded-[var(--radius-md)] text-xs font-bold tracking-tight",
               status === 'DELIVERED' ? "bg-[var(--well-success)] text-[var(--success)]" :
                 isActive ? "bg-[var(--well-warning)] text-[var(--primary)]" :
                   "bg-[var(--surface-muted)] text-[var(--text-secondary)]"
@@ -66,7 +66,7 @@ export function OrderCard({ order }: OrderCardProps) {
 
             {order.has_personalization && (
               <span className={cn(
-                "px-2 py-0.5 rounded-md text-xs font-bold tracking-tighter flex items-center gap-1 uppercase border",
+                "px-2 py-0.5 rounded-[var(--radius-md)] text-xs font-bold tracking-tighter flex items-center gap-1 uppercase border",
                 order.personalization_status === 'submitted' ? "bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20" :
                   order.personalization_status === 'approved' ? "bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20" :
                     "bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]"

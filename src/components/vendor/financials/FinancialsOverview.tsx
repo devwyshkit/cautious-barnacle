@@ -44,7 +44,7 @@ export function FinancialsOverview({ vendor, stats }: FinancialsOverviewProps) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-[var(--surface)] p-5 rounded-xl border border-[var(--border)]">
+        <div className="bg-[var(--surface)] p-5 rounded-[var(--radius-md)] border border-[var(--border)]">
           <p className="text-xs text-[var(--text-secondary)] mb-1">Today&apos;s earnings</p>
           <h2 className="text-2xl font-semibold text-[var(--text-primary)]">₹{stats.todayEarnings.toLocaleString('en-IN')}</h2>
           <div className="mt-3 flex items-center gap-2 text-[var(--success)]">
@@ -56,7 +56,7 @@ export function FinancialsOverview({ vendor, stats }: FinancialsOverviewProps) {
           </div>
         </div>
 
-        <div className="bg-[var(--surface)] p-5 rounded-xl border border-[var(--border)] border-l-4 border-l-[var(--warning)]">
+        <div className="bg-[var(--surface)] p-5 rounded-[var(--radius-md)] border border-[var(--border)] border-l-4 border-l-[var(--warning)]">
           <p className="text-xs text-[var(--text-secondary)] mb-1">Pending settlement</p>
           <h2 className="text-2xl font-semibold text-[var(--text-primary)]">₹{stats.pendingSettlement.toLocaleString('en-IN')}</h2>
           <p className="mt-3 text-xs text-[var(--warning)] flex items-center gap-1">
@@ -65,7 +65,7 @@ export function FinancialsOverview({ vendor, stats }: FinancialsOverviewProps) {
           </p>
         </div>
 
-        <div className="bg-[var(--text-primary)] p-5 rounded-xl">
+        <div className="bg-[var(--text-primary)] p-5 rounded-[var(--radius-md)]">
           <p className="text-xs text-[var(--text-tertiary)] mb-1">Your take rate</p>
           <h2 className="text-2xl font-semibold text-[var(--text-inverse)]">{100 - (vendor.commission_percentage || 20)}%</h2>
           <div className="mt-3">
@@ -76,7 +76,7 @@ export function FinancialsOverview({ vendor, stats }: FinancialsOverviewProps) {
         </div>
       </div>
 
-      <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+      <div className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] overflow-hidden">
         <div className="p-4 border-b border-[var(--border)] flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-[var(--text-primary)]">Settlement ledger</h3>
@@ -128,9 +128,9 @@ export function FinancialsOverview({ vendor, stats }: FinancialsOverviewProps) {
         </Table>
       </div>
 
-      <div className="bg-[var(--well-warning)] rounded-xl border border-[var(--warning)]/10 p-5">
+      <div className="bg-[var(--well-warning)] rounded-[var(--radius-md)] border border-[var(--warning)]/10 p-5">
         <div className="flex items-start gap-4">
-          <div className="size-10 rounded-lg bg-[var(--warning)]/10 flex items-center justify-center flex-shrink-0">
+          <div className="size-10 rounded-[var(--radius-sm)] bg-[var(--warning)]/10 flex items-center justify-center flex-shrink-0">
             <Info className="size-5 text-[var(--warning)]" />
           </div>
           <div className="flex-1">

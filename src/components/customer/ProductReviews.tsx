@@ -154,7 +154,7 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
       </div>
 
       {user && (
-        <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-[var(--surface-muted)] rounded-xl border border-[var(--border)]">
+        <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-xs font-bold text-[var(--text-secondary)] tracking-wider uppercase">Product Quality</label>
@@ -227,13 +227,13 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
               placeholder="Tell others what you liked or disliked. Was it just like the preview?"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="min-h-[100px] rounded-xl border-[var(--border)] focus:border-green-600 focus:ring-green-600/10 resize-none bg-[var(--surface)] font-medium text-sm"
+              className="min-h-[100px] rounded-[var(--radius-md)] border-[var(--border)] focus:border-green-600 focus:ring-green-600/10 resize-none bg-[var(--surface)] font-medium text-sm"
             />
           </div>
           <Button
             type="submit"
             disabled={submitting}
-            className="w-full h-11 bg-[var(--text-primary)] hover:bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-xl font-bold shadow-lg shadow-black/5 active:scale-[0.98] transition-transform"
+            className="w-full h-11 bg-[var(--text-primary)] hover:bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-md)] font-bold shadow-lg shadow-black/5 active:scale-[0.98] transition-transform"
           >
             {submitting ? <Loader2 className="size-4 animate-spin" /> : "Submit Review"}
           </Button>
@@ -277,8 +277,8 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
               </p>
 
               {review.approved_mockup_url && (
-                <div className="mt-4 p-3 bg-[var(--surface-muted)] rounded-xl border border-[var(--border)] flex items-center gap-4">
-                  <div className="size-16 rounded-lg bg-[var(--border)] overflow-hidden flex-shrink-0">
+                <div className="mt-4 p-3 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)] flex items-center gap-4">
+                  <div className="size-16 rounded-[var(--radius-sm)] bg-[var(--border)] overflow-hidden flex-shrink-0">
                     <img
                       src={review.approved_mockup_url}
                       alt="Original Mockup"
@@ -303,7 +303,7 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-10 space-y-3 bg-[var(--surface-muted)] rounded-xl border border-dashed border-[var(--border)]">
+          <div className="flex flex-col items-center justify-center py-10 space-y-3 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-dashed border-[var(--border)]">
             <div className="size-12 rounded-full bg-[var(--surface)] flex items-center justify-center shadow-sm">
               <MessageSquare className="size-6 text-[var(--border)]" />
             </div>

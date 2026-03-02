@@ -215,7 +215,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
           <div className="p-4">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center">
+                <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center">
                   <Package className="size-5 text-[var(--text-secondary)]" />
                 </div>
                 <div>

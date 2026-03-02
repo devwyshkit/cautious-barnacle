@@ -57,7 +57,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                     <div className="space-y-3">
                         <div className="flex items-center justify-between px-1">
                             <div className="flex items-center gap-2">
-                                <div className="size-5 rounded-md bg-[var(--text-primary)] flex items-center justify-center">
+                                <div className="size-5 rounded-[var(--radius-md)] bg-[var(--text-primary)] flex items-center justify-center">
                                     <Sparkles className="size-3 text-[var(--warning)]" />
                                 </div>
                                 <span className="text-xs font-bold text-[var(--text-primary)] tracking-tight">
@@ -79,7 +79,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                         {/* Quick View Carousel */}
                         <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-2">
                             {previews.map((preview, idx) => (
-                                <div key={preview.id} className="relative aspect-[4/3] w-[85%] shrink-0 snap-center rounded-xl overflow-hidden border border-[var(--border)] shadow-sm shadow-[var(--shadow-sm)]/50 bg-[var(--surface-muted)] group">
+                                <div key={preview.id} className="relative aspect-[4/3] w-[85%] shrink-0 snap-center rounded-[var(--radius-md)] overflow-hidden border border-[var(--border)] shadow-sm shadow-[var(--shadow-sm)]/50 bg-[var(--surface-muted)] group">
                                     <Image
                                         src={preview.preview_url}
                                         alt={`Design iteration ${previews.length - idx}`}
@@ -98,10 +98,10 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                         </div>
                     </div>
                 ) : (
-                    <div className="py-12 flex flex-col items-center justify-center text-center gap-4 bg-[var(--surface-muted)]/50 rounded-xl border border-[var(--border)] overflow-hidden relative">
+                    <div className="py-12 flex flex-col items-center justify-center text-center gap-4 bg-[var(--surface-muted)]/50 rounded-[var(--radius-md)] border border-[var(--border)] overflow-hidden relative">
                         {/* WYSHKIT 2026: Animated Pulse Background for high-impact action */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent opacity-50" />
-                        <div className="size-16 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shadow-sm relative z-10">
+                        <div className="absolute inset-0 bg-gradient-to-b from-[var(--surface)] to-transparent opacity-50" />
+                        <div className="size-16 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shadow-sm relative z-10">
                             {hasSubmittedBrief ? (
                                 <div className="relative">
                                     <Clock className="size-8 text-[var(--text-tertiary)]" />
@@ -140,7 +140,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                             triggerHaptic(HapticPattern.ACTION);
                                             onOpenPersonalization();
                                         }}
-                                        className="px-8 py-3 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-xl text-xs font-bold tracking-tight hover:bg-[var(--foreground)] active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10"
+                                        className="px-8 py-3 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-md)] text-xs font-bold tracking-tight hover:bg-[var(--foreground)] active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10"
                                     >
                                         Complete Brief
                                     </button>

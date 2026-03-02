@@ -52,8 +52,8 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
           const unitPrice = product.unit_price;
 
           return (
-            <div key={product.id} className="flex gap-2.5 p-2 bg-[var(--surface-muted)]/50 rounded-lg">
-              <div className="relative size-14 bg-[var(--surface)] rounded-lg overflow-hidden shrink-0 border border-[var(--border)]">
+            <div key={product.id} className="flex gap-2.5 p-2 bg-[var(--surface-muted)]/50 rounded-[var(--radius-sm)]">
+              <div className="relative size-14 bg-[var(--surface)] rounded-[var(--radius-sm)] overflow-hidden shrink-0 border border-[var(--border)]">
                 <Image
                   src={product.product_image || FALLBACK_IMAGE}
                   alt={product.product_name || ''}
@@ -144,7 +144,7 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
       </div>
 
       {hasPersonalized && (
-        <div className="p-2 rounded-lg bg-[var(--well-warning)]/50 border border-[var(--warning)]/20 flex items-start gap-2">
+        <div className="p-2 rounded-[var(--radius-sm)] bg-[var(--well-warning)]/50 border border-[var(--warning)]/20 flex items-start gap-2">
           <ShieldAlert className="size-3.5 text-[var(--warning)] shrink-0 mt-0.5" />
           <p className="text-xs font-medium text-[var(--text-primary)] leading-normal">
             Personalized products are non-returnable. Refunds only for damaged goods.

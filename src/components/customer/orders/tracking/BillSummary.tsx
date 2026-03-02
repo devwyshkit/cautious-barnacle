@@ -119,7 +119,7 @@ export function BillSummary({ order }: BillSummaryProps) {
                         </div>
 
                         {(order.total_savings && order.total_savings > 0) && (
-                            <div className="flex justify-between items-center py-2 px-3 bg-[var(--well-success)] rounded-xl border border-[var(--border-success)]/10">
+                            <div className="flex justify-between items-center py-2 px-3 bg-[var(--well-success)] rounded-[var(--radius-md)] border border-[var(--border-success)]/10">
                                 <span className="text-xs font-bold text-[var(--success)] tracking-tight">WyshKit Money & Discounts</span>
                                 <span className="text-sm font-bold text-[var(--success)]">-{formatCurrency(order.total_savings)}</span>
                             </div>

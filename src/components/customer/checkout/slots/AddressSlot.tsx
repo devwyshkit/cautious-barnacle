@@ -56,7 +56,7 @@ export function AddressSlot({ initialAddresses = [], currentAddress, disabled, e
               onClick={() => selectAction(a.id)}
               disabled={isPending || disabled}
               className={cn(
-                "w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between",
+                "w-full text-left p-3 rounded-[var(--radius-md)] border transition-all flex items-center justify-between",
                 a.id === currentAddress?.id
                   ? "bg-[var(--surface-muted)] border-[var(--border)]"
                   : "bg-[var(--surface)] border-[var(--border)] hover:bg-[var(--surface-muted)]",
@@ -84,7 +84,7 @@ export function AddressSlot({ initialAddresses = [], currentAddress, disabled, e
               }
             }}
             disabled={disabled}
-            className={cn("w-full p-3 rounded-xl border border-dashed border-[var(--border)] text-[var(--text-tertiary)] flex items-center justify-center gap-2 hover:bg-[var(--surface-muted)] transition-all font-bold", disabled && "opacity-50 pointer-events-none")}
+            className={cn("w-full p-3 rounded-[var(--radius-md)] border border-dashed border-[var(--border)] text-[var(--text-tertiary)] flex items-center justify-center gap-2 hover:bg-[var(--surface-muted)] transition-all font-bold", disabled && "opacity-50 pointer-events-none")}
           >
             <Plus className="size-4" />
             <span className="text-xs font-bold uppercase tracking-widest">Add New Address</span>
@@ -113,9 +113,9 @@ export function AddressSlot({ initialAddresses = [], currentAddress, disabled, e
       <button
         onClick={() => setIsChanging(true)}
         disabled={isPending || disabled}
-        className="w-full text-left p-4 bg-[var(--surface-muted)] rounded-xl flex items-start gap-4 border border-[var(--border)] active:scale-[0.98] transition-all hover:bg-[var(--surface-muted)]/50"
+        className="w-full text-left p-4 bg-[var(--surface-muted)] rounded-[var(--radius-md)] flex items-start gap-4 border border-[var(--border)] active:scale-[0.98] transition-all hover:bg-[var(--surface-muted)]/50"
       >
-        <div className="size-10 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shrink-0 shadow-sm">
+        <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shrink-0 shadow-sm">
           {isPending ? <Loader2 className="size-5 animate-spin text-[var(--text-tertiary)]" /> : <Icon className="size-5 text-[var(--text-secondary)]" />}
         </div>
         <div className="flex-1 min-w-0 px-1">

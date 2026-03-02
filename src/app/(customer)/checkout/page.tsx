@@ -19,7 +19,7 @@ export default async function CheckoutPage() {
             <Suspense fallback={
                 <div className="max-w-lg mx-auto px-4 pt-6 pb-24 space-y-4">
                     {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-32 bg-[var(--surface-muted)] rounded-2xl border border-[var(--border)] animate-pulse" />
+                        <div key={i} className="h-32 bg-[var(--surface-muted)] rounded-[var(--radius-lg)] border border-[var(--border)] animate-pulse" />
                     ))}
                 </div>
             }>

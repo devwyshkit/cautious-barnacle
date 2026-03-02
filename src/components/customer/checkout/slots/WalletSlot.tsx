@@ -34,14 +34,14 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: 
     return (
         <div className="py-2">
             <div className={cn(
-                "flex items-center justify-between p-4 rounded-xl border transition-all duration-300",
+                "flex items-center justify-between p-4 rounded-[var(--radius-md)] border transition-all duration-300",
                 useWalletBalance
                     ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--text-inverse)] shadow-lg shadow-[var(--shadow-sm)]"
                     : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] shadow-sm"
             )}>
                 <div className="flex items-center gap-3">
                     <div className={cn(
-                        "size-10 rounded-xl flex items-center justify-center transition-colors",
+                        "size-10 rounded-[var(--radius-md)] flex items-center justify-center transition-colors",
                         useWalletBalance ? "bg-[var(--surface)]/10" : "bg-[var(--surface)] border border-[var(--border)] shadow-sm"
                     )}>
                         <Wallet className={cn("size-5", useWalletBalance ? "text-[var(--text-inverse)]" : "text-[var(--text-secondary)]")} />

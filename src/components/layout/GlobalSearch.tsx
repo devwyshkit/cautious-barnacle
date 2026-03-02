@@ -45,7 +45,7 @@ export function GlobalSearch() {
   return (
     <div className="flex flex-col h-full bg-[var(--surface)]">
       <div className="p-4 border-b border-[var(--border)] flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={goBack} className="size-9 rounded-lg shrink-0">
+        <Button variant="ghost" size="icon" onClick={goBack} className="size-9 rounded-[var(--radius-sm)] shrink-0">
           <ArrowLeft className="size-5 text-[var(--text-secondary)]" />
         </Button>
         <div className="relative flex-1">
@@ -56,7 +56,7 @@ export function GlobalSearch() {
             placeholder="Search products, stores..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-9 h-10 bg-[var(--surface-muted)] border-[var(--border)] text-sm rounded-lg"
+            className="pl-9 h-10 bg-[var(--surface-muted)] border-[var(--border)] text-sm rounded-[var(--radius-sm)]"
           />
           {query && (
             <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -125,9 +125,9 @@ export function GlobalSearch() {
                           router.push(`/search?q=${encodeURIComponent(product.name || '')}&product=${product.id}`);
                         }
                       }}
-                      className="w-full flex items-center gap-3 p-3 bg-[var(--surface-muted)] rounded-xl hover:bg-[var(--surface-muted)] transition-colors text-left"
+                      className="w-full flex items-center gap-3 p-3 bg-[var(--surface-muted)] rounded-[var(--radius-md)] hover:bg-[var(--surface-muted)] transition-colors text-left"
                     >
-                      <div className="size-12 rounded-lg overflow-hidden shrink-0 bg-[var(--surface-muted)] relative border border-[var(--border)]">
+                      <div className="size-12 rounded-[var(--radius-sm)] overflow-hidden shrink-0 bg-[var(--surface-muted)] relative border border-[var(--border)]">
                         <Image src={(product as any).image_url || ((product as any).images?.[0]) || '/images/logo.png'} alt={product.name || 'Product'} fill className="object-cover" sizes="48px" />
                       </div>
                       <div className="flex-1 min-w-0">

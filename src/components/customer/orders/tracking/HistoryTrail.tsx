@@ -52,7 +52,7 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                 {/* Layer 1: The Briefing */}
                 {personalizedProducts.map(product => (
                     <div key={product.id} className="relative">
-                        <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-[var(--text-primary)] ring-4 ring-white shadow-sm" />
+                        <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-[var(--text-primary)] ring-4 ring-[var(--surface)] shadow-sm" />
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <h4 className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">Layer 1: The Briefing</h4>
@@ -82,7 +82,7 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                 {previews.map((preview, idx) => (
                     <div key={preview.id} className="relative">
                         <div className={cn(
-                            "absolute -left-[20px] top-1 size-2.5 rounded-full ring-4 ring-white shadow-sm",
+                            "absolute -left-[20px] top-1 size-2.5 rounded-full ring-4 ring-[var(--surface)] shadow-sm",
                             idx === 0 ? "bg-[var(--warning)] animate-pulse" : "bg-[var(--border)]"
                         )} />
                         <div className="space-y-4">
@@ -153,7 +153,7 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                 {/* Future layer: Final Fulfillment */}
                 {personalizedProducts.some(i => i.status === 'in_production') && (
                     <div className="relative opacity-50">
-                        <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-[var(--surface-muted)] ring-4 ring-white" />
+                        <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-[var(--surface-muted)] ring-4 ring-[var(--surface)]" />
                         <div className="space-y-2">
                             <h4 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight leading-none">In Production (Locked)</h4>
                             <p className="text-xs font-medium text-[var(--text-tertiary)]">Design finalized and shared with workshop.</p>

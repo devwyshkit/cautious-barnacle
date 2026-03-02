@@ -132,8 +132,8 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
 
     if (submitted) {
         return (
-            <div className="p-8 text-center bg-[var(--well-success)] rounded-xl border border-[var(--success)]/10 animate-in fade-in zoom-in duration-500">
-                <div className="size-16 bg-[var(--success)]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div className="p-8 text-center bg-[var(--well-success)] rounded-[var(--radius-md)] border border-[var(--success)]/10 animate-in fade-in zoom-in duration-500">
+                <div className="size-16 bg-[var(--success)]/10 rounded-[var(--radius-md)] flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="size-8 text-[var(--success)]" />
                 </div>
                 <h3 className="text-lg font-bold text-[var(--text-primary)] tracking-tight mb-2">Feedback Received</h3>
@@ -145,9 +145,9 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
     const personalisedProducts = products.filter(p => p.is_personalized);
 
     return (
-        <section className="bg-[var(--surface)] rounded-xl border border-[var(--border)] p-6 shadow-sm overflow-hidden space-y-8">
+        <section className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] p-6 shadow-sm overflow-hidden space-y-8">
             <div className="flex items-center gap-3">
-                <div className="size-10 bg-[var(--well-warning)] rounded-xl flex items-center justify-center">
+                <div className="size-10 bg-[var(--well-warning)] rounded-[var(--radius-md)] flex items-center justify-center">
                     <Star className="size-5 text-[var(--warning)] fill-[var(--warning)]" />
                 </div>
                 <div>
@@ -186,8 +186,8 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                             </div>
 
                             {/* Mockup Preview vs Fidelity Question */}
-                            <div className="bg-[var(--surface-muted)] rounded-2xl p-4 border border-[var(--border)] flex items-center gap-4">
-                                <div className="size-20 rounded-xl bg-[var(--border)] overflow-hidden relative group shrink-0">
+                            <div className="bg-[var(--surface-muted)] rounded-[var(--radius-lg)] p-4 border border-[var(--border)] flex items-center gap-4">
+                                <div className="size-20 rounded-[var(--radius-md)] bg-[var(--border)] overflow-hidden relative group shrink-0">
                                     {product.mockup_url ? (
                                         <img src={product.mockup_url} alt="Design" className="size-full object-cover" />
                                     ) : (

@@ -9,7 +9,7 @@ export default function VendorPageLoading() {
         <Skeleton className="h-4 w-32" />
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="aspect-square rounded-xl" />
+            <Skeleton key={i} className="aspect-square rounded-[var(--radius-md)]" />
           ))}
         </div>
       </div>

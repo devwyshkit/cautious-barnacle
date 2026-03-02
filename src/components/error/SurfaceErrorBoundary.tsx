@@ -54,7 +54,7 @@ export class SurfaceErrorBoundary extends Component<Props & { router?: any }, St
             return (
                 <div className={cn("min-h-[400px] flex items-center justify-center p-8 text-center", this.props.className)}>
                     <div className="max-w-md w-full space-y-6">
-                        <div className="size-20 rounded-xl bg-[var(--well-destructive)] flex items-center justify-center mx-auto border border-[var(--destructive)]/10 shadow-sm animate-in zoom-in duration-500">
+                        <div className="size-20 rounded-[var(--radius-md)] bg-[var(--well-destructive)] flex items-center justify-center mx-auto border border-[var(--destructive)]/10 shadow-sm animate-in zoom-in duration-500">
                             <AlertCircle className="size-10 text-[var(--destructive)]" />
                         </div>
 
@@ -64,7 +64,7 @@ export class SurfaceErrorBoundary extends Component<Props & { router?: any }, St
                                 We encountered a glitch on this page. Our team has been notified.
                             </p>
                             {process.env.NODE_ENV === 'development' && this.state.error && (
-                                <div className="mt-4 p-3 bg-[var(--surface-muted)] rounded-xl text-left border border-[var(--border)]">
+                                <div className="mt-4 p-3 bg-[var(--surface-muted)] rounded-[var(--radius-md)] text-left border border-[var(--border)]">
                                     <p className="text-xs font-black tracking-tight text-[var(--text-tertiary)] mb-1">Developer Details</p>
                                     <p className="text-xs text-[var(--destructive)] font-mono break-all">{this.state.error.message}</p>
                                 </div>
@@ -74,7 +74,7 @@ export class SurfaceErrorBoundary extends Component<Props & { router?: any }, St
                         <div className="flex flex-col gap-3 pt-2">
                             <Button
                                 onClick={this.handleReset}
-                                className="w-full h-14 rounded-xl font-black tracking-tight text-xs"
+                                className="w-full h-14 rounded-[var(--radius-md)] font-black tracking-tight text-xs"
                             >
                                 <RefreshCw className="size-4 mr-2" />
                                 Retry {this.props.surfaceName}
@@ -84,7 +84,7 @@ export class SurfaceErrorBoundary extends Component<Props & { router?: any }, St
                                 <Button
                                     onClick={() => window.location.href = '/'}
                                     variant="outline"
-                                    className="w-full h-14 rounded-xl font-black tracking-tight text-xs border-[var(--border)]"
+                                    className="w-full h-14 rounded-[var(--radius-md)] font-black tracking-tight text-xs border-[var(--border)]"
                                 >
                                     <Home className="size-4 mr-2" />
                                     Back to Home

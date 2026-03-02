@@ -166,7 +166,7 @@ export function OrderQueue({ initialOrders, vendorId }: OrderQueueProps) {
 
       <div className="space-y-3">
         {filteredOrders.length === 0 ? (
-          <div className="text-center py-16 bg-[var(--surface)] rounded-xl border border-[var(--border)]">
+          <div className="text-center py-16 bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)]">
             <Package className="size-12 text-[var(--border)] mx-auto mb-3" />
             <p className="text-sm text-[var(--text-secondary)]">No orders here</p>
           </div>

@@ -11,7 +11,7 @@ function ShimmerHint({ threshold }: { threshold: number }) {
     return (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div
-                className="absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                className="absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-[var(--surface-glass)] to-transparent"
                 style={{
                     '--shimmer-distance': `${threshold}px`,
                     animation: 'slideToPay-shimmer 2s ease-in-out infinite',
@@ -137,7 +137,7 @@ export function SlideToPay({
 
     if (isProcessing) {
         return (
-            <div className="w-full h-16 bg-[var(--primary)] rounded-xl flex items-center justify-center shadow-[var(--shadow-brand)]">
+            <div className="w-full h-16 bg-[var(--primary)] rounded-[var(--radius-md)] flex items-center justify-center shadow-[var(--shadow-brand)]">
                 <div className="size-6 border-2 border-[var(--text-inverse)]/20 border-t-[var(--text-inverse)] rounded-full animate-spin" />
             </div>
         );
@@ -155,9 +155,9 @@ export function SlideToPay({
                     triggerHaptic(HapticPattern.SUCCESS);
                     onPay();
                 }}
-                className="w-full h-16 rounded-xl text-sm font-bold tracking-tight shadow-[var(--shadow-brand)] gap-3 group overflow-hidden relative"
+                className="w-full h-16 rounded-[var(--radius-md)] text-sm font-bold tracking-tight shadow-[var(--shadow-brand)] gap-3 group overflow-hidden relative"
             >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--text-inverse)]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <ShieldCheck className="size-5" />
                 <span>Place order · {formatCurrency(amount)}</span>
             </Button>
@@ -167,7 +167,7 @@ export function SlideToPay({
     return (
         <div
             ref={constraintsRef}
-            className="relative w-full h-16 bg-[var(--surface-muted)] rounded-xl overflow-hidden p-1.5 select-none border border-[var(--border)] shadow-inner"
+            className="relative w-full h-16 bg-[var(--surface-muted)] rounded-[var(--radius-md)] overflow-hidden p-1.5 select-none border border-[var(--border)] shadow-inner"
         >
             {/* Background Progress */}
             <div

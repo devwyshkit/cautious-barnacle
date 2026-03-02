@@ -74,7 +74,7 @@ export function OTPInput({
                   key={index}
                   index={index}
                   className={cn(
-                    "size-12 rounded-lg bg-[var(--surface-muted)] border-none font-semibold text-lg transition-all duration-200",
+                    "size-12 rounded-[var(--radius-sm)] bg-[var(--surface-muted)] border-none font-semibold text-lg transition-all duration-200",
                     value[index] && "ring-1 ring-[var(--border)] bg-[var(--surface)]",
                     error && "ring-1 ring-rose-500 bg-rose-50"
                   )}
@@ -103,7 +103,7 @@ export function OTPInput({
             onClick={handleResend}
             disabled={cooldown > 0 || disabled}
             className={cn(
-              "text-xs font-semibold h-auto py-2 px-4 rounded-lg transition-all active:scale-95",
+              "text-xs font-semibold h-auto py-2 px-4 rounded-[var(--radius-sm)] transition-all active:scale-95",
               cooldown > 0 ? "text-[var(--text-tertiary)]" : "text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
             )}
           >

@@ -34,7 +34,7 @@ export function VendorGroupedGrid({ data, title, subtitle, context }: VendorGrou
                 {Object.entries(groupedData).map(([vId, group]: [string, any]) => (
                     <div
                         key={vId}
-                        className="p-2.5 bg-[var(--surface-muted)]/50 rounded-2xl border border-[var(--border)]/80 hover:bg-[var(--surface)] hover:shadow-sm transition-all duration-300 group"
+                        className="p-2.5 bg-[var(--surface-muted)]/50 rounded-[var(--radius-lg)] border border-[var(--border)]/80 hover:bg-[var(--surface)] hover:shadow-sm transition-all duration-300 group"
                     >
                         <div className="flex items-center justify-between mb-2.5 px-0.5">
                             <div className="min-w-0">
@@ -44,7 +44,7 @@ export function VendorGroupedGrid({ data, title, subtitle, context }: VendorGrou
                             </div>
                             <Link
                                 href={`/vendor/${vId}`}
-                                className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight hover:text-[var(--text-primary)] transition-colors bg-[var(--surface)] px-2 py-1 rounded-lg border border-[var(--border)] shadow-sm uppercase shrink-0"
+                                className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight hover:text-[var(--text-primary)] transition-colors bg-[var(--surface)] px-2 py-1 rounded-[var(--radius-sm)] border border-[var(--border)] shadow-sm uppercase shrink-0"
                             >
                                 Shop
                             </Link>

@@ -76,7 +76,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
     if (!parsed) return null;
 
     return (
-      <div className="space-y-1 mt-2 p-2 bg-blue-50 rounded-lg">
+      <div className="space-y-1 mt-2 p-2 bg-blue-50 rounded-[var(--radius-sm)]">
         {parsed.text && (
           <p className="text-xs text-blue-800">
             <span className="font-medium">Text:</span> {parsed.text}
@@ -95,7 +95,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
         {parsed.image_url && (
           <div className="mt-2">
             <p className="text-xs text-blue-800 font-medium mb-1">Customer image:</p>
-            <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-[var(--surface)]">
+            <div className="relative w-20 h-20 rounded-[var(--radius-sm)] overflow-hidden bg-[var(--surface)]">
               <Image
                 src={parsed.image_url}
                 alt="Customer upload"
@@ -145,7 +145,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
               </div>
 
               {order.order_products?.map((product) => (
-                <div key={product.id} className="mt-3 p-3 bg-[var(--surface-muted)] rounded-xl border border-[var(--border)]">
+                <div key={product.id} className="mt-3 p-3 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)]">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-medium text-[var(--text-primary)]">
                       {product.quantity}× {product.product_name}
@@ -202,7 +202,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                   {showHistory && (
                     <div className="mt-3 grid grid-cols-4 gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
                       {designHistory.map((p: any, i: number) => (
-                        <div key={p.id} className="relative aspect-square rounded-lg overflow-hidden border border-[var(--border)] bg-[var(--surface)] group/thumb">
+                        <div key={p.id} className="relative aspect-square rounded-[var(--radius-sm)] overflow-hidden border border-[var(--border)] bg-[var(--surface)] group/thumb">
                           <Image
                             src={p.preview_url}
                             alt={`Preview ${i}`}
@@ -302,7 +302,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center">
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center">
                 <Clock className="size-5 text-[var(--text-secondary)]" />
               </div>
               <div>
@@ -315,7 +315,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-[var(--well-warning)] flex items-center justify-center">
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-warning)] flex items-center justify-center">
                 <Upload className="size-5 text-[var(--warning)]" />
               </div>
               <div>
@@ -328,7 +328,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-orange-50 flex items-center justify-center">
+              <div className="size-10 rounded-[var(--radius-md)] bg-orange-50 flex items-center justify-center">
                 <RotateCcw className="size-5 text-orange-600" />
               </div>
               <div>
@@ -341,7 +341,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-blue-50 flex items-center justify-center">
+              <div className="size-10 rounded-[var(--radius-md)] bg-blue-50 flex items-center justify-center">
                 <Eye className="size-5 text-blue-600" />
               </div>
               <div>

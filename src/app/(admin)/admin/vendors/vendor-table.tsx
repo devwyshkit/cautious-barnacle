@@ -136,7 +136,7 @@ export function VendorTable({ vendors, currentStatus, totalCount, currentPage, p
         </Select>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-[var(--radius-sm)]">
         <Table>
           <TableHeader>
             <TableRow>

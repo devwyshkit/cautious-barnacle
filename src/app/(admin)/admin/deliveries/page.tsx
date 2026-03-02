@@ -61,23 +61,23 @@ export default async function DeliveriesPage({
       <h1 className="text-lg font-semibold text-[var(--text-primary)]">Deliveries</h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <div className="border rounded-lg p-3">
+        <div className="border rounded-[var(--radius-sm)] p-3">
           <p className="text-xs text-[var(--text-secondary)]">Pending pickup</p>
           <p className="text-xl font-semibold text-[var(--warning)]">{stats.pending}</p>
         </div>
-        <div className="border rounded-lg p-3">
+        <div className="border rounded-[var(--radius-sm)] p-3">
           <p className="text-xs text-[var(--text-secondary)]">Picked up</p>
           <p className="text-xl font-semibold text-blue-600">{stats.picked_up}</p>
         </div>
-        <div className="border rounded-lg p-3">
+        <div className="border rounded-[var(--radius-sm)] p-3">
           <p className="text-xs text-[var(--text-secondary)]">In transit</p>
           <p className="text-xl font-semibold text-purple-600">{stats.in_transit}</p>
         </div>
-        <div className="border rounded-lg p-3">
+        <div className="border rounded-[var(--radius-sm)] p-3">
           <p className="text-xs text-[var(--text-secondary)]">Delivered</p>
           <p className="text-xl font-semibold text-[var(--success)]">{stats.delivered}</p>
         </div>
-        <div className="border rounded-lg p-3">
+        <div className="border rounded-[var(--radius-sm)] p-3">
           <p className="text-xs text-[var(--text-secondary)]">Failed</p>
           <p className="text-xl font-semibold text-red-600">{stats.failed}</p>
         </div>

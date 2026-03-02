@@ -36,7 +36,7 @@ export default function CustomerError({
             <div className="flex flex-col gap-3 w-full max-w-xs">
                 <button
                     onClick={() => reset()}
-                    className="flex items-center justify-center gap-2 w-full bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-2xl py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]"
+                    className="flex items-center justify-center gap-2 w-full bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-lg)] py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]"
                 >
                     <RefreshCcw className="size-4" />
                     Try Again
@@ -44,7 +44,7 @@ export default function CustomerError({
 
                 <button
                     onClick={() => router.push('/')}
-                    className="flex items-center justify-center gap-2 w-full bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] rounded-2xl py-4 font-bold text-sm active:scale-95 transition-all"
+                    className="flex items-center justify-center gap-2 w-full bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border)] rounded-[var(--radius-lg)] py-4 font-bold text-sm active:scale-95 transition-all"
                 >
                     <Home className="size-4" />
                     Back to Home
@@ -54,7 +54,7 @@ export default function CustomerError({
             {process.env.NODE_ENV === 'development' && (
                 <div className="mt-12 w-full max-w-xl text-left">
                     <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-tertiary)] mb-2">Developer Context</p>
-                    <pre className="p-4 bg-[var(--surface-muted)] rounded-2xl border border-[var(--border)] text-xs font-mono text-[var(--text-tertiary)] overflow-auto max-h-40">
+                    <pre className="p-4 bg-[var(--surface-muted)] rounded-[var(--radius-lg)] border border-[var(--border)] text-xs font-mono text-[var(--text-tertiary)] overflow-auto max-h-40">
                         {error.stack || error.message}
                     </pre>
                 </div>

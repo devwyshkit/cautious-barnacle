@@ -82,7 +82,7 @@ export function EstimateButton({
 
     return (
         <form action={dispatch} className="flex flex-col gap-3">
-            <div className="flex items-start gap-3 p-4 bg-[var(--surface-muted)] rounded-xl border border-[var(--border)]">
+            <div className="flex items-start gap-3 p-4 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)]">
                 <Info className="size-4 text-[var(--text-tertiary)] mt-0.5" />
                 <p className="text-xs font-bold text-[var(--text-secondary)] leading-relaxed tracking-tight">
                     Need a pro-forma estimate for your business? Click below to generate a PDF.
@@ -92,7 +92,7 @@ export function EstimateButton({
                 type="submit"
                 disabled={loading}
                 variant="outline"
-                className="w-full h-14 rounded-xl border-2 border-[var(--border)] hover:border-[var(--text-primary)] gap-3 font-bold tracking-tight text-xs"
+                className="w-full h-14 rounded-[var(--radius-md)] border-2 border-[var(--border)] hover:border-[var(--text-primary)] gap-3 font-bold tracking-tight text-xs"
             >
                 {loading ? (
                     <Loader2 className="size-4 animate-spin" />

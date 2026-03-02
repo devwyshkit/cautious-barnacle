@@ -17,7 +17,7 @@ export function HeroCarousel() {
           <Link
             key={slide.id}
             href={slide.ctaLink}
-            className="flex-shrink-0 w-[85vw] max-w-[400px] h-40 md:h-48 rounded-xl overflow-hidden relative group snap-center"
+            className="flex-shrink-0 w-[85vw] max-w-[400px] h-40 md:h-48 rounded-[var(--radius-md)] overflow-hidden relative group snap-center"
           >
             <Image
               src={slide.image}

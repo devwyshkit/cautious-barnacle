@@ -46,7 +46,7 @@ export class CartErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="p-4 bg-[var(--well-warning)] border border-[var(--warning)]/20 rounded-xl space-y-3">
+        <div className="p-4 bg-[var(--well-warning)] border border-[var(--warning)]/20 rounded-[var(--radius-md)] space-y-3">
           <div className="flex items-center gap-2">
             <ShoppingBag className="size-4 text-[var(--warning)]" />
             <span className="text-sm font-semibold text-[var(--text-primary)]">Cart Error</span>

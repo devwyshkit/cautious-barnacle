@@ -78,7 +78,7 @@ export function ShareButton({
       <Button
         onClick={handleShare}
         variant="outline"
-        className={cn("w-full h-12 rounded-xl border-[var(--border)] gap-2 font-bold", className)}
+        className={cn("w-full h-12 rounded-[var(--radius-md)] border-[var(--border)] gap-2 font-bold", className)}
       >
         <Share2 className="size-4" />
         Share this

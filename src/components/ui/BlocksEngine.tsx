@@ -93,7 +93,7 @@ export function BlocksEngine({ blocks, className, context }: BlocksEngineProps) 
                             </div>
                         )}
 
-                        <Suspense fallback={<div className="h-24 animate-pulse bg-[var(--surface-muted)] rounded-xl" />}>
+                        <Suspense fallback={<div className="h-24 animate-pulse bg-[var(--surface-muted)] rounded-[var(--radius-md)]" />}>
                             {renderBlock(block)}
                         </Suspense>
                     </section>

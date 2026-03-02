@@ -14,7 +14,7 @@ export function ActionBanner({ personalizedProductsCount, deadline }: ActionBann
     if (personalizedProductsCount === 0) return null;
 
     return (
-        <div className="bg-[var(--well-warning)] border border-[var(--warning)]/20 rounded-xl p-4 mb-2 animate-in fade-in slide-in-from-top-2">
+        <div className="bg-[var(--well-warning)] border border-[var(--warning)]/20 rounded-[var(--radius-md)] p-4 mb-2 animate-in fade-in slide-in-from-top-2">
             <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="size-4 text-[var(--warning)]" />
                 <h3 className="text-xs font-bold text-[var(--text-primary)] tracking-tight">Input Needed</h3>

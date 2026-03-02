@@ -47,7 +47,7 @@ export function CustomerTable({ customers, totalCount, currentPage, pageSize }: 
         />
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-[var(--radius-sm)]">
         <Table>
           <TableHeader>
             <TableRow>

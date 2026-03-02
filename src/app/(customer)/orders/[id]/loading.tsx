@@ -5,9 +5,9 @@ export default function OrderDetailLoading() {
     <div className="bg-[var(--surface-muted)] py-4">
       <div className="max-w-xl mx-auto px-4 space-y-4">
         <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-24 w-full rounded-xl" />
-        <Skeleton className="h-32 w-full rounded-xl" />
-        <Skeleton className="h-24 w-full rounded-xl" />
+        <Skeleton className="h-24 w-full rounded-[var(--radius-md)]" />
+        <Skeleton className="h-32 w-full rounded-[var(--radius-md)]" />
+        <Skeleton className="h-24 w-full rounded-[var(--radius-md)]" />
       </div>
     </div>
   );

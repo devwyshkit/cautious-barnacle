@@ -101,7 +101,7 @@ export default function ErrorReporter({ error, reset }: ReporterProps) {
             )}
 
             {process.env.NODE_ENV === "development" && (
-                <div className="w-full max-w-lg mt-8 text-left bg-[var(--surface-muted)] rounded-2xl p-6 border border-[var(--border)] overflow-hidden">
+                <div className="w-full max-w-lg mt-8 text-left bg-[var(--surface-muted)] rounded-[var(--radius-lg)] p-6 border border-[var(--border)] overflow-hidden">
                     <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-tertiary)] mb-2">Technical Exception (Dev Only)</p>
                     <pre className="text-xs font-mono text-[var(--text-secondary)] overflow-auto max-h-[200px] whitespace-pre-wrap">
                         {error.message}

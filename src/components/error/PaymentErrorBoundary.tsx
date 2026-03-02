@@ -47,7 +47,7 @@ export class PaymentErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="p-6 bg-[var(--well-destructive)] border border-[var(--destructive)]/10 rounded-xl space-y-4">
+        <div className="p-6 bg-[var(--well-destructive)] border border-[var(--destructive)]/10 rounded-[var(--radius-md)] space-y-4">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-full bg-[var(--destructive)]/10 flex items-center justify-center shrink-0">
               <CreditCard className="size-5 text-[var(--destructive)]" />

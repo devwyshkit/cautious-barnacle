@@ -58,7 +58,7 @@ export function HeaderCart() {
                 variant="ghost"
                 onClick={handleCheckout}
                 className={cn(
-                    "h-10 px-4 rounded-xl hover:bg-[var(--surface-muted)] gap-3 font-bold text-sm text-[var(--text-primary)] active:scale-95 transition-all border border-[var(--border)]",
+                    "h-10 px-4 rounded-[var(--radius-md)] hover:bg-[var(--surface-muted)] gap-3 font-bold text-sm text-[var(--text-primary)] active:scale-95 transition-all border border-[var(--border)]",
                     shouldBounce && "scale-105 bg-[var(--primary-muted)] border-[var(--primary-ring)]"
                 )}
             >

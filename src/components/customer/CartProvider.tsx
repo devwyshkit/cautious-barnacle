@@ -268,7 +268,7 @@ export function CartProvider({
             {/* WYSHKIT 2026: Dialogs/Portals MUST wait for mount to avoid hydration mismatch */}
             {mounted && (
                 <AlertDialog open={showReplaceCartDialog} onOpenChange={setShowReplaceCartDialog}>
-                    <AlertDialogContent className="rounded-xl border-none shadow-sm bg-[var(--surface)]/95 backdrop-blur-xl">
+                    <AlertDialogContent className="rounded-[var(--radius-md)] border-none shadow-sm bg-[var(--surface)]/95 backdrop-blur-xl">
                         <AlertDialogHeader>
                             <AlertDialogTitle className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Replace cart?</AlertDialogTitle>
                             <AlertDialogDescription className="text-sm font-medium text-[var(--text-secondary)] leading-relaxed">
@@ -276,12 +276,12 @@ export function CartProvider({
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter className="flex-row gap-2 mt-4">
-                            <AlertDialogCancel className="flex-1 rounded-xl border-[var(--border)] font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]">
+                            <AlertDialogCancel className="flex-1 rounded-[var(--radius-md)] border-[var(--border)] font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]">
                                 Cancel
                             </AlertDialogCancel>
                             <AlertDialogAction
                                 onClick={handleReplaceCart}
-                                className="flex-1 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-[var(--text-inverse)] font-bold"
+                                className="flex-1 rounded-[var(--radius-md)] bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-[var(--text-inverse)] font-bold"
                             >
                                 Replace
                             </AlertDialogAction>

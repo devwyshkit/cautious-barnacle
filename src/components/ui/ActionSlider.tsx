@@ -132,7 +132,7 @@ export function ActionSlider({
                 disabled={disabled || isLoading || isSuccess}
                 onClick={handleConfirm}
                 className={cn(
-                    "relative h-14 w-full rounded-xl font-bold tracking-tight transition-all duration-300",
+                    "relative h-14 w-full rounded-[var(--radius-md)] font-bold tracking-tight transition-all duration-300",
                     isSuccess ? "bg-[var(--success)] text-[var(--text-inverse)]" : "text-[var(--text-inverse)] bg-[var(--primary)] shadow-brand hover:bg-[var(--primary-hover)]",
                     "border-none",
                     (disabled || isLoading) && "opacity-60 cursor-not-allowed",
@@ -161,7 +161,7 @@ export function ActionSlider({
         <div
             ref={containerRef}
             className={cn(
-                "relative h-14 w-full bg-[var(--surface-muted)] rounded-xl overflow-hidden p-1 select-none transition-colors duration-300",
+                "relative h-14 w-full bg-[var(--surface-muted)] rounded-[var(--radius-md)] overflow-hidden p-1 select-none transition-colors duration-300",
                 disabled || isLoading ? "opacity-60 cursor-not-allowed" : "cursor-pointer",
                 isSuccess ? "bg-[var(--success)]" : "",
                 className
@@ -203,7 +203,7 @@ export function ActionSlider({
                     onPointerUp={handlePointerUp}
                     onPointerCancel={handlePointerUp}
                     className={cn(
-                        "absolute left-1 top-1 bottom-1 aspect-square rounded-xl flex items-center justify-center shadow-lg z-10 transition-transform duration-150",
+                        "absolute left-1 top-1 bottom-1 aspect-square rounded-[var(--radius-md)] flex items-center justify-center shadow-lg z-10 transition-transform duration-150",
                         isDragging ? "scale-95 cursor-grabbing" : "cursor-grab",
                         "bg-[var(--primary)]"
                     )}
@@ -219,7 +219,7 @@ export function ActionSlider({
             {/* Loading/Success Icon */}
             {(isLoading || isSuccess) && (
                 <div
-                    className="absolute left-1 top-1 bottom-1 aspect-square bg-[var(--surface)] rounded-xl flex items-center justify-center shadow-lg z-10 animate-in zoom-in duration-300"
+                    className="absolute left-1 top-1 bottom-1 aspect-square bg-[var(--surface)] rounded-[var(--radius-md)] flex items-center justify-center shadow-lg z-10 animate-in zoom-in duration-300"
                     style={{ transform: isSuccess ? `translateX(${maxDrag}px)` : 'none' }}
                 >
                     {isLoading ? (

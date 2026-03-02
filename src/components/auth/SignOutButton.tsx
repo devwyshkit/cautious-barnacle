@@ -64,7 +64,7 @@ export function SignOutButton({
       onClick={handleSignOut}
       disabled={isLoading}
       className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group w-full",
+        "flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-md)] transition-all group w-full",
         variant === 'sidebar'
           ? "text-[var(--text-secondary)] hover:bg-rose-50 hover:text-rose-600"
           : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]",

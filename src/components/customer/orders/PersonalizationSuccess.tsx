@@ -22,7 +22,7 @@ export function PersonalizationSuccess({ onClose }: { onClose: () => void }) {
             <div className="pt-8">
                 <button
                     onClick={onClose}
-                    className="h-14 px-8 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-xl font-bold tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm shadow-[var(--text-primary)]/20"
+                    className="h-14 px-8 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-md)] font-bold tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-sm shadow-[var(--text-primary)]/20"
                 >
                     Great, thanks
                 </button>

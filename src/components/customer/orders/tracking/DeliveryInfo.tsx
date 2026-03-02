@@ -17,7 +17,7 @@ export function DeliveryInfo({ order }: DeliveryInfoProps) {
             {order.awb_number && (
                 <div className="surface-card p-4 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                        <div className="size-10 bg-[var(--surface-muted)] rounded-xl flex items-center justify-center">
+                        <div className="size-10 bg-[var(--surface-muted)] rounded-[var(--radius-md)] flex items-center justify-center">
                             <Package className="size-5 text-[var(--text-tertiary)]" />
                         </div>
                         <div>
@@ -30,7 +30,7 @@ export function DeliveryInfo({ order }: DeliveryInfoProps) {
                             href={order.tracking_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="h-10 px-5 rounded-xl bg-[var(--foreground)] text-[var(--text-inverse)] text-xs font-bold tracking-tight flex items-center justify-center active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10 border border-[var(--text-primary)]"
+                            className="h-10 px-5 rounded-[var(--radius-md)] bg-[var(--foreground)] text-[var(--text-inverse)] text-xs font-bold tracking-tight flex items-center justify-center active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10 border border-[var(--text-primary)]"
                         >
                             Track
                         </a>
@@ -40,7 +40,7 @@ export function DeliveryInfo({ order }: DeliveryInfoProps) {
 
             {order.delivery_address && (
                 <div className="surface-card p-4 flex items-start gap-4">
-                    <div className="size-10 bg-[var(--surface-muted)] rounded-xl flex items-center justify-center shrink-0">
+                    <div className="size-10 bg-[var(--surface-muted)] rounded-[var(--radius-md)] flex items-center justify-center shrink-0">
                         <MapPin className="size-5 text-[var(--text-tertiary)]" />
                     </div>
                     <div className="flex-1">
@@ -51,7 +51,7 @@ export function DeliveryInfo({ order }: DeliveryInfoProps) {
                                 : 'Address on file'}
                         </p>
                         {(order.gstin) && (
-                            <div className="mt-3 flex items-center gap-2 px-2.5 py-1 rounded-lg bg-[var(--surface-muted)] border border-[var(--border)] w-fit">
+                            <div className="mt-3 flex items-center gap-2 px-2.5 py-1 rounded-[var(--radius-sm)] bg-[var(--surface-muted)] border border-[var(--border)] w-fit">
                                 <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">GSTIN:</span>
                                 <span className="text-xs font-bold text-[var(--text-secondary)]">{order.gstin}</span>
                             </div>

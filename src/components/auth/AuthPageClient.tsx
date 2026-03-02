@@ -132,14 +132,14 @@ export function AuthPageClient({
           {step === "otp" ? (
             <button
               onClick={() => setStep("phone")}
-              className="size-9 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center transition-colors hover:bg-[var(--border)]"
+              className="size-9 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center transition-colors hover:bg-[var(--border)]"
             >
               <ChevronLeft className="size-5 text-[var(--text-secondary)]" />
             </button>
           ) : !hideBack ? (
             <button
               onClick={() => router.back()}
-              className="size-9 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center transition-colors hover:bg-[var(--input)]"
+              className="size-9 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center transition-colors hover:bg-[var(--input)]"
             >
               <ChevronLeft className="size-5 text-[var(--text-secondary)]" />
             </button>
@@ -174,7 +174,7 @@ export function AuthPageClient({
             onClick={handleSendOTP}
             disabled={loading || phone.length !== 10}
             className={cn(
-              "w-full h-14 rounded-xl font-bold text-base transition-all shadow-none",
+              "w-full h-14 rounded-[var(--radius-md)] font-bold text-base transition-all shadow-none",
               phone.length === 10 ? "bg-[var(--text-primary)] hover:opacity-90 active:scale-95 text-[var(--text-inverse)]" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)]"
             )}
           >
@@ -211,7 +211,7 @@ export function AuthPageClient({
 
       {error && (
         <div className={cn(
-          "mt-4 p-3 rounded-xl text-xs font-medium text-center animate-in fade-in slide-in-from-bottom-2",
+          "mt-4 p-3 rounded-[var(--radius-md)] text-xs font-medium text-center animate-in fade-in slide-in-from-bottom-2",
           isWarning ? "bg-[var(--well-warning)] text-[var(--well-warning-text)] border border-[var(--warning-border)]" : "bg-[var(--well-destructive)] text-[var(--well-destructive-text)] border border-[var(--destructive)]/20"
         )}>
           {error}

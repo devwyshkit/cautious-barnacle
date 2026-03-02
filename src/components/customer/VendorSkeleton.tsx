@@ -15,7 +15,7 @@ export function VendorSkeleton() {
         <div className="flex items-end justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Skeleton className="size-16 rounded-2xl shrink-0" />
+              <Skeleton className="size-16 rounded-[var(--radius-lg)] shrink-0" />
               <div className="flex flex-col gap-2">
                 <Skeleton className="h-6 w-48" />
                 <Skeleton className="h-3 w-24" />
@@ -23,15 +23,15 @@ export function VendorSkeleton() {
             </div>
           </div>
           <div className="flex gap-2 pb-1">
-            <Skeleton className="size-9 rounded-xl" />
-            <Skeleton className="w-11 h-10 rounded-xl" />
+            <Skeleton className="size-9 rounded-[var(--radius-md)]" />
+            <Skeleton className="w-11 h-10 rounded-[var(--radius-md)]" />
           </div>
         </div>
 
         {/* ETA/Delivery Status Pills */}
         <div className="flex items-center gap-3 mt-4">
-          <Skeleton className="h-6 w-24 rounded-lg" />
-          <Skeleton className="h-6 w-32 rounded-lg" />
+          <Skeleton className="h-6 w-24 rounded-[var(--radius-sm)]" />
+          <Skeleton className="h-6 w-32 rounded-[var(--radius-sm)]" />
         </div>
       </div>
 

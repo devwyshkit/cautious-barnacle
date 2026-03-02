@@ -81,13 +81,13 @@ export function CouponSlot({ initialCoupon, disabled }: CouponSlotProps) {
                         onChange={(e) => setCode(e.target.value.toUpperCase())}
                         disabled={disabled || isApplying}
                         placeholder="Enter code"
-                        className="flex-1 h-10 bg-[var(--surface)] rounded-xl px-4 text-xs font-bold border border-[var(--border)] outline-none focus:border-[var(--text-tertiary)] transition-all uppercase"
+                        className="flex-1 h-10 bg-[var(--surface)] rounded-[var(--radius-md)] px-4 text-xs font-bold border border-[var(--border)] outline-none focus:border-[var(--text-tertiary)] transition-all uppercase"
                     />
                     <button
                         onClick={initialCoupon ? handleRemove : handleApply}
                         disabled={disabled || isApplying || !code.trim()}
                         className={cn(
-                            "h-10 px-4 rounded-xl text-xs font-bold transition-all active:scale-95 disabled:opacity-50",
+                            "h-10 px-4 rounded-[var(--radius-md)] text-xs font-bold transition-all active:scale-95 disabled:opacity-50",
                             initialCoupon
                                 ? "bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:bg-[var(--border)]"
                                 : "bg-[var(--text-primary)] text-[var(--text-inverse)] hover:bg-[var(--foreground)]"

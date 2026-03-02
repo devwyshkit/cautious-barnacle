@@ -90,7 +90,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 {process.env.NODE_ENV === 'development' && (
                   <div className="flex flex-col gap-2 mt-2">
                     <p className="text-xs font-bold uppercase tracking-widest text-[var(--destructive)] opacity-40">Technical Details (Dev Only)</p>
-                    <pre className="text-xs bg-[var(--surface)]/60 p-4 rounded-xl font-mono overflow-auto border border-[var(--destructive)]/10">
+                    <pre className="text-xs bg-[var(--surface)]/60 p-4 rounded-[var(--radius-md)] font-mono overflow-auto border border-[var(--destructive)]/10">
                       {String((discovery as any).error)}
                     </pre>
                   </div>
@@ -141,7 +141,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <h1 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">Something went wrong</h1>
         <p className="text-sm text-[var(--text-secondary)] max-w-sm">We encountered an error while loading the home feed. Please refresh the page.</p>
         {process.env.NODE_ENV === 'development' && (
-          <pre className="mt-8 p-4 bg-[var(--surface-muted)] rounded-xl text-xs font-mono text-[var(--text-tertiary)] max-w-lg overflow-auto border border-[var(--border)]">
+          <pre className="mt-8 p-4 bg-[var(--surface-muted)] rounded-[var(--radius-md)] text-xs font-mono text-[var(--text-tertiary)] max-w-lg overflow-auto border border-[var(--border)]">
             {err.stack || err.message}
           </pre>
         )}

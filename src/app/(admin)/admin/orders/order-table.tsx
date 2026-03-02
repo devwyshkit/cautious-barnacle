@@ -101,7 +101,7 @@ export function OrderTable({ orders, currentStatus, totalCount, currentPage, pag
         </Select>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-[var(--radius-sm)]">
         <Table>
           <TableHeader>
             <TableRow>

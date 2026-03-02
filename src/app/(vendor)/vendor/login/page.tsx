@@ -111,7 +111,7 @@ export default function VendorLoginPage() {
         <div className="min-h-[100dvh] bg-[var(--surface-muted)] flex items-center justify-center p-4">
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
-                    <div className="size-12 rounded-xl bg-[var(--primary)] flex items-center justify-center mx-auto mb-4">
+                    <div className="size-12 rounded-[var(--radius-md)] bg-[var(--primary)] flex items-center justify-center mx-auto mb-4">
                         <Store className="size-6 text-[var(--text-inverse)]" />
                     </div>
                     <h1 className="text-xl font-bold text-[var(--text-primary)]">
@@ -126,7 +126,7 @@ export default function VendorLoginPage() {
 
                 {step === 'phone' ? (
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3">
+                        <div className="flex items-center gap-2 bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-sm)] px-3">
                             <span className="text-[var(--text-secondary)] text-sm">+91</span>
                             <Input
                                 type="tel"
@@ -140,7 +140,7 @@ export default function VendorLoginPage() {
                         </div>
 
                         {error && (
-                            <p className="text-sm text-red-400 bg-red-400/10 px-3 py-2 rounded-lg">
+                            <p className="text-sm text-red-400 bg-red-400/10 px-3 py-2 rounded-[var(--radius-sm)]">
                                 {error}
                             </p>
                         )}
@@ -170,7 +170,7 @@ export default function VendorLoginPage() {
                         />
 
                         {error && (
-                            <p className="text-sm text-red-400 bg-red-400/10 px-3 py-2 rounded-lg">
+                            <p className="text-sm text-red-400 bg-red-400/10 px-3 py-2 rounded-[var(--radius-sm)]">
                                 {error}
                             </p>
                         )}

@@ -17,7 +17,7 @@ export function BannerBento({ data, title, subtitle, timeContext }: BannerBentoP
     return (
         <>
             <div className="flex items-center gap-2 mb-3">
-                <div className="size-10 bg-[var(--primary)]/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-[var(--primary)]/20">
+                <div className="size-10 bg-[var(--primary)]/10 backdrop-blur-md rounded-[var(--radius-md)] flex items-center justify-center border border-[var(--primary)]/20">
                     <Sparkles className="size-5 text-[var(--primary)]" />
                 </div>
                 <div>

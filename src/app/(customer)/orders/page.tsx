@@ -62,7 +62,7 @@ async function AsyncOrderList({ userId }: { userId: string }) {
                 <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">No orders yet</h3>
                 <p className="text-xs font-medium text-[var(--text-tertiary)] mb-8 max-w-[200px] mx-auto">Start exploring the best premium stores in your city!</p>
                 <Link href="/">
-                    <button className="bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-2xl px-10 py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]">
+                    <button className="bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-lg)] px-10 py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]">
                         Browse Stores
                     </button>
                 </Link>
@@ -89,7 +89,7 @@ function OrdersSkeleton() {
         <div className="space-y-4">
             {[1, 2, 3].map((i) => (
                 <div key={i} className="h-32 bg-[var(--surface)] rounded-[var(--radius-3xl)] border border-[var(--border)] animate-pulse flex items-center px-[var(--space-6)] gap-[var(--space-4)]">
-                    <div className="size-16 rounded-2xl bg-[var(--surface-muted)]" />
+                    <div className="size-16 rounded-[var(--radius-lg)] bg-[var(--surface-muted)]" />
                     <div className="flex-1 space-y-2">
                         <div className="h-4 w-1/3 bg-[var(--surface-muted)] rounded" />
                         <div className="h-3 w-1/2 bg-[var(--surface-muted)] rounded" />

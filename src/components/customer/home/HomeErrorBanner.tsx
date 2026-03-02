@@ -17,7 +17,7 @@ export function HomeErrorBanner({ errors, allFailed }: HomeErrorBannerProps) {
   const router = useRouter();
   if (allFailed) {
     return (
-      <div className="mx-[var(--space-4)] md:mx-[var(--space-8)] p-[var(--space-4)] bg-[var(--destructive-foreground)] border border-[var(--destructive)]/20 rounded-xl">
+      <div className="mx-[var(--space-4)] md:mx-[var(--space-8)] p-[var(--space-4)] bg-[var(--destructive-foreground)] border border-[var(--destructive)]/20 rounded-[var(--radius-md)]">
         <div className="flex items-start gap-[var(--space-3)]">
           <div className="size-5 rounded-full bg-[var(--destructive)]/10 flex items-center justify-center shrink-0 mt-0.5">
             <AlertCircle className="size-4 text-[var(--destructive)]" />
@@ -44,7 +44,7 @@ export function HomeErrorBanner({ errors, allFailed }: HomeErrorBannerProps) {
 
   if (errors.length > 0) {
     return (
-      <div className="mx-[var(--space-4)] md:mx-[var(--space-8)] p-[var(--space-3)] bg-[var(--warning-foreground)] border border-[var(--warning)]/20 rounded-xl">
+      <div className="mx-[var(--space-4)] md:mx-[var(--space-8)] p-[var(--space-3)] bg-[var(--warning-foreground)] border border-[var(--warning)]/20 rounded-[var(--radius-md)]">
         <div className="flex items-start gap-[var(--space-2)]">
           <AlertCircle className="size-4 text-[var(--warning)] shrink-0 mt-0.5" />
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">

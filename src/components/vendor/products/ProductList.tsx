@@ -62,13 +62,13 @@ export function ProductList({
           <div
             key={product.id}
             className={cn(
-              "bg-[var(--surface)] border border-[var(--border)] rounded-xl p-3 transition-all",
+              "bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] p-3 transition-all",
               !product.is_active && "opacity-60"
             )}
           >
             <div className="flex gap-3">
               <div
-                className="relative size-16 rounded-lg overflow-hidden bg-[var(--surface-muted)] shrink-0 cursor-pointer"
+                className="relative size-16 rounded-[var(--radius-sm)] overflow-hidden bg-[var(--surface-muted)] shrink-0 cursor-pointer"
                 onClick={() => onEdit?.(product)}
               >
                 {product.images?.[0] ? (
@@ -233,7 +233,7 @@ function VariantStockItem({ variant }: { variant: Variant }) {
   };
 
   return (
-    <div className="flex items-center justify-between gap-2 p-2 bg-[var(--surface-muted)]/50 rounded-lg border border-[var(--border)]">
+    <div className="flex items-center justify-between gap-2 p-2 bg-[var(--surface-muted)]/50 rounded-[var(--radius-sm)] border border-[var(--border)]">
       <span className="text-xs font-medium text-[var(--text-secondary)] truncate flex-1">{variant.name || 'Base'}</span>
       <div className="flex items-center gap-1">
         <Input

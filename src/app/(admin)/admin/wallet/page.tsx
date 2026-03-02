@@ -54,19 +54,19 @@ export default async function WalletPage() {
       <h1 className="text-lg font-semibold text-[var(--text-primary)]">Wyshkit money</h1>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="border rounded-lg p-4">
+        <div className="border rounded-[var(--radius-sm)] p-4">
           <p className="text-sm text-[var(--text-secondary)]">Total outstanding</p>
           <p className="text-xl font-semibold">{formatCurrency(stats.totalBalance)}</p>
         </div>
-        <div className="border rounded-lg p-4">
+        <div className="border rounded-[var(--radius-sm)] p-4">
           <p className="text-sm text-[var(--text-secondary)]">Total credited</p>
           <p className="text-xl font-semibold text-[var(--success)]">{formatCurrency(stats.creditedTotal)}</p>
         </div>
-        <div className="border rounded-lg p-4">
+        <div className="border rounded-[var(--radius-sm)] p-4">
           <p className="text-sm text-[var(--text-secondary)]">Total used</p>
           <p className="text-xl font-semibold text-blue-600">{formatCurrency(stats.debitedTotal)}</p>
         </div>
-        <div className="border rounded-lg p-4">
+        <div className="border rounded-[var(--radius-sm)] p-4">
           <p className="text-sm text-[var(--text-secondary)]">Active wallets</p>
           <p className="text-xl font-semibold">{stats.walletCount}</p>
         </div>

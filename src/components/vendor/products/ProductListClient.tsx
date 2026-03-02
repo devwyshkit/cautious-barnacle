@@ -137,7 +137,7 @@ export function ProductListClient({ initialProducts, vendorId }: ProductListClie
       </div>
 
       {filteredProducts.length === 0 ? (
-        <div className="text-center py-12 bg-[var(--surface)] rounded-xl border border-[var(--border)]">
+        <div className="text-center py-12 bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)]">
           <Package className="size-12 text-[var(--text-tertiary)] mx-auto mb-3" />
           {search ? (
             <>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { ORDER_STATUS, type OrderStatus } from '@/lib/types/order-status';
 import { logger } from '@/lib/logging/logger';
@@ -29,7 +29,7 @@ export function useActiveOrders(initialOrders: ActiveOrder[] = []) {
     const [loading, setLoading] = useState(initialOrders.length === 0);
     const supabase = createClient();
 
-    const fetchActiveOrders = async (uid: string) => {
+    const fetchActiveOrders = useCallback(async (uid: string) => {
         const { data, error } = await supabase
             .from('v_order_tracking')
             .select('*')
@@ -52,7 +52,7 @@ export function useActiveOrders(initialOrders: ActiveOrder[] = []) {
             })));
         }
         setLoading(false);
-    };
+    }, [supabase]);
 
     useEffect(() => {
         if (authLoading || !user) {
@@ -89,7 +89,7 @@ export function useActiveOrders(initialOrders: ActiveOrder[] = []) {
         return () => {
             // Channel cleanup is managed by RealtimeProvider.
         };
-    }, [user?.id, authLoading, channel]);
+    }, [user, authLoading, channel, fetchActiveOrders]);
 
     return { activeOrders, loading };
 }

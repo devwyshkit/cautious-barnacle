@@ -432,7 +432,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
 
           <div className="space-y-1.5">
             <Label className="text-sm text-[var(--text-secondary)]">Images</Label>
-            <div className="border-2 border-dashed border-[var(--border)] rounded-lg p-6 text-center hover:border-[var(--border)] transition-colors cursor-pointer">
+            <div className="border-2 border-dashed border-[var(--border)] rounded-[var(--radius-sm)] p-6 text-center hover:border-[var(--border)] transition-colors cursor-pointer">
               <div className="flex flex-col items-center gap-2">
                 <div className="size-10 rounded-full bg-[var(--surface-muted)] flex items-center justify-center">
                   <ImageIcon className="size-5 text-[var(--text-tertiary)]" />
@@ -517,7 +517,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
               {variants.map((v, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-3 bg-[var(--surface-muted)] rounded-lg border border-[var(--border)]"
+                  className="flex items-center gap-3 p-3 bg-[var(--surface-muted)] rounded-[var(--radius-sm)] border border-[var(--border)]"
                 >
                   <GripVertical className="size-4 text-[var(--text-tertiary)] cursor-grab" />
                   <div className="flex-1 min-w-0">
@@ -552,7 +552,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
             </div>
           )}
 
-          <div className="p-3 border rounded-lg space-y-3 bg-[var(--surface)]">
+          <div className="p-3 border rounded-[var(--radius-sm)] space-y-3 bg-[var(--surface)]">
             <p className="text-xs font-medium text-[var(--text-secondary)] tracking-wide">Add variant</p>
             <div className="grid grid-cols-2 gap-2">
               <Input
@@ -610,7 +610,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
               {personalizationOptions.map((p, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-3 bg-[var(--surface-muted)] rounded-lg border border-[var(--border)]"
+                  className="flex items-center gap-3 p-3 bg-[var(--surface-muted)] rounded-[var(--radius-sm)] border border-[var(--border)]"
                 >
                   <div className="size-8 rounded-full bg-[var(--well-warning)] flex items-center justify-center shrink-0">
                     <Sparkles className="size-4 text-[var(--warning)]" />
@@ -636,7 +636,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
             </div>
           )}
 
-          <div className="p-3 border rounded-lg space-y-3 bg-[var(--surface)]">
+          <div className="p-3 border rounded-[var(--radius-sm)] space-y-3 bg-[var(--surface)]">
             <p className="text-xs font-medium text-[var(--text-secondary)] tracking-wide">Add option</p>
             <Input
               placeholder="Option name (e.g. Name engraving)"
@@ -704,7 +704,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
               {addons.map((a, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-3 bg-[var(--surface-muted)] rounded-lg border border-[var(--border)]"
+                  className="flex items-center gap-3 p-3 bg-[var(--surface-muted)] rounded-[var(--radius-sm)] border border-[var(--border)]"
                 >
                   <div className="size-8 rounded-full bg-[var(--well-success)] flex items-center justify-center shrink-0">
                     <ShoppingBag className="size-4 text-[var(--success)]" />
@@ -728,7 +728,7 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
             </div>
           )}
 
-          <div className="p-3 border rounded-lg space-y-3 bg-[var(--surface)]">
+          <div className="p-3 border rounded-[var(--radius-sm)] space-y-3 bg-[var(--surface)]">
             <p className="text-xs font-medium text-[var(--text-secondary)] tracking-wide">Add addon</p>
             <div className="grid grid-cols-2 gap-2">
               <Input

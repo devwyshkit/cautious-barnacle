@@ -237,7 +237,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                                 <RadioGroupItem value={type.value} id={`type-${type.value}`} className="peer sr-only" />
                                 <Label
                                     htmlFor={`type-${type.value}`}
-                                    className="flex flex-col items-center justify-between rounded-xl border-2 border-[var(--border)] bg-[var(--surface)] p-3 hover:bg-[var(--surface-muted)] cursor-pointer transition-all peer-data-[state=checked]:border-[var(--text-primary)] peer-data-[state=checked]:[&_svg]:text-[var(--text-primary)]"
+                                    className="flex flex-col items-center justify-between rounded-[var(--radius-md)] border-2 border-[var(--border)] bg-[var(--surface)] p-3 hover:bg-[var(--surface-muted)] cursor-pointer transition-all peer-data-[state=checked]:border-[var(--text-primary)] peer-data-[state=checked]:[&_svg]:text-[var(--text-primary)]"
                                 >
                                     <type.icon className="mb-2 size-5 text-[var(--text-tertiary)]" />
                                     <span className="text-xs font-bold tracking-tight">{type.label}</span>
@@ -344,7 +344,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 <Button
                     type="button"
                     variant="outline"
-                    className="flex-1 rounded-xl h-12 font-bold border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+                    className="flex-1 rounded-[var(--radius-md)] h-12 font-bold border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
                     onClick={onCancel}
                     disabled={isSubmitting}
                 >
@@ -352,7 +352,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 </Button>
                 <Button
                     type="submit"
-                    className="flex-[2] rounded-xl h-12 font-bold bg-[var(--text-primary)] text-[var(--text-inverse)] hover:bg-[var(--text-primary)]"
+                    className="flex-[2] rounded-[var(--radius-md)] h-12 font-bold bg-[var(--text-primary)] text-[var(--text-inverse)] hover:bg-[var(--text-primary)]"
                     disabled={
                         isSubmitting ||
                         (entryMode === 'search' ? !placeData : false) ||

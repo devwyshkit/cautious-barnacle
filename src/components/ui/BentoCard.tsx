@@ -19,7 +19,7 @@ export function BentoCard({ data, variant = 'small', priority = false }: BentoCa
         <Link
             href={data.href || `/vendor/${data.id || data.vendor_id}`}
             className={cn(
-                "relative overflow-hidden rounded-2xl group active:scale-[0.98] transition-all duration-300",
+                "relative overflow-hidden rounded-[var(--radius-lg)] group active:scale-[0.98] transition-all duration-300",
                 isLarge ? "col-span-2 aspect-[16/9]" : "aspect-square"
             )}
         >

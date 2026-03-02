@@ -115,7 +115,7 @@ export function CategoryList({ categories }: CategoryListProps) {
         </Dialog>
       </div>
 
-      <div className="border rounded-lg divide-y">
+      <div className="border rounded-[var(--radius-sm)] divide-y">
         {categories.length === 0 ? (
           <p className="p-8 text-center text-[var(--text-secondary)]">No categories yet</p>
         ) : (

@@ -41,7 +41,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
 
     return (
         <>
-            <section className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+            <section className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] overflow-hidden">
                 <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
                     <h3 className="text-xs font-bold text-[var(--text-primary)] tracking-tight">Order Contents</h3>
                     <span className="text-xs font-bold text-[var(--text-tertiary)] tabular-nums">#{order.order_number}</span>
@@ -56,7 +56,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                 }}
                                 className="w-full p-4 flex gap-4 text-left hover:bg-[var(--surface-muted)] active:scale-[0.99] transition-all outline-none relative z-10"
                             >
-                                <div className="size-16 bg-[var(--surface-muted)] rounded-xl relative overflow-hidden border border-[var(--border)] shrink-0">
+                                <div className="size-16 bg-[var(--surface-muted)] rounded-[var(--radius-md)] relative overflow-hidden border border-[var(--border)] shrink-0">
                                     {product.product_image_url ? (
                                         <Image
                                             src={product.product_image_url}
@@ -159,9 +159,9 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                 <div className="space-y-6">
                                     <div className="flex flex-col gap-2">
                                         <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight px-1">Tracking Status</span>
-                                        <div className="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl flex items-center justify-between">
+                                        <div className="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                                                <div className="size-10 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center border border-[var(--border)]">
+                                                <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center border border-[var(--border)]">
                                                     <Package className="size-5 text-[var(--text-tertiary)]" />
                                                 </div>
                                                 <div>
@@ -181,7 +181,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                                     itemName={selectedPreviewProduct.product_name}
                                                 />
                                             ) : (
-                                                <div className="p-8 text-center bg-[var(--surface-muted)] rounded-xl border border-[var(--border)]">
+                                                <div className="p-8 text-center bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)]">
                                                     <Sparkles className="size-8 text-[var(--border)] mx-auto mb-3" />
                                                     <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">Awaiting Personalisation Brief</p>
                                                 </div>

@@ -164,7 +164,7 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
             disabled={usingGeolocation}
             className="w-full flex items-center gap-4 p-4 rounded-[var(--radius-xl)] border border-[var(--border)] hover:bg-[var(--surface-muted)] hover:border-[var(--border)] transition-all text-left group shadow-[var(--shadow-sm)]"
           >
-            <div className="size-10 rounded-xl bg-[var(--primary)]/5 flex items-center justify-center shrink-0 border border-[var(--primary)]/10 group-hover:bg-[var(--primary)]/10 transition-colors">
+            <div className="size-10 rounded-[var(--radius-md)] bg-[var(--primary)]/5 flex items-center justify-center shrink-0 border border-[var(--primary)]/10 group-hover:bg-[var(--primary)]/10 transition-colors">
               {usingGeolocation ? <Loader2 className="size-4 animate-spin text-[var(--primary)]" /> : <Locate className="size-4 text-[var(--primary)]" />}
             </div>
             <div className="flex flex-col">

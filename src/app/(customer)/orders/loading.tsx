@@ -10,7 +10,7 @@ export default function OrdersLoading() {
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-xl" />
+            <Skeleton key={i} className="h-32 w-full rounded-[var(--radius-md)]" />
           ))}
         </div>
       </div>
