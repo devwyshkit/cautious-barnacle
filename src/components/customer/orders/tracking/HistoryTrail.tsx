@@ -4,6 +4,7 @@ import React from 'react';
 import { FileText, Sparkles, RefreshCw, CheckCircle2, MapPin, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { getOrderStatusColor, getOrderStatusDisplay } from '@/lib/types/order-status';
 
 interface HistoryEvent {
     id: string;
@@ -55,11 +56,11 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <h4 className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">Layer 1: The Briefing</h4>
-                                <span className="text-[var(--text-tiny)] font-bold text-[var(--text-tertiary)] tabular-nums">
+                                <span className="text-[var(--text-xxs)] font-bold text-[var(--text-tertiary)] tabular-nums">
                                     {product.details_submitted_at ? format(new Date(product.details_submitted_at), 'h:mm a') : 'Pending'}
                                 </span>
                             </div>
-                            <div className="bg-[var(--surface)] p-4 rounded-xl border border-[var(--border)] shadow-sm space-y-3">
+                            <div className="bg-[var(--surface)] p-4 rounded-[var(--radius-xl)] border border-[var(--border)] shadow-[var(--shadow-sm)] space-y-3">
                                 <div className="flex items-center gap-2">
                                     <FileText className="size-3.5 text-[var(--text-tertiary)]" />
                                     <p className="text-xs font-bold text-[var(--text-primary)]">{product.product_name}</p>
@@ -68,7 +69,7 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                                     <p className="text-xs text-[var(--text-secondary)] italic leading-relaxed">&quot;{product.personalization_details.text}&quot;</p>
                                 )}
                                 {product.personalization_details?.image_url && (
-                                    <div className="aspect-video rounded-xl overflow-hidden border border-[var(--border)]">
+                                    <div className="aspect-video rounded-[var(--radius-lg)] overflow-hidden border border-[var(--border)]">
                                         <img src={product.personalization_details.image_url} alt="Brief Reference" className="size-full object-cover" />
                                     </div>
                                 )}
@@ -89,29 +90,35 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                                 <h4 className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">
                                     {idx === 0 ? 'Latest Preview' : `Iteration ${previews.length - idx}`}
                                 </h4>
-                                <span className="text-[var(--text-tiny)] font-bold text-[var(--text-tertiary)] tabular-nums">
+                                <span className="text-[var(--text-xxs)] font-bold text-[var(--text-tertiary)] tabular-nums">
                                     {format(new Date(preview.submitted_at), 'h:mm a')}
                                 </span>
                             </div>
 
-                            <div className="bg-[var(--surface)] p-1 rounded-[var(--radius-xl)] border border-[var(--border)] shadow-[var(--shadow-md)] overflow-hidden group">
-                                <div className="aspect-[4/3] relative rounded-[var(--radius-3xl)] overflow-hidden bg-[var(--surface-muted)]">
+                            <div className="bg-[var(--surface)] p-1 rounded-[var(--radius-xl)] border border-[var(--border)] shadow-[var(--shadow-sm)] overflow-hidden group">
+                                <div className="aspect-[4/3] relative rounded-[var(--radius-xl)] overflow-hidden bg-[var(--surface-muted)]">
                                     <img src={preview.preview_url} alt="Design Preview" className="size-full object-cover" />
 
                                     {preview.status === 'approved' && (
                                         <div className="absolute inset-0 bg-[var(--success)]/10 flex items-center justify-center backdrop-blur-[2px]">
-                                            <div className="bg-[var(--surface)]/90 px-4 py-2 rounded-xl shadow-sm flex items-center gap-2">
-                                                <CheckCircle2 className="size-4 text-[var(--success)]" />
-                                                <span className="text-xs font-bold text-[var(--success)] tracking-tight">Approved</span>
+                                            <div className={cn(
+                                                "px-4 py-2 rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] flex items-center gap-2",
+                                                getOrderStatusColor('approved')
+                                            )}>
+                                                <CheckCircle2 className="size-4" />
+                                                <span className="text-xs font-bold tracking-tight">Approved</span>
                                             </div>
                                         </div>
                                     )}
 
                                     {preview.status === 'change_requested' && (
                                         <div className="absolute inset-0 bg-[var(--warning)]/10 flex items-center justify-center backdrop-blur-[2px]">
-                                            <div className="bg-[var(--surface)]/90 px-4 py-2 rounded-xl shadow-sm flex items-center gap-2">
-                                                <RefreshCw className="size-4 text-[var(--warning)]" />
-                                                <span className="text-xs font-bold text-[var(--warning)] tracking-tight">Revision Requested</span>
+                                            <div className={cn(
+                                                "px-4 py-2 rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)] flex items-center gap-2",
+                                                getOrderStatusColor('change_requested')
+                                            )}>
+                                                <RefreshCw className="size-4" />
+                                                <span className="text-xs font-bold tracking-tight">Revision Requested</span>
                                             </div>
                                         </div>
                                     )}
@@ -122,7 +129,7 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                                         <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-1.5 flex items-center gap-1.5">
                                             <Sparkles className="size-3" /> Vendor Notes
                                         </p>
-                                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed bg-[var(--well-warning)] p-3 rounded-xl border border-[var(--warning)]/20">
+                                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed bg-[var(--well-warning)] p-3 rounded-[var(--radius-lg)] border border-[var(--warning)]/20">
                                             {preview.vendor_notes}
                                         </p>
                                     </div>

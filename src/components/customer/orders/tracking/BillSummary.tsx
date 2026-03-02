@@ -52,7 +52,7 @@ export function BillSummary({ order }: BillSummaryProps) {
     };
 
     return (
-        <div className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+        <div className="bg-[var(--surface)] rounded-[var(--radius-xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
             <button
                 onClick={() => {
                     setIsExpanded(!isExpanded);
@@ -65,8 +65,8 @@ export function BillSummary({ order }: BillSummaryProps) {
             >
                 <div className="flex items-center gap-3">
                     <div className={cn(
-                        "size-10 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shadow-sm transition-transform duration-500",
-                        isExpanded && "rotate-6 scale-110"
+                        "size-10 rounded-[var(--radius-lg)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shadow-[var(--shadow-sm)] transition-transform duration-500",
+                        isExpanded && "rotate-6 scale-110 shadow-[var(--shadow-md)]"
                     )}>
                         <FileText className="size-5 text-[var(--text-primary)]" />
                     </div>
@@ -136,7 +136,7 @@ export function BillSummary({ order }: BillSummaryProps) {
                             <Button
                                 onClick={handleDownloadInvoice}
                                 variant="outline"
-                                className="w-full h-10 rounded-xl gap-2 font-bold text-xs"
+                                className="w-full h-10 rounded-[var(--radius-lg)] gap-2 font-bold text-xs border-[var(--border)] hover:bg-[var(--surface-muted)]"
                             >
                                 <Download className="size-3.5" />
                                 Download Tax Invoice

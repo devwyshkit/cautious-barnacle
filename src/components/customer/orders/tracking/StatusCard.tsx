@@ -105,14 +105,14 @@ export function StatusCard({ order }: StatusCardProps) {
 
     return (
         <section className={cn(
-            "rounded-xl border p-6 shadow-sm overflow-hidden relative transition-all duration-500",
-            isBreached ? "bg-rose-50/50 border-rose-100 shadow-rose-100/50" : "bg-[var(--surface)] border-[var(--border)]"
+            "rounded-[var(--radius-xl)] border p-6 shadow-[var(--shadow-sm)] overflow-hidden relative transition-all duration-500",
+            isBreached ? "bg-[var(--well-destructive)] border-[var(--destructive)]/20 shadow-[var(--shadow-glow-destructive)]" : "bg-[var(--surface)] border-[var(--border)]"
         )}>
             {/* WYSHKIT 2026: Live Pulse Header */}
             {deadline && (
                 <div className={cn(
-                    "absolute top-0 right-0 px-4 py-2 flex items-center gap-2 rounded-bl-2xl",
-                    isBreached ? "bg-rose-600" : "bg-[var(--foreground)]"
+                    "absolute top-0 right-0 px-4 py-2 flex items-center gap-2 rounded-bl-[var(--radius-xl)]",
+                    isBreached ? "bg-[var(--destructive)]" : "bg-[var(--foreground)]"
                 )}>
                     <div className="relative flex size-2 items-center justify-center">
                         <span className={cn("absolute inline-flex h-full w-full animate-ping rounded-full opacity-75", isBreached ? "bg-[var(--surface)]" : "bg-[var(--success)]/70")}></span>
@@ -126,8 +126,8 @@ export function StatusCard({ order }: StatusCardProps) {
 
             <div className="flex items-start gap-4">
                 <div className={cn(
-                    "size-14 rounded-xl flex items-center justify-center shrink-0 relative transition-all duration-500",
-                    isBreached ? "bg-rose-100 text-rose-600" : (
+                    "size-14 rounded-[var(--radius-xl)] flex items-center justify-center shrink-0 relative transition-all duration-500",
+                    isBreached ? "bg-[var(--well-destructive)] text-[var(--destructive)]" : (
                         order.status === ORDER_STATUS.DELIVERED ? "bg-[var(--well-success)] text-[var(--success)]" : "bg-[var(--surface-muted)] text-[var(--text-secondary)]"
                     ),
                 )}>
@@ -142,7 +142,7 @@ export function StatusCard({ order }: StatusCardProps) {
                     <div className="flex items-center gap-2">
                         <h2 className={cn(
                             "text-lg font-bold tracking-tight leading-tight",
-                            isBreached ? "text-rose-700" : "text-[var(--text-primary)]"
+                            isBreached ? "text-[var(--destructive)]" : "text-[var(--text-primary)]"
                         )}>
                             {isBreached ? 'Vendor is Running Late' : getStatusText(order.status || '')}
                         </h2>
@@ -175,7 +175,7 @@ export function StatusCard({ order }: StatusCardProps) {
                     ) : (
                         <div className="space-y-1.5 mt-1">
                             {isBreached ? (
-                                <p className="text-xs font-bold text-rose-600 leading-tight">
+                                <p className="text-xs font-bold text-[var(--destructive)] leading-tight">
                                     Our vendor missed their deadline. Our support team is intervening.
                                 </p>
                             ) : (
@@ -189,7 +189,7 @@ export function StatusCard({ order }: StatusCardProps) {
                                     <HyperlocalTimer
                                         deadline={deadline}
                                         variant="minimal"
-                                        className={cn("text-xs font-bold", isBreached ? "text-rose-500" : "text-[var(--text-secondary)]")}
+                                        className={cn("text-xs font-bold", isBreached ? "text-[var(--destructive)]/80" : "text-[var(--text-secondary)]")}
                                     />
                                 </div>
                             )}
@@ -199,18 +199,21 @@ export function StatusCard({ order }: StatusCardProps) {
             </div>
 
             {isBreached && (
-                <div className="mt-4 p-4 bg-[var(--surface)] rounded-xl border border-rose-100 shadow-sm animate-in slide-in-from-bottom-2 duration-500">
-                    <p className="text-xs font-bold text-rose-600 tracking-tight mb-3">Escalation Options</p>
+                <div className="mt-4 p-4 bg-[var(--surface)] rounded-[var(--radius-xl)] border border-[var(--destructive)]/10 shadow-[var(--shadow-sm)] animate-in slide-in-from-bottom-2 duration-500">
+                    <p className="text-xs font-bold text-[var(--destructive)] tracking-tight mb-3">Escalation Options</p>
                     <div className="flex gap-2">
                         <button
                             onClick={() => window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`}
-                            className="flex-1 py-3 bg-rose-600 text-white rounded-xl text-xs font-bold tracking-tight active:scale-95 transition-all"
+                            className="flex-1 py-3 bg-[var(--destructive)] text-white rounded-[var(--radius-xl)] text-xs font-bold tracking-tight active:scale-95 transition-all shadow-[var(--shadow-glow-destructive)]"
                         >
                             Priority Call
                         </button>
                         <button
-                            onClick={() => toast.info("Requesting automated refund status...")}
-                            className="flex-1 py-3 bg-[var(--surface-muted)] border border-rose-100 text-rose-600 rounded-xl text-xs font-bold tracking-tight active:scale-95 transition-all"
+                            onClick={() => {
+                                triggerHaptic(HapticPattern.ACTION);
+                                toast.info("Requesting automated refund status...");
+                            }}
+                            className="flex-1 py-3 bg-[var(--surface-muted)] border border-[var(--destructive)]/10 text-[var(--destructive)] rounded-[var(--radius-xl)] text-xs font-bold tracking-tight active:scale-95 transition-all"
                         >
                             Instant Refund
                         </button>
