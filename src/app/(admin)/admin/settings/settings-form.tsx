@@ -148,7 +148,7 @@ export function SettingsForm({ settings }: SettingsFormProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Maintenance mode</p>
-              <p className="text-sm text-zinc-500">Disable customer-facing features temporarily</p>
+              <p className="text-sm text-[var(--text-secondary)]">Disable customer-facing features temporarily</p>
             </div>
             <Switch
               checked={form.maintenance_mode}

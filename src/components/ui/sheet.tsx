@@ -36,7 +36,7 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/60 backdrop-blur-[8px]",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-[var(--foreground)]/50 backdrop-blur-md",
         className
       )}
       {...props}
@@ -60,7 +60,7 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 overflow-hidden",
+          "bg-[var(--surface)] data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col shadow-[var(--shadow-xl)] transition ease-in-out data-[state=closed]:duration-200 data-[state=open]:duration-300 overflow-hidden",
           side === "right" &&
           "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
           side === "left" &&
@@ -68,33 +68,38 @@ function SheetContent({
           side === "top" &&
           "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
           side === "bottom" &&
-          "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto max-h-[96vh] border-t rounded-t-[32px] sm:left-1/2 sm:right-auto sm:w-full sm:max-w-[500px] sm:-translate-x-1/2 sm:border-x flex flex-col scrollbar-none pb-safe",
+          "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto max-h-[96vh] border-t rounded-t-[var(--radius-3xl)] sm:left-1/2 sm:right-auto sm:w-full sm:max-w-[500px] sm:-translate-x-1/2 sm:border-x flex flex-col scrollbar-none sm:pb-0",
           className
         )}
         {...props}
       >
-        {children}
-        {!hideClose && (
-          <SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none z-30">
-            <XIcon className="size-4" />
-            <span className="sr-only">Close</span>
-          </SheetPrimitive.Close>
-        )}
+        {/* WYSHKIT 2026: Elite Clean UI. "Bottom Cross" purged. Dismiss via drag/overlay. */}
       </SheetPrimitive.Content>
     </SheetPortal>
   );
 }
 
-function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
+function SheetHeader({
+  className,
+  hideClose = false,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & { hideClose?: boolean }) {
   return (
     <div
       data-slot="sheet-header"
       className={cn(
-        "flex flex-col gap-1.5 p-6 border-b border-zinc-100 sticky top-0 bg-white/95 backdrop-blur-xl z-20 rounded-t-[32px]",
+        "flex flex-col gap-[var(--space-2)] p-[var(--space-6)] border-b border-[var(--border)] sticky top-0 bg-[var(--surface-glass)] backdrop-blur-xl z-20 rounded-t-[var(--radius-3xl)]",
         className
       )}
       {...props}
-    />
+    >
+      {!hideClose && (
+        <SheetPrimitive.Close className="absolute right-6 top-6 rounded-sm opacity-70 ring-offset-[var(--surface)] transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-[var(--surface-muted)] hidden sm:flex">
+          <XIcon className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </SheetPrimitive.Close>
+      )}
+    </div>
   )
 }
 
@@ -102,7 +107,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-footer"
-      className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+      className={cn("mt-auto flex flex-col gap-2 px-4 pt-4 pb-[max(var(--space-6),env(safe-area-inset-bottom,0px))]", className)}
       {...props}
     />
   )
@@ -115,7 +120,7 @@ function SheetTitle({
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn("text-foreground font-semibold", className)}
+      className={cn("text-[var(--text-primary)] font-semibold", className)}
       {...props}
     />
   )
@@ -128,7 +133,7 @@ function SheetDescription({
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-[var(--text-secondary)] text-sm", className)}
       {...props}
     />
   )

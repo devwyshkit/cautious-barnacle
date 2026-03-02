@@ -46,12 +46,12 @@ export class CartErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl space-y-3">
+        <div className="p-4 bg-[var(--well-warning)] border border-[var(--warning)]/20 rounded-xl space-y-3">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="size-4 text-amber-600" />
-            <span className="text-sm font-semibold text-amber-900">Cart Error</span>
+            <ShoppingBag className="size-4 text-[var(--warning)]" />
+            <span className="text-sm font-semibold text-[var(--text-primary)]">Cart Error</span>
           </div>
-          <p className="text-xs text-amber-700">
+          <p className="text-xs text-[var(--text-secondary)]">
             There was an issue updating your cart. Please refresh the page.
           </p>
           <Button

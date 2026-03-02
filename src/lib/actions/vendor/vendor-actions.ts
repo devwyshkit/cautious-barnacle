@@ -91,8 +91,8 @@ export async function get_vendor_orders(
 export async function get_vendor_stats(vendor_id: string): Promise<{ data?: VendorStats; error?: string }> {
   try {
     const supabase = await createClient();
+    const today = new Date().toISOString().split('T')[0];
 
-    // get_vendor_dashboard_stats was dropped — query directly
     const { data, error } = await supabase
       .from('orders')
       .select('total, status, created_at')
@@ -100,10 +100,52 @@ export async function get_vendor_stats(vendor_id: string): Promise<{ data?: Vend
 
     if (error) throw error;
 
-    return { data: data as unknown as VendorStats };
+    const orders = data || [];
+    const today_orders_list = orders.filter(o => o.created_at?.startsWith(today));
+    const pending = orders.filter(o => ['PLACED', 'CONFIRMED', 'IN_PRODUCTION'].includes(o.status as string));
+
+    const stats: VendorStats = {
+      today_orders: today_orders_list.length,
+      today_revenue: today_orders_list.reduce((s, o) => s + Number(o.total || 0), 0),
+      pending_orders: pending.length,
+      avg_rating: null, // Zero Shadow Math: Ratings computed by DB trigger
+      low_stock_count: 0,
+      total_earnings: orders.filter(o => o.status === 'DELIVERED').reduce((s, o) => s + Number(o.total || 0), 0),
+      pending_settlement: pending.reduce((s, o) => s + Number(o.total || 0), 0),
+    };
+
+    return { data: stats };
   } catch (error) {
     logError(error, 'get_vendor_stats');
     return { error: 'Failed to fetch stats' };
+  }
+}
+
+export async function get_vendor_surface(vendor_id: string): Promise<{
+  data?: {
+    stats: VendorStats;
+    pending_orders: VendorOrder[];
+  };
+  error?: string;
+}> {
+  try {
+    const [statsResult, ordersResult] = await Promise.all([
+      get_vendor_stats(vendor_id),
+      get_vendor_orders(vendor_id, ['PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED'])
+    ]);
+
+    if (statsResult.error || !statsResult.data) throw new Error(statsResult.error || 'Stats failure');
+    if (ordersResult.error || !ordersResult.data) throw new Error(ordersResult.error || 'Orders failure');
+
+    return {
+      data: {
+        stats: statsResult.data,
+        pending_orders: ordersResult.data
+      }
+    };
+  } catch (error) {
+    logError(error, `get_vendor_surface:${vendor_id}`);
+    return { error: 'Failed to fetch dashboard' };
   }
 }
 
@@ -348,7 +390,7 @@ export async function toggle_product_active_status(
 
     if (error) throw error;
     const { revalidatePath } = await import('next/cache');
-    revalidatePath('/vendor/catalog');
+    revalidatePath('/vendor/products');
     revalidatePath('/');
     return { success: true };
   } catch (error) {
@@ -377,7 +419,7 @@ export async function update_variant_stock(
 
     if (error) throw error;
     const { revalidatePath } = await import('next/cache');
-    revalidatePath('/vendor/catalog');
+    revalidatePath('/vendor/products');
     revalidatePath('/');
 
     return { success: true };

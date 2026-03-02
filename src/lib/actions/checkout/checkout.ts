@@ -37,6 +37,7 @@ export interface CheckoutData {
     vendor_city?: string
     vendor_prep_mins?: number
     distance_km?: number | null
+    eta_minutes?: number | null
     error?: string
 }
 
@@ -106,6 +107,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         const addresses = (typedContext.addresses || []) as Address[];
         const pricing = typedContext.pricing as PricingBreakdown | null;
         const distanceKm = typedContext.distance_km ? Number(typedContext.distance_km) : null;
+        const etaMinutes = typedContext.eta_minutes ? Number(typedContext.eta_minutes) : null;
 
         if (products.length === 0) {
             return {
@@ -143,6 +145,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
             vendor_city: products[0]?.vendor_city || 'Bangalore',
             vendor_prep_mins: products[0]?.vendor_prep_mins || 30,
             distance_km: distanceKm,
+            eta_minutes: typedContext.eta_minutes ? Number(typedContext.eta_minutes) : null,
         }
 
     } catch (error) {

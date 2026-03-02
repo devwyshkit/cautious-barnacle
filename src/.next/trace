@@ -1,0 +1,5 @@
+[{"name":"hot-reloader","duration":28,"timestamp":393228941612,"id":3,"tags":{"version":"15.5.7"},"startTime":1772435235353,"traceId":"c9ac997e4b4d2e6c"},{"name":"compile-path","duration":1817817,"timestamp":393229397749,"id":4,"tags":{"trigger":"instrumentation Node.js"},"startTime":1772435235810,"traceId":"c9ac997e4b4d2e6c"}]
+[{"name":"compile-path","duration":30382,"timestamp":393231216449,"id":5,"tags":{"trigger":"instrumentation Edge"},"startTime":1772435237628,"traceId":"c9ac997e4b4d2e6c"}]
+[{"name":"compile-path","duration":397460,"timestamp":393231256265,"id":6,"tags":{"trigger":"middleware"},"startTime":1772435237668,"traceId":"c9ac997e4b4d2e6c"}]
+[{"name":"compile-path","duration":23379,"timestamp":393231742919,"id":7,"tags":{"trigger":"middleware"},"startTime":1772435238155,"traceId":"c9ac997e4b4d2e6c"}]
+[{"name":"next-dev","duration":19396585,"timestamp":393227529763,"id":1,"tags":{},"startTime":1772435233942,"traceId":"c9ac997e4b4d2e6c"}]

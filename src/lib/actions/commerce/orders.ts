@@ -65,7 +65,7 @@ export async function update_order_status(
     let target_status = status;
 
     // 2. Side Effect: Auto-Dispatch (Trigger on RIDER_ASSIGNED)
-    // Swiggy 2026: PACKED -> RIDER_ASSIGNED (via dispatch_order)
+    // WYSHKIT 2026: PACKED -> RIDER_ASSIGNED (via dispatch_order)
     if (status === 'RIDER_ASSIGNED' || status === 'PACKED') {
       // Note: dispatch_order logic will be moved to its own service or handled in the UI trigger.
       // For now, we keep the auto-transition logic in transition_order if possible.

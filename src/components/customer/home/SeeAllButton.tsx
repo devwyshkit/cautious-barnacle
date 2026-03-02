@@ -12,7 +12,7 @@ export function SeeAllButton() {
   return (
     <button 
       onClick={() => router.push('/search')}
-      className="size-10 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-900 hover:bg-zinc-100 transition-colors"
+      className="size-10 rounded-full bg-[var(--surface-muted)] border border-[var(--border)] flex items-center justify-center text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors"
     >
       <ChevronRight className="size-5" />
     </button>

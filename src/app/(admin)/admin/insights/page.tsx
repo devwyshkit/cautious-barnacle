@@ -100,11 +100,11 @@ function formatCurrency(amount: number) {
 }
 
 function getTrend(today: number, yesterday: number) {
-  if (yesterday === 0) return { icon: Minus, color: 'text-zinc-400', text: '-' }
+  if (yesterday === 0) return { icon: Minus, color: 'text-[var(--text-tertiary)]', text: '-' }
   const change = ((today - yesterday) / yesterday) * 100
-  if (change > 0) return { icon: TrendingUp, color: 'text-emerald-600', text: `+${change.toFixed(0)}%` }
+  if (change > 0) return { icon: TrendingUp, color: 'text-[var(--success)]', text: `+${change.toFixed(0)}%` }
   if (change < 0) return { icon: TrendingDown, color: 'text-red-600', text: `${change.toFixed(0)}%` }
-  return { icon: Minus, color: 'text-zinc-400', text: '0%' }
+  return { icon: Minus, color: 'text-[var(--text-tertiary)]', text: '0%' }
 }
 
 export default async function InsightsPage() {
@@ -114,13 +114,13 @@ export default async function InsightsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-zinc-900">Insights</h1>
+      <h1 className="text-lg font-semibold text-[var(--text-primary)]">Insights</h1>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">GMV today</CardTitle>
+            <CardTitle className="text-sm font-medium text-[var(--text-secondary)]">GMV today</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">{formatCurrency(insights.today.gmv)}</p>
@@ -133,7 +133,7 @@ export default async function InsightsPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Orders today</CardTitle>
+            <CardTitle className="text-sm font-medium text-[var(--text-secondary)]">Orders today</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">{insights.today.orders}</p>
@@ -146,21 +146,21 @@ export default async function InsightsPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">GMV this week</CardTitle>
+            <CardTitle className="text-sm font-medium text-[var(--text-secondary)]">GMV this week</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">{formatCurrency(insights.week.gmv)}</p>
-            <p className="text-xs text-zinc-500">{insights.week.orders} orders</p>
+            <p className="text-xs text-[var(--text-secondary)]">{insights.week.orders} orders</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">GMV this month</CardTitle>
+            <CardTitle className="text-sm font-medium text-[var(--text-secondary)]">GMV this month</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">{formatCurrency(insights.month.gmv)}</p>
-            <p className="text-xs text-zinc-500">{insights.month.orders} orders</p>
+            <p className="text-xs text-[var(--text-secondary)]">{insights.month.orders} orders</p>
           </CardContent>
         </Card>
       </div>
@@ -173,16 +173,16 @@ export default async function InsightsPage() {
           </CardHeader>
           <CardContent className="p-0">
             {insights.topVendors.length === 0 ? (
-              <p className="p-4 text-sm text-zinc-500">No data yet</p>
+              <p className="p-4 text-sm text-[var(--text-secondary)]">No data yet</p>
             ) : (
               <div className="divide-y">
                 {insights.topVendors.map((vendor, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-zinc-400 w-4">{i + 1}</span>
+                      <span className="text-xs text-[var(--text-tertiary)] w-4">{i + 1}</span>
                       <span className="text-sm font-medium">{vendor.name}</span>
                     </div>
-                    <span className="text-sm text-zinc-500">{vendor.count} orders</span>
+                    <span className="text-sm text-[var(--text-secondary)]">{vendor.count} orders</span>
                   </div>
                 ))}
               </div>
@@ -197,16 +197,16 @@ export default async function InsightsPage() {
           </CardHeader>
           <CardContent className="p-0">
             {insights.topProducts.length === 0 ? (
-              <p className="p-4 text-sm text-zinc-500">No data yet</p>
+              <p className="p-4 text-sm text-[var(--text-secondary)]">No data yet</p>
             ) : (
               <div className="divide-y">
                 {insights.topProducts.map((product, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-zinc-400 w-4">{i + 1}</span>
+                      <span className="text-xs text-[var(--text-tertiary)] w-4">{i + 1}</span>
                       <span className="text-sm font-medium truncate max-w-[150px]">{product.name}</span>
                     </div>
-                    <span className="text-sm text-zinc-500">{product.count} sold</span>
+                    <span className="text-sm text-[var(--text-secondary)]">{product.count} sold</span>
                   </div>
                 ))}
               </div>
@@ -221,7 +221,7 @@ export default async function InsightsPage() {
           </CardHeader>
           <CardContent className="p-0">
             {Object.keys(insights.statusDistribution).length === 0 ? (
-              <p className="p-4 text-sm text-zinc-500">No data yet</p>
+              <p className="p-4 text-sm text-[var(--text-secondary)]">No data yet</p>
             ) : (
               <div className="divide-y">
                 {Object.entries(insights.statusDistribution).map(([status, count]) => (

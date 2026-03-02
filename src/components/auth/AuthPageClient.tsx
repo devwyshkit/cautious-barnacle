@@ -126,22 +126,22 @@ export function AuthPageClient({
   };
 
   return (
-    <div className={cn("max-w-md mx-auto px-4", hideHeader ? "py-0" : "py-8")}>
+    <div className={cn("max-w-md mx-auto w-full", hideHeader ? "py-0" : "py-6 sm:py-8 px-4 sm:px-6")}>
       {!hideHeader && (
         <div className="flex items-center justify-between mb-6">
           {step === "otp" ? (
             <button
               onClick={() => setStep("phone")}
-              className="size-9 rounded-xl bg-zinc-100 flex items-center justify-center transition-colors hover:bg-zinc-200"
+              className="size-9 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center transition-colors hover:bg-[var(--border)]"
             >
-              <ChevronLeft className="size-5 text-zinc-600" />
+              <ChevronLeft className="size-5 text-[var(--text-secondary)]" />
             </button>
           ) : !hideBack ? (
             <button
               onClick={() => router.back()}
-              className="size-9 rounded-xl bg-zinc-100 flex items-center justify-center transition-colors hover:bg-zinc-200"
+              className="size-9 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center transition-colors hover:bg-[var(--input)]"
             >
-              <ChevronLeft className="size-5 text-zinc-600" />
+              <ChevronLeft className="size-5 text-[var(--text-secondary)]" />
             </button>
           ) : (
             <div className="size-9" />
@@ -154,10 +154,10 @@ export function AuthPageClient({
       )}
 
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-semibold text-zinc-900 tracking-tight">
+        <h2 className="text-2xl font-semibold text-[var(--text-primary)] tracking-tight">
           {step === "phone" ? title : "Verify OTP"}
         </h2>
-        <p className="text-[14px] text-zinc-500 mt-1.5">
+        <p className="text-sm text-[var(--text-secondary)] mt-1.5">
           {step === "phone" ? description : `Code sent to +91 ${phone}`}
         </p>
       </div>
@@ -174,14 +174,14 @@ export function AuthPageClient({
             onClick={handleSendOTP}
             disabled={loading || phone.length !== 10}
             className={cn(
-              "w-full h-14 rounded-xl font-semibold text-base transition-all shadow-none",
-              phone.length === 10 ? "bg-zinc-900 hover:bg-zinc-800 text-white" : "bg-zinc-100 text-zinc-400"
+              "w-full h-14 rounded-xl font-bold text-base transition-all shadow-none",
+              phone.length === 10 ? "bg-[var(--text-primary)] hover:opacity-90 active:scale-95 text-white" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)]"
             )}
           >
             {loading ? "Sending..." : "Continue"}
           </Button>
-          <p className="text-center text-[11px] text-zinc-400 px-8 leading-relaxed">
-            By continuing, you agree to our <span className="text-zinc-900 font-medium hover:underline cursor-pointer">Terms of Service</span> and <span className="text-zinc-900 font-medium hover:underline cursor-pointer">Privacy Policy</span>
+          <p className="text-center text-xs text-[var(--text-tertiary)] px-8 leading-relaxed">
+            By continuing, you agree to our <span className="text-[var(--text-primary)] font-medium hover:underline cursor-pointer">Terms of Service</span> and <span className="text-[var(--text-primary)] font-medium hover:underline cursor-pointer">Privacy Policy</span>
           </p>
         </div>
       ) : (
@@ -195,11 +195,11 @@ export function AuthPageClient({
             disabled={loading}
           />
           <div className="text-center">
-            <p className="text-[14px] text-zinc-500">
+            <p className="text-sm text-[var(--text-secondary)]">
               Didn&apos;t receive the code?
               <button
                 onClick={handleResendOTP}
-                className="text-zinc-900 ml-1.5 font-semibold hover:underline"
+                className="text-[var(--text-primary)] ml-1.5 font-semibold hover:underline"
                 disabled={loading}
               >
                 Resend OTP
@@ -212,7 +212,7 @@ export function AuthPageClient({
       {error && (
         <div className={cn(
           "mt-4 p-3 rounded-xl text-xs font-medium text-center animate-in fade-in slide-in-from-bottom-2",
-          isWarning ? "bg-amber-50 text-amber-600 border border-amber-100" : "bg-rose-50 text-rose-600 border border-rose-100"
+          isWarning ? "bg-[var(--well-warning)] text-[var(--well-warning-text)] border border-[var(--warning-border)]" : "bg-[var(--well-destructive)] text-[var(--well-destructive-text)] border border-[var(--destructive)]/20"
         )}>
           {error}
         </div>

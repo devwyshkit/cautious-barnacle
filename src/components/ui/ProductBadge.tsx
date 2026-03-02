@@ -22,11 +22,11 @@ export function Badge({ type, value, className }: BadgeProps) {
   }[type];
 
   const variants = {
-    rating: "bg-zinc-50 text-zinc-900 border border-zinc-100",
+    rating: "bg-[var(--surface-muted)] text-[var(--text-primary)] border border-[var(--border)]",
     discount: "bg-[var(--primary)] text-white",
-    fulfillment: "bg-zinc-900 text-white",
+    fulfillment: "bg-[var(--text-primary)] text-white",
     delivery: "bg-[var(--primary)]/10 text-[var(--primary)] border border-red-200",
-    status: "bg-zinc-100 text-zinc-600 border border-zinc-200",
+    status: "bg-[var(--surface-muted)] text-[var(--text-secondary)] border border-[var(--border)]",
   };
 
   return (

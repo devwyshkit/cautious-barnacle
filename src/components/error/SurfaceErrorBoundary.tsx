@@ -54,19 +54,19 @@ export class SurfaceErrorBoundary extends Component<Props & { router?: any }, St
             return (
                 <div className={cn("min-h-[400px] flex items-center justify-center p-8 text-center", this.props.className)}>
                     <div className="max-w-md w-full space-y-6">
-                        <div className="size-20 rounded-xl bg-red-50 flex items-center justify-center mx-auto border border-red-100 shadow-sm animate-in zoom-in duration-500">
-                            <AlertCircle className="size-10 text-red-500" />
+                        <div className="size-20 rounded-xl bg-[var(--well-destructive)] flex items-center justify-center mx-auto border border-[var(--destructive)]/10 shadow-sm animate-in zoom-in duration-500">
+                            <AlertCircle className="size-10 text-[var(--destructive)]" />
                         </div>
 
                         <div className="space-y-2">
-                            <h2 className="text-xl font-black text-zinc-900 tracking-tight">Something went wrong</h2>
-                            <p className="text-sm text-zinc-500 font-medium px-4">
+                            <h2 className="text-xl font-black text-[var(--text-primary)] tracking-tight">Something went wrong</h2>
+                            <p className="text-sm text-[var(--text-secondary)] font-medium px-4">
                                 We encountered a glitch on this page. Our team has been notified.
                             </p>
                             {process.env.NODE_ENV === 'development' && this.state.error && (
-                                <div className="mt-4 p-3 bg-zinc-50 rounded-xl text-left border border-zinc-100">
-                                    <p className="text-xs font-black tracking-tight text-zinc-400 mb-1">Developer Details</p>
-                                    <p className="text-[11px] text-red-600 font-mono break-all">{this.state.error.message}</p>
+                                <div className="mt-4 p-3 bg-[var(--surface-muted)] rounded-xl text-left border border-[var(--border)]">
+                                    <p className="text-xs font-black tracking-tight text-[var(--text-tertiary)] mb-1">Developer Details</p>
+                                    <p className="text-xs text-[var(--destructive)] font-mono break-all">{this.state.error.message}</p>
                                 </div>
                             )}
                         </div>
@@ -84,7 +84,7 @@ export class SurfaceErrorBoundary extends Component<Props & { router?: any }, St
                                 <Button
                                     onClick={() => window.location.href = '/'}
                                     variant="outline"
-                                    className="w-full h-14 rounded-xl font-black tracking-tight text-xs border-zinc-200"
+                                    className="w-full h-14 rounded-xl font-black tracking-tight text-xs border-[var(--border)]"
                                 >
                                     <Home className="size-4 mr-2" />
                                     Back to Home

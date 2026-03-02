@@ -1,27 +1,126 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 :root {
   --background: #FFFFFF;
-  --foreground: #101111;
-  --primary: #D91B24;
-  --radius: 0.5rem;
+  --foreground: #09090B;
+  /* [var(--text-primary)] equivalent for 2026 */
 
-  /* Swiggy 2026 Spacing Scale */
+  /* Brand Tokens */
+  --primary: #D91B24;
+  --primary-hover: #B7161D;
+  --primary-foreground: #FFFFFF;
+  --primary-muted: color-mix(in srgb, #D91B24 10%, white);
+  --primary-ring: color-mix(in srgb, #D91B24 20%, transparent);
+
+  --success: #16a34a;
+  --success-foreground: #f0fdf4;
+  --warning: #d97706;
+  --warning-foreground: #fffbeb;
+  --warning-border: color-mix(in srgb, var(--warning) 20%, transparent);
+  --destructive: #dc2626;
+  --destructive-foreground: #fef2f2;
+  --destructive-muted: color-mix(in srgb, var(--destructive) 8%, white);
+  --info: #2563eb;
+  --info-foreground: #eff6ff;
+
+  /* Surface Tokens */
+  --surface: #FFFFFF;
+  --surface-muted: #F8F8F8;
+  --surface-raised: #FFFFFF;
+  --surface-glass: rgba(255, 255, 255, 0.8);
+  --border: #F1F1F1;
+  --input: #F1F1F1;
+  --ring: #D91B24;
+
+  /* Text Tokens */
+  --text-primary: #09090B;
+  --text-secondary: #52525B;
+  --text-tertiary: #A1A1AA;
+  --text-inverse: #FFFFFF;
+
+  /* Extreme Density Mobile Typography (7px-10px) */
+  --text-tiny: 8px;
+  --text-xxs: 10px;
+
+  /* WYSHKIT 2026 Radius Scale - Elite Standard */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+  --radius: 12px;
+
+  /* Spacing Scale - Swiggy 2026 */
+  --space-0-5: 2px;
   --space-1: 4px;
+  --space-1-5: 6px;
   --space-2: 8px;
+  --space-2-5: 10px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
 
-  /* Surface Isolation */
-  --surface-border: #F1F1F1;
-  --surface-bg: #FFFFFF;
+  /* Swiggy 2026 Elite Elevation */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+  --shadow-brand: 0 4px 12px color-mix(in srgb, var(--primary) 20%, transparent);
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+
+  /* Swiggy 2026: Glow Tokens (Replacing ad-hoc shadow math) */
+  --shadow-glow-primary: 0 0 12px 1px color-mix(in srgb, var(--primary) 15%, transparent);
+  --shadow-glow-destructive: 0 0 12px 1px color-mix(in srgb, var(--destructive) 15%, transparent);
+  --shadow-glow-success: 0 0 12px 1px color-mix(in srgb, var(--success) 15%, transparent);
+  --shadow-glow-warning: 0 0 12px 1px color-mix(in srgb, var(--warning) 15%, transparent);
+
+  /* Special Cosmetic Tokens */
+  --star-rating: #f59e0b;
+
+  /* Layout Tokens */
+  --top-header-height-mobile: 120px;
+  --top-header-height: 64px;
+  --bottom-nav-height: 56px;
+  --floating-cart-bottom: calc(var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom, 0px));
+
+  /* Swiggy 2026 Z-Index Architecture */
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-nav: 40;
+  --z-overlay: 50;
+  --z-modal: 100;
+  --z-toast: 150;
+
+  /* Semantic Status Wells (icon backgrounds for state indicators) */
+  --well-success: color-mix(in srgb, var(--success) 12%, white);
+  --well-success-text: var(--success);
+  --well-warning: color-mix(in srgb, var(--warning) 12%, white);
+  --well-warning-text: var(--warning);
+  --well-info: color-mix(in srgb, var(--info) 12%, white);
+  --well-info-text: var(--info);
+  --well-brand: var(--primary-muted);
+  --well-brand-text: var(--primary);
+  --well-neutral: var(--surface-muted);
+  --well-neutral-text: var(--text-secondary);
+  --well-destructive: color-mix(in srgb, var(--destructive) 12%, white);
+  --well-destructive-text: var(--destructive);
 }
 
-[data-slot="sheet-content"], [data-slot="drawer-content"] {
-  border-color: var(--surface-border) !important;
-}
 
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
@@ -30,28 +129,34 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
+[data-slot="sheet-content"],
+[data-slot="drawer-content"] {
+  border-color: var(--border) !important;
+  outline: none !important;
 }
 
-h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+/* Elite Focus Strategy */
+:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary-ring) !important;
 }
 
-h3 {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin-bottom: 0.375rem;
+/* Base typography - clean resets */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 p {
-  font-size: 0.875rem;
-  color: #3D4152;
+  color: var(--text-secondary);
 }

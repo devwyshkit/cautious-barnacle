@@ -15,7 +15,7 @@ interface CartSlotProps {
  * WYSHKIT 2026: Cart Slot Component
  * Displays cart summary with edit capabilities
  * 
- * Swiggy 2026 Pattern: Stateless & Seamless
+ * WYSHKIT 2026 Pattern: Stateless & Seamless
  * - Data injected via props
  * - Mutations via Server Actions + router.refresh()
  */
@@ -52,7 +52,7 @@ export function CartSlot({ initialHydratedProducts = [] }: CartSlotProps) {
   if (displayProducts.length === 0) {
     return (
       <div className="py-8 text-center">
-        <p className="text-sm text-zinc-400">Your cart is empty</p>
+        <p className="text-sm text-[var(--text-tertiary)]">Your cart is empty</p>
       </div>
     );
   }

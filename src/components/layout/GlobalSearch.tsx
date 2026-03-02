@@ -49,24 +49,24 @@ export function GlobalSearch() {
   const hasResults = results.products.length > 0 || results.vendors.length > 0;
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      <div className="p-4 border-b border-zinc-100 flex items-center gap-3">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
+      <div className="p-4 border-b border-[var(--border)] flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={goBack} className="size-9 rounded-lg shrink-0">
-          <ArrowLeft className="size-5 text-zinc-600" />
+          <ArrowLeft className="size-5 text-[var(--text-secondary)]" />
         </Button>
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--text-tertiary)]" />
           <Input
             ref={inputRef}
             type="text"
             placeholder="Search products, stores..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-9 h-10 bg-zinc-50 border-zinc-100 text-sm rounded-lg"
+            className="pl-9 h-10 bg-[var(--surface-muted)] border-[var(--border)] text-sm rounded-lg"
           />
           {query && (
             <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2">
-              <X className="size-4 text-zinc-400" />
+              <X className="size-4 text-[var(--text-tertiary)]" />
             </button>
           )}
         </div>
@@ -75,27 +75,27 @@ export function GlobalSearch() {
       <div className="flex-1 overflow-y-auto p-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="size-6 animate-spin text-zinc-400" />
+            <Loader2 className="size-6 animate-spin text-[var(--text-tertiary)]" />
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm font-medium text-zinc-500">Search failed. Please try again.</p>
+            <p className="text-sm font-medium text-[var(--text-secondary)]">Search failed. Please try again.</p>
           </div>
         ) : !query ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Search className="size-10 text-zinc-200 mb-4" />
-            <p className="text-sm font-semibold text-zinc-400">Search for products or stores</p>
+            <Search className="size-10 text-[var(--border)] mb-4" />
+            <p className="text-sm font-semibold text-[var(--text-tertiary)]">Search for products or stores</p>
           </div>
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <Search className="size-8 text-zinc-200 mb-3" />
-            <p className="text-sm font-medium text-zinc-500">No results for &quot;{query}&quot;</p>
+            <Search className="size-8 text-[var(--border)] mb-3" />
+            <p className="text-sm font-medium text-[var(--text-secondary)]">No results for &quot;{query}&quot;</p>
           </div>
         ) : (
           <div className="space-y-6">
             {results.vendors.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-zinc-400 mb-3">Stores</p>
+                <p className="text-xs font-medium text-[var(--text-tertiary)] mb-3">Stores</p>
                 <div className="space-y-2">
                   {results.vendors.map((vendor) => (
                     <div
@@ -113,7 +113,7 @@ export function GlobalSearch() {
 
             {results.products.length > 0 && (
               <div>
-                <p className="text-xs font-medium text-zinc-400 mb-3">Products</p>
+                <p className="text-xs font-medium text-[var(--text-tertiary)] mb-3">Products</p>
                 <div className="space-y-2">
                   {results.products.map((product) => (
                     <button
@@ -131,14 +131,14 @@ export function GlobalSearch() {
                           router.push(`/search?q=${encodeURIComponent(product.name || '')}&product=${product.id}`);
                         }
                       }}
-                      className="w-full flex items-center gap-3 p-3 bg-zinc-50 rounded-xl hover:bg-zinc-100 transition-colors text-left"
+                      className="w-full flex items-center gap-3 p-3 bg-[var(--surface-muted)] rounded-xl hover:bg-[var(--surface-muted)] transition-colors text-left"
                     >
-                      <div className="size-12 rounded-lg overflow-hidden shrink-0 bg-zinc-50 relative border border-zinc-100">
+                      <div className="size-12 rounded-lg overflow-hidden shrink-0 bg-[var(--surface-muted)] relative border border-[var(--border)]">
                         <Image src={(product as any).image_url || ((product as any).images?.[0]) || '/images/logo.png'} alt={product.name || 'Product'} fill className="object-cover" sizes="48px" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-zinc-900 truncate">{product.name}</p>
-                        <p className="text-xs text-zinc-500">{(product.vendor_name || 'Store')} · ₹{product.base_price}</p>
+                        <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{product.name}</p>
+                        <p className="text-xs text-[var(--text-secondary)]">{(product.vendor_name || 'Store')} · ₹{product.base_price}</p>
                       </div>
                     </button>
                   ))}

@@ -45,11 +45,11 @@ const STATUS_OPTIONS = [
 function getStatusBadge(status: string | null) {
   switch (status) {
     case 'SUBMITTED':
-      return <Badge variant="outline" className="text-amber-600 border-amber-200">Pending</Badge>
+      return <Badge variant="outline" className="text-[var(--warning)] border-[var(--warning)]/20">Pending</Badge>
     case 'ACTIVE':
-      return <Badge variant="outline" className="text-emerald-600 border-emerald-200">Active</Badge>
+      return <Badge variant="outline" className="text-[var(--success)] border-[var(--success)]/20">Active</Badge>
     case 'REJECTED':
-      return <Badge variant="outline" className="text-red-600 border-red-200">Rejected</Badge>
+      return <Badge variant="outline" className="text-[var(--destructive)] border-[var(--border)] bg-[var(--destructive-muted)]">Rejected</Badge>
     default:
       return <Badge variant="secondary">Unknown</Badge>
   }
@@ -116,7 +116,7 @@ export function VendorTable({ vendors, currentStatus, totalCount, currentPage, p
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--text-tertiary)]" />
           <Input
             placeholder="Search vendors..."
             value={search}
@@ -151,7 +151,7 @@ export function VendorTable({ vendors, currentStatus, totalCount, currentPage, p
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-zinc-500 py-8">
+                <TableCell colSpan={6} className="text-center text-[var(--text-secondary)] py-8">
                   No vendors found
                 </TableCell>
               </TableRow>
@@ -165,7 +165,7 @@ export function VendorTable({ vendors, currentStatus, totalCount, currentPage, p
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
                     <div className="text-sm">{vendor.email || '-'}</div>
-                    <div className="text-xs text-zinc-500">{vendor.whatsapp_number ?? (vendor.whatsapp_phoneNumber != null ? String(vendor.whatsapp_phoneNumber) : null) ?? '-'}</div>
+                    <div className="text-xs text-[var(--text-secondary)]">{vendor.whatsapp_number ?? (vendor.whatsapp_phoneNumber != null ? String(vendor.whatsapp_phoneNumber) : null) ?? '-'}</div>
                   </TableCell>
                   <TableCell>{getStatusBadge(vendor.kyc_status as any)}</TableCell>
                   <TableCell className="hidden lg:table-cell">{vendor.commission_percentage ?? 10}%</TableCell>
@@ -178,7 +178,7 @@ export function VendorTable({ vendors, currentStatus, totalCount, currentPage, p
                           variant="ghost"
                           onClick={() => handleApprove(vendor.id)}
                           disabled={loading === vendor.id}
-                          className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                          className="text-[var(--success)] hover:text-[var(--success)]/80 hover:bg-[var(--well-success)]"
                         >
                           <Check className="size-4" />
                         </Button>
@@ -187,7 +187,7 @@ export function VendorTable({ vendors, currentStatus, totalCount, currentPage, p
                           variant="ghost"
                           onClick={() => handleReject(vendor.id)}
                           disabled={loading === vendor.id}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-[var(--destructive)] hover:text-[var(--destructive)] hover:bg-[var(--destructive-muted)]"
                         >
                           <X className="size-4" />
                         </Button>
@@ -208,7 +208,7 @@ export function VendorTable({ vendors, currentStatus, totalCount, currentPage, p
 
       {totalCount > pageSize && (
         <div className="flex items-center justify-between px-2 py-4">
-          <div className="text-sm text-zinc-500">
+          <div className="text-sm text-[var(--text-secondary)]">
             Showing {Math.min((currentPage - 1) * pageSize + 1, totalCount)} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} vendors
           </div>
           <div className="flex items-center gap-2">

@@ -74,9 +74,9 @@ export function OTPInput({
                   key={index}
                   index={index}
                   className={cn(
-                    "size-12 rounded-lg bg-zinc-50 border-none font-semibold text-lg transition-all duration-200",
-                    value[index] && "ring-1 ring-zinc-200 bg-white",
-                    error && "ring-1 ring-red-500 bg-red-50"
+                    "size-12 rounded-lg bg-[var(--surface-muted)] border-none font-semibold text-lg transition-all duration-200",
+                    value[index] && "ring-1 ring-[var(--border)] bg-[var(--surface)]",
+                    error && "ring-1 ring-rose-500 bg-rose-50"
                   )}
                 />
               ))}
@@ -88,7 +88,7 @@ export function OTPInput({
             {error}
           </p>
         ) : (
-          <p className="text-xs text-center text-zinc-400 leading-relaxed font-medium">
+          <p className="text-xs text-center text-[var(--text-tertiary)] leading-relaxed font-medium">
             Enter the 6-digit code sent to your phone
           </p>
         )}
@@ -104,7 +104,7 @@ export function OTPInput({
             disabled={cooldown > 0 || disabled}
             className={cn(
               "text-xs font-semibold h-auto py-2 px-4 rounded-lg transition-all active:scale-95",
-              cooldown > 0 ? "text-zinc-400" : "text-zinc-900 hover:bg-zinc-100"
+              cooldown > 0 ? "text-[var(--text-tertiary)]" : "text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
             )}
           >
             {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend OTP"}

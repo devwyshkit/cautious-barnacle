@@ -52,7 +52,7 @@ export function SignOutButton({
       <button
         onClick={handleSignOut}
         disabled={isLoading}
-        className={cn("p-2 text-zinc-400 hover:text-rose-600 transition-colors", className)}
+        className={cn("p-2 text-[var(--text-tertiary)] hover:text-rose-600 transition-colors", className)}
       >
         <LogOut className="size-5" />
       </button>
@@ -66,13 +66,13 @@ export function SignOutButton({
       className={cn(
         "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group w-full",
         variant === 'sidebar'
-          ? "text-zinc-500 hover:bg-rose-50 hover:text-rose-600"
-          : "text-zinc-400 hover:text-zinc-900",
+          ? "text-[var(--text-secondary)] hover:bg-rose-50 hover:text-rose-600"
+          : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)]",
         isLoading && "opacity-50 cursor-not-allowed",
         className
       )}
     >
-      <LogOut className={cn("size-5 shrink-0", variant === 'sidebar' ? "text-zinc-400 group-hover:text-rose-500" : "")} />
+      <LogOut className={cn("size-5 shrink-0", variant === 'sidebar' ? "text-[var(--text-tertiary)] group-hover:text-rose-500" : "")} />
       {showLabel && <span className="text-sm font-bold tracking-tight">Sign Out</span>}
     </button>
   );

@@ -21,10 +21,10 @@ export function BannerBento({ data, title, subtitle, timeContext }: BannerBentoP
                     <Sparkles className="size-5 text-[var(--primary)]" />
                 </div>
                 <div>
-                    <h2 className="text-sm font-black text-zinc-900 tracking-tight uppercase">
+                    <h2 className="text-sm font-bold text-[var(--text-primary)] tracking-tight uppercase">
                         {title || 'Trending now'} {timeContext ? `· ${timeContext}` : ''}
                     </h2>
-                    <p className="text-[10px] font-bold text-zinc-500 tracking-widest uppercase">
+                    <p className="text-xs font-bold text-[var(--text-secondary)] tracking-widest uppercase">
                         {subtitle || 'Popular in your area'}
                     </p>
                 </div>

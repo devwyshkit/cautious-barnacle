@@ -43,7 +43,7 @@ interface AddressAutocompleteProps {
 }
 
 /**
- * WYSHKIT 2026: Google Places Autocomplete (Swiggy 2026 pattern)
+ * WYSHKIT 2026: Google Places Autocomplete (WYSHKIT 2026 pattern)
  * Pincode-first address search with structured output
  */
 export function AddressAutocomplete({
@@ -138,17 +138,17 @@ export function AddressAutocomplete({
   return (
     <div className={className}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--text-tertiary)]" />
         <Input
           ref={inputRef}
           type="text"
           placeholder={effectivePlaceholder}
-          className="pl-9 bg-zinc-50/50 border-zinc-200 focus:bg-white transition-all"
+          className="pl-9 bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)] transition-all"
           autoComplete="off"
         />
       </div>
       {!hasApiKey && (
-        <p className="text-xs text-zinc-400 mt-1">Or use &quot;Enter manually&quot; below</p>
+        <p className="text-xs text-[var(--text-tertiary)] mt-1">Or use &quot;Enter manually&quot; below</p>
       )}
     </div>
   );

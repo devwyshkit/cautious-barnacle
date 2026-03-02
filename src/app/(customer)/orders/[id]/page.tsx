@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { OrderTracker } from "@/components/customer/orders/OrderTracker";
@@ -8,7 +8,7 @@ import { SurfaceErrorBoundaryWithRouter as ErrorBoundary } from "@/components/er
  * WYSHKIT 2026: Order Details Page
  * Route: /orders/[id]
  * 
- * Swiggy 2026 Pattern: URL-addressable order details
+ * WYSHKIT 2026 Pattern: URL-addressable order details
  * - Shareable order links
  * - Browser back/forward works
  * - Intent-based navigation
@@ -18,10 +18,10 @@ export default async function OrderDetailsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const headerList = await headers();
+  const userId = headerList.get('x-wyshkit-user-id');
 
-  if (!user) {
+  if (!userId) {
     const { id } = await params;
     redirect(`/auth?intent=signin&returnUrl=/orders/${id}`);
   }
@@ -29,11 +29,11 @@ export default async function OrderDetailsPage({
   const { id } = await params;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[100dvh]">
       <ErrorBoundary surfaceName="Order Details">
         <Suspense fallback={
           <div className="flex items-center justify-center py-20">
-            <div className="text-sm text-zinc-500">Loading order...</div>
+            <div className="text-sm text-[var(--text-secondary)]">Loading order...</div>
           </div>
         }>
           <OrderTracker orderId={id} />

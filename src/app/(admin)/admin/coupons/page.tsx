@@ -16,7 +16,7 @@ export default async function CouponsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-zinc-900">Coupons</h1>
+      <h1 className="text-lg font-semibold text-[var(--text-primary)]">Coupons</h1>
       <CouponList coupons={coupons} />
     </div>
   )

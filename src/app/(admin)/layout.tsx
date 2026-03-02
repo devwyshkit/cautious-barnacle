@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { getAdminSession } from '@/lib/auth/admin'
 import { AdminShell } from '@/components/admin/layout/admin-shell'
 
@@ -9,11 +10,19 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
+  const headerList = await headers();
+  const pathname = headerList.get('x-url') || '';
+  const isLoginPage = pathname.includes('/login');
+
   const admin = await getAdminSession()
 
-  if (!admin) {
+  if (!admin && !isLoginPage) {
     redirect('/admin/login')
   }
 
-  return <AdminShell admin={admin}>{children}</AdminShell>
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
+  return <AdminShell admin={admin as any}>{children}</AdminShell>
 }

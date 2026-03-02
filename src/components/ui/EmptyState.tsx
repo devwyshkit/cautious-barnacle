@@ -42,11 +42,11 @@ export function EmptyState({
         {/* Elite Ambient Orbs */}
         <div className={cn(
           "absolute -inset-8 rounded-full blur-[40px] opacity-20 group-hover:opacity-40 transition-all duration-1000 animate-pulse-slow",
-          variant === 'premium' ? "bg-rose-500" : "bg-zinc-400"
+          variant === 'premium' ? "bg-[var(--primary)]" : "bg-[var(--text-tertiary)]"
         )} />
         <div className={cn(
           "absolute -inset-12 rounded-full blur-[60px] opacity-10 group-hover:opacity-20 transition-all duration-1000 animate-pulse-delayed",
-          variant === 'premium' ? "bg-orange-400" : "bg-zinc-300"
+          variant === 'premium' ? "bg-[var(--warning)]" : "bg-[var(--surface-muted)]"
         )} />
 
         {/* Glass Icon Container */}
@@ -55,8 +55,8 @@ export function EmptyState({
           "hover:scale-110 hover:-rotate-3 active:scale-95",
           "glass-morphism border-2",
           variant === 'premium'
-            ? "bg-gradient-to-br from-rose-500/90 to-orange-500/90 border-white/20 shadow-rose-500/20"
-            : "bg-white/40 backdrop-blur-3xl border-white/80 shadow-zinc-200/50"
+            ? "bg-gradient-to-br from-[var(--primary)] to-[var(--warning)] border-[var(--surface)]/20 shadow-[var(--primary)]/20"
+            : "bg-[var(--surface)]/40 backdrop-blur-3xl border-[var(--border)] shadow-[var(--shadow-sm)]/50"
         )}>
           {IconOrEmoji ? (
             isEmoji ? (
@@ -64,20 +64,20 @@ export function EmptyState({
             ) : (
               <IconOrEmoji className={cn(
                 "size-12 animate-float",
-                variant === 'premium' ? "text-white" : "text-zinc-900"
+                variant === 'premium' ? "text-white" : "text-[var(--text-primary)]"
               )} />
             )
           ) : (
             <ShoppingBag className={cn(
               "size-12 animate-float",
-              variant === 'premium' ? "text-white" : "text-zinc-900"
+              variant === 'premium' ? "text-white" : "text-[var(--text-primary)]"
             )} />
           )}
 
           <div className="absolute -top-3 -right-3">
             <div className="relative">
-              <div className="absolute inset-0 bg-white/40 rounded-full blur-xl animate-pulse" />
-              <Sparkles className="relative size-8 text-amber-400 drop-shadow-glow animate-sparkle" />
+              <div className="absolute inset-0 bg-[var(--surface)]/40 rounded-full blur-xl animate-pulse" />
+              <Sparkles className="relative size-8 text-[var(--star-rating)] drop-shadow-glow animate-sparkle" />
             </div>
           </div>
         </div>
@@ -85,12 +85,12 @@ export function EmptyState({
 
       <div className="max-w-[300px] space-y-4">
         <h3 className={cn(
-          "text-3xl font-black italic tracking-tighter leading-[0.9] decoration-amber-400/30 underline-offset-4",
-          variant === 'premium' ? "text-zinc-950" : "text-zinc-900 shadow-zinc-500/10 drop-shadow-sm"
+          "text-3xl font-bold italic tracking-tighter leading-[0.9] decoration-[var(--primary)]/30 underline-offset-4",
+          variant === 'premium' ? "text-[var(--text-primary)]" : "text-[var(--text-primary)] shadow-[var(--text-secondary)]/10 drop-shadow-sm"
         )}>
           {title}
         </h3>
-        <p className="text-[13px] font-bold text-zinc-500/80 leading-snug px-4 tracking-tight">
+        <p className="text-sm font-bold text-[var(--text-secondary)]/80 leading-snug px-4 tracking-tight">
           {description}
         </p>
       </div>
@@ -101,11 +101,11 @@ export function EmptyState({
         <Button
           onClick={onAction}
           className={cn(
-            "mt-12 rounded-2xl px-12 font-black tracking-tight h-16 shadow-xl active:scale-95 transition-all duration-500",
+            "mt-12 rounded-2xl px-12 font-bold tracking-tight h-16 shadow-xl active:scale-95 transition-all duration-500",
             "border-b-4",
             variant === 'premium'
-              ? "bg-[var(--primary)] hover:bg-[var(--primary)] border-rose-700 text-white shadow-rose-500/30"
-              : "bg-zinc-950 hover:bg-zinc-900 border-zinc-800 text-white shadow-zinc-900/20"
+              ? "bg-[var(--primary)] hover:bg-[var(--primary)]/90 border-rose-900 text-[var(--primary-foreground)] shadow-[var(--primary)]/30"
+              : "bg-[var(--foreground)] hover:bg-[var(--text-primary)] border-[var(--border)] text-[var(--primary-foreground)] shadow-[var(--shadow-lg)]"
           )}
         >
           {actionLabel}

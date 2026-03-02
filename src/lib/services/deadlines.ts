@@ -52,7 +52,7 @@ export async function enforce_acceptance_deadlines() {
                 }
             }
 
-            // Swiggy 2026: Use transition_order RPC for atomic cancellation
+            // WYSHKIT 2026: Use transition_order RPC for atomic cancellation
             await supabase.rpc('transition_order', {
                 p_order_id: order.id,
                 p_target_status: ORDER_STATUS.CANCELLED,

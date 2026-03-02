@@ -1,5 +1,5 @@
 import { getVendorFromSession } from '@/lib/auth/server';
-import { get_vendor_stats, get_vendor_orders } from "@/lib/actions/vendor/vendor-actions";
+import { get_vendor_surface } from "@/lib/actions/vendor/vendor-actions";
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import {
@@ -18,23 +18,26 @@ export default async function VendorDashboard() {
   const vendor = await getVendorFromSession();
   if (!vendor) redirect('/vendor/login');
 
-  const vendor_id = vendor.id; // Define vendor_id as per instruction's usage
+  const vendor_id = vendor.id;
 
-  const [statsResult, ordersResult] = await Promise.all([
-    get_vendor_stats(vendor_id),
-    get_vendor_orders(vendor_id, ['PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED'])
-  ]);
+  const result = await get_vendor_surface(vendor_id);
+  if (result.error || !result.data) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-[var(--destructive)]">Error loading dashboard: {result.error}</p>
+      </div>
+    );
+  }
 
-  const stats = statsResult.data;
-  const pendingOrders = ordersResult.data || [];
+  const { stats, pending_orders } = result.data;
 
   return (
     <div className="px-4 py-6 space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">
+        <h1 className="text-xl font-semibold text-[var(--text-primary)]">
           {vendor.name}
         </h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <p className="text-sm text-[var(--text-secondary)] mt-1">
           Today&apos;s overview
         </p>
       </div>
@@ -43,14 +46,14 @@ export default async function VendorDashboard() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                <Package className="size-5 text-blue-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-info)] flex items-center justify-center">
+                <Package className="size-5 text-[var(--well-info-text)]" />
               </div>
               <div>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-2xl font-semibold text-[var(--text-primary)]">
                   {stats?.today_orders || 0}
                 </p>
-                <p className="text-xs text-zinc-500">Orders today</p>
+                <p className="text-xs text-[var(--text-secondary)]">Orders today</p>
               </div>
             </div>
           </CardContent>
@@ -59,14 +62,14 @@ export default async function VendorDashboard() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                <IndianRupee className="size-5 text-emerald-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-success)] flex items-center justify-center">
+                <IndianRupee className="size-5 text-[var(--well-success-text)]" />
               </div>
               <div>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-2xl font-semibold text-[var(--text-primary)]">
                   ₹{(stats?.today_revenue || 0).toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-zinc-500">Revenue today</p>
+                <p className="text-xs text-[var(--text-secondary)]">Revenue today</p>
               </div>
             </div>
           </CardContent>
@@ -75,14 +78,14 @@ export default async function VendorDashboard() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                <Clock className="size-5 text-amber-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-warning)] flex items-center justify-center">
+                <Clock className="size-5 text-[var(--well-warning-text)]" />
               </div>
               <div>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-2xl font-semibold text-[var(--text-primary)]">
                   {stats?.pending_orders || 0}
                 </p>
-                <p className="text-xs text-zinc-500">Pending</p>
+                <p className="text-xs text-[var(--text-secondary)]">Pending</p>
               </div>
             </div>
           </CardContent>
@@ -91,14 +94,14 @@ export default async function VendorDashboard() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-purple-50 flex items-center justify-center">
-                <Star className="size-5 text-purple-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-neutral)] flex items-center justify-center">
+                <Star className="size-5 text-[var(--well-neutral-text)]" />
               </div>
               <div>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-2xl font-semibold text-[var(--text-primary)]">
                   {stats?.avg_rating?.toFixed(1) || '-'}
                 </p>
-                <p className="text-xs text-zinc-500">Rating</p>
+                <p className="text-xs text-[var(--text-secondary)]">Rating</p>
               </div>
             </div>
           </CardContent>
@@ -107,19 +110,19 @@ export default async function VendorDashboard() {
 
       {/* Financial Summary */}
       <div className="grid grid-cols-1 gap-3">
-        <Card className="bg-zinc-900 text-white border-zinc-800">
+        <Card className="bg-[var(--text-primary)] text-white border-[var(--text-secondary)]/20">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-bold tracking-tight text-zinc-500">Earnings Summary</CardTitle>
+            <CardTitle className="text-xs font-bold tracking-tight text-[var(--text-secondary)]">Earnings Summary</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-end justify-between">
               <div>
                 <p className="text-3xl font-bold tracking-tight">₹{(stats?.total_earnings || 0).toLocaleString('en-IN')}</p>
-                <p className="text-xs text-zinc-400 mt-1">Total Settled Earnings</p>
+                <p className="text-xs text-[var(--text-tertiary)] mt-1">Total Settled Earnings</p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-semibold text-emerald-400">₹{(stats?.pending_settlement || 0).toLocaleString('en-IN')}</p>
-                <p className="text-xs text-zinc-500 font-bold tracking-tight">Pending</p>
+                <p className="text-lg font-semibold text-[var(--success)]">₹{(stats?.pending_settlement || 0).toLocaleString('en-IN')}</p>
+                <p className="text-xs text-[var(--text-secondary)] font-bold tracking-tight">Pending</p>
               </div>
             </div>
           </CardContent>
@@ -128,20 +131,20 @@ export default async function VendorDashboard() {
 
       {/* Low Stock Alert */}
       {stats?.low_stock_count !== undefined && stats.low_stock_count > 0 && (
-        <Card className="border-amber-100 bg-amber-50/50">
+        <Card className="border-[var(--well-warning-border)] bg-[var(--well-warning)]/50">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-amber-100 flex items-center justify-center">
-                  <AlertCircle className="size-5 text-amber-600" />
+                <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-warning)] flex items-center justify-center">
+                  <AlertCircle className="size-5 text-[var(--well-warning-text)]" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-amber-900">{stats.low_stock_count} Products Low on Stock</p>
-                  <p className="text-xs text-amber-700">Refill soon to avoid order cancellations</p>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">{stats.low_stock_count} Products Low on Stock</p>
+                  <p className="text-xs text-[var(--text-secondary)]">Refill soon to avoid order cancellations</p>
                 </div>
               </div>
-              <Link href="/vendor/catalog">
-                <Button size="sm" variant="outline" className="bg-white border-amber-200 text-amber-700 hover:bg-amber-50 h-8">
+              <Link href="/vendor/products">
+                <Button size="sm" variant="outline" className="bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface-muted)] h-8 rounded-[var(--radius-md)]">
                   Update
                 </Button>
               </Link>
@@ -150,16 +153,16 @@ export default async function VendorDashboard() {
         </Card>
       )}
 
-      {pendingOrders.length > 0 && (
-        <Card className="border-red-100 bg-red-50/30">
+      {pending_orders.length > 0 && (
+        <Card className="border-[var(--well-destructive-border)] bg-[var(--well-destructive)]/30">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold flex items-center gap-2">
-                <AlertCircle className="size-4 text-red-500" />
+                <AlertCircle className="size-4 text-[var(--destructive)]" />
                 Action needed
               </CardTitle>
               <Link href="/vendor/orders">
-                <Button variant="ghost" size="sm" className="gap-1 text-zinc-500">
+                <Button variant="ghost" size="sm" className="gap-1 text-[var(--text-secondary)]">
                   View all
                   <ChevronRight className="size-4" />
                 </Button>
@@ -168,21 +171,21 @@ export default async function VendorDashboard() {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3">
-              {pendingOrders.slice(0, 3).map((order: any) => (
+              {pending_orders.slice(0, 3).map((order: any) => (
                 <Link
                   key={order.id}
                   href="/vendor/orders"
-                  className="flex items-center justify-between py-3 border-b border-zinc-100 last:border-0 hover:bg-white/50 -mx-2 px-2 rounded-lg transition-colors"
+                  className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0 hover:bg-[var(--surface-muted)] -mx-2 px-2 rounded-lg transition-colors"
                 >
                   <div>
-                    <p className="text-sm font-medium text-zinc-900">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
                       #{order.order_number}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-0.5">
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">
                       {order.order_products?.length || 0} products · ₹{Number(order.total).toLocaleString('en-IN')}
                     </p>
                   </div>
-                  <Badge className="bg-red-100 text-red-700 border-0 text-xs">
+                  <Badge className="bg-[var(--well-destructive)] text-[var(--well-destructive-text)] border-0 text-xs rounded-[var(--radius-xs)] font-bold">
                     New
                   </Badge>
                 </Link>
@@ -192,12 +195,12 @@ export default async function VendorDashboard() {
         </Card>
       )}
 
-      {pendingOrders.length === 0 && (
+      {pending_orders.length === 0 && (
         <Card>
           <CardContent className="py-8">
             <div className="text-center">
-              <Package className="size-10 text-zinc-200 mx-auto mb-2" />
-              <p className="text-sm text-zinc-500">No pending orders</p>
+              <Package className="size-10 text-[var(--border)] mx-auto mb-2" />
+              <p className="text-sm text-[var(--text-secondary)]">No pending orders</p>
             </div>
           </CardContent>
         </Card>

@@ -28,7 +28,7 @@ const DrawerOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <DrawerPrimitive.Overlay
         ref={ref}
-        className={cn("fixed inset-0 z-50 bg-black/80", className)}
+        className={cn("fixed inset-0 z-[var(--z-overlay)] bg-[var(--foreground)]/50 backdrop-blur-md", className)}
         {...props}
     />
 ))
@@ -43,12 +43,12 @@ const DrawerContent = React.forwardRef<
         <DrawerPrimitive.Content
             ref={ref}
             className={cn(
-                "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[32px] border-t border-zinc-200/50 bg-white shadow-[0_-12px_40px_-12px_rgba(0,0,0,0.15)]",
+                "fixed inset-x-0 bottom-0 z-[var(--z-overlay)] mt-safe flex h-auto max-h-[92vh] flex-col rounded-t-[var(--radius-3xl)] border-t border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-xl)]",
                 className
             )}
             {...props}
         >
-            <div className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-zinc-200/80" />
+            <div className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[var(--border)] sm:hidden" />
             {children}
         </DrawerPrimitive.Content>
     </DrawerPortal>
@@ -60,7 +60,7 @@ const DrawerHeader = ({
     ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
     <div
-        className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
+        className={cn("grid gap-[var(--space-1-5)] p-[var(--space-4)] text-center sm:text-left", className)}
         {...props}
     />
 )
@@ -71,7 +71,7 @@ const DrawerFooter = ({
     ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
     <div
-        className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+        className={cn("mt-auto flex flex-col gap-[var(--space-2)] p-[var(--space-4)] pb-[max(var(--space-6),env(safe-area-inset-bottom,0px))] sm:pb-[var(--space-4)]", className)}
         {...props}
     />
 )
@@ -98,7 +98,7 @@ const DrawerDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <DrawerPrimitive.Description
         ref={ref}
-        className={cn("text-sm text-zinc-500", className)}
+        className={cn("text-sm text-[var(--text-secondary)]", className)}
         {...props}
     />
 ))

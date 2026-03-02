@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function OrdersLoading() {
   return (
-    <div className="bg-zinc-50 py-4">
+    <div className="bg-[var(--surface-muted)] py-4">
       <div className="max-w-xl mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <Skeleton className="h-8 w-40" />

@@ -10,7 +10,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ type }: DashboardHeaderProps) {
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-zinc-100 shadow-sm">
+    <header className="sticky top-0 z-[var(--z-nav)] bg-[var(--surface)] border-b border-[var(--border)] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6">
           <Link href={`/${type}`} className="shrink-0 active:opacity-70 transition-opacity">
@@ -22,23 +22,23 @@ export function DashboardHeader({ type }: DashboardHeaderProps) {
               className="h-8 w-auto"
               priority
             />
-            <span className="text-xs font-black tracking-tight text-primary block -mt-1">
-                {type === 'admin' ? 'Control Center' : 'Vendor Manager'}
-              </span>
+            <span className="text-xs font-bold tracking-tight text-primary block -mt-1">
+              {type === 'admin' ? 'Control Center' : 'Vendor Manager'}
+            </span>
           </Link>
         </div>
 
         <div className="flex items-center gap-3 sm:gap-6">
-          <button className="p-2 hover:bg-zinc-50 rounded-full transition-opacity">
-            <Search className="w-5 h-5 text-zinc-600" />
+          <button className="p-2 hover:bg-[var(--surface-muted)] rounded-full transition-opacity">
+            <Search className="w-5 h-5 text-[var(--text-secondary)]" />
           </button>
-          
-          <button className="relative p-2 hover:bg-zinc-50 rounded-full transition-opacity group">
-            <Bell className="w-5 h-5 text-zinc-600 group-hover:text-primary" />
+
+          <button className="relative p-2 hover:bg-[var(--surface-muted)] rounded-full transition-opacity group">
+            <Bell className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-primary" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full border-2 border-white" />
           </button>
 
-          <Link 
+          <Link
             href={`/${type}/profile`}
             className="flex items-center gap-2 text-sm font-bold hover:text-primary transition-opacity"
           >

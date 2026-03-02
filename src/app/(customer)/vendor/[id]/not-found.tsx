@@ -4,17 +4,17 @@ import { Store, Search } from 'lucide-react';
 
 /**
  * WYSHKIT 2026: Vendor Not Found Page
- * Swiggy 2026 Pattern: Proper 404 handling with helpful navigation
+ * WYSHKIT 2026 Pattern: Proper 404 handling with helpful navigation
  */
 export default function VendorNotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+    <div className="min-h-[100dvh] flex items-center justify-center p-6 bg-background">
       <div className="text-center space-y-4 max-w-md">
         <div className="flex justify-center">
-          <Store className="size-16 text-zinc-300" />
+          <Store className="size-16 text-[var(--text-tertiary)]" />
         </div>
-        <h1 className="text-2xl font-bold text-zinc-900">Store Not Found</h1>
-        <p className="text-sm text-zinc-500">
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">Store Not Found</h1>
+        <p className="text-sm text-[var(--text-secondary)]">
           The store you&apos;re looking for doesn&apos;t exist or is no longer available.
         </p>
         <div className="flex gap-3 justify-center pt-4">

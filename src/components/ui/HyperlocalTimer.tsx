@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 
 interface HyperlocalTimerProps {
     deadline?: string; // ISO string
-    variant?: 'default' | 'urgent' | 'minimal' | 'badge';
+    variant?: 'default' | 'urgent' | 'minimal' | 'badge' | 'subtle';
     className?: string;
     onExpire?: () => void;
 }
@@ -60,8 +60,8 @@ export function HyperlocalTimer({
 
     if (variant === 'minimal') {
         return (
-            <div className={cn("flex items-center gap-1.5 tabular-nums text-xs font-black tracking-tight", isUrgent ? "text-rose-500" : "text-amber-500", className)}>
-                <div className={cn("size-1 rounded-full", isUrgent ? "bg-rose-500 animate-ping" : "bg-amber-500")} />
+            <div className={cn("flex items-center gap-1.5 tabular-nums text-xs font-bold tracking-tight", isUrgent ? "text-[var(--destructive)]" : "text-[var(--well-warning-text)]", className)}>
+                <div className={cn("size-1 rounded-full", isUrgent ? "bg-[var(--destructive)] animate-ping" : "bg-[var(--well-warning-text)]")} />
                 {timeLeft}
             </div>
         );
@@ -79,36 +79,40 @@ export function HyperlocalTimer({
         );
     }
 
-    const isDark = variant === 'default' && className?.includes('bg-zinc-800') || className?.includes('bg-zinc-900') || className?.includes('bg-black');
+    const isSubtle = variant === 'subtle';
 
     return (
         <div className={cn(
-            "flex items-center gap-3 p-3 rounded-xl border transition-all duration-300",
-            isUrgent ? "bg-rose-50/50 border-rose-100 shadow-[0_4px_12px_rgba(225,29,72,0.05)]" : (isDark ? "bg-white/5 border-white/10" : "bg-white border-zinc-100"),
+            "flex items-center gap-3 p-3 rounded-[var(--radius-lg)] border transition-all duration-300",
+            isUrgent
+                ? "bg-[var(--well-destructive)] border-[var(--well-destructive-border)] shadow-[var(--shadow-glow-destructive)]"
+                : isSubtle
+                    ? "bg-[var(--surface-muted)] border-transparent"
+                    : "bg-[var(--surface)] border-[var(--border)]",
             className
         )}>
             <div className={cn(
-                "size-8 rounded-xl flex items-center justify-center transition-colors",
-                isUrgent ? "bg-rose-100 text-rose-600" : (isDark ? "bg-white/10 text-white" : "bg-black text-white")
+                "size-8 rounded-[var(--radius-md)] flex items-center justify-center transition-colors shadow-[var(--shadow-sm)]",
+                isUrgent ? "bg-[var(--background)] text-[var(--destructive)]" : "bg-[var(--foreground)] text-[var(--background)]"
             )}>
                 <Timer className={cn("size-4", isUrgent && "animate-pulse")} />
             </div>
             <div>
                 <p className={cn(
-                    "text-[11px] font-black tracking-[0.15em] mb-0.5",
-                    isUrgent ? "text-rose-500" : (isDark ? "text-white/40" : "text-zinc-400")
+                    "text-[var(--text-xxs)] font-black tracking-widest mb-0.5 uppercase",
+                    isUrgent ? "text-[var(--destructive)]" : "text-[var(--text-tertiary)]"
                 )}>
-                    {isUrgent ? 'Expiring Soon' : 'Preparation Deadline'}
+                    {isUrgent ? 'Expiring Soon' : 'Prep Deadline'}
                 </p>
                 <div className="flex items-center gap-2">
                     <span className={cn(
-                        "text-sm font-black tabular-nums tracking-tight",
-                        isUrgent ? "text-rose-700" : (isDark ? "text-white" : "text-zinc-900")
+                        "text-sm font-bold tabular-nums tracking-tight",
+                        isUrgent ? "text-[var(--destructive)]" : "text-[var(--text-primary)]"
                     )}>
                         {timeLeft}
                     </span>
                     {isUrgent && (
-                        <span className="text-xs font-bold text-rose-500 animate-pulse tracking-tighter">Urgent</span>
+                        <span className="text-[var(--text-xxs)] font-black text-[var(--destructive)] animate-pulse tracking-tighter uppercase px-1.5 py-0.5 bg-[var(--well-destructive)] rounded-[var(--radius-xs)]">Urgent</span>
                     )}
                 </div>
             </div>

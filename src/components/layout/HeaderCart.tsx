@@ -58,23 +58,23 @@ export function HeaderCart() {
                 variant="ghost"
                 onClick={handleCheckout}
                 className={cn(
-                    "h-10 px-4 rounded-xl hover:bg-zinc-50 gap-3 font-bold text-[14px] text-zinc-900 active:scale-95 transition-all border border-zinc-100",
-                    shouldBounce && "scale-105 bg-emerald-50 border-emerald-200"
+                    "h-10 px-4 rounded-xl hover:bg-[var(--surface-muted)] gap-3 font-bold text-sm text-[var(--text-primary)] active:scale-95 transition-all border border-[var(--border)]",
+                    shouldBounce && "scale-105 bg-[var(--primary-muted)] border-[var(--primary-ring)]"
                 )}
             >
                 <div className="relative">
-                    <ShoppingBag className={cn("size-5", shouldBounce ? "text-emerald-600" : "text-zinc-900")} />
+                    <ShoppingBag className={cn("size-5", shouldBounce ? "text-[var(--primary)]" : "text-[var(--text-primary)]")} />
                     {visualCount > 0 && (
                         <span className={cn(
                             "absolute -top-2 -right-2 size-4 rounded-full flex items-center justify-center text-xs text-white font-bold transition-colors",
-                            shouldBounce ? "bg-emerald-600" : "bg-red-500"
+                            shouldBounce ? "bg-[var(--primary)]" : "bg-[var(--primary)]" // Consistent brand red
                         )}>
                             {visualCount}
                         </span>
                     )}
                 </div>
                 <div className="flex flex-col items-start leading-none">
-                    <span className="text-xs text-zinc-500 font-medium tracking-tight">Cart</span>
+                    <span className="text-xs text-[var(--text-secondary)] font-medium tracking-tight">Cart</span>
                     <span className="tabular-nums">{formatCurrency(displayTotal)}</span>
                 </div>
             </Button>

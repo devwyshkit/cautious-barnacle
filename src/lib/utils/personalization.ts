@@ -15,7 +15,7 @@ export interface PersonalizationCheckProduct {
  */
 /**
  * Checks if a product has active personalization requirements.
- * Swiggy 2026: Narrowed to prevent over-triggering badges.
+ * WYSHKIT 2026: Narrowed to prevent over-triggering badges.
  */
 export function hasProductPersonalization(product: any): boolean {
   if (!product) return false;
@@ -29,7 +29,7 @@ export function hasProductPersonalization(product: any): boolean {
   if (product.is_personalized === true) return true;
 
   // 3. Addons that require a preview (implies a design/approval step)
-  const addons = product.product_addons || product.item_addons || product.selected_addons || product.selectedAddons || [];
+  const addons = product.product_addons || product.selected_addons || product.selectedAddons || [];
   if (Array.isArray(addons) && addons.some((a: any) => !!a.requires_preview)) return true;
 
   // 4. Legacy check for specific metadata

@@ -28,11 +28,12 @@ export function InterceptedProductSheet({ product, onCloseOverride }: Intercepte
 
     const handleClose = React.useCallback(() => {
         setOpen(false);
-        // Swiggy 2026: Elite navigation stability.
+        // WYSHKIT 2026: Elite navigation stability.
         // We favor explicit paths over history.back() for intercepted sheets
         // to ensure we never land on a "dead end" or redirect loop.
+        const returnUrl = searchParams.get('returnUrl');
         const vendorPath = `/vendor/${product.vendor_id || searchParams.get('id')}`;
-        const targetPath = onCloseOverride || vendorPath;
+        const targetPath = returnUrl || onCloseOverride || vendorPath;
 
         // Small delay to allow drawer closing animation
         setTimeout(() => {
@@ -58,7 +59,6 @@ export function InterceptedProductSheet({ product, onCloseOverride }: Intercepte
             title={product.name || 'Product Details'}
             description={`View details and add ${product.name || 'this product'} to your cart.`}
             className="md:max-w-[520px]"
-            showClose={false}
             lean
         >
             <div className="flex-1 relative h-full">

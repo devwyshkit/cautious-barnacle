@@ -53,44 +53,44 @@ export function VendorTopBar({ vendor }: VendorTopBarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-zinc-100">
+    <header className="sticky top-0 z-[var(--z-nav)] bg-[var(--surface)] border-b border-[var(--border)]">
       <div className="flex items-center justify-between h-14 px-4">
         <div className="flex items-center gap-3">
           <div className="lg:hidden">
-            <div className="size-8 rounded-lg bg-zinc-900 flex items-center justify-center">
+            <div className="size-8 rounded-lg bg-[var(--primary)] flex items-center justify-center">
               <span className="text-white text-sm font-semibold">W</span>
             </div>
           </div>
           <div className="hidden lg:block">
-            <h1 className="text-sm font-medium text-zinc-900 truncate max-w-[200px]">
+            <h1 className="text-sm font-medium text-[var(--text-primary)] truncate max-w-[200px]">
               {vendor.name}
             </h1>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-50 border border-zinc-100">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface-muted)] border border-[var(--border)]">
             <div className={cn(
               "size-2 rounded-full",
-              isOnline ? "bg-emerald-500" : "bg-zinc-300"
+              isOnline ? "bg-[var(--success)]" : "bg-[var(--surface-muted)]"
             )} />
-            <span className="text-xs font-medium text-zinc-600">
+            <span className="text-xs font-medium text-[var(--text-secondary)]">
               {isOnline ? 'Online' : 'Offline'}
             </span>
             <Switch
               checked={isOnline}
               onCheckedChange={handleOnlineToggle}
               disabled={isUpdating}
-              className="data-[state=checked]:bg-emerald-500"
+              className="data-[state=checked]:bg-[var(--success)]"
             />
           </div>
 
           <Link href="/vendor/orders">
             <Button variant="ghost" size="icon" className="relative">
-              <Bell className="size-5 text-zinc-600" />
+              <Bell className="size-5 text-[var(--text-secondary)]" />
               {pendingCount > 0 && (
                 <Badge
-                  className="absolute -top-1 -right-1 size-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs font-medium"
+                  className="absolute -top-1 -right-1 size-5 p-0 flex items-center justify-center bg-[var(--primary)] text-white text-xs font-medium"
                 >
                   {pendingCount > 9 ? '9+' : pendingCount}
                 </Badge>
@@ -101,7 +101,7 @@ export function VendorTopBar({ vendor }: VendorTopBarProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
-                <Settings className="size-5 text-zinc-600" />
+                <Settings className="size-5 text-[var(--text-secondary)]" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
@@ -112,7 +112,7 @@ export function VendorTopBar({ vendor }: VendorTopBarProps) {
                 <Link href="/vendor/insights">View insights</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
+              <DropdownMenuItem className="text-[var(--destructive)]" onClick={handleLogout}>
                 <LogOut className="size-4 mr-2" />
                 Log out
               </DropdownMenuItem>

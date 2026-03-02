@@ -15,7 +15,7 @@ const NAV_LINKS = [
   { href: '/vendor', label: 'Home', icon: Home },
   { href: '/vendor/orders', label: 'Orders', icon: Package },
   { href: '/vendor/personalization', label: 'Preview', icon: Palette },
-  { href: '/vendor/catalog', label: 'Catalog', icon: ShoppingBag },
+  { href: '/vendor/products', label: "Products", icon: ShoppingBag },
   { href: '/vendor/financials', label: 'Money', icon: Wallet },
 ];
 
@@ -23,10 +23,10 @@ export function VendorMobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 lg:hidden z-50 safe-area-pb">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[var(--surface)] border-t border-[var(--border)] lg:hidden z-[var(--z-nav)] safe-area-pb">
       <div className="flex items-center justify-around h-16 px-2">
         {NAV_LINKS.map((link) => {
-          const isActive = pathname === link.href || 
+          const isActive = pathname === link.href ||
             (link.href !== '/vendor' && pathname.startsWith(link.href));
           const Icon = link.icon;
 
@@ -36,9 +36,9 @@ export function VendorMobileNav() {
               href={link.href}
               className={cn(
                 'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]',
-                isActive 
-                  ? 'text-zinc-900' 
-                  : 'text-zinc-400'
+                isActive
+                  ? 'text-[var(--text-primary)]'
+                  : 'text-[var(--text-tertiary)]'
               )}
             >
               <Icon className={cn("size-5", isActive && "stroke-[2.5px]")} />

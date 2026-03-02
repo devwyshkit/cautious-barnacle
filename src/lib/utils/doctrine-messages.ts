@@ -11,7 +11,7 @@ export const DOCTRINE_ERRORS: Record<string, string> = {
     'INSUFFICIENT_WALLET_BALANCE': 'Your wallet balance is insufficient for this transaction.',
 
     // Commerce Constraints
-    'VENDOR_MISMATCH': 'You already have items from another store in your cart. Start a new order?',
+    'VENDOR_MISMATCH': 'You already have products from another store in your cart. Start a new order?',
     'PRODUCT_NOT_FOUND': 'One or more products are no longer available. We\'ve updated your cart.',
     'OUT_OF_STOCK': 'This product just sold out. Please explore other variants.',
     'PRICE_MISMATCH': 'Pricing has been updated. Please review the new bill before proceeding.',

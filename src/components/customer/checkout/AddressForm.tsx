@@ -195,15 +195,23 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pb-6 md:max-w-md">
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold tracking-tight text-zinc-500">Contact</Label>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="relative">
-                            <User className="absolute left-3 top-3 size-4 text-zinc-400" />
-                            <Input placeholder="Full Name" {...form.register('name')} className="pl-9 bg-zinc-50/50 border-zinc-200 focus:bg-white transition-all" />
+                    <Label className="text-xs font-bold tracking-tight text-[var(--text-secondary)]">Contact</Label>
+                    {/* Name & Phone Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--space-3)]">
+                        <div className="space-y-1.5 min-w-0">
+                            <label htmlFor="receiver_name" className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-tight px-1 block">Receiver Name</label>
+                            <Input
+                                id="receiver_name"
+                                placeholder="Full Name" {...form.register('name')} className="bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)] transition-all" />
                         </div>
-                        <div className="relative">
-                            <Phone className="absolute left-3 top-3 size-4 text-zinc-400" />
-                            <Input placeholder="Phone" {...form.register('phone')} className="pl-9 bg-zinc-50/50 border-zinc-200 focus:bg-white transition-all" maxLength={10} />
+                        <div className="space-y-1.5 min-w-0">
+                            <label htmlFor="receiver_phone" className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-tight px-1 block">Phone Number</label>
+                            <div className="relative">
+                                <Phone className="absolute left-3 top-3 size-4 text-[var(--text-tertiary)]" />
+                                <Input
+                                    id="receiver_phone"
+                                    placeholder="Phone" {...form.register('phone')} className="pl-9 bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)] transition-all" maxLength={10} />
+                            </div>
                         </div>
                     </div>
                     {(form.formState.errors.name || form.formState.errors.phone) && (
@@ -214,7 +222,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold tracking-tight text-zinc-500">Address Type</Label>
+                    <Label className="text-xs font-bold tracking-tight text-[var(--text-secondary)]">Address Type</Label>
                     <RadioGroup
                         value={form.watch('type')}
                         onValueChange={(val) => form.setValue('type', val as any)}
@@ -229,9 +237,9 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                                 <RadioGroupItem value={type.value} id={`type-${type.value}`} className="peer sr-only" />
                                 <Label
                                     htmlFor={`type-${type.value}`}
-                                    className="flex flex-col items-center justify-between rounded-xl border-2 border-zinc-100 bg-white p-3 hover:bg-zinc-50 cursor-pointer transition-all peer-data-[state=checked]:border-zinc-900 peer-data-[state=checked]:[&_svg]:text-zinc-900"
+                                    className="flex flex-col items-center justify-between rounded-xl border-2 border-[var(--border)] bg-[var(--surface)] p-3 hover:bg-[var(--surface-muted)] cursor-pointer transition-all peer-data-[state=checked]:border-[var(--text-primary)] peer-data-[state=checked]:[&_svg]:text-[var(--text-primary)]"
                                 >
-                                    <type.icon className="mb-2 size-5 text-zinc-400" />
+                                    <type.icon className="mb-2 size-5 text-[var(--text-tertiary)]" />
                                     <span className="text-xs font-bold tracking-tight">{type.label}</span>
                                 </Label>
                             </div>
@@ -240,37 +248,34 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 </div>
 
                 <div className="space-y-2">
-                    <Label className="text-xs font-bold tracking-tight text-zinc-500">Location</Label>
+                    <Label className="text-xs font-bold tracking-tight text-[var(--text-secondary)]">Location</Label>
                     {entryMode === 'search' ? (
                         <>
-                            <div className="flex gap-2">
-                                <div className="flex-1">
-                                    <AddressAutocomplete
-                                        onPlaceSelect={handlePlaceSelect}
-                                        placeholder="Search area or address"
-                                    />
-                                </div>
+                            <div className="grid gap-[var(--space-3)]">
+                                <AddressAutocomplete
+                                    onPlaceSelect={handlePlaceSelect}
+                                    placeholder="Search area or address"
+                                />
                                 <Button
                                     type="button"
-                                    variant="outline"
-                                    size="icon"
                                     onClick={handleUseCurrentLocation}
                                     disabled={isGettingLocation}
-                                    className="shrink-0 rounded-xl h-10 w-10"
-                                    aria-label="Use current location"
+                                    variant="outline"
+                                    className="w-full justify-center gap-2"
                                 >
-                                    {isGettingLocation ? <Loader2 className="size-4 animate-spin" /> : <Navigation className="size-4" />}
+                                    {isGettingLocation ? <Loader2 className="size-4 animate-spin" /> : <MapPin className="size-4" />}
+                                    {isGettingLocation ? 'Locating...' : 'Use Current Location'}
                                 </Button>
                             </div>
                             {placeData && (
-                                <p className="text-xs text-emerald-600 font-medium">
+                                <p className="text-xs text-[var(--success)] font-medium">
                                     {placeData.city} {placeData.pincode}
                                 </p>
                             )}
                             <button
                                 type="button"
                                 onClick={() => setEntryMode('manual')}
-                                className="text-xs font-semibold text-zinc-500 hover:text-zinc-700 underline decoration-zinc-200"
+                                className="text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-secondary)] underline decoration-[var(--border)]"
                             >
                                 Can&apos;t find your address? Enter manually
                             </button>
@@ -281,24 +286,24 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                                 <Input
                                     placeholder="Area, street, locality"
                                     {...form.register('manualArea')}
-                                    className="bg-zinc-50/50 border-zinc-200 focus:bg-white"
+                                    className="bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)]"
                                 />
                                 <div className="grid grid-cols-2 gap-3">
                                     <Input
                                         placeholder="City"
                                         {...form.register('manualCity')}
-                                        className="bg-zinc-50/50 border-zinc-200 focus:bg-white"
+                                        className="bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)]"
                                     />
                                     <Input
                                         placeholder="State"
                                         {...form.register('manualState')}
-                                        className="bg-zinc-50/50 border-zinc-200 focus:bg-white"
+                                        className="bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)]"
                                     />
                                 </div>
                                 <Input
                                     placeholder="Pincode (6 digits)"
                                     {...form.register('manualPincode')}
-                                    className="bg-zinc-50/50 border-zinc-200 focus:bg-white"
+                                    className="bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)]"
                                     maxLength={6}
                                     inputMode="numeric"
                                 />
@@ -306,7 +311,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                             <button
                                 type="button"
                                 onClick={() => setEntryMode('search')}
-                                className="text-xs font-semibold text-zinc-500 hover:text-zinc-700 underline decoration-zinc-200 flex items-center gap-1"
+                                className="text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-secondary)] underline decoration-[var(--border)] flex items-center gap-1"
                             >
                                 <Edit3 className="size-3" />
                                 Use search or current location instead
@@ -319,7 +324,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                     <Input
                         placeholder="Flat, Building, Floor (e.g. 101, Tower A)"
                         {...form.register('flatBuilding')}
-                        className="bg-zinc-50/50 border-zinc-200 focus:bg-white transition-all"
+                        className="bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)] transition-all"
                     />
                     {form.formState.errors.flatBuilding && (
                         <p className="text-xs font-bold text-rose-500 ml-1">{form.formState.errors.flatBuilding.message}</p>
@@ -330,7 +335,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                     <Input
                         placeholder="Landmark (optional)"
                         {...form.register('landmark')}
-                        className="bg-zinc-50/50 border-zinc-200 focus:bg-white transition-all"
+                        className="bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)] transition-all"
                     />
                 </div>
             </div>
@@ -339,7 +344,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 <Button
                     type="button"
                     variant="outline"
-                    className="flex-1 rounded-xl h-12 font-bold border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                    className="flex-1 rounded-xl h-12 font-bold border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
                     onClick={onCancel}
                     disabled={isSubmitting}
                 >
@@ -347,7 +352,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 </Button>
                 <Button
                     type="submit"
-                    className="flex-[2] rounded-xl h-12 font-bold bg-zinc-900 text-white hover:bg-zinc-800"
+                    className="flex-[2] rounded-xl h-12 font-bold bg-[var(--text-primary)] text-white hover:bg-[var(--text-primary)]"
                     disabled={
                         isSubmitting ||
                         (entryMode === 'search' ? !placeData : false) ||

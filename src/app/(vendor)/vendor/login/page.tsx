@@ -108,16 +108,16 @@ export default function VendorLoginPage() {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
+        <div className="min-h-[100dvh] bg-[var(--surface-muted)] flex items-center justify-center p-4">
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
-                    <div className="size-12 rounded-xl bg-orange-500 flex items-center justify-center mx-auto mb-4">
+                    <div className="size-12 rounded-xl bg-[var(--primary)] flex items-center justify-center mx-auto mb-4">
                         <Store className="size-6 text-white" />
                     </div>
-                    <h1 className="text-xl font-semibold text-white">
-                        {step === 'phone' ? 'Vendor login' : 'Verify code'}
+                    <h1 className="text-xl font-bold text-[var(--text-primary)]">
+                        {step === 'phone' ? 'WyshKit Shop' : 'Verify code'}
                     </h1>
-                    <p className="text-zinc-500 text-sm mt-1">
+                    <p className="text-[var(--text-secondary)] text-sm mt-1">
                         {step === 'phone'
                             ? 'Enter your registered phone number'
                             : `Code sent to +91 ${phone}`}
@@ -126,15 +126,15 @@ export default function VendorLoginPage() {
 
                 {step === 'phone' ? (
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-lg px-3">
-                            <span className="text-zinc-500 text-sm">+91</span>
+                        <div className="flex items-center gap-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg px-3">
+                            <span className="text-[var(--text-secondary)] text-sm">+91</span>
                             <Input
                                 type="tel"
                                 inputMode="numeric"
                                 placeholder="Phone number"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                className="border-0 bg-transparent text-white placeholder:text-zinc-600 focus-visible:ring-0"
+                                className="border-0 bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus-visible:ring-0"
                                 maxLength={10}
                             />
                         </div>
@@ -148,7 +148,7 @@ export default function VendorLoginPage() {
                         <Button
                             onClick={handleSendOTP}
                             disabled={loading || phone.length !== 10}
-                            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium"
+                            className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium shadow-brand"
                         >
                             {loading ? (
                                 <Loader2 className="size-4 animate-spin" />
@@ -165,7 +165,7 @@ export default function VendorLoginPage() {
                             placeholder="Enter 6-digit OTP"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                            className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-600 text-center tracking-[0.5em] text-lg"
+                            className="bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] text-center tracking-[0.5em] text-lg h-12"
                             maxLength={6}
                         />
 
@@ -178,7 +178,7 @@ export default function VendorLoginPage() {
                         <Button
                             onClick={handleVerifyOTP}
                             disabled={loading || otp.length !== 6}
-                            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium"
+                            className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium shadow-brand"
                         >
                             {loading ? <Loader2 className="size-4 animate-spin" /> : 'Verify & Enter'}
                         </Button>
@@ -189,7 +189,7 @@ export default function VendorLoginPage() {
                                     setStep('phone')
                                     setError('')
                                 }}
-                                className="text-xs text-zinc-500 hover:text-white flex items-center gap-1"
+                                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1"
                             >
                                 <ChevronLeft className="size-3" />
                                 Change number
@@ -197,7 +197,7 @@ export default function VendorLoginPage() {
                             <button
                                 onClick={handleSendOTP}
                                 disabled={loading}
-                                className="text-xs text-zinc-500 hover:text-white"
+                                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                             >
                                 Resend OTP
                             </button>

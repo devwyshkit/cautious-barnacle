@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logging/logger';
 import imageCompression from 'browser-image-compression';
+import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 interface PreviewUploaderProps {
   orderId: string;
@@ -101,6 +102,8 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
+    triggerHaptic(HapticPattern.ACTION);
+
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.drawImage(video, 0, 0);
@@ -152,10 +155,12 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
       const result = await upload_preview(orderId, orderProductId, publicUrl);
 
       if (result.success) {
+        triggerHaptic(HapticPattern.SUCCESS);
         toast.success('Preview uploaded');
         onSuccess();
         handleClose();
       } else {
+        triggerHaptic(HapticPattern.ERROR);
         toast.error(result.error || 'Failed to upload');
       }
     } catch (error) {
@@ -194,21 +199,21 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setMode('upload')}
-                className="flex flex-col items-center gap-3 p-6 border-2 border-dashed border-zinc-200 rounded-xl hover:border-zinc-300 hover:bg-zinc-50 transition-colors"
+                className="flex flex-col items-center gap-3 p-6 border-2 border-dashed border-[var(--border)] rounded-xl hover:border-[var(--border)] hover:bg-[var(--surface-muted)] transition-colors"
               >
-                <div className="size-12 rounded-full bg-zinc-100 flex items-center justify-center">
-                  <Upload className="size-5 text-zinc-500" />
+                <div className="size-12 rounded-full bg-[var(--surface-muted)] flex items-center justify-center">
+                  <Upload className="size-5 text-[var(--text-secondary)]" />
                 </div>
-                <span className="text-sm font-medium text-zinc-700">Upload file</span>
+                <span className="text-sm font-medium text-[var(--text-secondary)]">Upload file</span>
               </button>
               <button
                 onClick={startCamera}
-                className="flex flex-col items-center gap-3 p-6 border-2 border-dashed border-zinc-200 rounded-xl hover:border-zinc-300 hover:bg-zinc-50 transition-colors"
+                className="flex flex-col items-center gap-3 p-6 border-2 border-dashed border-[var(--border)] rounded-xl hover:border-[var(--border)] hover:bg-[var(--surface-muted)] transition-colors"
               >
-                <div className="size-12 rounded-full bg-zinc-100 flex items-center justify-center">
-                  <Camera className="size-5 text-zinc-500" />
+                <div className="size-12 rounded-full bg-[var(--surface-muted)] flex items-center justify-center">
+                  <Camera className="size-5 text-[var(--text-secondary)]" />
                 </div>
-                <span className="text-sm font-medium text-zinc-700">Take photo</span>
+                <span className="text-sm font-medium text-[var(--text-secondary)]">Take photo</span>
               </button>
             </div>
           )}
@@ -216,7 +221,7 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
           {/* Camera View */}
           {mode === 'camera' && (
             <div className="space-y-3">
-              <div className="relative aspect-square rounded-xl overflow-hidden bg-black">
+              <div className="relative aspect-square rounded-xl overflow-hidden bg-[var(--foreground)]">
                 <video
                   ref={videoRef}
                   autoPlay
@@ -251,25 +256,25 @@ export function PreviewUploader({ orderId, orderProductId, orderNumber, isOpen, 
               {...getRootProps()}
               className={cn(
                 "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors",
-                isDragActive ? "border-zinc-400 bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
+                isDragActive ? "border-[var(--primary)] bg-[var(--surface-muted)]" : "border-[var(--border)] hover:border-[var(--primary-ring)]"
               )}
             >
               <input {...getInputProps()} />
               <div className="flex flex-col items-center gap-2">
-                <div className="size-12 rounded-full bg-zinc-100 flex items-center justify-center">
-                  <ImageIcon className="size-5 text-zinc-500" />
+                <div className="size-12 rounded-full bg-[var(--surface-muted)] flex items-center justify-center">
+                  <ImageIcon className="size-5 text-[var(--text-secondary)]" />
                 </div>
-                <p className="text-sm font-medium text-zinc-700">
+                <p className="text-sm font-medium text-[var(--text-secondary)]">
                   {isDragActive ? 'Drop image here' : 'Drag image or click to browse'}
                 </p>
-                <p className="text-xs text-zinc-500">PNG, JPG up to 5MB</p>
+                <p className="text-xs text-[var(--text-secondary)]">PNG, JPG up to 5MB</p>
               </div>
             </div>
           )}
 
           {/* Preview */}
           {preview && (
-            <div className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100">
+            <div className="relative aspect-square rounded-xl overflow-hidden bg-[var(--surface-muted)]">
               <Image
                 src={preview}
                 alt="Preview"

@@ -14,7 +14,7 @@ interface NavShellProps {
 /**
  * WYSHKIT 2026: NavShell - Singleton Layout Controller
  *
- * Swiggy 2026 Pattern: Immersive Toggle
+ * WYSHKIT 2026 Pattern: Immersive Toggle
  * - Hides global navigation on checkout/auth flows where focus is required.
  * - Manages global spacing (padding-top) to prevent jank.
  */
@@ -22,9 +22,12 @@ export function NavShell({ initialLocation, children }: NavShellProps) {
     const pathname = usePathname();
 
     // Immersive routes where we hide the global header/nav
-    const isImmersive = pathname.startsWith('/auth') ||
-        pathname === '/checkout' ||
-        (pathname.startsWith('/orders/') && pathname !== '/orders');
+    // WYSHKIT 2026: Focused transactional environments
+    const isImmersive =
+        pathname.startsWith('/auth') ||
+        pathname.startsWith('/checkout') ||
+        pathname.startsWith('/orders/') || // Matches /orders/[id] but not /orders
+        pathname.startsWith('/onboarding');
 
     // WYSHKIT 2026: Footer Allowlist (Strict Mode)
     // Only show on Hub pages. Never on transactional pages.
@@ -35,7 +38,7 @@ export function NavShell({ initialLocation, children }: NavShellProps) {
     return (
         <div data-immersive={isImmersive}>
             {!isImmersive && <TopHeader initialLocation={initialLocation} />}
-            <div className={!isImmersive ? "pt-[72px] md:pt-16 min-h-screen" : "min-h-screen"}>
+            <div className={!isImmersive ? "pt-[var(--top-header-height-mobile)] md:pt-[var(--top-header-height)] min-h-[100dvh]" : "min-h-[100dvh]"}>
                 {children}
                 {/* Legal Footer (Desktop/Mobile - Bottom of page content) */}
                 {!isImmersive && showFooter && <ComplianceFooter className="hidden md:block" />}

@@ -132,9 +132,9 @@ export function ActionSlider({
                 disabled={disabled || isLoading || isSuccess}
                 onClick={handleConfirm}
                 className={cn(
-                    "relative h-14 w-full rounded-xl font-black tracking-tight transition-all duration-300",
-                    isSuccess ? "bg-emerald-500 text-white" : variant === 'amber' ? "bg-amber-500 text-white" : "bg-zinc-900 text-white",
-                    "hover:scale-[1.01] active:scale-[0.98] border-none shadow-sm",
+                    "relative h-14 w-full rounded-xl font-bold tracking-tight transition-all duration-300",
+                    isSuccess ? "bg-[var(--success)] text-white" : "text-white bg-[var(--primary)] shadow-brand hover:bg-[var(--primary-hover)]",
+                    "border-none",
                     (disabled || isLoading) && "opacity-60 cursor-not-allowed",
                     className
                 )}
@@ -161,11 +161,9 @@ export function ActionSlider({
         <div
             ref={containerRef}
             className={cn(
-                "relative h-14 w-full bg-zinc-100 rounded-xl overflow-hidden p-1 select-none transition-colors duration-300",
+                "relative h-14 w-full bg-[var(--surface-muted)] rounded-xl overflow-hidden p-1 select-none transition-colors duration-300",
                 disabled || isLoading ? "opacity-60 cursor-not-allowed" : "cursor-pointer",
-                isSuccess ? "bg-emerald-500" : "",
-                variant === 'amber' && !isSuccess ? "bg-amber-50" : "",
-                variant === 'amber' && !isSuccess && dragX > 0 ? "bg-amber-100" : "",
+                isSuccess ? "bg-[var(--success)]" : "",
                 className
             )}
             onClick={() => {
@@ -180,8 +178,8 @@ export function ActionSlider({
                     className="flex items-center gap-3 transition-opacity duration-150"
                     style={{ opacity: textOpacity }}
                 >
-                    <ChevronRight className="size-4 text-zinc-300 animate-pulse" />
-                    <span className="text-[11px] font-black tracking-tight text-zinc-400">
+                    <ChevronRight className="size-4 text-[var(--text-tertiary)] animate-pulse" />
+                    <span className="text-xs font-bold tracking-tight text-[var(--text-tertiary)]">
                         {label}
                     </span>
                 </div>
@@ -191,7 +189,7 @@ export function ActionSlider({
             <div
                 className={cn(
                     "absolute left-0 top-0 bottom-0 pointer-events-none transition-all duration-75",
-                    isSuccess ? "bg-emerald-600" : variant === 'amber' ? "bg-amber-500/10" : "bg-zinc-200"
+                    isSuccess ? "bg-[var(--success)]" : "bg-[var(--border)]"
                 )}
                 style={{ width: isSuccess ? '100%' : `${dragX + 24}px` }}
             />
@@ -207,7 +205,7 @@ export function ActionSlider({
                     className={cn(
                         "absolute left-1 top-1 bottom-1 aspect-square rounded-xl flex items-center justify-center shadow-lg z-10 transition-transform duration-150",
                         isDragging ? "scale-95 cursor-grabbing" : "cursor-grab",
-                        variant === 'amber' ? "bg-amber-500" : "bg-zinc-900"
+                        "bg-[var(--primary)]"
                     )}
                     style={{
                         transform: `translateX(${dragX}px)`,
@@ -221,13 +219,13 @@ export function ActionSlider({
             {/* Loading/Success Icon */}
             {(isLoading || isSuccess) && (
                 <div
-                    className="absolute left-1 top-1 bottom-1 aspect-square bg-white rounded-xl flex items-center justify-center shadow-lg z-10 animate-in zoom-in duration-300"
+                    className="absolute left-1 top-1 bottom-1 aspect-square bg-[var(--surface)] rounded-xl flex items-center justify-center shadow-lg z-10 animate-in zoom-in duration-300"
                     style={{ transform: isSuccess ? `translateX(${maxDrag}px)` : 'none' }}
                 >
                     {isLoading ? (
-                        <Loader2 className="size-5 text-zinc-900 animate-spin" />
+                        <Loader2 className="size-5 text-[var(--text-primary)] animate-spin" />
                     ) : (
-                        <Check className="size-5 text-emerald-600 stroke-[4]" />
+                        <Check className="size-5 text-[var(--success)] stroke-[4]" />
                     )}
                 </div>
             )}

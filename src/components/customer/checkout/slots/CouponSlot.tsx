@@ -50,27 +50,27 @@ export function CouponSlot({ initialCoupon, disabled }: CouponSlotProps) {
     };
 
     return (
-        <section className={cn("bg-white rounded-[24px] border border-[var(--surface-border)] overflow-hidden transition-all duration-300", disabled && "opacity-50 pointer-events-none")}>
+        <section className={cn("bg-[var(--surface)] rounded-[24px] border border-[var(--surface-border)] overflow-hidden transition-all duration-300", disabled && "opacity-50 pointer-events-none")}>
             <button
                 onClick={() => setExpanded(!expanded)}
-                className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-zinc-100/50 transition-colors"
+                className="w-full px-4 py-3.5 flex items-center justify-between hover:bg-[var(--surface-muted)]/50 transition-colors"
                 type="button"
                 disabled={disabled}
             >
                 <div className="flex items-center gap-2.5">
-                    <Ticket className={cn("size-4", initialCoupon ? "text-emerald-500" : "text-zinc-400")} />
+                    <Ticket className={cn("size-4", initialCoupon ? "text-[var(--success)]" : "text-[var(--text-tertiary)]")} />
                     <div className="text-left">
-                        <p className="text-xs font-black tracking-tight text-zinc-900">
+                        <p className="text-xs font-bold tracking-tight text-[var(--text-primary)]">
                             {initialCoupon ? `Coupon Applied: ${initialCoupon.code}` : 'Have a promo code?'}
                         </p>
                         {initialCoupon && (
-                            <p className="text-[10px] font-bold text-emerald-600 tracking-tight">
+                            <p className="text-xs font-bold text-[var(--success)] tracking-tight">
                                 Recommended for you
                             </p>
                         )}
                     </div>
                 </div>
-                {expanded ? <ChevronUp className="size-3.5 text-zinc-300" /> : <ChevronDown className="size-3.5 text-zinc-300" />}
+                {expanded ? <ChevronUp className="size-3.5 text-[var(--text-tertiary)]" /> : <ChevronDown className="size-3.5 text-[var(--text-tertiary)]" />}
             </button>
 
             {expanded && (
@@ -81,16 +81,16 @@ export function CouponSlot({ initialCoupon, disabled }: CouponSlotProps) {
                         onChange={(e) => setCode(e.target.value.toUpperCase())}
                         disabled={disabled || isApplying}
                         placeholder="Enter code"
-                        className="flex-1 h-10 bg-white rounded-xl px-4 text-xs font-bold border border-zinc-200 outline-none focus:border-zinc-400 transition-all uppercase"
+                        className="flex-1 h-10 bg-[var(--surface)] rounded-xl px-4 text-xs font-bold border border-[var(--border)] outline-none focus:border-[var(--text-tertiary)] transition-all uppercase"
                     />
                     <button
                         onClick={initialCoupon ? handleRemove : handleApply}
                         disabled={disabled || isApplying || !code.trim()}
                         className={cn(
-                            "h-10 px-4 rounded-xl text-[11px] font-black transition-all active:scale-95 disabled:opacity-50",
+                            "h-10 px-4 rounded-xl text-xs font-bold transition-all active:scale-95 disabled:opacity-50",
                             initialCoupon
-                                ? "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                                : "bg-zinc-900 text-white hover:bg-black"
+                                ? "bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:bg-[var(--border)]"
+                                : "bg-[var(--text-primary)] text-white hover:bg-[var(--foreground)]"
                         )}
                     >
                         {isApplying ? <Loader2 className="size-3.5 animate-spin" /> : (initialCoupon ? 'Remove' : 'Apply')}

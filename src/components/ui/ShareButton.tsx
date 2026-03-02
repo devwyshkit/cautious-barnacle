@@ -78,7 +78,7 @@ export function ShareButton({
       <Button
         onClick={handleShare}
         variant="outline"
-        className={cn("w-full h-12 rounded-xl border-zinc-100 gap-2 font-bold", className)}
+        className={cn("w-full h-12 rounded-xl border-[var(--border)] gap-2 font-bold", className)}
       >
         <Share2 className="size-4" />
         Share this
@@ -91,14 +91,14 @@ export function ShareButton({
       <button
         onClick={handleShare}
         className={cn(
-          "flex items-center justify-center size-8 rounded-full bg-white/90 backdrop-blur-sm shadow-sm transition-all active:scale-90",
+          "flex items-center justify-center size-8 rounded-full bg-[var(--surface)]/90 backdrop-blur-md border border-[var(--border)] transition-all active:scale-90",
           className
         )}
       >
         {copied ? (
-          <Check className="size-3.5 text-green-600" />
+          <Check className="size-3.5 text-[var(--success)]" />
         ) : (
-          <Share2 className="size-3.5 text-zinc-600" />
+          <Share2 className="size-3.5 text-[var(--text-secondary)]" />
         )}
       </button>
     );
@@ -112,7 +112,7 @@ export function ShareButton({
       onClick={handleShare}
     >
       {copied ? (
-        <Check className="size-4 text-green-500" />
+        <Check className="size-4 text-[var(--success)]" />
       ) : (
         <Share2 className="size-4" />
       )}

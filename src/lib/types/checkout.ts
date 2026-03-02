@@ -13,4 +13,5 @@ export interface CheckoutContext {
     pricing: PricingBreakdown | null;
     wallet_info: WalletInfo | null;
     distance_km?: number | null;
+    eta_minutes?: number | null;
 }

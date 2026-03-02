@@ -28,20 +28,36 @@ export function CircleRail({ data, context }: CircleRailProps) {
             {categories.map((product: any) => {
                 const isSelected = selectedCategory === product.slug;
 
+                // WYSHKIT 2026: Contextual Navigation
+                // If in vendor context, use hash fragments for in-page scrolling
+                const href = context?.vendor_id
+                    ? `#${product.name?.toLowerCase().replace(/\s+/g, '-')}`
+                    : (product.slug?.startsWith('/') ? product.slug : `/?category=${product.slug}`);
+
                 return (
                     <Link
                         key={product.id}
-                        href={product.slug?.startsWith('/') ? product.slug : `/?category=${product.slug}`}
-                        onClick={() => triggerHaptic(HapticPattern.ACTION)}
-                        scroll={false}
+                        href={href}
+                        onClick={(e) => {
+                            triggerHaptic(HapticPattern.ACTION);
+                            // If it's a hash link, we might want to prevent default and handle smooth scroll
+                            if (href.startsWith('#')) {
+                                e.preventDefault();
+                                const element = document.getElementById(href.substring(1));
+                                if (element) {
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }
+                            }
+                        }}
+                        scroll={!href.startsWith('#')}
                         className="outline-none"
                     >
                         <div className="flex flex-col items-center gap-1.5 shrink-0 group active:scale-95 transition-all duration-300">
                             <div className={cn(
                                 "size-14 md:size-16 rounded-full overflow-hidden relative transition-all duration-500 border-2",
                                 isSelected
-                                    ? "border-zinc-900 bg-white"
-                                    : "border-transparent bg-zinc-50"
+                                    ? "border-[var(--text-primary)] bg-[var(--surface)]"
+                                    : "border-transparent bg-[var(--surface-muted)]"
                             )}>
                                 {product.image_url ? (
                                     <Image
@@ -56,16 +72,16 @@ export function CircleRail({ data, context }: CircleRailProps) {
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center h-full">
-                                        <LayoutGrid className="size-5 text-zinc-300" />
+                                        <LayoutGrid className="size-5 text-[var(--text-tertiary)]" />
                                     </div>
                                 )}
                             </div>
                             <span className={cn(
-                                "text-[10px] font-black tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
-                                isSelected ? "text-zinc-950" : "text-zinc-400"
+                                "text-xs font-bold tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
+                                isSelected ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]"
                             )}>
                                 {product.name === 'ALL' ? (
-                                    <span className="text-[10px] font-black tracking-widest text-[#D91B24]">All</span>
+                                    <span className="text-xs font-bold tracking-widest text-[var(--primary)]">All</span>
                                 ) : (
                                     product.name
                                 )}
@@ -80,8 +96,8 @@ export function CircleRail({ data, context }: CircleRailProps) {
                 <div className="flex gap-4 animate-pulse">
                     {[1, 2, 3, 4, 5].map((i) => (
                         <div key={i} className="flex flex-col items-center gap-1.5 shrink-0">
-                            <div className="size-[68px] md:size-[80px] rounded-full bg-zinc-50" />
-                            <div className="h-2 w-10 bg-zinc-50 rounded" />
+                            <div className="size-[68px] md:size-[80px] rounded-full bg-[var(--surface-muted)]" />
+                            <div className="h-2 w-10 bg-[var(--surface-muted)] rounded" />
                         </div>
                     ))}
                 </div>

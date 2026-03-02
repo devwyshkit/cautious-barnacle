@@ -133,7 +133,7 @@ export function useOrderRealtime({
     if (!orderId) return;
 
     const supabase = createClient();
-    const orderChannel = supabase.channel(`order-pulse-${orderId}`);
+    const orderChannel = supabase.channel(`order:${orderId}`);
 
     // 1. Orders table — status transitions trigger full re-fetch for consistency
     orderChannel.on(

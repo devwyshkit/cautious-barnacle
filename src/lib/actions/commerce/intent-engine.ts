@@ -79,7 +79,7 @@ const PlaceOrderSchema = z.object({
     use_wallet: z.boolean().optional(),
     gstin: z.string().optional(),
     delivery_instructions: z.string().optional(),
-    distance_km: z.number().optional(),
+    // [PURGED] WYSHKIT 2026: distance_km is now computed internally by the Postgres kernel.
 });
 
 const CommerceIntentSchema = z.discriminatedUnion('intent', [
@@ -182,6 +182,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     if (data && !(data as any).success) {
                         throw new Error((data as any).error || 'Failed to update quantity');
                     }
+                    revalidateTag('cart');
                     break;
                 }
 
@@ -192,6 +193,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
+                    revalidateTag('cart');
                     break;
                 }
 
@@ -202,6 +204,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
+                    revalidateTag('cart');
                     break;
                 }
 
@@ -212,6 +215,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
+                    revalidateTag('cart');
                     break;
                 }
 
@@ -222,6 +226,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
+                    revalidateTag('cart');
                     break;
                 }
 
@@ -232,6 +237,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
+                    revalidateTag('cart');
                     break;
                 }
 
@@ -245,12 +251,12 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_use_wallet: validated.payload.use_wallet ?? undefined,
                         p_gstin: validated.payload.gstin ?? undefined,
                         p_delivery_instructions: validated.payload.delivery_instructions ?? undefined,
-                        p_distance_km: validated.payload.distance_km ?? undefined
+                        // [PURGED] WYSHKIT 2026: distance_km is now computed internally by the Postgres kernel.
                     });
                     if (error) throw error;
 
-                    revalidatePath('/');
                     revalidateTag('orders');
+                    revalidateTag('cart');
                     return { success: true, data };
                 }
 
@@ -269,6 +275,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     if (data && !(data as any).success) {
                         throw new Error((data as any).error || 'Failed to update product');
                     }
+                    revalidateTag('cart');
                     break;
                 }
 
@@ -333,6 +340,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
+                    revalidateTag('cart');
                     break;
                 }
             }

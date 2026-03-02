@@ -117,20 +117,20 @@ export function CategoryList({ categories }: CategoryListProps) {
 
       <div className="border rounded-lg divide-y">
         {categories.length === 0 ? (
-          <p className="p-8 text-center text-zinc-500">No categories yet</p>
+          <p className="p-8 text-center text-[var(--text-secondary)]">No categories yet</p>
         ) : (
           categories.map((cat) => (
             <div key={cat.id} className="flex items-center gap-4 p-4">
               <div className="flex-1">
                 <p className="font-medium">{cat.name}</p>
-                <p className="text-xs text-zinc-500">{cat.slug}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{cat.slug}</p>
               </div>
               <Switch checked={cat.is_active ?? false} onCheckedChange={() => handleToggle(cat.id, cat.is_active ?? false)} />
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setDeleteId(cat.id)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="text-[var(--destructive)] hover:text-[var(--destructive)] hover:bg-[var(--destructive-muted)]"
               >
                 <Trash2 className="size-4" />
               </Button>
@@ -150,7 +150,7 @@ export function CategoryList({ categories }: CategoryListProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction onClick={handleDelete} className="bg-[var(--destructive)] hover:opacity-90">
               {loading ? <Loader2 className="size-4 animate-spin" /> : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>

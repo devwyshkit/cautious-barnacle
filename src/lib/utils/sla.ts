@@ -22,7 +22,7 @@ export function getDeliverySLASignal(product: any): SLASignal | null {
         return {
             type: 'fast',
             text: 'Perishable: Fast SLA',
-            colorClass: 'text-orange-500',
+            colorClass: 'text-[var(--warning)]',
             // icon defined in component to avoid React element serialization issues if needed, 
             // but for simple cases we can return the node
         };
@@ -32,7 +32,7 @@ export function getDeliverySLASignal(product: any): SLASignal | null {
         return {
             type: 'fast',
             text: `${productionTime} mins prep`,
-            colorClass: 'text-emerald-500',
+            colorClass: 'text-[var(--success)]',
         };
     }
 
@@ -43,12 +43,12 @@ export function getStockSLASignal(product: any): SLASignal | null {
     const stockQuantity = product.stock_quantity;
     const isPersonalizable = product.has_personalization || (product.personalization_options?.length > 0);
 
-    // Swiggy 2026: Only show scarcity for non-personalized products (physical stock matters)
+    // WYSHKIT 2026: Only show scarcity for non-personalized products (physical stock matters)
     if (!isPersonalizable && typeof stockQuantity === 'number' && stockQuantity > 0 && stockQuantity <= 3) {
         return {
             type: 'scarcity',
             text: `Only ${stockQuantity} left`,
-            colorClass: 'text-amber-600',
+            colorClass: 'text-[var(--warning)]',
         };
     }
 
@@ -87,7 +87,7 @@ export function calculateHaversineDistance(
 export function calculateTravelTime(distanceKm?: number | null): { min: number; max: number } | null {
     if (distanceKm == null || distanceKm === undefined) return null;
 
-    // SWIGGY 2026: ~5 mins per 1km in city traffic + 10 mins buffer.
+    // WYSHKIT 2026: ~5 mins per 1km in city traffic + 10 mins buffer.
     const baseMins = Math.ceil(distanceKm * 5);
     return {
         min: baseMins + 5,

@@ -38,39 +38,31 @@ export async function getProductWithFullSpec(productId: string) {
         }
         const supabase = await createClient();
 
-        const [productRes, variantsRes] = await Promise.all([
-            supabase
-                .from('products')
-                .select('*, vendors:vendors(id, name, slug, city, rating, image_url, gstin)')
-                .eq('id', productId)
-                .eq('is_active', true)
-                .maybeSingle(),
-            supabase
-                .from('product_variants')
-                .select('*')
-                .eq('product_id', productId)
-                .eq('is_active', true)
-                .order('price', { ascending: true })
-        ]);
+        // WYSHKIT 2026: Single Atomic Trip for Product Context
+        const { data, error } = await supabase.rpc('get_product_surface_v1' as any, {
+            p_product_id: productId,
+            p_vendor_id_or_slug: null // Fetch standalone spec if vendor unknown
+        });
 
-        if (productRes.error) throw productRes.error;
-        if (!productRes.data) return { data: null, error: 'Product not found' };
+        if (error) {
+            logger.error('RPC Failure: get_product_surface_v1', error, { productId });
+            return { data: null, error: error.message };
+        }
 
-        const rawProduct = {
-            ...(productRes.data),
-            vendors: (productRes.data.vendors as unknown) as MappedVendor,
-            variants: variantsRes.data || [],
-        };
+        const raw = data as any;
+        if (!raw || !raw.product_spec) {
+            return { data: null, error: 'Product not found' };
+        }
 
-        const validated = WyshkitProductSchema.safeParse(rawProduct);
+        const validated = WyshkitProductSchema.safeParse(raw.product_spec);
         if (!validated.success) {
             logger.error('Zod Validation Failed: getProductWithFullSpec', validated.error);
-            return { data: rawProduct as any, error: undefined };
+            return { data: raw.product_spec as any, error: undefined };
         }
 
         return { data: validated.data, error: undefined };
     } catch (error) {
-        logger.error('Failed to get product with full spec', error, { productId });
+        logger.error('Failed to get product surface', error, { productId });
         return { data: null, error: 'Internal server error' };
     }
 }
@@ -106,5 +98,56 @@ export async function getUpsellProducts(
     } catch (error) {
         logger.error('Failed to fetch upsell products', error, { productId, vendorId, category });
         return { data: null, error: 'Failed to fetch upsell products' };
+    }
+}
+/**
+ * Get Product Surface (One-Trip deep link context)
+ * Consolidates product, variants, and background vendor store.
+ */
+export async function getProductSurface(productId: string, vendorIdOrSlug: string) {
+    try {
+        const supabase = await createClient();
+        const { data, error } = await supabase.rpc('get_product_surface_v1' as any, {
+            p_product_id: productId,
+            p_vendor_id_or_slug: vendorIdOrSlug
+        });
+
+        if (error) {
+            logger.error('Failed to fetch product surface', error, { productId, vendorIdOrSlug });
+            return { data: null, error: error.message };
+        }
+
+        const raw = data as any;
+        if (raw.error) return { data: null, error: raw.error };
+
+        // Process vendor surface for the UI (reuse grouping logic)
+        const products = (raw.vendor_surface.products || []) as unknown as WyshkitProduct[];
+        const groupedProducts = products.reduce((acc: any, product: any) => {
+            const catName = product.category_name || 'Other';
+            if (!acc[catName]) acc[catName] = [];
+            acc[catName].push(product);
+            return acc;
+        }, {});
+
+        const categories = [
+            { id: 'all', name: 'All', slug: 'All' },
+            ...(raw.vendor_surface.categories || []).map((c: any) => ({ id: c.id, name: c.name, slug: c.slug }))
+        ];
+
+        return {
+            data: {
+                product: raw.product_spec as unknown as WyshkitProduct,
+                vendorContext: {
+                    vendor: raw.vendor_surface.vendor as MappedVendor,
+                    products,
+                    productsGroupedByCategory: groupedProducts,
+                    categories
+                }
+            },
+            error: null
+        };
+    } catch (err: any) {
+        logger.error('Unexpected error in getProductSurface', err);
+        return { data: null, error: 'Failed to fetch immersive context' };
     }
 }

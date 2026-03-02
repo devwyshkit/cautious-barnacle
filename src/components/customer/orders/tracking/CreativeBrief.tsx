@@ -25,7 +25,7 @@ interface CreativeBriefProps {
 /**
  * WYSHKIT 2026: Design Command Center (REFINED)
  * 
- * Swiggy 2026 Pattern: Absolute Transparency & Zero Friction
+ * WYSHKIT 2026 Pattern: Absolute Transparency & Zero Friction
  * - Move "Skip" logic to the main dashboard for minimal clicks.
  * - Add "Approval SLA" countdown (15m) when preview is ready.
  * - Momentum UI: Micro-animations for high-intent states.
@@ -57,10 +57,10 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                     <div className="space-y-3">
                         <div className="flex items-center justify-between px-1">
                             <div className="flex items-center gap-2">
-                                <div className="size-5 rounded-md bg-zinc-900 flex items-center justify-center">
-                                    <Sparkles className="size-3 text-amber-500" />
+                                <div className="size-5 rounded-md bg-[var(--text-primary)] flex items-center justify-center">
+                                    <Sparkles className="size-3 text-[var(--warning)]" />
                                 </div>
-                                <span className="text-xs font-black text-zinc-900 tracking-tight">
+                                <span className="text-xs font-bold text-[var(--text-primary)] tracking-tight">
                                     Status: {order.personalization_status === 'preview_ready' ? 'Preview Awaiting Action' : 'In Progress'}
                                 </span>
                             </div>
@@ -70,7 +70,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                     <HyperlocalTimer
                                         deadline={approvalDeadline}
                                         variant="minimal"
-                                        className="text-[11px] font-black text-rose-600 p-0 shadow-none bg-transparent"
+                                        className="text-xs font-bold text-rose-600 p-0 shadow-none bg-transparent"
                                     />
                                 </div>
                             )}
@@ -79,7 +79,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                         {/* Quick View Carousel */}
                         <div className="flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-2">
                             {previews.map((preview, idx) => (
-                                <div key={preview.id} className="relative aspect-[4/3] w-[85%] shrink-0 snap-center rounded-xl overflow-hidden border border-zinc-100 shadow-sm shadow-zinc-200/50 bg-zinc-50 group">
+                                <div key={preview.id} className="relative aspect-[4/3] w-[85%] shrink-0 snap-center rounded-xl overflow-hidden border border-[var(--border)] shadow-sm shadow-[var(--shadow-sm)]/50 bg-[var(--surface-muted)] group">
                                     <Image
                                         src={preview.preview_url}
                                         alt={`Design iteration ${previews.length - idx}`}
@@ -87,9 +87,9 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                         className="object-cover"
                                     />
                                     {/* Iteration Badge */}
-                                    <div className="absolute top-4 left-4 px-3 py-1 bg-black/40 backdrop-blur-md rounded-full border border-white/20 flex items-center gap-1.5">
-                                        <div className={cn("size-1.5 rounded-full", idx === 0 ? "bg-amber-400 animate-pulse" : "bg-zinc-400")} />
-                                        <p className="text-[11px] font-black text-white tracking-tight">
+                                    <div className="absolute top-4 left-4 px-3 py-1 bg-[var(--foreground)]/40 backdrop-blur-md rounded-full border border-white/20 flex items-center gap-1.5">
+                                        <div className={cn("size-1.5 rounded-full", idx === 0 ? "bg-[var(--warning)] animate-pulse" : "bg-[var(--text-tertiary)]")} />
+                                        <p className="text-xs font-bold text-white tracking-tight">
                                             {idx === 0 ? 'Latest' : `Ver. ${previews.length - idx}`}
                                         </p>
                                     </div>
@@ -98,32 +98,32 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                         </div>
                     </div>
                 ) : (
-                    <div className="py-12 flex flex-col items-center justify-center text-center gap-4 bg-zinc-50/50 rounded-xl border border-zinc-100 overflow-hidden relative">
-                        {/* Swiggy 2026: Animated Pulse Background for high-impact action */}
+                    <div className="py-12 flex flex-col items-center justify-center text-center gap-4 bg-[var(--surface-muted)]/50 rounded-xl border border-[var(--border)] overflow-hidden relative">
+                        {/* WYSHKIT 2026: Animated Pulse Background for high-impact action */}
                         <div className="absolute inset-0 bg-gradient-to-b from-white to-transparent opacity-50" />
-                        <div className="size-16 rounded-xl bg-white border border-zinc-100 flex items-center justify-center shadow-sm relative z-10">
+                        <div className="size-16 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shadow-sm relative z-10">
                             {hasSubmittedBrief ? (
                                 <div className="relative">
-                                    <Clock className="size-8 text-zinc-400" />
-                                    <div className="absolute inset-0 size-8 border-2 border-zinc-100 border-t-zinc-400 rounded-full animate-spin opacity-20" />
+                                    <Clock className="size-8 text-[var(--text-tertiary)]" />
+                                    <div className="absolute inset-0 size-8 border-2 border-[var(--border)] border-t-[var(--text-tertiary)] rounded-full animate-spin opacity-20" />
                                 </div>
                             ) : (
-                                <Sparkles className="size-8 text-zinc-200" />
+                                <Sparkles className="size-8 text-[var(--border)]" />
                             )}
                         </div>
                         <div className="space-y-3 px-6 relative z-10">
                             <div>
                                 {hasSubmittedBrief ? (
                                     <>
-                                        <p className="text-[11px] font-black text-zinc-950 tracking-tight leading-none">Brief Received</p>
-                                        <p className="text-xs font-bold text-zinc-400 mt-2 max-w-[220px] mx-auto leading-relaxed">
+                                        <p className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">Brief Received</p>
+                                        <p className="text-xs font-bold text-[var(--text-tertiary)] mt-2 max-w-[220px] mx-auto leading-relaxed">
                                             Your vendor is reviewing your vision. First preview expected shortly.
                                         </p>
                                     </>
                                 ) : (
                                     <>
-                                        <p className="text-[11px] font-black text-zinc-950 tracking-tight leading-none">Creative Process Pending</p>
-                                        <p className="text-xs font-bold text-zinc-400 mt-2 max-w-[220px] mx-auto leading-relaxed">
+                                        <p className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">Creative Process Pending</p>
+                                        <p className="text-xs font-bold text-[var(--text-tertiary)] mt-2 max-w-[220px] mx-auto leading-relaxed">
                                             Share your vision to start the bespoke crafting process.
                                         </p>
                                     </>
@@ -140,7 +140,7 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                             triggerHaptic(HapticPattern.ACTION);
                                             onOpenPersonalization();
                                         }}
-                                        className="px-8 py-3 bg-zinc-900 text-white rounded-xl text-xs font-black tracking-tight hover:bg-black active:scale-95 transition-all shadow-sm shadow-zinc-950/10"
+                                        className="px-8 py-3 bg-[var(--text-primary)] text-white rounded-xl text-xs font-bold tracking-tight hover:bg-[var(--foreground)] active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10"
                                     >
                                         Complete Brief
                                     </button>

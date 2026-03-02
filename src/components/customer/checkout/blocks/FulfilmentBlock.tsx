@@ -86,21 +86,21 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
           <label className="label-overline">Delivering to</label>
           <button
             onClick={() => onCommit(null)}
-            className="text-xs font-semibold text-zinc-900 active:opacity-50"
+            className="text-xs font-semibold text-[var(--text-primary)] active:opacity-50"
           >
             Change
           </button>
         </div>
-        <div className="p-2.5 bg-zinc-50 rounded-lg flex items-start gap-2.5">
-          <div className="size-8 rounded-md bg-white border border-zinc-100 flex items-center justify-center shrink-0">
-            <Icon className="size-3.5 text-zinc-600" />
+        <div className="p-2.5 bg-[var(--surface-muted)] rounded-[var(--radius-md)] flex items-start gap-2.5">
+          <div className="size-8 rounded-[var(--radius-sm)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shrink-0">
+            <Icon className="size-3.5 text-[var(--text-secondary)]" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="text-sm font-semibold text-zinc-900 truncate">{addr.name}</p>
-              <Check className="size-3 text-emerald-500 shrink-0" />
+              <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{addr.name}</p>
+              <Check className="size-3 text-[var(--success)] shrink-0" />
             </div>
-            <p className="text-xs text-zinc-500 leading-relaxed mt-0.5 line-clamp-2">
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed mt-0.5 line-clamp-2">
               {addr.address_line1}{addr.city ? `, ${addr.city}` : ''} {addr.pincode || ''}
             </p>
           </div>
@@ -114,7 +114,7 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
       <div className="space-y-2">
         <label className="label-overline">Delivery address</label>
         <div className="flex items-center justify-center py-6">
-          <Loader2 className="size-4 animate-spin text-zinc-400" />
+          <Loader2 className="size-4 animate-spin text-[var(--text-tertiary)]" />
         </div>
       </div>
     );
@@ -125,9 +125,9 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
       <label className="label-overline">Delivery address</label>
 
       {isAddingAddress ? (
-        <div className="p-4 bg-white rounded-xl border border-zinc-200 shadow-sm">
+        <div className="p-4 bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)] shadow-[var(--shadow-sm)]">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-zinc-900">Add New Address</h3>
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">Add New Address</h3>
           </div>
 
           <AddressForm
@@ -142,16 +142,16 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
           />
         </div>
       ) : addresses.length === 0 ? (
-        <div className="p-4 text-center bg-zinc-50 rounded-lg">
-          <div className="size-8 rounded-full bg-zinc-100 flex items-center justify-center mx-auto mb-2">
-            <MapPin className="size-3.5 text-zinc-400" />
+        <div className="p-4 text-center bg-[var(--surface-muted)] rounded-[var(--radius-md)]">
+          <div className="size-8 rounded-full bg-[var(--surface-muted)] flex items-center justify-center mx-auto mb-2">
+            <MapPin className="size-3.5 text-[var(--text-tertiary)]" />
           </div>
-          <p className="text-xs font-semibold text-zinc-500 mb-2">No saved addresses</p>
+          <p className="text-xs font-semibold text-[var(--text-secondary)] mb-2">No saved addresses</p>
           <Button
             onClick={() => setIsAddingAddress(true)}
             variant="outline"
             size="sm"
-            className="rounded-lg font-semibold gap-1.5 h-8 text-xs"
+            className="rounded-[var(--radius-md)] font-semibold gap-1.5 h-8 text-xs"
           >
             <Plus className="size-3.5" />
             Add address
@@ -169,10 +169,10 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
                 <div
                   key={addr.id}
                   className={cn(
-                    "w-full flex items-start gap-2.5 p-2.5 rounded-lg border transition-all",
+                    "w-full flex items-start gap-2.5 p-2.5 rounded-[var(--radius-md)] border transition-all",
                     isSelected
-                      ? "bg-zinc-900 border-zinc-900"
-                      : "bg-white border-zinc-100 hover:border-zinc-200"
+                      ? "bg-[var(--text-primary)] border-[var(--text-primary)]"
+                      : "bg-[var(--surface)] border-[var(--border)] hover:border-[var(--border)]"
                   )}
                 >
                   <button
@@ -184,18 +184,18 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
                   >
                     <div className={cn(
                       "size-3.5 rounded-full border-2 flex items-center justify-center mt-0.5 shrink-0",
-                      isSelected ? "border-white" : "border-zinc-200"
+                      isSelected ? "border-white" : "border-[var(--border)]"
                     )}>
-                      {isSelected && <div className="size-1.5 rounded-full bg-white" />}
+                      {isSelected && <div className="size-1.5 rounded-full bg-[var(--surface)]" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-0.5">
-                        <Icon className={cn("size-3", isSelected ? "text-white/70" : "text-zinc-400")} />
-                        <p className={cn("text-[13px] font-semibold", isSelected ? "text-white" : "text-zinc-900")}>
+                        <Icon className={cn("size-3", isSelected ? "text-white/70" : "text-[var(--text-tertiary)]")} />
+                        <p className={cn("text-sm font-semibold", isSelected ? "text-white" : "text-[var(--text-primary)]")}>
                           {addr.name}
                         </p>
                       </div>
-                      <p className={cn("text-xs leading-relaxed", isSelected ? "text-white/60" : "text-zinc-500")}>
+                      <p className={cn("text-xs leading-relaxed", isSelected ? "text-white/60" : "text-[var(--text-secondary)]")}>
                         {addr.address_line1}{addr.city ? `, ${addr.city}` : ''}
                       </p>
                     </div>
@@ -206,8 +206,8 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
                         onClick={(e) => e.stopPropagation()}
                         disabled={isDeleting}
                         className={cn(
-                          "p-1.5 rounded-lg shrink-0 transition-colors",
-                          isSelected ? "hover:bg-white/10 text-white/70" : "hover:bg-zinc-100 text-zinc-400"
+                          "p-1.5 rounded-[var(--radius-md)] shrink-0 transition-colors",
+                          isSelected ? "hover:bg-[var(--surface)]/10 text-[var(--background)]/70" : "hover:bg-[var(--surface-muted)] text-[var(--text-tertiary)]"
                         )}
                         aria-label="Address options"
                       >
@@ -257,7 +257,7 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
             onClick={() => setIsAddingAddress(true)}
             variant="ghost"
             size="sm"
-            className="w-full h-9 rounded-lg font-bold text-xs text-zinc-500 border border-dashed border-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 gap-1.5"
+            className="w-full h-9 rounded-[var(--radius-md)] font-bold text-xs text-[var(--text-secondary)] border border-dashed border-[var(--border)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] gap-1.5"
           >
             <Plus className="size-3.5" />
             Add New Address

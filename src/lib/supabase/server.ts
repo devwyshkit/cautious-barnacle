@@ -1,52 +1,23 @@
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from './database.types'
 import { getSupabaseEnv } from '@/lib/env'
-import { logger } from '@/lib/logging/logger'
+import { resilientFetch } from './resilience'
 
+/**
+ * WYSHKIT 2026: Standard Server Client
+ * Uses the God-Level Resilience Fetch for India-region DNS failover.
+ */
 export async function createClient() {
   const { cookies } = await import('next/headers')
   const cookieStore = await cookies()
   const { url, key } = getSupabaseEnv()
-
-  // WYSHKIT 2026: Network Resilience Wrapper
-  // Specifically designed to combat "fetch failed" in unstable local environments.
-  const resilientFetch = async (url: string, options: any = {}) => {
-    let lastError;
-    for (let i = 0; i < 3; i++) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-
-        const response = await fetch(url, {
-          ...options,
-          signal: controller.signal,
-          headers: {
-            ...options.headers,
-            'x-wyshkit-client-resilience': 'true',
-            'x-wyshkit-retry-count': i.toString(),
-          }
-        });
-        clearTimeout(timeoutId);
-        return response;
-      } catch (err: any) {
-        lastError = err;
-        if (err.name === 'AbortError') {
-          logger.warn(`[SUPABASE_RESILIENCE] Timeout on attempt ${i + 1} for ${url}`);
-        } else {
-          logger.warn(`[SUPABASE_RESILIENCE] Fetch failed on attempt ${i + 1}: ${err.message}`);
-        }
-        await new Promise(res => setTimeout(res, 500 * (i + 1))); // Exponential backoff
-      }
-    }
-    throw lastError;
-  };
 
   return createServerClient<Database>(
     url,
     key,
     {
       global: {
-        fetch: resilientFetch as any
+        fetch: (u, o) => resilientFetch(u, { ...o, traceName: 'SERVER_CLIENT' })
       },
       cookies: {
         getAll() {
@@ -58,30 +29,35 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             )
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // Server Component cookie restriction (expected)
           }
         },
       },
     }
   )
 }
+
 import { createClient as createBaseClient } from '@supabase/supabase-js'
 
+/**
+ * WYSHKIT 2026: Admin Client
+ * Bypasses RLS - Uses same Resilience Layer.
+ */
 export async function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const { url } = getSupabaseEnv();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!url || !serviceRoleKey) {
     throw new Error('Missing Supabase Admin environment variables')
   }
 
-  // SWIGGY 2026: Admin client requires the pure JS client, not SSR cookie client
   return createBaseClient<Database>(
     url,
     serviceRoleKey,
     {
+      global: {
+        fetch: (u, o) => resilientFetch(u, { ...o, traceName: 'ADMIN_CLIENT', timeoutMs: 12000 })
+      },
       auth: {
         autoRefreshToken: false,
         persistSession: false

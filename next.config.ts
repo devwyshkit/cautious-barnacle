@@ -1,20 +1,24 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000"],
+      allowedOrigins: ["localhost:3000", "wyshkit.com", "*.wyshkit.com", "wyshkit-salt-bae.vercel.app"],
       bodySizeLimit: '10mb'
     },
   },
-  outputFileTracingRoot: path.join(__dirname),
+
   images: {
     formats: ['image/webp', 'image/avif'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'hlvwfzickwpobjaxsbcc.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'hlvwfzickwpobjaxsbcc.supabase.com',
         pathname: '/storage/v1/object/public/**',
       },
       {

@@ -18,55 +18,31 @@ export interface LocationData {
 /**
  * WYSHKIT 2026: Server-side Location Resolver
  * 
- * Swiggy 2026 Pattern: One-Trip Location
+ * WYSHKIT 2026 Pattern: One-Trip Location
  * - Resolves location once on the server to prevent hydration flickers.
  * - Authenticated users: Fetches default address from Supabase.
  * - Guest users: Checks cookies for ephemeral location.
  */
-export const getServerLocation = cache(async function getServerLocation(): Promise<LocationData> {
+export const getServerLocation = cache(async function getServerLocation(userParam?: any): Promise<LocationData> {
     try {
-        // 1. Check Edge-Injected Headers (Fastest Path - Swiggy 2026)
+        // 1. Check Edge-Injected Headers (Fastest Path - WYSHKIT 2026: Zero-Trip)
         const headerList = await headers()
         const edgeLat = headerList.get('x-wyshkit-location-lat')
         const edgeLng = headerList.get('x-wyshkit-location-lng')
         const edgeName = headerList.get('x-wyshkit-location-name')
 
         if (edgeLat && edgeLng) {
+            // WYSHKIT 2026: If we have Edge Headers, we are done. Zero DB trips.
             return {
                 name: edgeName ? decodeURIComponent(edgeName) : 'Current location',
-                address: `${edgeLat}, ${edgeLng}`,
+                address: '',
                 pincode: '',
                 lat: parseFloat(edgeLat),
                 lng: parseFloat(edgeLng)
             }
         }
 
-        const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-
-        // 2. Fetch from Supabase for authenticated users (Fallback 1)
-        if (user) {
-            const { data: addresses } = await supabase
-                .from('user_addresses')
-                .select('name, type, city, address_line1, pincode, is_default, latitude, longitude')
-                .eq('user_id', user.id)
-                .order('is_default', { ascending: false })
-                .limit(1);
-
-            if (addresses?.length) {
-                const addr = addresses[0];
-                const lat = addr.latitude !== null ? Number(addr.latitude) : undefined;
-                const lng = addr.longitude !== null ? Number(addr.longitude) : undefined;
-                return {
-                    name: addr.name || addr.type || 'Saved address',
-                    address: addr.city || addr.address_line1 || '',
-                    pincode: addr.pincode || '',
-                    ...(lat !== undefined && lng !== undefined && { lat, lng })
-                };
-            }
-        }
-
-        // 3. Fetch from Cookies for guest users (Fallback 2)
+        // 2. Fetch from Cookies (Secondary Path - Zero-Trip)
         const cookieStore = await cookies()
         const lat = cookieStore.get('wyshkit_lat')?.value
         const lng = cookieStore.get('wyshkit_lng')?.value
@@ -82,8 +58,33 @@ export const getServerLocation = cache(async function getServerLocation(): Promi
             }
         }
 
-        // 4. Fallback default
-        // WYSHKIT 2026: Dev Experience - Default to Bangalore if no location set
+        // 3. Fallback to Supabase for authenticated users (Tertiary Path - One-Trip)
+        // Note: We only do this if userParam is provided or if we can get it without a trip
+        let user = userParam;
+
+        if (user) {
+            const supabase = await createClient()
+            const { data: addresses } = await supabase
+                .from('user_addresses')
+                .select('name, type, city, address_line1, pincode, is_default, latitude, longitude')
+                .eq('user_id', user.id)
+                .order('is_default', { ascending: false })
+                .limit(1);
+
+            if (addresses?.length) {
+                const addr = addresses[0];
+                const latVal = addr.latitude !== null ? Number(addr.latitude) : undefined;
+                const lngVal = addr.longitude !== null ? Number(addr.longitude) : undefined;
+                return {
+                    name: addr.name || addr.type || 'Saved address',
+                    address: addr.city || addr.address_line1 || '',
+                    pincode: addr.pincode || '',
+                    ...(latVal !== undefined && lngVal !== undefined && { lat: latVal, lng: lngVal })
+                };
+            }
+        }
+
+        // 4. Fallback default (Dev Experience)
         if (process.env.NODE_ENV === 'development') {
             return {
                 name: 'Bangalore (Dev)',

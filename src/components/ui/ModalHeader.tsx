@@ -31,14 +31,14 @@ export function ModalHeader({
 
     return (
         <div className={cn(
-            "flex flex-col shrink-0 bg-white z-10",
+            "flex flex-col shrink-0 bg-[var(--surface)] z-10",
             isSheet ? "pt-2" : "pt-0",
             className
         )}>
             {/* Pull Indicator for Sheets */}
             {isSheet && (
                 <div className="flex justify-center pb-2">
-                    <div className="h-1.5 w-12 rounded-full bg-zinc-200" aria-hidden />
+                    <div className="h-1.5 w-12 rounded-full bg-[var(--border)]" aria-hidden />
                 </div>
             )}
 
@@ -46,7 +46,7 @@ export function ModalHeader({
                 {showBack && (
                     <button
                         onClick={handleBack}
-                        className="size-10 flex items-center justify-center rounded-xl bg-zinc-50 text-zinc-900 active:scale-95 transition-all"
+                        className="size-10 flex items-center justify-center rounded-xl bg-[var(--surface-muted)] text-[var(--text-primary)] active:scale-95 transition-all"
                         aria-label="Go back"
                     >
                         <ChevronLeft className="size-6" />
@@ -55,7 +55,7 @@ export function ModalHeader({
 
                 <div className="flex-1 min-w-0">
                     {title && (
-                        <h2 className="text-[17px] font-bold text-zinc-950 truncate tracking-tight">
+                        <h2 className="text-base font-bold text-[var(--text-primary)] truncate tracking-tight">
                             {title}
                         </h2>
                     )}
@@ -64,7 +64,7 @@ export function ModalHeader({
                 {showClose && (
                     <button
                         onClick={handleClose}
-                        className="size-10 flex items-center justify-center rounded-xl bg-zinc-50 text-zinc-900 active:scale-95 transition-all"
+                        className="size-10 flex items-center justify-center rounded-xl bg-[var(--surface-muted)] text-[var(--text-primary)] active:scale-95 transition-all"
                         aria-label="Close"
                     >
                         <X className="size-5" />

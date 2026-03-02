@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function VendorPageLoading() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[100dvh]">
       <Skeleton className="w-full aspect-[3/2]" />
       <div className="px-4 py-6 space-y-4">
         <Skeleton className="h-8 w-48" />

@@ -47,7 +47,7 @@ export function useSearch(params: SearchParams) {
       setError(null);
 
       try {
-        // WYSHKIT 2026: Use Server Action instead of API route (Swiggy Pattern)
+        // WYSHKIT 2026: Use Server Action instead of API route (WyshKit Pattern)
         const result = await searchFiltered({
           q: params.q,
           category: params.category,

@@ -18,7 +18,12 @@ export function Confetti() {
     }>>([]);
 
     useEffect(() => {
-        const colors = ['#C5A059', '#161824', '#F1F1F6', '#686B78'];
+        const colors = [
+            'var(--primary)',
+            'var(--text-primary)',
+            'var(--surface-muted)',
+            'var(--text-tertiary)'
+        ];
         const newPieces = Array.from({ length: 50 }).map((_, i) => ({
             id: i,
             x: Math.random() * 100,
@@ -35,7 +40,7 @@ export function Confetti() {
     }, []);
 
     return (
-        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none z-[var(--z-toast)] overflow-hidden">
             {pieces.map((p) => (
                 <div
                     key={p.id}

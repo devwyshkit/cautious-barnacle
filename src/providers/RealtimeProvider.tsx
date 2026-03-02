@@ -27,12 +27,7 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
     const { user, loading: authLoading } = useAuth();
     const [channel, setChannel] = useState<RealtimeChannel | null>(null);
     const [isConnected, setIsConnected] = useState(false);
-    const [mounted, setMounted] = useState(false);
     const supabase = useMemo(() => createClient(), []);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     useEffect(() => {
         if (authLoading || !user) {
@@ -58,8 +53,6 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
             supabase.removeChannel(userChannel);
         };
     }, [user?.id, authLoading, supabase]);
-
-    if (!mounted) return null;
 
     return (
         <RealtimeContext.Provider value={{ channel, isConnected }}>

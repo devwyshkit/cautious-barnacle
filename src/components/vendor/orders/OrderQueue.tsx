@@ -136,24 +136,24 @@ export function OrderQueue({ initialOrders, vendorId }: OrderQueueProps) {
   return (
     <div className="space-y-4 h-full flex flex-col">
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as StatusTab)}>
-        <TabsList className="grid grid-cols-4 w-full bg-zinc-100">
+        <TabsList className="grid grid-cols-4 w-full bg-[var(--surface-muted)]">
           {STATUS_TABS.map(tab => {
             const count = getOrderCount(tab.id);
             return (
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="relative data-[state=active]:bg-white"
+                className="relative data-[state=active]:bg-[var(--surface)]"
               >
                 {tab.label}
                 {count > 0 && (
                   <span className={cn(
                     "ml-1.5 inline-flex items-center justify-center min-w-[18px] px-1 py-0.5 text-xs font-medium rounded-full",
                     activeTab === tab.id
-                      ? "bg-zinc-900 text-white"
+                      ? "bg-[var(--text-primary)] text-white"
                       : tab.id === 'new'
-                        ? "bg-red-500 text-white"
-                        : "bg-zinc-200 text-zinc-600"
+                        ? "bg-[var(--primary)] text-white"
+                        : "bg-[var(--border)] text-[var(--text-secondary)]"
                   )}>
                     {count}
                   </span>
@@ -166,9 +166,9 @@ export function OrderQueue({ initialOrders, vendorId }: OrderQueueProps) {
 
       <div className="space-y-3">
         {filteredOrders.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl border border-zinc-100">
-            <Package className="size-12 text-zinc-200 mx-auto mb-3" />
-            <p className="text-sm text-zinc-500">No orders here</p>
+          <div className="text-center py-16 bg-[var(--surface)] rounded-xl border border-[var(--border)]">
+            <Package className="size-12 text-[var(--border)] mx-auto mb-3" />
+            <p className="text-sm text-[var(--text-secondary)]">No orders here</p>
           </div>
         ) : (
           filteredOrders.map(order => (

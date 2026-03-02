@@ -24,14 +24,14 @@ export function OrderList({ initialOrders }: OrderListProps) {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
       // WYSHKIT 2026: Authority from View
       const { data, error } = await supabase
         .from("v_order_tracking")
         .select("*")
-        .eq("user_id", session.user.id)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -60,7 +60,7 @@ export function OrderList({ initialOrders }: OrderListProps) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="size-8 animate-spin text-zinc-200" />
+        <Loader2 className="size-8 animate-spin text-[var(--border)]" />
       </div>
     );
   }
@@ -74,8 +74,8 @@ export function OrderList({ initialOrders }: OrderListProps) {
           actionLabel="Browse products"
           onAction={() => router.push("/")}
         >
-          <div className="size-16 rounded-xl bg-zinc-50 flex items-center justify-center mb-4">
-            <PackageOpen className="size-8 text-zinc-300" />
+          <div className="size-16 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center mb-4">
+            <PackageOpen className="size-8 text-[var(--text-tertiary)]" />
           </div>
         </EmptyState>
       </div>

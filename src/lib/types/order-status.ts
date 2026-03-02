@@ -17,7 +17,7 @@ export interface StatusConfig {
   label: string;
   subLabel: string;
   icon: React.ReactNode;
-  color: string; // Tailwind class like 'bg-zinc-500'
+  color: string; // Tailwind class like 'bg-[var(--surface-muted)]0'
   pulse: boolean;
 }
 
@@ -66,8 +66,8 @@ export function getStatusConfig(order: {
     return {
       label: "Design Input Needed",
       subLabel: "Upload your design details now",
-      icon: React.createElement(Sparkles, { className: "size-4 text-amber-500" }),
-      color: "bg-amber-50",
+      icon: React.createElement(Sparkles, { className: "size-4 text-[var(--warning)]" }),
+      color: "bg-[var(--well-warning)]",
       pulse: true
     };
   }
@@ -77,8 +77,8 @@ export function getStatusConfig(order: {
     return {
       label: "Preview Ready",
       subLabel: "Tap to approve and ship",
-      icon: React.createElement(Package, { className: "size-4 text-emerald-500" }),
-      color: "bg-emerald-50",
+      icon: React.createElement(Package, { className: "size-4 text-[var(--success)]" }),
+      color: "bg-[var(--well-success)]",
       pulse: true
     };
   }
@@ -88,8 +88,8 @@ export function getStatusConfig(order: {
     return {
       label: "Order Placed",
       subLabel: "Waiting for vendor to accept",
-      icon: React.createElement(Clock, { className: "size-4 text-zinc-400" }),
-      color: "bg-zinc-50",
+      icon: React.createElement(Clock, { className: "size-4 text-[var(--text-tertiary)]" }),
+      color: "bg-[var(--surface-muted)]",
       pulse: true
     };
   }
@@ -98,8 +98,8 @@ export function getStatusConfig(order: {
   return {
     label: `Order #${order.order_number || (order.id ? order.id.slice(0, 8) : '...')}`,
     subLabel: getOrderStatusDisplay(order.status).toLowerCase(),
-    icon: React.createElement(Clock, { className: "size-4 text-zinc-400" }),
-    color: "bg-zinc-50",
+    icon: React.createElement(Clock, { className: "size-4 text-[var(--text-tertiary)]" }),
+    color: "bg-[var(--surface-muted)]",
     pulse: false
   };
 }
@@ -131,17 +131,17 @@ const STATUS_DISPLAY: Record<string, string> = {
 
 // Color classes for statuses - Wyshkit 2026 Design Language
 const STATUS_COLORS: Record<string, string> = {
-  PLACED: 'bg-rose-50 text-[var(--primary)] border-rose-100',
-  CONFIRMED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
-  IN_PRODUCTION: 'bg-amber-50 text-amber-600 border-amber-100',
-  PACKED: 'bg-rose-50 text-rose-600 border-rose-100',
-  RIDER_ASSIGNED: 'bg-indigo-50 text-indigo-600 border-indigo-100',
-  ARRIVED_PICKUP: 'bg-blue-50 text-blue-600 border-blue-100',
-  OUT_FOR_DELIVERY: 'bg-amber-50 text-amber-600 border-amber-100',
-  ARRIVED_DROP: 'bg-teal-50 text-teal-600 border-teal-100',
-  DELIVERED: 'bg-emerald-50 text-[#60B246] border-emerald-100',
-  CANCELLED: 'bg-zinc-100 text-zinc-500 border-zinc-200',
-  REFUNDED: 'bg-zinc-100 text-zinc-500 border-zinc-200',
+  PLACED: 'bg-[var(--well-destructive)] text-[var(--primary)] border-[var(--destructive)]/20',
+  CONFIRMED: 'bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20',
+  IN_PRODUCTION: 'bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20',
+  PACKED: 'bg-[var(--well-destructive)] text-[var(--destructive)] border-[var(--destructive)]/20',
+  RIDER_ASSIGNED: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
+  ARRIVED_PICKUP: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
+  OUT_FOR_DELIVERY: 'bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20',
+  ARRIVED_DROP: 'bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20',
+  DELIVERED: 'bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20',
+  CANCELLED: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
+  REFUNDED: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
 };
 
 export function getOrderStatusDisplay(status: string): string {
@@ -149,10 +149,10 @@ export function getOrderStatusDisplay(status: string): string {
 }
 
 export function getOrderStatusColor(status: string): string {
-  return STATUS_COLORS[status as OrderStatus] || 'bg-zinc-50 text-zinc-400 border-zinc-100';
+  return STATUS_COLORS[status as OrderStatus] || 'bg-[var(--surface-muted)] text-[var(--text-tertiary)] border-[var(--border)]';
 }
 
-// Swiggy 2026: Minimal Status Tracking
+// WYSHKIT 2026: Minimal Status Tracking
 const ORDER_TRACKING_STEPS = [
   ORDER_STATUS.PLACED,
   ORDER_STATUS.CONFIRMED,
@@ -177,11 +177,11 @@ export function isFinalStatus(status: string): boolean {
 export function canCancelOrder(status: string): boolean {
   return [ORDER_STATUS.PLACED, ORDER_STATUS.CONFIRMED].includes(status as any);
 }
-// Swiggy 2026: Order Product Status Configuration
+// WYSHKIT 2026: Order Product Status Configuration
 export function getProductStatusConfig(productStatus: string) {
   // Map legacy product statuses to the lean model if needed
   const display = STATUS_DISPLAY[productStatus] || productStatus;
-  const color = STATUS_COLORS[productStatus] || 'bg-zinc-100 text-zinc-600 border-zinc-200';
+  const color = STATUS_COLORS[productStatus] || 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]';
 
   return {
     label: display,

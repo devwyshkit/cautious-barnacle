@@ -98,10 +98,10 @@ export async function executeVendorIntent(intent: VendorIntent) {
                     const { variant_id, quantity } = validated.metadata;
                     await supabase.from('product_variants').update({ stock_quantity: quantity }).eq('id', variant_id).eq('product_id', validated.id);
                 } else if (validated.action === 'DELETE') {
-                    const { deleteProduct } = await import('./catalog');
+                    const { deleteProduct } = await import('./products');
                     return await deleteProduct(validated.id);
                 }
-                revalidatePath('/vendor/catalog');
+                revalidatePath('/vendor/products');
                 break;
             }
 

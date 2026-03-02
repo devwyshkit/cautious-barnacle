@@ -39,12 +39,12 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
 
     return (
         <>
-            <section className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
-                <div className="px-5 py-4 border-b border-zinc-100 bg-white flex items-center justify-between">
-                    <h3 className="text-[11px] font-black text-zinc-950 tracking-tight">Order Contents</h3>
-                    <span className="text-xs font-black text-zinc-400 tabular-nums">#{order.order_number}</span>
+            <section className="bg-[var(--surface)] rounded-xl border border-[var(--border)] overflow-hidden">
+                <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-[var(--text-primary)] tracking-tight">Order Contents</h3>
+                    <span className="text-xs font-bold text-[var(--text-tertiary)] tabular-nums">#{order.order_number}</span>
                 </div>
-                <div className="divide-y divide-zinc-50">
+                <div className="divide-y divide-[var(--surface-muted)]">
                     {(order.order_products || []).map((product: any) => (
                         <div key={product.id} className="group/product">
                             <button
@@ -52,9 +52,9 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                     e.stopPropagation();
                                     setSelectedPreviewProduct(product);
                                 }}
-                                className="w-full p-4 flex gap-4 text-left hover:bg-zinc-50 active:scale-[0.99] transition-all outline-none relative z-10"
+                                className="w-full p-4 flex gap-4 text-left hover:bg-[var(--surface-muted)] active:scale-[0.99] transition-all outline-none relative z-10"
                             >
-                                <div className="size-16 bg-zinc-50 rounded-xl relative overflow-hidden border border-zinc-100 shrink-0">
+                                <div className="size-16 bg-[var(--surface-muted)] rounded-xl relative overflow-hidden border border-[var(--border)] shrink-0">
                                     {product.product_image_url ? (
                                         <Image
                                             src={product.product_image_url}
@@ -64,26 +64,26 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                         />
                                     ) : (
                                         <div className="size-full flex items-center justify-center">
-                                            <ShoppingBag className="size-6 text-zinc-200" />
+                                            <ShoppingBag className="size-6 text-[var(--border)]" />
                                         </div>
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-start justify-between gap-2 mb-1">
-                                        <p className="text-sm font-bold text-zinc-900 line-clamp-2 leading-tight">{product.product_name}</p>
-                                        <p className="text-xs font-bold text-zinc-900 tabular-nums">x{product.quantity}</p>
+                                        <p className="text-sm font-bold text-[var(--text-primary)] line-clamp-2 leading-tight">{product.product_name}</p>
+                                        <p className="text-xs font-bold text-[var(--text-primary)] tabular-nums">x{product.quantity}</p>
                                     </div>
 
                                     <div className="flex items-center justify-between mt-2">
                                         {renderProductStatus(product)}
-                                        <span className="text-xs font-bold text-zinc-900">{formatCurrency(product.total_price)}</span>
+                                        <span className="text-xs font-bold text-[var(--text-primary)]">{formatCurrency(product.total_price)}</span>
                                     </div>
 
                                     {/* WYSHKIT 2026: Details Peek (When not in full review) */}
                                     {product.is_personalized && product.personalization_details && product.status !== 'preview_ready' && (
-                                        <div className="mt-4 pt-4 border-t border-zinc-50/50">
-                                            <p className="text-xs font-black text-zinc-400 tracking-tight mb-2">Submitted Brief</p>
-                                            <div className="line-clamp-2 text-[11px] text-zinc-600 italic">
+                                        <div className="mt-4 pt-4 border-t border-[var(--surface-muted)]/50">
+                                            <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-2">Submitted Brief</p>
+                                            <div className="line-clamp-2 text-xs text-[var(--text-secondary)] italic">
                                                 {Object.values(product.personalization_details).filter(v => typeof v === 'string').join(', ')}
                                             </div>
                                         </div>
@@ -99,12 +99,12 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
             <ResponsiveSurface
                 open={!!selectedPreviewProduct}
                 onOpenChange={(open) => !open && setSelectedPreviewProduct(null)}
-                className="p-0 sm:max-w-xl h-[85dvh] sm:h-[90dvh] bg-zinc-50 border-none"
+                className="p-0 sm:max-w-xl h-[85dvh] sm:h-[90dvh] bg-[var(--surface-muted)] border-none"
             >
                 {selectedPreviewProduct && productPreviews[selectedPreviewProduct.id] && (
                     <div className="h-full overflow-y-auto overscroll-contain pb-safe scrollbar-hide">
-                        <div className="p-4 sticky top-0 bg-white/80 backdrop-blur-md z-10 border-b border-zinc-100 flex items-center justify-between">
-                            <h3 className="text-lg font-black text-zinc-900 tracking-tight">
+                        <div className="p-4 sticky top-0 bg-[var(--surface)]/80 backdrop-blur-md z-10 border-b border-[var(--border)] flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">
                                 {selectedPreviewProduct.status === 'preview_ready' ? 'Review Design' : 'Product Details'}
                             </h3>
                         </div>
@@ -156,15 +156,15 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                             ) : (
                                 <div className="space-y-6">
                                     <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-black text-zinc-400 tracking-tight px-1">Tracking Status</span>
-                                        <div className="p-4 bg-white border border-zinc-100 rounded-xl flex items-center justify-between">
+                                        <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight px-1">Tracking Status</span>
+                                        <div className="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-xl flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                                                <div className="size-10 rounded-xl bg-zinc-50 flex items-center justify-center border border-zinc-100">
-                                                    <Package className="size-5 text-zinc-400" />
+                                                <div className="size-10 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center border border-[var(--border)]">
+                                                    <Package className="size-5 text-[var(--text-tertiary)]" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs font-bold text-zinc-900 tracking-tight">{selectedPreviewProduct.status || order.status}</p>
-                                                    <p className="text-xs text-zinc-500 font-medium">Last updated recently</p>
+                                                    <p className="text-xs font-bold text-[var(--text-primary)] tracking-tight">{selectedPreviewProduct.status || order.status}</p>
+                                                    <p className="text-xs text-[var(--text-secondary)] font-medium">Last updated recently</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -172,16 +172,16 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
 
                                     {selectedPreviewProduct.is_personalized && (
                                         <div className="space-y-3">
-                                            <span className="text-xs font-black text-zinc-400 tracking-tight px-1">Personalisation Details</span>
+                                            <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight px-1">Personalisation Details</span>
                                             {selectedPreviewProduct.personalization_details ? (
                                                 <SubmittedPersonalization
                                                     details={selectedPreviewProduct.personalization_details as any}
                                                     itemName={selectedPreviewProduct.product_name}
                                                 />
                                             ) : (
-                                                <div className="p-8 text-center bg-zinc-50 rounded-xl border border-zinc-100">
-                                                    <Sparkles className="size-8 text-zinc-200 mx-auto mb-3" />
-                                                    <p className="text-xs font-bold text-zinc-400 tracking-tight">Awaiting Personalisation Brief</p>
+                                                <div className="p-8 text-center bg-[var(--surface-muted)] rounded-xl border border-[var(--border)]">
+                                                    <Sparkles className="size-8 text-[var(--border)] mx-auto mb-3" />
+                                                    <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">Awaiting Personalisation Brief</p>
                                                 </div>
                                             )}
                                         </div>

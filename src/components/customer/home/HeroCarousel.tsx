@@ -11,8 +11,8 @@ import { HERO_SLIDES } from '@/lib/constants/home-config';
  */
 export function HeroCarousel() {
   return (
-    <section className="px-4 pb-3 md:px-8 slide-in-from-bottom-2 [animation-delay:0.05s]">
-      <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 snap-x snap-mandatory">
+    <section className="px-[var(--space-4)] pb-[var(--space-3)] md:px-[var(--space-8)] slide-in-from-bottom-2 [animation-delay:0.05s]">
+      <div className="flex gap-[var(--space-3)] overflow-x-auto no-scrollbar -mx-[var(--space-4)] px-[var(--space-4)] snap-x snap-mandatory">
         {HERO_SLIDES.map((slide) => (
           <Link
             key={slide.id}

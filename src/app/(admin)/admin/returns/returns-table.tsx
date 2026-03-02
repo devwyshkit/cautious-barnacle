@@ -44,9 +44,9 @@ function formatDate(date: string | null) {
 
 function getStatusBadge(status: string | null) {
   const colors: Record<string, string> = {
-    pending: 'text-amber-600 border-amber-200',
-    approved: 'text-emerald-600 border-emerald-200',
-    rejected: 'text-red-600 border-red-200',
+    pending: 'text-[var(--warning)] border-[var(--warning)]/20',
+    approved: 'text-[var(--success)] border-[var(--success)]/20',
+    rejected: 'text-[var(--destructive)] border-[var(--border)] bg-[var(--destructive-muted)]',
   }
   return <Badge variant="outline" className={colors[status || ''] || ''}>{status || 'pending'}</Badge>
 }
@@ -97,7 +97,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--text-tertiary)]" />
           <Input
             placeholder="Search by order or reason..."
             value={search}
@@ -131,7 +131,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-zinc-500 py-8">
+                <TableCell colSpan={7} className="text-center text-[var(--text-secondary)] py-8">
                   No returns found
                 </TableCell>
               </TableRow>
@@ -141,7 +141,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
                   <TableCell className="font-medium">
                     #{returnProduct.orders?.order_number || '-'}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-zinc-500">
+                  <TableCell className="hidden md:table-cell text-[var(--text-secondary)]">
                     {returnProduct.orders?.vendors?.business_name || '-'}
                   </TableCell>
                   <TableCell className="max-w-[200px] truncate" title={returnProduct.reason ?? undefined}>
@@ -151,7 +151,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
                     {returnProduct.refund_amount ? formatCurrency(returnProduct.refund_amount) : formatCurrency(returnProduct.orders?.total || 0)}
                   </TableCell>
                   <TableCell>{getStatusBadge(returnProduct.status)}</TableCell>
-                  <TableCell className="hidden lg:table-cell text-zinc-500">
+                  <TableCell className="hidden lg:table-cell text-[var(--text-secondary)]">
                     {formatDate(returnProduct.created_at)}
                   </TableCell>
                   <TableCell className="text-right">
@@ -162,7 +162,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
                           variant="ghost"
                           onClick={() => handleApprove(returnProduct.id, returnProduct.orders?.total || 0)}
                           disabled={processing === returnProduct.id}
-                          className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                          className="text-[var(--success)] hover:text-[var(--success)]/80 hover:bg-[var(--well-success)]"
                         >
                           <Check className="size-4" />
                         </Button>
@@ -171,7 +171,7 @@ export function ReturnsTable({ returns, currentStatus }: ReturnsTableProps) {
                           variant="ghost"
                           onClick={() => handleReject(returnProduct.id)}
                           disabled={processing === returnProduct.id}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-[var(--destructive)] hover:text-[var(--destructive)] hover:bg-[var(--destructive-muted)]"
                         >
                           <X className="size-4" />
                         </Button>

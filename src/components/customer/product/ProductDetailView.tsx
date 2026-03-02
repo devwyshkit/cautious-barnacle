@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Plus, Minus, Star, Check, Loader2, PlayCircle, Clock, ShieldCheck, Info, AlertTriangle, Sparkles, IndianRupee, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Minus, Plus, ShoppingBag, Store, Clock, Star, Heart, TrendingUp, Sparkles, AlertCircle, Loader2, Info, Snowflake, PlayCircle, AlertTriangle, Check, ShieldCheck } from 'lucide-react';
 import { ImageWithFallback } from '@/components/ui/ImageWithFallback';
 import { useCart, CartActionResult } from '@/components/customer/CartProvider';
 
@@ -170,22 +170,22 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
     }, [selectedVariant, product.images]);
 
     return (
-        <div className="flex flex-col h-full bg-white font-sans overflow-hidden">
+        <div className="flex flex-col h-full bg-[var(--surface)] font-sans overflow-hidden">
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar" data-vaul-no-drag>
                 {/* Immersive Navigation Bar */}
-                <div className="sticky top-0 left-0 right-0 z-50 p-4 pointer-events-none">
+                <div className="sticky top-0 left-0 right-0 z-[var(--z-nav)] p-4 pointer-events-none">
                     <button
                         onClick={handleBack}
-                        className="size-11 rounded-full bg-white/80 backdrop-blur-md shadow-sm flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-black/5"
+                        className="size-11 rounded-full bg-[var(--surface)]/80 backdrop-blur-md shadow-sm flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-black/5"
                         aria-label="Back"
                     >
-                        <Plus className="size-5 rotate-45 text-zinc-900" />
+                        <Plus className="size-5 rotate-45 text-[var(--text-primary)]" />
                     </button>
                 </div>
 
                 {/* Image Section */}
-                <div className="relative bg-white w-full aspect-[4/3] md:aspect-square">
+                <div className="relative bg-[var(--surface)] w-full aspect-[4/3] md:aspect-square">
                     <div
                         ref={imageContainerRef}
                         className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
@@ -197,7 +197,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         }}
                     >
                         {images.map((img: string, idx: number) => (
-                            <div key={idx} className="w-full h-full min-w-full flex-shrink-0 snap-center snap-always relative bg-zinc-50">
+                            <div key={idx} className="w-full h-full min-w-full flex-shrink-0 snap-center snap-always relative bg-[var(--surface-muted)]">
                                 <ImageWithFallback
                                     src={img || FALLBACK_IMAGE}
                                     alt={`${product.name} - ${idx + 1}`}
@@ -213,14 +213,14 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                     {product.video_url && (
                         <button
                             onClick={(e) => { e.stopPropagation(); window.open(product.video_url!, '_blank'); }}
-                            className="absolute bottom-6 right-6 z-10 size-12 rounded-full bg-white/90 backdrop-blur-md shadow-sm flex items-center justify-center hover:bg-white active:scale-95 transition-all text-zinc-900 border border-white"
+                            className="absolute bottom-6 right-6 z-10 size-12 rounded-full bg-[var(--surface)]/90 backdrop-blur-md shadow-sm flex items-center justify-center hover:bg-[var(--surface)] active:scale-95 transition-all text-[var(--text-primary)] border border-[var(--border)]"
                         >
                             <PlayCircle className="size-7" />
                         </button>
                     )}
 
                     {images.length > 1 && (
-                        <div className="absolute bottom-6 left-6 flex gap-1.5 z-10 p-2 rounded-full bg-black/30 backdrop-blur-md border border-white/20">
+                        <div className="absolute bottom-6 left-6 flex gap-1.5 z-10 p-2 rounded-full bg-[var(--foreground)]/30 backdrop-blur-md border border-[var(--border)]/20">
                             {images.map((_img: string, idx: number) => (
                                 <button
                                     key={idx}
@@ -230,7 +230,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                     }}
                                     className={cn(
                                         "w-1.5 h-1.5 rounded-full transition-all",
-                                        idx === activeImageIndex ? "bg-white w-4" : "bg-white/40"
+                                        idx === activeImageIndex ? "bg-[var(--surface)] w-4" : "bg-[var(--surface)]/40"
                                     )}
                                     aria-label={`View product image ${idx + 1}`}
                                     aria-current={idx === activeImageIndex ? 'true' : 'false'}
@@ -246,20 +246,20 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         <div className="flex items-start justify-between gap-4">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <p className="text-sm font-semibold text-zinc-500 tracking-tight">{(product as any).category || product.category_id || 'Product'}</p>
-                                    <div className="size-1 rounded-full bg-zinc-200" />
-                                    <p className="text-sm font-semibold text-zinc-500 tracking-tight">{product.vendors?.name || vendorId}</p>
+                                    <p className="text-sm font-semibold text-[var(--text-secondary)] tracking-tight">{(product as any).category || product.category_id || 'Product'}</p>
+                                    <div className="size-1 rounded-full bg-[var(--border)]" />
+                                    <p className="text-sm font-semibold text-[var(--text-secondary)] tracking-tight">{product.vendors?.name || vendorId}</p>
                                 </div>
-                                <h2 className="text-2xl font-black text-zinc-900 leading-tight tracking-tight">
+                                <h2 className="text-2xl font-bold text-[var(--text-primary)] leading-tight tracking-tight">
                                     {product.name}
                                 </h2>
                             </div>
                             <div className="flex flex-col items-end shrink-0">
-                                <span className="text-2xl font-black text-[var(--primary)] tabular-nums">
+                                <span className="text-2xl font-bold text-[var(--primary)] tabular-nums">
                                     {formatCurrency(unitPrice)}
                                 </span>
                                 {product.mrp && product.mrp > unitPrice && (
-                                    <span className="text-sm text-zinc-400 line-through tabular-nums decoration-zinc-300">
+                                    <span className="text-sm text-[var(--text-tertiary)] line-through tabular-nums decoration-[var(--border)]">
                                         {formatCurrency(product.mrp)}
                                     </span>
                                 )}
@@ -267,13 +267,19 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2 pt-1">
+                            {/* @ts-ignore - Handle missing is_cold in strict types temporarily */}
+                            {product.is_cold && (
+                                <span className="inline-flex items-center gap-1 rounded-[var(--radius-xs)] bg-[var(--well-info)] px-1.5 py-0.5 text-xs font-bold text-[var(--well-info-text)] uppercase tracking-widest border border-[var(--well-info-text)]/20 backdrop-blur-sm shadow-[var(--shadow-sm)]">
+                                    <Snowflake className="size-2.5" />
+                                </span>
+                            )}
                             {product.preview_time_minutes && product.preview_time_minutes > 0 && (
-                                <div className="flex items-center gap-1.5 px-2 py-1 bg-zinc-900 text-white rounded-lg shadow-sm">
-                                    <Sparkles className="size-3 text-amber-400" />
-                                    <span className="text-[11px] font-semibold tracking-tight">{product.preview_time_minutes} min preview</span>
+                                <div className="flex items-center gap-1.5 px-2 py-1 bg-[var(--text-primary)] text-[var(--background)] rounded-[var(--radius-md)] shadow-[var(--shadow-sm)]">
+                                    <Sparkles className="size-3 text-[var(--warning)]" />
+                                    <span className="text-xs font-semibold tracking-tight">{product.preview_time_minutes} min preview</span>
                                 </div>
                             )}
-                            <span className="text-[11px] font-semibold text-zinc-400 tracking-tight">Inc. {product.gst_percentage || 0}% GST</span>
+                            <span className="text-xs font-semibold text-[var(--text-tertiary)] tracking-tight">Inc. {product.gst_percentage || 0}% GST</span>
                         </div>
                     </div>
 
@@ -281,8 +287,8 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                     {variantsArray.length > 0 && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight">Select Option</h3>
-                                <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 tracking-tight">Required</span>
+                                <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Select Option</h3>
+                                <span className="text-xs font-semibold text-[var(--well-warning-text)] bg-[var(--well-warning)] px-2 py-0.5 rounded-[var(--radius-sm)] border border-[var(--well-warning-text)]/20 tracking-tight">Required</span>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 {(variantsArray as any[]).map((v: any) => {
@@ -298,22 +304,22 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                                 triggerHaptic(HapticPattern.ACTION);
                                             }}
                                             className={cn(
-                                                "flex flex-col items-start p-3 rounded-xl border text-left transition-all active:scale-[0.98]",
+                                                "flex flex-col items-start p-3 rounded-[var(--radius-lg)] border text-left transition-all active:scale-[0.98]",
                                                 isSelected
-                                                    ? "bg-zinc-900 border-zinc-900 text-white shadow-md shadow-zinc-200"
+                                                    ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
                                                     : isOutOfStock
-                                                        ? "bg-zinc-50 border-zinc-100 text-zinc-300 cursor-not-allowed"
-                                                        : "bg-white border-zinc-100 text-zinc-600 hover:border-zinc-200"
+                                                        ? "bg-[var(--surface-muted)] border-[var(--border)] text-[var(--text-tertiary)] cursor-not-allowed"
+                                                        : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
                                             )}
                                         >
                                             <span className="text-xs font-semibold leading-tight mb-1">{v.name}</span>
                                             <span className={cn(
                                                 "text-xs font-bold tabular-nums",
-                                                isSelected ? "text-white/80" : isOutOfStock ? "text-zinc-300" : "text-zinc-400"
+                                                isSelected ? "text-white/80" : isOutOfStock ? "text-[var(--text-tertiary)]" : "text-[var(--text-tertiary)]"
                                             )}>
                                                 {formatCurrency(v.price || 0)}
                                             </span>
-                                            {isOutOfStock && <span className="text-[11px] font-semibold text-rose-500 tracking-tight ml-1">Sold Out</span>}
+                                            {isOutOfStock && <span className="text-xs font-semibold text-rose-500 tracking-tight ml-1">Sold Out</span>}
                                         </button>
                                     );
                                 })}
@@ -326,16 +332,16 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight">Add Personalization</h3>
+                                    <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Add Personalization</h3>
                                     {personalizationArray.some(p => ('is_required' in p && (p as any).is_required)) && (
-                                        <span className="text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100 tracking-tight">Required</span>
+                                        <span className="text-xs font-semibold text-[var(--well-warning-text)] bg-[var(--well-warning)] px-2 py-0.5 rounded-[var(--radius-sm)] border border-[var(--well-warning-text)]/20 tracking-tight">Required</span>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 rounded-xl mb-2">
-                                <AlertTriangle className="size-4 text-rose-500 shrink-0" />
-                                <p className="text-[11px] font-semibold text-rose-800 leading-tight">
+                            <div className="flex items-center gap-3 p-4 bg-[var(--well-destructive)] border border-[var(--well-destructive-text)]/10 rounded-[var(--radius-lg)] mb-2">
+                                <AlertTriangle className="size-4 text-[var(--well-destructive-text)] shrink-0" />
+                                <p className="text-xs font-semibold text-[var(--well-destructive-text)] leading-tight">
                                     Personalized products are crafted specially for you and are non-returnable.
                                 </p>
                             </div>
@@ -353,24 +359,24 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                                 setSelectedAddonIds(next);
                                             }}
                                             className={cn(
-                                                "w-full flex items-center justify-between p-4 rounded-xl border transition-all active:scale-[0.99]",
+                                                "w-full flex items-center justify-between p-4 rounded-[var(--radius-lg)] border transition-all active:scale-[0.99]",
                                                 isSelected
-                                                    ? "bg-zinc-900 border-zinc-900 text-white shadow-md"
-                                                    : "bg-white border-zinc-100 text-zinc-600 hover:border-zinc-200"
+                                                    ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
+                                                    : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
                                             )}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className={cn(
-                                                    "size-5 rounded-md border flex items-center justify-center transition-colors",
-                                                    isSelected ? "bg-white border-white" : "bg-zinc-50 border-zinc-200"
+                                                    "size-5 rounded-[var(--radius-sm)] border flex items-center justify-center transition-colors",
+                                                    isSelected ? "bg-[var(--surface)] border-[var(--background)]" : "bg-[var(--surface-muted)] border-[var(--border)]"
                                                 )}>
-                                                    {isSelected && <Check className="size-3 text-zinc-900" strokeWidth={4} />}
+                                                    {isSelected && <Check className="size-3 text-[var(--text-primary)]" strokeWidth={4} />}
                                                 </div>
                                                 <span className="text-sm font-semibold">{p.name}</span>
                                             </div>
                                             <span className={cn(
                                                 "text-xs font-bold tabular-nums",
-                                                isSelected ? "text-white/60" : "text-zinc-400"
+                                                isSelected ? "text-white/60" : "text-[var(--text-tertiary)]"
                                             )}>
                                                 +{formatCurrency(p.price || 0)}
                                             </span>
@@ -385,8 +391,8 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                     {addonsArray.length > 0 && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight">Add Extras</h3>
-                                <span className="text-[11px] font-semibold text-zinc-400 bg-zinc-50 px-2 py-0.5 rounded-md border border-zinc-100 tracking-tight">Optional</span>
+                                <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Add Extras</h3>
+                                <span className="text-xs font-semibold text-[var(--text-tertiary)] bg-[var(--surface-muted)] px-2 py-0.5 rounded-[var(--radius-sm)] border border-[var(--border)] tracking-tight">Optional</span>
                             </div>
                             <div className="space-y-3">
                                 {addonsArray.map((addon) => {
@@ -406,23 +412,23 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                                 setSelectedAddonIds(next);
                                             }}
                                             className={cn(
-                                                "w-full flex items-center justify-between p-4 rounded-xl border transition-all active:scale-[0.99]",
+                                                "w-full flex items-center justify-between p-4 rounded-[var(--radius-lg)] border transition-all active:scale-[0.99]",
                                                 isSelected
-                                                    ? "bg-[var(--primary)] border-[var(--primary)] text-white shadow-md shadow-rose-100"
-                                                    : "bg-white border-zinc-100 text-zinc-600 hover:border-zinc-200"
+                                                    ? "bg-[var(--primary)] border-[var(--primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
+                                                    : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
                                             )}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className={cn(
-                                                    "size-5 rounded-md border flex items-center justify-center transition-colors",
-                                                    isSelected ? "bg-white border-white" : "bg-zinc-50 border-zinc-200"
+                                                    "size-5 rounded-[var(--radius-sm)] border flex items-center justify-center transition-colors",
+                                                    isSelected ? "bg-[var(--surface)] border-[var(--background)]" : "bg-[var(--surface-muted)] border-[var(--border)]"
                                                 )}>
                                                     {isSelected && <Check className="size-3 text-[var(--primary)]" strokeWidth={4} />}
                                                 </div>
                                                 <div className="flex flex-col items-start">
                                                     <span className="text-sm font-semibold">{addon.name}</span>
                                                     {isSelected && (
-                                                        <p className="text-[11px] font-bold text-white/80 leading-tight tracking-tight">
+                                                        <p className="text-xs font-bold text-white/80 leading-tight tracking-tight">
                                                             Added to your gift
                                                         </p>
                                                     )}
@@ -430,7 +436,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                             </div>
                                             <span className={cn(
                                                 "text-xs font-bold tabular-nums",
-                                                isSelected ? "text-white/80" : "text-zinc-400"
+                                                isSelected ? "text-white/80" : "text-[var(--text-tertiary)]"
                                             )}>
                                                 +{formatCurrency(addon.price || 0)}
                                             </span>
@@ -442,33 +448,33 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                     )}
 
                     {/* Technical Metadata Table */}
-                    <section className="space-y-4 pt-6 border-t border-zinc-100">
-                        <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight px-1">Specifications</h3>
-                        <div className="grid grid-cols-1 gap-2 bg-zinc-50/50 rounded-xl p-2 border border-zinc-100">
-                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Dimensions</span>
-                                <span className="text-xs font-semibold text-zinc-900">
+                    <section className="space-y-4 pt-6 border-t border-[var(--border)]">
+                        <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight px-1">Specifications</h3>
+                        <div className="grid grid-cols-1 gap-2 bg-[var(--surface-muted)]/50 rounded-[var(--radius-lg)] p-2 border border-[var(--border)]">
+                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)]/50">
+                                <span className="text-xs font-semibold text-[var(--text-secondary)] tracking-tight">Dimensions</span>
+                                <span className="text-xs font-semibold text-[var(--text-primary)]">
                                     {product.dimensions ? (typeof product.dimensions === 'string' ? product.dimensions : JSON.stringify(product.dimensions).replace(/["{}]/g, '').replace(/:/g, ': ')) : '–'}
                                 </span>
                             </div>
-                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Weight</span>
-                                <span className="text-xs font-semibold text-zinc-900">
+                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)]/50">
+                                <span className="text-xs font-semibold text-[var(--text-secondary)] tracking-tight">Weight</span>
+                                <span className="text-xs font-semibold text-[var(--text-primary)]">
                                     {product.weight_kg ? `${product.weight_kg} kg` : '–'}
                                 </span>
                             </div>
-                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Material</span>
-                                <span className="text-xs font-semibold text-zinc-900">{product.material || 'Premium Finish'}</span>
+                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)]/50">
+                                <span className="text-xs font-semibold text-[var(--text-secondary)] tracking-tight">Material</span>
+                                <span className="text-xs font-semibold text-[var(--text-primary)]">{product.material || 'Premium Finish'}</span>
                             </div>
-                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-lg bg-white border border-zinc-100/50">
-                                <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">HSN Code</span>
-                                <span className="text-xs font-semibold text-emerald-600 tracking-tight">{product.hsn_code || '4901'} ({product.gst_percentage || 0}%)</span>
+                            <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)]/50">
+                                <span className="text-xs font-semibold text-[var(--text-secondary)] tracking-tight">HSN Code</span>
+                                <span className="text-xs font-semibold text-[var(--well-success-text)] tracking-tight">{product.hsn_code || '4901'} ({product.gst_percentage || 0}%)</span>
                             </div>
                             {product.manufacturer_info && (
-                                <div className="flex flex-col gap-1.5 p-3 rounded-lg bg-white border border-zinc-100/50">
-                                    <span className="text-[11px] font-semibold text-zinc-500 tracking-tight">Manufacturer Details</span>
-                                    <span className="text-[11px] font-medium text-zinc-400 leading-relaxed line-clamp-2">
+                                <div className="flex flex-col gap-1.5 p-3 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)]/50">
+                                    <span className="text-xs font-semibold text-[var(--text-secondary)] tracking-tight">Manufacturer Details</span>
+                                    <span className="text-xs font-medium text-[var(--text-tertiary)] leading-relaxed line-clamp-2">
                                         {product.manufacturer_info}
                                     </span>
                                 </div>
@@ -479,13 +485,13 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                     {/* Support Section */}
                     <section className="flex items-center gap-3 pt-4">
                         <div className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 font-semibold tracking-tight text-[11px]",
-                            product.return_eligible ? "bg-blue-50 border-blue-100 text-blue-600" : "bg-zinc-50 border-zinc-100 text-zinc-500"
+                            "flex-1 flex items-center justify-center gap-2 py-4 rounded-[var(--radius-lg)] border-2 font-semibold tracking-tight text-xs",
+                            product.return_eligible ? "bg-[var(--well-info)] border-[var(--well-info-text)]/10 text-[var(--well-info-text)]" : "bg-[var(--surface-muted)] border-[var(--border)] text-[var(--text-secondary)]"
                         )}>
                             <Info className="size-4" />
                             {product.return_eligible ? '7-Day Return' : 'Final Sale - No Returns'}
                         </div>
-                        <div className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 bg-zinc-50 border-zinc-100 text-zinc-500 font-semibold tracking-tight text-[11px]">
+                        <div className="flex-1 flex items-center justify-center gap-2 py-4 rounded-[var(--radius-lg)] border-2 bg-[var(--surface-muted)] border-[var(--border)] text-[var(--text-secondary)] font-semibold tracking-tight text-xs">
                             <ShieldCheck className="size-4" />
                             Secure Order
                         </div>
@@ -494,8 +500,8 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                     {/* Description Section */}
                     {product.description && (
                         <section className="space-y-3">
-                            <h3 className="text-[15px] font-semibold text-zinc-900 tracking-tight px-1">About product</h3>
-                            <p className="text-sm text-zinc-600 leading-relaxed font-medium">
+                            <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight px-1">About product</h3>
+                            <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
                                 {product.description}
                             </p>
                         </section>
@@ -507,23 +513,23 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
             </div>
 
             {/* Fixed Action Footer */}
-            <div className="bg-white px-5 py-5 pb-safe border-t border-zinc-50 shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
+            <div className="bg-[var(--surface)] px-5 pt-5 pb-[max(var(--space-5),env(safe-area-inset-bottom,0px))] border-t border-[var(--surface-muted)] shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
                 <div className="flex items-center gap-4">
                     {/* Quantity controls */}
-                    <div className="flex items-center bg-zinc-100 rounded-xl p-1 shrink-0">
+                    <div className="flex items-center bg-[var(--surface-muted)] rounded-[var(--radius-lg)] p-1 shrink-0">
                         <button
                             onClick={() => { triggerHaptic(HapticPattern.ACTION); setQuantity(Math.max(1, quantity - 1)); }}
-                            className="size-10 flex items-center justify-center active:scale-90 transition-all text-zinc-900"
+                            className="size-10 flex items-center justify-center active:scale-90 transition-all text-[var(--text-primary)]"
                             disabled={quantity <= 1}
                         >
                             <span className="text-xl font-bold">−</span>
                         </button>
-                        <span className="w-8 text-center font-black text-sm tabular-nums text-zinc-900">
+                        <span className="w-8 text-center font-bold text-sm tabular-nums text-[var(--text-primary)]">
                             {quantity}
                         </span>
                         <button
                             onClick={() => { triggerHaptic(HapticPattern.ACTION); setQuantity(quantity + 1); }}
-                            className="size-10 flex items-center justify-center active:scale-90 transition-all text-zinc-900"
+                            className="size-10 flex items-center justify-center active:scale-90 transition-all text-[var(--text-primary)]"
                         >
                             <span className="text-xl font-bold">+</span>
                         </button>
@@ -531,7 +537,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
 
                     {/* Add to Cart Button */}
                     <button
-                        className="flex-1 h-12 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white font-semibold text-[14px] tracking-tight rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                        className="flex-1 h-12 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--background)] font-semibold text-sm tracking-tight rounded-[var(--radius-lg)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                         onClick={handleAddToCart}
                         data-testid="add-to-cart-drawer"
                         disabled={continuing || !canAdd}
@@ -543,7 +549,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         ) : (
                             <>
                                 <span>{isEditMode ? 'Update Product' : 'Add to Cart'}</span>
-                                <div className="h-4 w-px bg-white/20" />
+                                <div className="h-4 w-px bg-[var(--surface)]/20" />
                                 <span>{formatCurrency(totalPrice)}</span>
                             </>
                         )}

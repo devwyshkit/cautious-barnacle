@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({
             success: true,
             processedAcceptance: acceptance.count,
-            processedDesign: design.count,
+            processedPersonalisation: design.count,
             timestamp: new Date().toISOString()
         });
 

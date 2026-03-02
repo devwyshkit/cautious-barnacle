@@ -28,8 +28,8 @@ export default async function AuditLogsPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-zinc-900">Audit logs</h1>
-      <p className="text-sm text-zinc-500">Recent admin actions across the platform</p>
+      <h1 className="text-lg font-semibold text-[var(--text-primary)]">Audit logs</h1>
+      <p className="text-sm text-[var(--text-secondary)]">Recent admin actions across the platform</p>
       <AuditLogTable
         logs={logs}
         totalCount={totalCount}

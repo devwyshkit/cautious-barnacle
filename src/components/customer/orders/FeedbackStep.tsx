@@ -132,12 +132,12 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
 
     if (submitted) {
         return (
-            <div className="p-8 text-center bg-emerald-50 rounded-xl border border-emerald-100 animate-in fade-in zoom-in duration-500">
-                <div className="size-16 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="size-8 text-emerald-600" />
+            <div className="p-8 text-center bg-[var(--well-success)] rounded-xl border border-[var(--success)]/10 animate-in fade-in zoom-in duration-500">
+                <div className="size-16 bg-[var(--success)]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="size-8 text-[var(--success)]" />
                 </div>
-                <h3 className="text-lg font-black text-emerald-900 tracking-tight mb-2">Feedback Received</h3>
-                <p className="text-sm text-emerald-600 font-medium">Your reviews help everyone in the community.</p>
+                <h3 className="text-lg font-bold text-[var(--text-primary)] tracking-tight mb-2">Feedback Received</h3>
+                <p className="text-sm text-[var(--success)] font-medium">Your reviews help everyone in the community.</p>
             </div>
         );
     }
@@ -145,14 +145,14 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
     const personalisedProducts = products.filter(p => p.is_personalized);
 
     return (
-        <section className="bg-white rounded-xl border border-zinc-100 p-6 shadow-sm overflow-hidden space-y-8">
+        <section className="bg-[var(--surface)] rounded-xl border border-[var(--border)] p-6 shadow-sm overflow-hidden space-y-8">
             <div className="flex items-center gap-3">
-                <div className="size-10 bg-amber-50 rounded-xl flex items-center justify-center">
-                    <Star className="size-5 text-amber-500 fill-amber-500" />
+                <div className="size-10 bg-[var(--well-warning)] rounded-xl flex items-center justify-center">
+                    <Star className="size-5 text-[var(--warning)] fill-[var(--warning)]" />
                 </div>
                 <div>
-                    <h3 className="text-sm font-black text-zinc-900 tracking-tight uppercase">Rate your experience</h3>
-                    <p className="text-xs text-zinc-400 font-medium mt-0.5 tracking-tight">How was your order from our vendor?</p>
+                    <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-tight uppercase">Rate your experience</h3>
+                    <p className="text-xs text-[var(--text-tertiary)] font-medium mt-0.5 tracking-tight">How was your order from our vendor?</p>
                 </div>
             </div>
 
@@ -167,7 +167,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                         <Star
                             className={cn(
                                 "size-10 transition-colors",
-                                overallRating >= s ? "text-amber-400 fill-amber-400" : "text-zinc-100"
+                                overallRating >= s ? "text-[var(--warning)] fill-[var(--warning)]" : "text-[var(--border)]"
                             )}
                         />
                     </button>
@@ -176,30 +176,30 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
 
             {overallRating > 0 && personalisedProducts.length > 0 && (
                 <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-                    <div className="h-px bg-zinc-50 w-full" />
+                    <div className="h-px bg-[var(--surface-muted)] w-full" />
 
                     {personalisedProducts.map(product => (
                         <div key={product.orderProductId} className="space-y-6 p-1">
                             <div className="flex items-center gap-2">
-                                <Sparkles className="size-4 text-emerald-500" />
-                                <h4 className="text-xs font-black text-zinc-900 tracking-tight uppercase">Personalization Fidelity</h4>
+                                <Sparkles className="size-4 text-[var(--success)]" />
+                                <h4 className="text-xs font-bold text-[var(--text-primary)] tracking-tight uppercase">Personalization Fidelity</h4>
                             </div>
 
                             {/* Mockup Preview vs Fidelity Question */}
-                            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100 flex items-center gap-4">
-                                <div className="size-20 rounded-xl bg-zinc-200 overflow-hidden relative group shrink-0">
+                            <div className="bg-[var(--surface-muted)] rounded-2xl p-4 border border-[var(--border)] flex items-center gap-4">
+                                <div className="size-20 rounded-xl bg-[var(--border)] overflow-hidden relative group shrink-0">
                                     {product.mockup_url ? (
                                         <img src={product.mockup_url} alt="Design" className="size-full object-cover" />
                                     ) : (
-                                        <div className="size-full flex items-center justify-center"><ImageIcon className="size-6 text-zinc-300" /></div>
+                                        <div className="size-full flex items-center justify-center"><ImageIcon className="size-6 text-[var(--text-tertiary)]" /></div>
                                     )}
-                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <p className="text-[8px] font-black text-white uppercase tracking-wider">Preview</p>
+                                    <div className="absolute inset-0 bg-[var(--foreground)]/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <p className="text-[8px] font-bold text-white uppercase tracking-wider">Preview</p>
                                     </div>
                                 </div>
                                 <div className="flex-1 space-y-2">
-                                    <p className="text-[11px] font-bold text-zinc-500 leading-tight">
-                                        Did your <span className="text-zinc-900">&quot;{product.name}&quot;</span> match this preview?
+                                    <p className="text-xs font-bold text-[var(--text-secondary)] leading-tight">
+                                        Did your <span className="text-[var(--text-primary)]">&quot;{product.name}&quot;</span> match this preview?
                                     </p>
                                     <div className="flex items-center gap-1.5">
                                         {[1, 2, 3, 4, 5].map((s) => (
@@ -211,7 +211,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                                                 <Star
                                                     className={cn(
                                                         "size-5",
-                                                        (productReviews[product.orderProductId].fidelityRating || 0) >= s ? "fill-emerald-500 text-emerald-500" : "text-zinc-200"
+                                                        (productReviews[product.orderProductId].fidelityRating || 0) >= s ? "fill-[var(--success)] text-[var(--success)]" : "text-[var(--border)]"
                                                     )}
                                                 />
                                             </button>
@@ -227,10 +227,10 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                                         key={tag.id}
                                         onClick={() => toggleTag(product.orderProductId, tag.label)}
                                         className={cn(
-                                            "whitespace-nowrap px-4 py-2 rounded-full text-[10px] font-black border transition-all flex items-center gap-1.5",
+                                            "whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all flex items-center gap-1.5",
                                             productReviews[product.orderProductId].tags.includes(tag.label)
-                                                ? "bg-zinc-900 border-zinc-900 text-white"
-                                                : "bg-white border-zinc-100 text-zinc-500"
+                                                ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-white"
+                                                : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)]"
                                         )}
                                     >
                                         {productReviews[product.orderProductId].tags.includes(tag.label) && <Check className="size-3" />}
@@ -244,7 +244,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                                 value={productReviews[product.orderProductId].comment}
                                 onChange={(e) => handleProductRatingChange(product.orderProductId, 'comment', e.target.value)}
                                 placeholder="Add any specific details about the design..."
-                                className="w-full min-h-[80px] p-4 rounded-xl bg-zinc-50 border border-zinc-100 text-xs font-medium focus:bg-white focus:border-zinc-900 transition-all outline-none resize-none placeholder:text-zinc-300 text-zinc-900"
+                                className="w-full min-h-[80px] p-4 rounded-[var(--radius-xl)] bg-[var(--surface-muted)] border border-[var(--border)] text-xs font-medium focus:bg-[var(--surface)] focus:border-[var(--primary)] transition-all outline-none resize-none placeholder:text-[var(--text-tertiary)] text-[var(--text-primary)]"
                             />
                         </div>
                     ))}
@@ -261,7 +261,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                         label="Slide to submit reviews"
                         successLabel="Verified"
                         variant="amber"
-                        className="bg-black text-white"
+                        className="bg-[var(--foreground)] text-white"
                     />
                 </div>
             )}

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { User, AuthChangeEvent, Session } from "@supabase/supabase-js";
 import * as AuthCoreLib from "@/lib/auth/core";
 import { logger } from "@/lib/logging/logger";
-import { useEffect, useMemo, useState, createContext, useContext, useRef } from "react";
+import { useEffect, useMemo, useState, createContext, useContext, useRef, useCallback } from "react";
 import { normalizePhone } from "@/lib/utils/phone";
 import { mergeGuestCartToUser } from "@/lib/actions/cart/logic";
 import { useRouter } from "next/navigation";
@@ -18,16 +18,25 @@ interface AuthContextType {
     verifyOTP: (phone: string, token: string) => Promise<{ success: boolean; user?: User; error?: string }>;
     signOut: () => Promise<{ success: boolean; error?: string }>;
     refreshSession: () => Promise<void>;
+    initialUser?: User | null;
+    initialPermissions?: AuthCoreLib.UserPermissions | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [permissions, setPermissions] = useState<AuthCoreLib.UserPermissions | null>(null);
-    const [loading, setLoading] = useState(true);
+export function AuthProvider({
+    children,
+    initialUser = null,
+    initialPermissions = null
+}: {
+    children: React.ReactNode;
+    initialUser?: User | null;
+    initialPermissions?: AuthCoreLib.UserPermissions | null;
+}) {
+    const [user, setUser] = useState<User | null>(initialUser);
+    const [permissions, setPermissions] = useState<AuthCoreLib.UserPermissions | null>(initialPermissions);
+    const [loading, setLoading] = useState(!initialUser);
     const [error, setError] = useState<string | null>(null);
-    const [mounted, setMounted] = useState(false);
     const router = useRouter();
 
     const supabase = useMemo(() => createClient(), []);
@@ -39,12 +48,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         userIdRef.current = user?.id || null;
     }, [user?.id]);
 
-    const updatePermissions = async (userId: string) => {
+    const updatePermissions = useCallback(async (userId: string) => {
         if (fetchingRef.current === userId) return;
         fetchingRef.current = userId;
 
         try {
-            // SWIGGY 2026: Zero trust. Always fetch fresh permissions from DB.
+            // WYSHKIT 2026: Zero trust. Always fetch fresh permissions from DB.
             const perms = await AuthCoreLib.resolveUserPermissions(supabase, userId);
             setPermissions(perms);
             setError(null);
@@ -53,9 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } finally {
             fetchingRef.current = null;
         }
-    };
+    }, [supabase]);
 
-    const refreshSession = async () => {
+    const refreshSession = useCallback(async () => {
         try {
             // WYSHKIT 2026: Security Hardening - Use getUser() as source of truth
             const { data: { user: fetchedUser }, error: userError } = await supabase.auth.getUser();
@@ -75,11 +84,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setError('Failed to initialize authentication');
             setLoading(false);
         }
-    };
+    }, [supabase, updatePermissions]);
 
     useEffect(() => {
-        setMounted(true);
-        refreshSession();
+        // WYSHKIT 2026: Only fetch if server didn't provide initial state
+        if (!initialUser) {
+            refreshSession();
+        }
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
             const currentUser = session?.user ?? null;
@@ -103,9 +114,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => {
             subscription.unsubscribe();
         };
-    }, [supabase]);
+    }, [supabase, initialUser]);
 
-    const signInWithPhone = async (phone: string) => {
+    const signInWithPhone = useCallback(async (phone: string) => {
         try {
             const authPhone = normalizePhone(phone);
             const { error } = await supabase.auth.signInWithOtp({
@@ -119,9 +130,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const isRetryable = errorMessage.includes("500") || errorMessage.includes("Twilio");
             return { success: false, error: errorMessage, isRetryable };
         }
-    };
+    }, [supabase]);
 
-    const verifyOTP = async (phone: string, token: string) => {
+    const verifyOTP = useCallback(async (phone: string, token: string) => {
         try {
             const authPhone = normalizePhone(phone);
             const result = await supabase.auth.verifyOtp({
@@ -131,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
 
             if (!result.error && result.data.user) {
-                // Swiggy 2026: Parallelize critical path for faster TTI
+                // WYSHKIT 2026: Parallelize critical path for faster TTI
                 await Promise.all([
                     mergeGuestCartToUser().catch(e => logger.error('Cart merge failed', e as Error)),
                     refreshSession()
@@ -144,9 +155,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (err: unknown) {
             return { success: false, error: err instanceof Error ? err.message : "Failed to verify OTP" };
         }
-    };
+    }, [supabase, refreshSession]);
 
-    const signOut = async () => {
+    const signOut = useCallback(async () => {
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
@@ -158,7 +169,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const errorMessage = err instanceof Error ? err.message : 'Failed to sign out';
             return { success: false, error: errorMessage };
         }
-    };
+    }, [supabase, router]);
 
     const value = useMemo(() => ({
         user,
@@ -168,12 +179,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithPhone,
         verifyOTP,
         signOut,
-        refreshSession
-    }), [user, permissions, loading, error, signInWithPhone, verifyOTP, signOut]);
-
-    // WYSHKIT 2026: Hydration Barrier
-    // Prevents SSR/CSR mismatch errors (the '10+ console errors' root cause)
-    if (!mounted) return null;
+        refreshSession,
+        initialUser,
+        initialPermissions
+    }), [user, permissions, loading, error, signInWithPhone, verifyOTP, signOut, refreshSession, initialUser, initialPermissions]);
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

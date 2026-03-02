@@ -38,7 +38,7 @@ export function CustomerTable({ customers, totalCount, currentPage, pageSize }: 
   return (
     <div className="space-y-4">
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--text-tertiary)]" />
         <Input
           placeholder="Search by name, phone, or email..."
           value={search}
@@ -61,7 +61,7 @@ export function CustomerTable({ customers, totalCount, currentPage, pageSize }: 
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-zinc-500 py-8">
+                <TableCell colSpan={5} className="text-center text-[var(--text-secondary)] py-8">
                   No customers found
                 </TableCell>
               </TableRow>
@@ -72,16 +72,16 @@ export function CustomerTable({ customers, totalCount, currentPage, pageSize }: 
                     {customer.full_name || 'Unnamed'}
                   </TableCell>
                   <TableCell className="font-mono text-sm">{customer.phone}</TableCell>
-                  <TableCell className="hidden md:table-cell text-zinc-500">
+                  <TableCell className="hidden md:table-cell text-[var(--text-secondary)]">
                     {customer.email || '-'}
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-zinc-500">
+                  <TableCell className="hidden lg:table-cell text-[var(--text-secondary)]">
                     {formatDate(customer.created_at)}
                   </TableCell>
                   <TableCell>
                     <Badge
                       variant="outline"
-                      className={customer.status === 'active' ? 'text-emerald-600 border-emerald-200' : 'text-zinc-500'}
+                      className={customer.status === 'active' ? 'text-[var(--success)] border-[var(--success)]/20' : 'text-[var(--text-secondary)]'}
                     >
                       {customer.status || 'active'}
                     </Badge>
@@ -94,8 +94,8 @@ export function CustomerTable({ customers, totalCount, currentPage, pageSize }: 
       </div>
 
       {totalCount > pageSize && (
-        <div className="flex items-center justify-between px-2 py-4 border-t border-zinc-100">
-          <div className="text-sm text-zinc-500">
+        <div className="flex items-center justify-between px-2 py-4 border-t border-[var(--border)]">
+          <div className="text-sm text-[var(--text-secondary)]">
             Showing {Math.min((currentPage - 1) * pageSize + 1, totalCount)} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} customers
           </div>
           <div className="flex items-center gap-2">

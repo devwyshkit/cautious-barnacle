@@ -20,7 +20,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-zinc-900">Settings</h1>
+      <h1 className="text-lg font-semibold text-[var(--text-primary)]">Settings</h1>
       <SettingsForm settings={settingsMap} />
     </div>
   )

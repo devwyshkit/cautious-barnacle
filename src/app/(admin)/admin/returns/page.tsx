@@ -53,13 +53,13 @@ export default async function ReturnsPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-zinc-900">Returns</h1>
+        <h1 className="text-lg font-semibold text-[var(--text-primary)]">Returns</h1>
         <div className="flex gap-4 text-sm">
-          <span className="text-zinc-500">
-            Pending: <strong className="text-amber-600">{stats.pending}</strong>
+          <span className="text-[var(--text-secondary)]">
+            Pending: <strong className="text-[var(--warning)]">{stats.pending}</strong>
           </span>
-          <span className="text-zinc-500">
-            Refunded: <strong className="text-emerald-600">{formatCurrency(stats.totalRefunded)}</strong>
+          <span className="text-[var(--text-secondary)]">
+            Refunded: <strong className="text-[var(--success)]">{formatCurrency(stats.totalRefunded)}</strong>
           </span>
         </div>
       </div>

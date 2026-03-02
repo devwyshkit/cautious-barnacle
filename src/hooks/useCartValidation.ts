@@ -11,15 +11,15 @@ export function useCartValidation(targetVendorId?: string | null) {
     const { draftOrder } = useCart();
 
     const isMismatch = useMemo(() => {
-        if (!draftOrder.vendor_id || !targetVendorId) return false;
+        if (!draftOrder?.vendor_id || !targetVendorId) return false;
         return draftOrder.vendor_id !== targetVendorId;
-    }, [draftOrder.vendor_id, targetVendorId]);
+    }, [draftOrder?.vendor_id, targetVendorId]);
 
-    const hasProductsInCart = draftOrder.products.length > 0;
+    const hasProductsInCart = (draftOrder?.products?.length || 0) > 0;
 
     return {
         isMismatch: isMismatch && hasProductsInCart,
-        currentCartVendorId: draftOrder.vendor_id,
+        currentCartVendorId: draftOrder?.vendor_id,
         hasProductsInCart
     };
 }

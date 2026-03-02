@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
-import { Plus, Check, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Plus, Check, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCart } from '@/components/customer/CartProvider';
 import { Button } from '@/components/ui/button';
@@ -15,11 +16,13 @@ interface AddToCartButtonProps {
     vendor_id: string;
     vendor_name: string;
     className?: string;
+    has_personalization?: boolean;
 }
 
 /**
  * WYSHKIT 2026: AddToCartButton (One Thing Pattern)
  * Minimalist interaction focusing on the "Add" intent.
+ * Hardened: Personalization check prevents bypass.
  */
 export function AddToCartButton({
     product_id,
@@ -29,18 +32,22 @@ export function AddToCartButton({
     vendor_id,
     vendor_name,
     className,
+    has_personalization = false,
 }: AddToCartButtonProps) {
+    const router = useRouter();
     const { addToDraftOrder, isPending } = useCart();
     const [justAdded, setJustAdded] = useState(false);
-
-    // We can't easily get the specific pending state for this button from the provider
-    // but startTransition in provider will set isPending globally.
-    // For many buttons, we might want local loading state.
     const [localPending, setLocalPending] = useState(false);
 
-    const handleAdd = async (e: React.MouseEvent) => {
+    const handleAction = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (has_personalization && !justAdded) {
+            triggerHaptic(HapticPattern.ACTION);
+            router.push(`/vendor/${vendor_id}/product/${product_id}`);
+            return;
+        }
 
         setLocalPending(true);
         const optimistic_data = {
@@ -79,17 +86,21 @@ export function AddToCartButton({
         }
     }, [justAdded]);
 
+    const showCustomize = has_personalization && !justAdded;
+
     return (
         <Button
             type="button"
             size="sm"
-            onClick={handleAdd}
+            onClick={handleAction}
             disabled={localPending || isPending}
             className={cn(
-                "h-8 px-3 rounded-lg transition-all z-10 font-black text-[10px] tracking-tight min-w-[70px]",
+                "h-8 px-3 rounded-[var(--radius-md)] transition-all z-10 font-bold text-xs tracking-tight min-w-[70px]",
                 justAdded
-                    ? "bg-emerald-500 text-white hover:bg-emerald-600 border-none shadow-emerald-100"
-                    : "bg-white text-zinc-950 hover:bg-zinc-50 shadow-sm border border-zinc-200",
+                    ? "bg-[var(--success)] text-[var(--background)] hover:bg-[var(--success)]/90 border-none shadow-[var(--shadow-sm)]"
+                    : showCustomize
+                        ? "bg-[var(--foreground)] text-[var(--background)] hover:bg-[var(--foreground)]/90 border-none"
+                        : "bg-[var(--surface)] text-[var(--text-primary)] hover:bg-[var(--surface-muted)] shadow-[var(--shadow-sm)] border border-[var(--border)]",
                 "active:scale-95",
                 className
             )}
@@ -101,8 +112,13 @@ export function AddToCartButton({
                     <Check className="size-3 stroke-[3]" />
                     <span className="uppercase italic">Added</span>
                 </div>
+            ) : showCustomize ? (
+                <div className="flex items-center gap-1">
+                    <Sparkles className="size-3" />
+                    <span className="uppercase">Select</span>
+                </div>
             ) : (
-                <div className="flex items-center gap-1 text-zinc-900">
+                <div className="flex items-center gap-1 text-[var(--text-primary)]">
                     <Plus className="size-3 stroke-[3]" />
                     <span className="uppercase">Add</span>
                 </div>

@@ -14,7 +14,7 @@ export function Grid({ data }: GridProps) {
                 <VendorCard
                     key={product.id}
                     data={product}
-                    className="bg-white"
+                    className="bg-[var(--surface)]"
                 />
             ))}
         </LayoutGrid>

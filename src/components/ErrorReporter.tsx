@@ -75,43 +75,41 @@ export default function ErrorReporter({ error, reset }: ReporterProps) {
     /* ─ ordinary pages render nothing ─ */
     if (!error) return null;
 
-    /* ─ global-error UI ─ */
+    /* ─ global-error or route-error UI ─ */
     return (
-        <html>
-            <body className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
-                <div className="max-w-md w-full text-center space-y-6">
-                    <div className="space-y-2">
-                        <h1 className="text-2xl font-bold text-destructive">
-                            Something went wrong!
-                        </h1>
-                        <p className="text-muted-foreground">
-                            An unexpected error occurred. Please try again
-                        </p>
-                    </div>
-                    <div className="space-y-2">
-                        {process.env.NODE_ENV === "development" && (
-                            <details className="mt-4 text-left">
-                                <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
-                                    Error details
-                                </summary>
-                                <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-auto">
-                                    {error.message}
-                                    {error.stack && (
-                                        <div className="mt-2 text-muted-foreground">
-                                            {error.stack}
-                                        </div>
-                                    )}
-                                    {error.digest && (
-                                        <div className="mt-2 text-muted-foreground">
-                                            Digest: {error.digest}
-                                        </div>
-                                    )}
-                                </pre>
-                            </details>
-                        )}
-                    </div>
+        <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 text-center gap-6 animate-in fade-in duration-500">
+            <div className="size-16 rounded-full bg-rose-50 flex items-center justify-center text-rose-500">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+            </div>
+
+            <div className="space-y-2">
+                <h1 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">
+                    Something went wrong
+                </h1>
+                <p className="text-sm font-medium text-[var(--text-secondary)] max-w-xs mx-auto">
+                    We encountered an unexpected error. Our team has been notified.
+                </p>
+            </div>
+
+            {reset && (
+                <button
+                    onClick={() => reset()}
+                    className="h-11 px-8 rounded-full bg-[var(--foreground)] text-white font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]"
+                >
+                    Try Again
+                </button>
+            )}
+
+            {process.env.NODE_ENV === "development" && (
+                <div className="w-full max-w-lg mt-8 text-left bg-[var(--surface-muted)] rounded-2xl p-6 border border-[var(--border)] overflow-hidden">
+                    <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-tertiary)] mb-2">Technical Exception (Dev Only)</p>
+                    <pre className="text-xs font-mono text-[var(--text-secondary)] overflow-auto max-h-[200px] whitespace-pre-wrap">
+                        {error.message}
+                        {"\n\n"}
+                        {error.stack}
+                    </pre>
                 </div>
-            </body>
-        </html>
+            )}
+        </div>
     );
 }

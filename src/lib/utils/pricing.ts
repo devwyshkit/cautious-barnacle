@@ -8,7 +8,7 @@
  */
 
 /**
- * Formats a number as Indian Rupee (Swiggy 2026 Standard)
+ * Formats a number as Indian Rupee (WYSHKIT 2026 Standard)
  */
 export function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('en-IN', {

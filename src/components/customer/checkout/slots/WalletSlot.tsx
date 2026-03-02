@@ -20,7 +20,7 @@ interface WalletSlotProps {
 /**
  * WYSHKIT 2026: Wallet Slot Component
  * 
- * Swiggy 2026 Pattern: Stateless & Seamless
+ * WYSHKIT 2026 Pattern: Stateless & Seamless
  * - Mutations via Server Actions + router.refresh()
  */
 export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: WalletSlotProps) {
@@ -36,23 +36,23 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: 
             <div className={cn(
                 "flex items-center justify-between p-4 rounded-xl border transition-all duration-300",
                 useWalletBalance
-                    ? "bg-zinc-900 border-zinc-900 text-white shadow-lg shadow-zinc-200"
-                    : "bg-white border-zinc-100 text-zinc-900 shadow-sm"
+                    ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-white shadow-lg shadow-[var(--shadow-sm)]"
+                    : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-primary)] shadow-sm"
             )}>
                 <div className="flex items-center gap-3">
                     <div className={cn(
                         "size-10 rounded-xl flex items-center justify-center transition-colors",
-                        useWalletBalance ? "bg-white/10" : "bg-white border border-zinc-100 shadow-sm"
+                        useWalletBalance ? "bg-[var(--surface)]/10" : "bg-[var(--surface)] border border-[var(--border)] shadow-sm"
                     )}>
-                        <Wallet className={cn("size-5", useWalletBalance ? "text-white" : "text-zinc-600")} />
+                        <Wallet className={cn("size-5", useWalletBalance ? "text-white" : "text-[var(--text-secondary)]")} />
                     </div>
                     <div>
-                        <p className="text-[13px] font-black tracking-tight">
+                        <p className="text-sm font-bold tracking-tight">
                             Wyshkit Money
                         </p>
                         <p className={cn(
                             "text-xs font-bold tracking-tight mt-0.5",
-                            useWalletBalance ? "text-white/60" : "text-zinc-400"
+                            useWalletBalance ? "text-white/60" : "text-[var(--text-tertiary)]"
                         )}>
                             Balance: {formatCurrency(walletInfo.balance)}
                         </p>
@@ -61,20 +61,20 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: 
 
                 <div className="flex items-center gap-3">
                     {useWalletBalance && (
-                        <span className="text-[11px] font-black text-white/90">
+                        <span className="text-xs font-bold text-white/90">
                             -{formatCurrency(pricing.wallet_discount)}
                         </span>
                     )}
                     {isPending ? (
-                        <Loader2 className="size-4 animate-spin text-zinc-400" />
+                        <Loader2 className="size-4 animate-spin text-[var(--text-tertiary)]" />
                     ) : (
                         <Switch
                             checked={useWalletBalance}
                             onCheckedChange={() => toggleAction()}
                             disabled={isPending || disabled}
                             className={cn(
-                                "data-[state=checked]:bg-emerald-500",
-                                !useWalletBalance && "bg-zinc-200"
+                                "data-[state=checked]:bg-[var(--success)]",
+                                !useWalletBalance && "bg-[var(--border)]"
                             )}
                         />
                     )}

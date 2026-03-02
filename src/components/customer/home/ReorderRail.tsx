@@ -9,6 +9,17 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logging/logger';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
+import { formatCurrency } from '@/lib/utils/pricing';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface RecentOrder {
   id: string;
@@ -125,12 +136,12 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
     <section>
       <div className="flex items-center justify-between mb-4 px-1">
         <div className="flex items-center gap-2">
-          <div className="size-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-            <RotateCcw className="size-4 text-emerald-600" />
+          <div className="size-8 rounded-[var(--radius-sm)] bg-[var(--well-success)] flex items-center justify-center">
+            <RotateCcw className="size-4 text-[var(--well-success-text)]" />
           </div>
           <div>
-            <h2 className="text-base font-black text-zinc-900 tracking-tight">Reorder</h2>
-            <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">From your recent picks</p>
+            <h2 className="text-base font-bold text-[var(--text-primary)] tracking-tight">Reorder</h2>
+            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">From your recent picks</p>
           </div>
         </div>
       </div>
@@ -149,8 +160,8 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
               onClick={() => initiateReorder(order)}
               disabled={isPending || isReordering || !isOrderAvailable}
               className={cn(
-                "shrink-0 w-[260px] bg-white rounded-2xl border border-zinc-100 overflow-hidden shadow-sm",
-                "hover:border-zinc-200 transition-all duration-300",
+                "shrink-0 w-[260px] bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden shadow-sm",
+                "hover:border-[var(--border)] transition-all duration-300",
                 "active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed",
                 !isOrderAvailable && "grayscale",
                 "group animate-in fade-in slide-in-from-bottom-2",
@@ -158,7 +169,7 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
               )}
             >
               <div className="flex items-stretch h-28">
-                <div className="relative w-28 bg-zinc-100 shrink-0">
+                <div className="relative w-28 bg-[var(--surface-muted)] shrink-0">
                   {firstProduct?.image_url ? (
                     <Image
                       src={firstProduct.image_url}
@@ -169,45 +180,45 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
                     />
                   ) : (
                     <div className="size-full flex items-center justify-center">
-                      <RotateCcw className="size-6 text-zinc-300" />
+                      <RotateCcw className="size-6 text-[var(--text-tertiary)]" />
                     </div>
                   )}
                   {hasPersonalization && (
-                    <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-md bg-amber-500 shadow-lg shadow-amber-500/20">
+                    <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-[var(--radius-xs)] bg-[var(--warning)] shadow-lg shadow-[var(--warning)]/20">
                       <Sparkles className="size-3 text-white fill-white" />
                     </div>
                   )}
                 </div>
 
                 <div className="flex-1 p-3 flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5 text-[10px] font-black text-zinc-400 mb-1 uppercase tracking-wider">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-tertiary)] mb-1 uppercase tracking-wider">
                     <Clock className="size-3" />
                     <span>{formatDate(order.created_at)}</span>
                     <span>•</span>
                     <span className="truncate">{order.vendor_name}</span>
                   </div>
 
-                  <p className="text-sm font-black text-zinc-900 truncate leading-tight">
+                  <p className="text-sm font-bold text-[var(--text-primary)] truncate leading-tight">
                     {firstProduct?.product_name || 'Order'}
                   </p>
                   {productCount > 1 && (
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase mt-0.5">
+                    <p className="text-xs font-bold text-[var(--text-secondary)] uppercase mt-0.5">
                       +{productCount - 1} other product{productCount > 2 ? 's' : ''}
                     </p>
                   )}
 
                   <div className="flex items-center justify-between mt-auto">
-                    <span className="text-sm font-black text-zinc-950 tabular-nums">
-                      ₹{Math.floor(order.total)}
+                    <span className="text-sm font-bold text-[var(--text-primary)] tabular-nums">
+                      {formatCurrency(order.total)}
                     </span>
 
                     <div className={cn(
-                      "flex items-center gap-1 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all",
+                      "flex items-center gap-1 px-3 py-1.5 rounded-[var(--radius-md)] text-xs font-bold uppercase tracking-tight transition-all",
                       isReordering
-                        ? "bg-emerald-100 text-emerald-700"
+                        ? "bg-[var(--well-success)] text-[var(--well-success-text)]"
                         : !isOrderAvailable
-                          ? "bg-rose-50 text-rose-600"
-                          : "bg-zinc-50 text-zinc-900 group-hover:bg-zinc-950 group-hover:text-white"
+                          ? "bg-[var(--well-destructive)] text-[var(--well-destructive-text)]"
+                          : "bg-[var(--surface-muted)] text-[var(--text-primary)] group-hover:bg-[var(--foreground)] group-hover:text-white"
                     )}>
                       {isReordering ? (
                         <>
@@ -235,47 +246,44 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
       </div>
 
       {/* WYSHKIT 2026: Personalisation Choice Modal (PA-08) */}
-      {personalizationChoiceOrder && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-sm rounded-[40px] p-8 shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-10 duration-500">
-            <div className="flex flex-col items-center text-center space-y-6">
-              <div className="size-20 rounded-[30px] bg-amber-50 flex items-center justify-center relative overflow-hidden">
-                <Sparkles className="size-10 text-amber-500 relative z-10 fill-amber-500/20" />
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-200/20 to-transparent" />
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-2xl font-black tracking-tighter text-zinc-950 leading-tight">Same design particulars?</h3>
-                <p className="text-sm font-medium text-zinc-500 px-4">
-                  Do you want to use the exact same personalisation as before, or start fresh?
-                </p>
-              </div>
-
-              <div className="w-full space-y-3 pt-2">
-                <button
-                  onClick={() => handleReorder(personalizationChoiceOrder, true)}
-                  className="w-full h-16 bg-zinc-950 text-white rounded-[24px] font-black tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
-                >
-                  <RotateCcw className="size-5 text-amber-400" />
-                  Repeat details
-                </button>
-                <button
-                  onClick={() => handleReorder(personalizationChoiceOrder, false)}
-                  className="w-full h-16 bg-white text-zinc-950 border-2 border-zinc-100 rounded-[24px] font-black tracking-tight hover:bg-zinc-50 active:scale-[0.98] transition-all"
-                >
-                  New personalisation
-                </button>
-                <button
-                  onClick={() => setPersonalizationChoiceOrder(null)}
-                  className="w-full py-2 text-xs font-black text-zinc-400 tracking-tight hover:text-zinc-600 transition-colors uppercase"
-                >
-                  Never mind
-                </button>
-              </div>
+      <AlertDialog open={!!personalizationChoiceOrder} onOpenChange={(open) => !open && setPersonalizationChoiceOrder(null)}>
+        <AlertDialogContent className="max-w-sm rounded-[var(--radius-3xl)] p-8 shadow-2xl border-[var(--border)] z-[var(--z-modal)]">
+          <AlertDialogHeader className="flex flex-col items-center text-center space-y-6">
+            <div className="size-20 rounded-[var(--radius-2xl)] bg-[var(--well-warning)] flex items-center justify-center relative overflow-hidden">
+              <Sparkles className="size-10 text-[var(--well-warning-text)] relative z-10 fill-[var(--warning)]/20" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[var(--warning)]/10 to-transparent" />
             </div>
-          </div>
-        </div>
-      )}
+
+            <div className="space-y-2">
+              <AlertDialogTitle className="text-2xl font-bold tracking-tighter text-[var(--text-primary)] leading-tight">Same design particulars?</AlertDialogTitle>
+              <AlertDialogDescription className="text-sm font-medium text-[var(--text-secondary)] px-4">
+                Do you want to use the exact same personalisation as before, or start fresh?
+              </AlertDialogDescription>
+            </div>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter className="flex flex-col sm:flex-col w-full space-y-3 pt-2">
+            <AlertDialogAction
+              onClick={() => personalizationChoiceOrder && handleReorder(personalizationChoiceOrder, true)}
+              className="w-full h-16 bg-[var(--foreground)] text-white rounded-[var(--radius-xl)] font-[900] uppercase tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-[var(--shadow-md)] shadow-[var(--foreground)]/10"
+            >
+              <RotateCcw className="size-5 text-[var(--primary)]" />
+              Repeat design
+            </AlertDialogAction>
+            <AlertDialogAction
+              onClick={() => personalizationChoiceOrder && handleReorder(personalizationChoiceOrder, false)}
+              className="w-full h-16 bg-[var(--surface)] text-[var(--text-primary)] border-2 border-[var(--border)] rounded-[var(--radius-xl)] font-[900] uppercase tracking-tight hover:bg-[var(--surface-muted)] active:scale-[0.98] transition-all shadow-[var(--shadow-sm)]"
+            >
+              New personalisation
+            </AlertDialogAction>
+            <AlertDialogCancel
+              className="w-full py-2 text-xs font-bold text-[var(--text-tertiary)] tracking-tight hover:text-[var(--text-secondary)] transition-colors uppercase border-none bg-transparent hover:bg-transparent"
+            >
+              Cancel
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

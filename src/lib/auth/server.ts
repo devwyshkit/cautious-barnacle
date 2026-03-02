@@ -31,9 +31,8 @@ export async function getVendorFromSession(): Promise<Vendor | null> {
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
 
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session || !session.user) return null;
-  const user = session.user;
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
 
   // WYSHKIT 2026: Single-Trip Vendor Resolution via RPC
   const { data: vendor, error } = await (supabase as any).rpc('get_vendor_from_session', {

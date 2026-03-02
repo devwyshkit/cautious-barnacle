@@ -6,6 +6,7 @@ import { IndianRupee, Clock, ArrowUpRight, Percent, Calendar, CheckCircle2, Aler
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { addDays, format, startOfWeek, endOfWeek, isSameWeek, isWithinInterval } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 function getNextSettlementDate(settlementDays: number = 7): Date {
   const today = new Date();
@@ -30,19 +31,19 @@ function SettlementCalendar({ pendingAmount, settlementDays }: { pendingAmount: 
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+          <div className="flex items-center justify-between p-3 bg-[var(--well-success)] rounded-[var(--radius-md)] border border-[var(--well-success-border)]">
             <div>
-              <p className="text-sm font-medium text-emerald-900">Next payout</p>
-              <p className="text-xs text-emerald-600">{format(nextSettlement, 'EEEE, d MMM')}</p>
+              <p className="text-sm font-bold text-[var(--well-success-text)]">Next payout</p>
+              <p className="text-xs text-[var(--well-success-text)]/70">{format(nextSettlement, 'EEEE, d MMM')}</p>
             </div>
-            <p className="text-lg font-semibold text-emerald-700">
+            <p className="text-lg font-bold text-[var(--well-success-text)]">
               ₹{pendingAmount.toLocaleString('en-IN')}
             </p>
           </div>
 
           <div className="grid grid-cols-7 gap-1">
             {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, i) => (
-              <div key={i} className="text-center text-xs text-zinc-400 py-1">{day}</div>
+              <div key={i} className="text-center text-xs text-[var(--text-tertiary)] py-1">{day}</div>
             ))}
             {weekDays.map((day, i) => {
               const isToday = format(day, 'yyyy-MM-dd') === format(today, 'yyyy-MM-dd');
@@ -50,12 +51,12 @@ function SettlementCalendar({ pendingAmount, settlementDays }: { pendingAmount: 
               return (
                 <div
                   key={i}
-                  className={`aspect - square flex products - center justify - center rounded - lg text - sm ${isSettlementDay
-                    ? 'bg-emerald-500 text-white font-medium'
+                  className={`aspect-square flex items-center justify-center rounded-[var(--radius-md)] text-sm transition-colors ${isSettlementDay
+                    ? 'bg-[var(--success)] text-[var(--background)] font-bold'
                     : isToday
-                      ? 'bg-zinc-900 text-white'
-                      : 'bg-zinc-50 text-zinc-600'
-                    } `}
+                      ? 'bg-[var(--text-primary)] text-[var(--background)] font-bold'
+                      : 'bg-[var(--surface-muted)] text-[var(--text-secondary)]'
+                    }`}
                 >
                   {format(day, 'd')}
                 </div>
@@ -63,7 +64,7 @@ function SettlementCalendar({ pendingAmount, settlementDays }: { pendingAmount: 
             })}
           </div>
 
-          <p className="text-xs text-zinc-500 text-center">
+          <p className="text-xs text-[var(--text-secondary)] text-center">
             Payouts are processed every {settlementDays} days
           </p>
         </div>
@@ -84,8 +85,8 @@ export default async function VendorFinancialsPage() {
   return (
     <div className="px-4 py-6 space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">Money</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 className="text-xl font-semibold text-[var(--text-primary)]">Money</h1>
+        <p className="text-sm text-[var(--text-secondary)] mt-1">
           Track earnings and payouts
         </p>
       </div>
@@ -94,14 +95,14 @@ export default async function VendorFinancialsPage() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                <IndianRupee className="size-5 text-emerald-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-success)] flex items-center justify-center">
+                <IndianRupee className="size-5 text-[var(--well-success-text)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-zinc-900">
+                <p className="text-xl font-semibold text-[var(--text-primary)]">
                   ₹{formatCurrency(financials?.total_earnings || 0)}
                 </p>
-                <p className="text-xs text-zinc-500">Total earnings</p>
+                <p className="text-xs text-[var(--text-secondary)]">Total earnings</p>
               </div>
             </div>
           </CardContent>
@@ -110,14 +111,14 @@ export default async function VendorFinancialsPage() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                <Clock className="size-5 text-amber-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-warning)] flex items-center justify-center">
+                <Clock className="size-5 text-[var(--well-warning-text)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-zinc-900">
+                <p className="text-xl font-semibold text-[var(--text-primary)]">
                   ₹{formatCurrency(financials?.pending_settlement || 0)}
                 </p>
-                <p className="text-xs text-zinc-500">Pending</p>
+                <p className="text-xs text-[var(--text-secondary)]">Pending</p>
               </div>
             </div>
           </CardContent>
@@ -126,14 +127,14 @@ export default async function VendorFinancialsPage() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                <ArrowUpRight className="size-5 text-blue-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-info)] flex items-center justify-center">
+                <ArrowUpRight className="size-5 text-[var(--well-info-text)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-zinc-900">
+                <p className="text-xl font-semibold text-[var(--text-primary)]">
                   {financials?.last_payout ? `₹${formatCurrency(financials.last_payout)}` : 'None yet'}
                 </p>
-                <p className="text-xs text-zinc-500">Last payout</p>
+                <p className="text-xs text-[var(--text-secondary)]">Last payout</p>
               </div>
             </div>
           </CardContent>
@@ -142,14 +143,14 @@ export default async function VendorFinancialsPage() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-                <Percent className="size-5 text-zinc-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center">
+                <Percent className="size-5 text-[var(--text-secondary)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-zinc-900">
+                <p className="text-xl font-semibold text-[var(--text-primary)]">
                   {financials?.commission_rate || 0}%
                 </p>
-                <p className="text-xs text-zinc-500">Commission</p>
+                <p className="text-xs text-[var(--text-secondary)]">Commission</p>
               </div>
             </div>
           </CardContent>
@@ -168,8 +169,8 @@ export default async function VendorFinancialsPage() {
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-zinc-600">Bank account</span>
-              <span className="text-sm font-medium text-zinc-900">
+              <span className="text-sm text-[var(--text-secondary)]">Bank account</span>
+              <span className="text-sm font-medium text-[var(--text-primary)]">
                 {(vendor as any).payout_account_number
                   ? `**** ${(vendor as any).payout_account_number.slice(-4)} `
                   : 'Not set'
@@ -177,14 +178,14 @@ export default async function VendorFinancialsPage() {
               </span>
             </div>
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-zinc-600">IFSC</span>
-              <span className="text-sm font-medium text-zinc-900">
+              <span className="text-sm text-[var(--text-secondary)]">IFSC</span>
+              <span className="text-sm font-medium text-[var(--text-primary)]">
                 {(vendor as any).payout_ifsc || 'Not set'}
               </span>
             </div>
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-zinc-600">Settlement cycle</span>
-              <span className="text-sm font-medium text-zinc-900">
+              <span className="text-sm text-[var(--text-secondary)]">Settlement cycle</span>
+              <span className="text-sm font-medium text-[var(--text-primary)]">
                 {(vendor as any).settlement_days || 7} days
               </span>
             </div>
@@ -200,29 +201,30 @@ export default async function VendorFinancialsPage() {
           {payouts && payouts.length > 0 ? (
             <div className="space-y-3">
               {payouts.slice(0, 5).map((payout: { id: string; amount: number; status: string; created_at: string }) => (
-                <div key={payout.id} className="flex items-center justify-between py-2 border-b border-zinc-100 last:border-0">
+                <div key={payout.id} className="flex items-center justify-between py-2 border-b border-[var(--border)] last:border-0">
                   <div className="flex items-center gap-3">
-                    <div className={`size - 8 rounded - full flex products - center justify - center ${payout.status === 'completed' ? 'bg-emerald-50' : 'bg-amber-50'
-                      } `}>
+                    <div className={`size-8 rounded-full flex items-center justify-center ${payout.status === 'completed' ? 'bg-[var(--well-success)]' : 'bg-[var(--well-warning)]'
+                      }`}>
                       {payout.status === 'completed'
-                        ? <CheckCircle2 className="size-4 text-emerald-600" />
-                        : <AlertCircle className="size-4 text-amber-600" />
+                        ? <CheckCircle2 className="size-4 text-[var(--well-success-text)]" />
+                        : <AlertCircle className="size-4 text-[var(--well-warning-text)]" />
                       }
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-zinc-900">
+                      <p className="text-sm font-medium text-[var(--text-primary)]">
                         ₹{payout.amount.toLocaleString('en-IN')}
                       </p>
-                      <p className="text-xs text-zinc-500">
+                      <p className="text-xs text-[var(--text-secondary)]">
                         {format(new Date(payout.created_at), 'd MMM yyyy')}
                       </p>
                     </div>
                   </div>
-                  <Badge variant="outline" className={
+                  <Badge variant="outline" className={cn(
+                    "text-xs rounded-[var(--radius-xs)] font-bold",
                     payout.status === 'completed'
-                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                      : 'bg-amber-50 text-amber-700 border-amber-200'
-                  }>
+                      ? 'bg-[var(--well-success)] text-[var(--well-success-text)] border-[var(--well-success-border)]'
+                      : 'bg-[var(--well-warning)] text-[var(--well-warning-text)] border-[var(--well-warning-border)]'
+                  )}>
                     {payout.status}
                   </Badge>
                 </div>
@@ -230,7 +232,7 @@ export default async function VendorFinancialsPage() {
             </div>
           ) : (
             <div className="text-center py-6">
-              <p className="text-sm text-zinc-500">No payouts yet</p>
+              <p className="text-sm text-[var(--text-secondary)]">No payouts yet</p>
             </div>
           )}
         </CardContent>

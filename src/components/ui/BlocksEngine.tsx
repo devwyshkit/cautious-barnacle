@@ -81,11 +81,11 @@ export function BlocksEngine({ blocks, className, context }: BlocksEngineProps) 
                         {block.title && block.type !== 'BANNER_BENTO' && (
                             <div className="flex items-center justify-between mb-3">
                                 <div>
-                                    <h2 className="text-lg md:text-xl font-black text-zinc-950 tracking-tighter leading-none">
+                                    <h2 className="text-lg md:text-xl font-bold text-[var(--text-primary)] tracking-tighter leading-none">
                                         {block.title}
                                     </h2>
                                     {block.subtitle && (
-                                        <p className="text-[10px] font-black text-zinc-500 tracking-tight mt-1 px-1 border-l-2 border-[var(--primary)]">
+                                        <p className="text-xs font-bold text-[var(--text-secondary)] tracking-tight mt-1 px-1 border-l-2 border-[var(--primary)]">
                                             {block.subtitle}
                                         </p>
                                     )}
@@ -93,7 +93,7 @@ export function BlocksEngine({ blocks, className, context }: BlocksEngineProps) 
                             </div>
                         )}
 
-                        <Suspense fallback={<div className="h-24 animate-pulse bg-zinc-50 rounded-xl" />}>
+                        <Suspense fallback={<div className="h-24 animate-pulse bg-[var(--surface-muted)] rounded-xl" />}>
                             {renderBlock(block)}
                         </Suspense>
                     </section>

@@ -50,6 +50,9 @@ export const getNearbyDiscovery = cache(async (lat: number, lng: number, radiusK
 export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, userId?: string) => {
     try {
         const supabase = await createClient();
+
+        // WYSHKIT 2026: The discovery engine is the heart of the app.
+        // If this fails in India, it's likely the ISP block.
         const { data, error } = await supabase.rpc('get_home_surface' as any, {
             p_lat: lat,
             p_lng: lng,
@@ -57,6 +60,9 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
         });
 
         if (error) {
+            if (error.message?.includes('fetch failed')) {
+                logger.error('[INDIA_DNS_BLOCK] Discovery fetch failed. Advise user to use 1.1.1.1');
+            }
             logError(error, 'GetHomeSurfaceContext');
             return {
                 sections: [],
@@ -69,7 +75,7 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
             };
         }
 
-        // SWIGGY 2026 Pattern: Robust Unwrapping
+        // WYSHKIT 2026 Pattern: Robust Unwrapping
         const raw = Array.isArray(data) ? (data[0]?.get_home_surface || data[0]) : data;
 
         if (!raw) {
@@ -103,7 +109,10 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
             cartCount: raw.cart_count || 0,
             metadata: {
                 system_status: raw.system_status || 'normal',
-                orders: raw.active_orders || []
+                orders: raw.active_orders || [],
+                location_name: raw.metadata?.location_name,
+                resolved_lat: raw.metadata?.resolved_lat,
+                resolved_lng: raw.metadata?.resolved_lng
             }
         };
     } catch (error: any) {
@@ -119,55 +128,3 @@ export const getHomeSurfaceContext = cache(async (lat?: number, lng?: number, us
         };
     }
 });
-
-/** @deprecated WYSHKIT 2026: Use getHomeSurfaceContext() instead. */
-export async function getCategories() {
-    logger.warn('getCategories is DEPRECATED. Use getHomeSurfaceContext for atomic discovery context.');
-    const supabase = await createClient();
-    const { data } = await supabase.from('categories').select('*').order('name');
-    return data || [];
-}
-
-/** @deprecated WYSHKIT 2026: Use getHomeSurfaceContext() instead. */
-export async function getFeaturedVendors(limit: number = 8) {
-    logger.warn('getFeaturedVendors is DEPRECATED. Use getHomeSurfaceContext for atomic discovery context.');
-    const supabase = await createClient();
-    const { data, error } = await supabase
-        .from('vendors')
-        .select(`
-            id, name, image_url, rating, city, 
-            avg_prep_time_mins, base_delivery_charge, 
-            slug, business_type, is_online, description
-        `)
-        .eq('is_active', true)
-        .limit(limit);
-
-    if (error) return { data: [], error: error.message };
-
-    // Map to UI-friendly structure
-    const mappedVendors = (data || []).map(p => ({
-        ...p,
-        prep_mins: p.avg_prep_time_mins || 45,
-        delivery_fee: Number(p.base_delivery_charge || 0)
-    }));
-
-    return { data: mappedVendors, error: null };
-}
-
-/** @deprecated WYSHKIT 2026: Use getHomeSurfaceContext() instead. */
-export async function getTrendingProducts(limit: number = 3) {
-    logger.warn('getTrendingProducts is DEPRECATED. Use getHomeSurfaceContext for atomic discovery context.');
-    try {
-        const supabase = await createClient();
-        const { data, error } = await supabase
-            .from('products')
-            .select('*, vendors(name, city)')
-            .eq('is_active', true)
-            .limit(limit);
-
-        if (error) return { data: [], error: error.message };
-        return { data: data as any, error: null };
-    } catch (err: any) {
-        return { data: [], error: err.message };
-    }
-}

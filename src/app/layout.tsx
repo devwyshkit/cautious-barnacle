@@ -18,8 +18,8 @@ checkRecommendedEnv();
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: "WyshKit | Premium Hyperlocal Personalization",
-  description: "The gold standard for hyperlocal gifts and products. Order from premium local vendors with seamless, optional personalization.",
-  keywords: ["hyperlocal", "marketplace", "personalization", "delivery", "local vendors", "wyshkit"],
+  description: "Last-minute personalised gifts, delivered in under 60 minutes by your local vendor.",
+  keywords: ["hyperlocal", "personalization", "delivery", "local vendors", "wyshkit", "personalised gifts", "gift delivery"],
   authors: [{ name: "Wyshkit" }],
   icons: {
     icon: '/favicon.ico',
@@ -36,13 +36,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Wyshkit",
-    title: "Wyshkit | Hyperlocal Product Marketplace",
-    description: "Hyperlocal product marketplace with optional personalization. Order from local vendors.",
+    title: "WyshKit | Personalised Gifts Delivered in 60 Minutes",
+    description: "See a preview before we make it. Personalised gifts from local vendors, delivered fast.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Wyshkit | Hyperlocal Product Marketplace",
-    description: "Hyperlocal product marketplace with optional personalization. Order from local vendors.",
+    title: "WyshKit | Personalised Gifts Delivered in 60 Minutes",
+    description: "See a preview before we make it. Personalised gifts from local vendors, delivered fast.",
   },
 };
 
@@ -52,7 +52,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: '#C5A059',
+  themeColor: '#D91B24',
 };
 
 export default function RootLayout({
@@ -62,8 +62,8 @@ export default function RootLayout({
 }>) {
   try {
     return (
-      <html lang="en" className={cn("min-h-screen w-full selection:bg-rose-100 selection:text-rose-900", inter.variable)}>
-        <body className="font-sans antialiased min-h-screen w-full bg-white">
+      <html lang="en" className={cn("min-h-screen w-full selection:bg-[var(--primary-muted)] selection:text-[var(--primary)]", inter.variable)}>
+        <body className="font-sans antialiased min-h-screen w-full bg-[var(--background)]">
           <ErrorReporter />
           <Providers>
             {children}
@@ -75,7 +75,7 @@ export default function RootLayout({
     return (
       <html lang="en">
         <body>
-          <div className="p-10 text-red-600 bg-red-50 min-h-screen font-mono">
+          <div className="p-10 text-[var(--destructive)] bg-[var(--well-destructive)] min-h-screen font-mono">
             <h1 className="text-xl font-bold mb-4">Root Layout Error (Debug)</h1>
             <pre className="whitespace-pre-wrap text-xs bg-white p-4 rounded border border-red-100 shadow-sm">
               {err.stack || err.message || String(err)}

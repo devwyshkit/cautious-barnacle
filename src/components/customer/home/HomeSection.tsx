@@ -15,18 +15,18 @@ export function HomeSection({ title, subtitle, href, children, className }: Home
     <section className={cn("space-y-6", className)}>
       <div className="flex items-center justify-between px-4 md:px-8">
         <div>
-          <h2 className="text-[16px] md:text-[18px] font-semibold text-zinc-900 tracking-tight">
+          <h2 className="text-[16px] md:text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-[11px] text-zinc-500 mt-0.5 tracking-tight">{subtitle}</p>
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5 tracking-tight">{subtitle}</p>
           )}
         </div>
 
         {href && (
           <Link
             href={href}
-            className="flex items-center gap-0.5 text-xs font-semibold text-zinc-500 hover:text-zinc-700 active:scale-95 transition-all"
+            className="flex items-center gap-0.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-secondary)] active:scale-95 transition-all"
           >
             See all
             <ChevronRight className="size-4" />

@@ -15,11 +15,11 @@ export default async function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-50">
+        <div className="min-h-[100dvh] bg-[var(--surface-muted)]">
             <Suspense fallback={
                 <div className="max-w-lg mx-auto px-4 pt-6 pb-24 space-y-4">
                     {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-32 bg-white rounded-2xl border border-zinc-100 animate-pulse" />
+                        <div key={i} className="h-32 bg-[var(--surface-muted)] rounded-2xl border border-[var(--border)] animate-pulse" />
                     ))}
                 </div>
             }>

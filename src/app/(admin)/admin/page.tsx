@@ -95,13 +95,13 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-zinc-900">Overview</h1>
+      <h1 className="text-lg font-semibold text-[var(--text-primary)]">Overview</h1>
 
       {/* Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">GMV today</CardTitle>
+            <CardTitle className="text-sm font-medium text-[var(--text-secondary)]">GMV today</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">{formatCurrency(metrics.gmv_today)}</p>
@@ -110,7 +110,7 @@ export default async function AdminDashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Orders today</CardTitle>
+            <CardTitle className="text-sm font-medium text-[var(--text-secondary)]">Orders today</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">{metrics.orders_today}</p>
@@ -119,7 +119,7 @@ export default async function AdminDashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">Active vendors</CardTitle>
+            <CardTitle className="text-sm font-medium text-[var(--text-secondary)]">Active vendors</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-semibold">{metrics.active_vendors}</p>
@@ -128,12 +128,12 @@ export default async function AdminDashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-500">KYC Queue</CardTitle>
+            <CardTitle className="text-sm font-medium text-[var(--text-secondary)]">KYC Queue</CardTitle>
           </CardHeader>
           <CardContent>
             <Link href="/admin/vendors?status=SUBMITTED" className="flex items-center gap-2">
-              <p className="text-2xl font-semibold text-amber-600">{metrics.pending_kyc}</p>
-              {metrics.pending_kyc > 0 && <ArrowRight className="size-4 text-amber-600" />}
+              <p className="text-2xl font-semibold text-[var(--warning)]">{metrics.pending_kyc}</p>
+              {metrics.pending_kyc > 0 && <ArrowRight className="size-4 text-[var(--warning)]" />}
             </Link>
           </CardContent>
         </Card>
@@ -144,20 +144,20 @@ export default async function AdminDashboard() {
         <Card>
           <CardHeader className="flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Recent orders</CardTitle>
-            <Link href="/admin/orders" className="text-xs text-zinc-500 hover:text-zinc-900">
+            <Link href="/admin/orders" className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
               View all
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             {recentOrders.length === 0 ? (
-              <p className="p-4 text-sm text-zinc-500">No orders yet</p>
+              <p className="p-4 text-sm text-[var(--text-secondary)]">No orders yet</p>
             ) : (
-              <div className="divide-y divide-zinc-100">
+              <div className="divide-y divide-[var(--border)]">
                 {recentOrders.map((order) => (
                   <div key={order.id} className="flex items-center justify-between px-4 py-3">
                     <div>
                       <p className="text-sm font-medium">#{order.order_number}</p>
-                      <p className="text-xs text-zinc-500">
+                      <p className="text-xs text-[var(--text-secondary)]">
                         {order.vendors?.business_name || 'Unknown vendor'}
                       </p>
                     </div>
@@ -176,26 +176,26 @@ export default async function AdminDashboard() {
         <Card>
           <CardHeader className="flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">KYC queue</CardTitle>
-            <Link href="/admin/vendors?status=SUBMITTED" className="text-xs text-zinc-500 hover:text-zinc-900">
+            <Link href="/admin/vendors?status=SUBMITTED" className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
               View all
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             {pendingKYC.length === 0 ? (
-              <p className="p-4 text-sm text-zinc-500">No pending applications</p>
+              <p className="p-4 text-sm text-[var(--text-secondary)]">No pending applications</p>
             ) : (
-              <div className="divide-y divide-zinc-100">
+              <div className="divide-y divide-[var(--border)]">
                 {pendingKYC.map((vendor) => (
                   <Link
                     key={vendor.id}
                     href={`/admin/vendors/${vendor.id}`}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-zinc-50"
+                    className="flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-muted)]"
                   >
                     <div>
                       <p className="text-sm font-medium">{vendor.business_name}</p>
-                      <p className="text-xs text-zinc-500">Applied {formatDate(vendor.created_at!)}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">Applied {formatDate(vendor.created_at!)}</p>
                     </div>
-                    <Badge variant="outline" className="text-amber-600 border-amber-200">Review</Badge>
+                    <Badge variant="outline" className="text-[var(--warning)] border-[var(--warning)]/20">Review</Badge>
                   </Link>
                 ))}
               </div>

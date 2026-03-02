@@ -47,10 +47,10 @@ export default async function CustomersPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-zinc-900">Customers</h1>
+        <h1 className="text-lg font-semibold text-[var(--text-primary)]">Customers</h1>
         <div className="flex gap-4 text-sm">
-          <span className="text-zinc-500">Total: <strong className="text-zinc-900">{stats.total}</strong></span>
-          <span className="text-zinc-500">Today: <strong className="text-emerald-600">+{stats.today}</strong></span>
+          <span className="text-[var(--text-secondary)]">Total: <strong className="text-[var(--text-primary)]">{stats.total}</strong></span>
+          <span className="text-[var(--text-secondary)]">Today: <strong className="text-[var(--success)]">+{stats.today}</strong></span>
         </div>
       </div>
       <CustomerTable

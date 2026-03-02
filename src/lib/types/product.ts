@@ -31,8 +31,8 @@ export type ProductListItem = Tables<'products'> & {
 export interface WyshkitProduct extends Omit<Tables<'products'>, 'variants' | 'personalization_options' | 'video_url' | 'preview_time_minutes'> {
   // UI Computed & Joined fields
   price?: number; // Normalized price (base_price or variant price)
-  image_url?: string | null;
-  vendor_name?: string | null;
+  image_url?: string;
+  vendor_name?: string;
   distance_km?: number | null;
   distance_meters?: number | null;
   is_promoted: boolean | null;
@@ -49,9 +49,9 @@ export interface WyshkitProduct extends Omit<Tables<'products'>, 'variants' | 'p
 
   // Aliases & Missing Fields (Shadow State Resolution)
   variants?: Array<Tables<'product_variants'> & { price: number | null; stock_quantity: number | null }>;
-  personalization_options?: any;
-  video_url?: string | null;
-  preview_time_minutes?: number | null;
+  personalization_options: any;
+  video_url: string | null;
+  preview_time_minutes: number | null;
   return_eligible?: boolean;
 
   elite_signals?: ValidatedWyshkitProduct['elite_signals'];

@@ -1,6 +1,6 @@
 /**
  * WYSHKIT 2026: Standardized Haptic Feedback Patterns
- * Swiggy 2026 Pattern: Consistent haptic feedback for all user actions
+ * WYSHKIT 2026 Pattern: Consistent haptic feedback for all user actions
  * 
  * Patterns:
  * - Success: Double light tap (50ms, 50ms) - confirms action completed

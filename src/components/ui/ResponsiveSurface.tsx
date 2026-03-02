@@ -3,23 +3,23 @@
 import * as React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
+    Drawer,
+    DrawerContent,
+    DrawerDescription,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from '@/components/ui/drawer';
+import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from '@/components/ui/drawer';
+import { XIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -39,7 +39,6 @@ interface ResponsiveSurfaceProps {
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
     className?: string;
-    showClose?: boolean;
     lean?: boolean;
 }
 
@@ -51,62 +50,74 @@ export function ResponsiveSurface({
     open = false,
     onOpenChange,
     className,
-    showClose = true,
     lean = false
 }: ResponsiveSurfaceProps) {
     const isMobile = useIsMobile();
-    const [mounted, setMounted] = React.useState(false);
-
-    // WYSHKIT 2026: Hydration Barrier
-    React.useEffect(() => {
-        setMounted(true);
-    }, []);
 
     const handleOpenChange = React.useCallback((val: boolean) => {
         if (onOpenChange) onOpenChange(val);
     }, [onOpenChange]);
 
-    if (!mounted) return null;
-
-    if (isMobile) {
+    if (!isMobile) {
         return (
-            <Drawer open={open} onOpenChange={handleOpenChange}>
-                {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-                <DrawerContent className={cn("flex flex-col max-h-[92vh] border-t-0", className)}>
+            <Dialog open={open} onOpenChange={handleOpenChange}>
+                {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+                <DialogContent className={cn(
+                    "flex flex-col max-h-[85vh] sm:max-w-2xl",
+                    className
+                )} lean={lean}>
                     {(!lean && (title || description)) && (
-                        <DrawerHeader className="text-left shrink-0 pb-4 border-b border-zinc-100/50">
-                            {title && <DrawerTitle className="text-xl font-black tracking-tight text-zinc-900">{title}</DrawerTitle>}
-                            {description && <DrawerDescription className="text-zinc-500">{description}</DrawerDescription>}
-                        </DrawerHeader>
+                        <DialogHeader className="text-left shrink-0 p-6 sm:p-8 space-y-1 border-b border-[var(--border)]">
+                            {title && <DialogTitle className="text-xl font-bold tracking-tight text-[var(--text-primary)] sm:text-2xl">{title}</DialogTitle>}
+                            {description && <DialogDescription className="text-sm font-medium text-[var(--text-secondary)]">{description}</DialogDescription>}
+
+                            {/* Close button handled by DialogContent base in some shadcn versions, 
+                                but here we ensure consistency with the Plan. */}
+                            <DialogClose className="absolute right-6 top-6 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none">
+                                <XIcon className="h-4 w-4" />
+                                <span className="sr-only">Close</span>
+                            </DialogClose>
+                        </DialogHeader>
                     )}
-                    <div
-                        data-vaul-no-drag
-                        className={cn(
-                            "flex-1 overflow-y-auto overscroll-contain touch-pan-y scrollbar-none",
-                            lean ? "px-0 pb-0" : "px-4 pt-4 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]"
-                        )}
-                    >
+                    <div className={cn(
+                        "flex flex-col min-h-0 relative overflow-y-auto overscroll-contain custom-scrollbar",
+                        lean ? "p-0" : "p-0 sm:p-0" // WYSHKIT 2026: Zero padding here. Consumer (e.g. AuthPageClient) handles px-4.
+                    )}>
                         {children}
                     </div>
-                </DrawerContent>
-            </Drawer>
+                </DialogContent>
+            </Dialog>
         );
     }
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent className={cn("sm:max-w-[425px]", lean ? "p-0 overflow-hidden" : "", className)} showCloseButton={showClose && !lean}>
+        <Drawer open={open} onOpenChange={handleOpenChange}>
+            {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
+            <DrawerContent className={cn(
+                "flex flex-col max-h-[92vh] border-t-0 rounded-t-[var(--radius-3xl)] bg-[var(--surface)] z-[var(--z-overlay)] pb-safe",
+                className
+            )}>
+                {/* WYSHKIT 2026: Elite Handle (Mobile Only) - Now managed by DrawerContent base with sm:hidden */}
+
                 {(!lean && (title || description)) && (
-                    <DialogHeader className="text-left">
-                        {title && <DialogTitle className="text-xl font-black tracking-tight">{title}</DialogTitle>}
-                        {description && <DialogDescription>{description}</DialogDescription>}
-                    </DialogHeader>
+                    <DrawerHeader className="text-left shrink-0 pb-[var(--space-4)] pt-4 border-b border-[var(--border)] bg-[var(--surface)] rounded-t-[var(--radius-3xl)]">
+                        {title && <DrawerTitle className="text-xl font-black tracking-tight text-[var(--text-primary)]">{title}</DrawerTitle>}
+                        {description && <DrawerDescription className="text-xs font-medium text-[var(--text-secondary)]">{description}</DrawerDescription>}
+                    </DrawerHeader>
                 )}
-                <div className={cn("overflow-y-auto", lean ? "max-h-[90vh]" : "max-h-[80vh]")}>
+
+                <div
+                    data-vaul-no-drag
+                    className={cn(
+                        "flex-1 overflow-y-auto overscroll-contain custom-scrollbar flex flex-col min-h-0 relative",
+                        lean ? "p-0" : "p-0" // WYSHKIT 2026: Remove px-5 pt-4 pb-10. Consumer handles its own internal layout.
+                    )}
+                >
                     {children}
                 </div>
-            </DialogContent>
-        </Dialog>
+
+                {/* WYSHKIT 2026: Elite Clean UI. Dismiss via drag/overlay. */}
+            </DrawerContent>
+        </Drawer>
     );
 }

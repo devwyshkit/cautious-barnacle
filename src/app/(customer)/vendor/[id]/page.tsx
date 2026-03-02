@@ -16,7 +16,7 @@ import { MappedVendor } from '@/lib/types/vendor';
  * 
  * WYSHKIT 2026: Server-First Data Fetching - Fetch vendor + products in parallel
  * 
- * Swiggy 2026 Pattern: Server-First Architecture
+ * WYSHKIT 2026 Pattern: Server-First Architecture
  * - Data fetched server-side in parallel before render
  * - Client Component receives props immediately (no Suspense needed for Client Components)
  * - No client-side data fetching waterfalls
@@ -37,7 +37,7 @@ export default async function VendorPage({
   const { category } = await searchParams;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[100dvh]">
       <Suspense fallback={<VendorSkeleton />}>
         <AsyncVendorContent id={id} category={category} />
       </Suspense>

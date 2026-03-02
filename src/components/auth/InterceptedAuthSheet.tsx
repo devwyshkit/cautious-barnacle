@@ -28,7 +28,7 @@ export function InterceptedAuthSheet({ intent = 'signin', returnUrl = '/' }: Int
                 }
             }}
         >
-            <div className="bg-white p-6 pb-12">
+            <div className="bg-[var(--surface)] p-6 pb-12">
                 <AuthPageClient intent={intent} returnUrl={returnUrl} />
             </div>
         </ResponsiveSurface>

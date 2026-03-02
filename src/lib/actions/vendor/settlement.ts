@@ -39,7 +39,7 @@ export async function trigger_post_delivery_events(order_id: string) {
             return { success: true, message: 'Already settled' };
         }
 
-        // 2. SETTLEMENT CALCULATION (Swiggy 2026 Model)
+        // 2. SETTLEMENT CALCULATION (WYSHKIT 2026 Model)
         // [PURIFIED] trust vendor.commission_percentage for settlement authority
         const vendor = order.vendor as any;
         const commission_rate = Number(vendor?.commission_percentage ?? 18) / 100;

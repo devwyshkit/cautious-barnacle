@@ -8,19 +8,15 @@ import { useCart } from '@/components/customer/CartProvider';
 import { useAuth } from '@/providers/AuthProvider';
 import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
-import { hasAnyPersonalization, hasProductPersonalization } from '@/lib/utils/personalization';
+import { hasAnyPersonalization } from '@/lib/utils/personalization';
 import { formatCurrency } from '@/lib/utils/pricing';
 
 /**
- * WYSHKIT 2026: FloatingCartBar - CSS transitions (zero JS overhead)
- * Swiggy 2026 Pattern: Immediate visibility, smooth CSS animations
- * Keep in DOM for proper CSS transitions (no early return)
+ * WYSHKIT 2026: FloatingCartBar - Token Aligned
+ * REFRESHED: Switched from Swiggy Emerald to WyshKit Red.
  */
 export function FloatingCartBar() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { draftOrder, loading } = useCart();
-  const { user: authUser } = useAuth();
+  const { draftOrder, loading, setDrawerOpen } = useCart();
 
   const displayCart = draftOrder;
   const hasProducts = displayCart && displayCart.product_count > 0;
@@ -29,11 +25,9 @@ export function FloatingCartBar() {
   const handleOpenCart = (e: React.MouseEvent) => {
     e.preventDefault();
     triggerHaptic(HapticPattern.ACTION);
-
-    router.push('/checkout');
+    setDrawerOpen(true);
   };
 
-  const firstItemImage = displayCart?.products?.[0]?.product_image;
   const hasPersonalization = hasAnyPersonalization((displayCart?.products || []) as any[]);
   const productCount = displayCart?.product_count || 0;
   const displayTotal = displayCart?.total || 0;
@@ -62,67 +56,61 @@ export function FloatingCartBar() {
       aria-label="Floating cart summary"
       data-testid="floating-cart-bar"
       className={cn(
-        "fixed z-[45] transition-all duration-300 ease-out",
-        "left-4 right-4 md:left-auto md:w-[420px] md:right-8",
+        "fixed z-[var(--z-overlay)] transition-all duration-300 ease-out",
+        "left-[var(--space-4)] right-[var(--space-4)] bottom-[var(--floating-cart-bottom)] pb-safe",
+        "md:left-auto md:w-[420px] md:right-[var(--space-8)] md:bottom-[var(--space-8)] md:pb-0",
         isVisible ? "translate-y-0 opacity-100" : "translate-y-32 opacity-0 pointer-events-none"
       )}
-      style={{
-        // Sit directly above BottomNav
-        bottom: `calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 16px)`
-      }}
     >
-      <div
+      <button
         onClick={handleOpenCart}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && handleOpenCart(e as any)}
+        type="button"
+        aria-label={`View cart: ${visualCount} items, ${formatCurrency(displayTotal)}`}
         className={cn(
-          "bg-emerald-600 backdrop-blur-3xl rounded-xl shadow-sm border border-emerald-500 overflow-hidden",
-          "transition-all duration-300 cursor-pointer active:scale-[0.98]",
-          shouldPulse && "scale-[1.02] bg-emerald-500",
+          "w-full bg-[var(--primary)] backdrop-blur-3xl rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--primary-hover)]/30 overflow-hidden",
+          "transition-all duration-300 cursor-pointer active:scale-[0.98] text-left",
+          shouldPulse && "scale-[1.02] bg-[var(--primary-hover)]",
           isLoading && "opacity-70 pointer-events-none"
         )}
       >
-        <div className="flex items-center justify-between px-4 py-3 min-h-[56px]">
-          {/* Left: Standardized slim cart product summary */}
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between px-[var(--space-4)] py-[var(--space-3)] min-h-[56px]">
+          <div className="flex items-center gap-[var(--space-3)]">
             <div className="relative">
-              <ShoppingBag className="size-5 text-emerald-100" />
-              <div className="absolute -top-1.5 -right-1.5 size-4 rounded-full bg-white flex items-center justify-center shadow-sm">
-                <span className="text-[9px] font-black text-emerald-600">{visualCount}</span>
+              <ShoppingBag className="size-5 text-[var(--primary-foreground)]/90" />
+              <div className="absolute -top-1.5 -right-1.5 size-4 rounded-full bg-[var(--surface)] flex items-center justify-center shadow-[var(--shadow-sm)]">
+                <span className="text-xs font-bold text-[var(--primary)]">{visualCount}</span>
               </div>
             </div>
 
             <div className="flex flex-col">
-              <span className="text-sm font-black text-white leading-none">
+              <span className="text-sm font-bold text-[var(--primary-foreground)] leading-none">
                 {visualCount} {visualCount === 1 ? 'product' : 'products'}
               </span>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="text-xs font-medium text-emerald-100/90 truncate max-w-[120px]">
+              <div className="flex items-center gap-[var(--space-2)] mt-0.5">
+                <span className="text-xs font-medium text-[var(--primary-foreground)]/80 truncate max-w-[120px]">
                   {displayCart?.products?.[0]?.vendor_name || 'Local store'}
                 </span>
                 {hasPersonalization && (
-                  <div className="flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-white/20">
+                  <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[var(--surface)]/20">
                     <Sparkles className="size-2 text-white" />
-                    <span className="text-[9px] font-black text-white tracking-tight leading-none">Personalized</span>
+                    <span className="text-xs font-bold text-white tracking-tight leading-none uppercase">Personalized</span>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Right: Price & CTA */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-black text-white tabular-nums">
+          <div className="flex items-center gap-[var(--space-2)]">
+            <span className="text-sm font-bold text-[var(--primary-foreground)] tabular-nums">
               {formatCurrency(displayTotal)}
             </span>
-            <div className="flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full text-white font-bold text-xs">
+            <div className="flex items-center gap-1 bg-[var(--surface)]/20 px-2.5 py-1 rounded-full text-white font-bold text-xs">
               View
               <ChevronRight className="size-3 stroke-[3]" />
             </div>
           </div>
         </div>
-      </div>
+      </button>
     </div>
   );
 }

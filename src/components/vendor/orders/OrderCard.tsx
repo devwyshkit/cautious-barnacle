@@ -19,6 +19,7 @@ import type { VendorOrder } from '@/lib/actions/commerce/orders';
 import { cn } from '@/lib/utils';
 
 import { PreviewUploader } from '../personalization/PreviewUploader';
+import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 const ACCEPT_SLA_MINUTES = 5;
 const DESIGN_DEADLINE_HOURS = 24;
@@ -73,12 +74,12 @@ const getAvailableAction = (order: VendorOrder) => {
 };
 
 const STATUS_COLORS: Partial<Record<OrderStatus, string>> = {
-  [ORDER_STATUS.PLACED]: 'bg-red-50 text-red-700 border-red-200',
-  [ORDER_STATUS.CONFIRMED]: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  [ORDER_STATUS.IN_PRODUCTION]: 'bg-purple-50 text-purple-700 border-purple-200',
-  [ORDER_STATUS.PACKED]: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  [ORDER_STATUS.OUT_FOR_DELIVERY]: 'bg-blue-50 text-blue-700 border-blue-200',
-  [ORDER_STATUS.DELIVERED]: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  [ORDER_STATUS.PLACED]: 'bg-[var(--well-destructive)] text-[var(--well-destructive-text)] border-[var(--well-destructive-border)]',
+  [ORDER_STATUS.CONFIRMED]: 'bg-[var(--well-success)] text-[var(--well-success-text)] border-[var(--well-success-border)]',
+  [ORDER_STATUS.IN_PRODUCTION]: 'bg-[var(--well-neutral)] text-[var(--well-neutral-text)] border-[var(--well-neutral-border)]',
+  [ORDER_STATUS.PACKED]: 'bg-[var(--well-success)] text-[var(--well-success-text)] border-[var(--well-success-border)]',
+  [ORDER_STATUS.OUT_FOR_DELIVERY]: 'bg-[var(--well-info)] text-[var(--well-info-text)] border-[var(--well-info-border)]',
+  [ORDER_STATUS.DELIVERED]: 'bg-[var(--well-success)] text-[var(--well-success-text)] border-[var(--well-success-border)]',
 };
 
 export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdating }: OrderCardProps) {
@@ -102,7 +103,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
   const isExpress = !order.has_personalization;
   const action = getAvailableAction(order);
 
-  const statusColor = STATUS_COLORS[order.status as OrderStatus] || 'bg-zinc-100 text-zinc-700';
+  const statusColor = STATUS_COLORS[order.status as OrderStatus] || 'bg-[var(--surface-muted)] text-[var(--text-secondary)]';
 
   useEffect(() => {
     if (!isNewOrder || !order.created_at) return;
@@ -167,9 +168,24 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
 
   const handleReject = () => {
     if (rejectReason) {
+      triggerHaptic(HapticPattern.ACTION);
       onReject(order.id, rejectReason);
       setShowRejectDialog(false);
       setRejectReason('');
+    }
+  };
+
+  const handleUpdateStatus = (status: OrderStatus) => {
+    triggerHaptic(HapticPattern.ACTION);
+    onStatusUpdate(order.id, status);
+  };
+
+  const handleAcceptOrder = () => {
+    triggerHaptic(HapticPattern.SUCCESS);
+    if (isExpress) {
+      onStatusUpdate(order.id, ORDER_STATUS.IN_PRODUCTION);
+    } else {
+      onAccept(order.id);
     }
   };
 
@@ -179,17 +195,17 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
         <CardContent className="p-0">
           {/* WYSHKIT 2026: Revision Feedback Block (Momentum Saver) */}
           {order.personalization_status === 'revision_requested' && order.latest_preview?.customer_feedback && (
-            <div className="p-4 bg-orange-50 border-b border-orange-100 animate-in slide-in-from-top-1 duration-500">
+            <div className="p-4 bg-[var(--well-warning)] border-b border-[var(--well-warning-border)] animate-in slide-in-from-top-1 duration-500">
               <div className="flex items-start gap-3">
-                <div className="size-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-                  <AlertTriangle className="size-4 text-orange-600" />
+                <div className="size-8 rounded-full bg-[var(--background)] flex items-center justify-center shrink-0 shadow-[var(--shadow-sm)]">
+                  <AlertTriangle className="size-4 text-[var(--well-warning-text)]" />
                 </div>
                 <div>
-                  <p className="text-xs font-black text-orange-900 tracking-tight leading-none mb-1">Action Required: Correction Requested</p>
-                  <p className="text-sm font-bold text-orange-800 leading-tight">
+                  <p className="text-xs font-black text-[var(--text-primary)] tracking-tight leading-none mb-1 uppercase">Correction Requested</p>
+                  <p className="text-sm font-bold text-[var(--text-primary)] leading-tight">
                     &quot;{order.latest_preview.customer_feedback}&quot;
                   </p>
-                  <p className="text-xs text-orange-600 mt-2 font-medium italic">
+                  <p className="text-xs text-[var(--text-secondary)] mt-2 font-medium italic">
                     Upload a corrected preview to proceed.
                   </p>
                 </div>
@@ -199,12 +215,12 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
           <div className="p-4">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-                  <Package className="size-5 text-zinc-500" />
+                <div className="size-10 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center">
+                  <Package className="size-5 text-[var(--text-secondary)]" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-zinc-900">
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">
                       #{order.order_number}
                     </p>
                     <Badge variant="outline" className={cn('text-xs', statusColor)}>
@@ -214,10 +230,10 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                       <Badge
                         variant="outline"
                         className={cn(
-                          'text-xs font-mono tabular-nums',
+                          'text-xs font-mono tabular-nums rounded-[var(--radius-xs)]',
                           isUrgent
-                            ? 'bg-red-100 text-red-700 border-red-300 animate-pulse'
-                            : 'bg-amber-50 text-amber-700 border-amber-200'
+                            ? 'bg-[var(--well-destructive)] text-[var(--well-destructive-text)] border-[var(--well-destructive-border)] animate-pulse'
+                            : 'bg-[var(--well-warning)] text-[var(--well-warning-text)] border-[var(--well-warning-border)]'
                         )}
                       >
                         <Clock className="size-3 mr-1" />
@@ -228,10 +244,10 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                       <Badge
                         variant="outline"
                         className={cn(
-                          'text-xs',
+                          'text-xs rounded-[var(--radius-xs)]',
                           isDeadlineUrgent
-                            ? 'bg-orange-100 text-orange-700 border-orange-300'
-                            : 'bg-blue-50 text-blue-700 border-blue-200'
+                            ? 'bg-[var(--well-destructive)] text-[var(--well-destructive-text)] border-[var(--well-destructive-border)]'
+                            : 'bg-[var(--well-info)] text-[var(--well-info-text)] border-[var(--well-info-border)]'
                         )}
                       >
                         <AlertTriangle className="size-3 mr-1" />
@@ -239,7 +255,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 text-zinc-500 mt-0.5">
+                  <div className="flex items-center gap-1.5 text-[var(--text-secondary)] mt-0.5">
                     <Clock className="size-3" />
                     <span className="text-xs">
                       {formatDistanceToNow(new Date(order.created_at!), { addSuffix: true })}
@@ -247,39 +263,39 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                   </div>
                 </div>
               </div>
-              <p className="text-base font-semibold text-zinc-900">
+              <p className="text-base font-semibold text-[var(--text-primary)]">
                 ₹{Number(order.total).toLocaleString('en-IN')}
               </p>
             </div>
 
-            <div className="space-y-2 py-3 border-t border-zinc-100">
+            <div className="space-y-2 py-3 border-t border-[var(--border)]">
               {isExpress && order.status === ORDER_STATUS.PLACED && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 mb-2 animate-in slide-in-from-top-1 duration-300">
-                  <Zap className="size-3 fill-emerald-600" />
-                  <span className="text-xs font-black tracking-tight">Express Fulfill</span>
-                  <span className="text-[11px] font-medium opacity-70 ml-auto">No personalization needed</span>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--well-success)] text-[var(--well-success-text)] rounded-[var(--radius-md)] border border-[var(--well-success-border)] mb-2 animate-in slide-in-from-top-1 duration-300">
+                  <Zap className="size-3 fill-[var(--well-success-text)]" />
+                  <span className="text-xs font-black tracking-tight uppercase">Express Fulfill</span>
+                  <span className="text-[10px] font-bold opacity-70 ml-auto uppercase">Automatic</span>
                 </div>
               )}
               {order.order_products?.map((product: any, idx: number) => (
                 <div key={idx} className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="text-sm text-zinc-900">
+                    <p className="text-sm text-[var(--text-primary)]">
                       {product.quantity}× {product.product_name}
                     </p>
                     {product.selected_variant_options && (
-                      <p className="text-xs text-zinc-500 mt-0.5 font-medium italic">
+                      <p className="text-xs text-[var(--text-secondary)] mt-0.5 font-medium italic">
                         {Object.entries(product.selected_variant_options as Record<string, string>)
                           .map(([key, value]) => `${key}: ${value}`)
                           .join(' · ')}
                       </p>
                     )}
                     {product.is_personalized && (
-                      <Badge variant="outline" className="mt-1 text-xs bg-blue-50 text-blue-700 border-blue-200">
+                      <Badge variant="outline" className="mt-1 text-[10px] font-black uppercase bg-[var(--well-info)] text-[var(--well-info-text)] border-[var(--well-info-border)] rounded-[var(--radius-xs)]">
                         Personalization
                       </Badge>
                     )}
                   </div>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-[var(--text-secondary)]">
                     {/* WYSHKIT 2026: Calculate total from unit price */}
                     ₹{Number((product.unit_price || 0) * product.quantity).toLocaleString('en-IN')}
                   </p>
@@ -288,9 +304,9 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
             </div>
 
             {order.delivery_address && (
-              <div className="flex items-start gap-2 py-3 border-t border-zinc-100">
-                <MapPin className="size-4 text-zinc-400 mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-zinc-600 line-clamp-2">
+              <div className="flex items-start gap-2 py-3 border-t border-[var(--border)]">
+                <MapPin className="size-4 text-[var(--text-tertiary)] mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-[var(--text-secondary)] line-clamp-2">
                   {typeof order.delivery_address === 'string'
                     ? order.delivery_address
                     : (order.delivery_address as { formatted?: string })?.formatted || 'Address not available'}
@@ -301,8 +317,8 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
 
           {/* WYSHKIT 2026: Personalization Details Section (Canonical Product-Level) */}
           {order.order_products?.some((i: any) => i.personalization_entry || i.personalization_details) && (
-            <div className="mx-4 mb-4 p-4 rounded-xl bg-amber-50 border border-amber-100 space-y-3">
-              <p className="text-xs font-black text-amber-900 tracking-tight">Customer Design Details</p>
+            <div className="mx-4 mb-4 p-4 rounded-[var(--radius-lg)] bg-[var(--well-warning)] border border-[var(--well-warning-border)] space-y-3">
+              <p className="text-xs font-black text-[var(--well-warning-text)] tracking-tight uppercase">Customer Design Details</p>
               <div className="space-y-4">
                 {order.order_products.filter((i: any) => i.is_personalized).map((product: any, idx: number) => {
                   const data = (product.personalization_entry || product.personalization_details || {}) as any;
@@ -310,14 +326,14 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
 
                   return (
                     <div key={product.id || idx} className="space-y-2">
-                      <p className="text-xs font-bold text-amber-800">{product.product_name || 'Personalization'}</p>
+                      <p className="text-xs font-bold text-[var(--well-warning-text)]">{product.product_name || 'Personalization'}</p>
                       {data.text && (
-                        <p className="text-sm text-amber-900 bg-white/50 p-2 rounded-lg border border-amber-100 font-medium">&quot;{data.text}&quot;</p>
+                        <p className="text-sm text-[var(--text-primary)] bg-[var(--surface)]/50 p-2 rounded-[var(--radius-md)] border border-[var(--well-warning-border)] font-medium">&quot;{data.text}&quot;</p>
                       )}
                       {data.image_url && (
-                        <div className="relative aspect-square w-24 rounded-lg overflow-hidden border border-amber-200 group">
+                        <div className="relative aspect-square w-24 rounded-[var(--radius-md)] overflow-hidden border border-[var(--well-warning-border)] group shadow-[var(--shadow-sm)]">
                           <img src={data.image_url} alt="Customer upload" className="size-full object-cover" />
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-2 transition-opacity">
+                          <div className="absolute inset-0 bg-[var(--foreground)]/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-2 transition-opacity">
                             <a
                               href={data.image_url}
                               target="_blank"
@@ -330,7 +346,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                             {(order.status === ORDER_STATUS.CONFIRMED || order.status === ORDER_STATUS.PLACED) && (
                               <Button
                                 size="sm"
-                                className="h-6 px-2 text-[11px] bg-white text-zinc-900 border-none hover:bg-zinc-100"
+                                className="h-6 px-2 text-xs bg-[var(--surface)] text-[var(--text-primary)] border-none hover:bg-[var(--surface-muted)]"
                                 onClick={() => {
                                   setSelectedOrderProductId(product.id);
                                   setShowPreviewModal(true);
@@ -345,7 +361,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                       {data.addons && Array.isArray(data.addons) && (
                         <div className="flex flex-wrap gap-1">
                           {data.addons.map((a: string) => (
-                            <Badge key={a} variant="secondary" className="text-[11px] bg-amber-100 text-amber-700 border-none">{a}</Badge>
+                            <Badge key={a} variant="secondary" className="text-[10px] font-bold uppercase bg-[var(--well-warning-border)] text-[var(--well-warning-text)] border-none rounded-[var(--radius-xs)]">{a}</Badge>
                           ))}
                         </div>
                       )}
@@ -357,29 +373,29 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
           )}
 
           {isNewOrder ? (
-            <div className="flex border-t border-zinc-100">
+            <div className="flex border-t border-[var(--border)]">
               <Button
                 variant="ghost"
-                className="flex-1 rounded-none h-12 text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="flex-1 rounded-none h-12 text-[var(--destructive)] hover:text-[var(--destructive)] hover:bg-[var(--well-destructive)] font-bold uppercase tracking-tight"
                 onClick={() => setShowRejectDialog(true)}
                 disabled={isUpdating}
               >
                 <X className="size-4 mr-2" />
                 Reject
               </Button>
-              <div className="w-px bg-zinc-100" />
+              <div className="w-px bg-[var(--border)]" />
               <Button
                 variant="ghost"
                 className={cn(
-                  "flex-1 rounded-none h-12 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 font-bold",
-                  isExpress && "bg-emerald-50 animate-in fade-in duration-500"
+                  "flex-1 rounded-none h-12 text-[var(--well-success-text)] hover:text-[var(--well-success-text)] hover:bg-[var(--well-success)] font-black uppercase tracking-tight",
+                  isExpress && "bg-[var(--well-success)] animate-in fade-in duration-500"
                 )}
-                onClick={() => isExpress ? onStatusUpdate(order.id, ORDER_STATUS.IN_PRODUCTION) : onAccept(order.id)}
+                onClick={handleAcceptOrder}
                 disabled={isUpdating}
               >
                 {isExpress ? (
                   <>
-                    <Zap className="size-4 mr-2 fill-emerald-600" />
+                    <Zap className="size-4 mr-2 fill-[var(--well-success-text)]" />
                     Accept & Start
                   </>
                 ) : (
@@ -394,7 +410,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
             <div className="p-4 pt-0">
               <Button
                 className="w-full"
-                onClick={() => (action as any).isUpload ? setShowPreviewModal(true) : onStatusUpdate(order.id, (action as any).nextStatus!)}
+                onClick={() => (action as any).isUpload ? setShowPreviewModal(true) : handleUpdateStatus((action as any).nextStatus!)}
                 disabled={isUpdating}
               >
                 {action.label}
@@ -408,13 +424,13 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
             <div className="p-4 pt-0">
               <Button
                 variant="secondary"
-                className="w-full h-12 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 italic"
+                className="w-full h-12 bg-[var(--well-warning)] text-[var(--well-warning-text)] border border-[var(--well-warning-border)] hover:bg-[var(--well-warning)]/80 italic font-bold rounded-[var(--radius-md)]"
                 disabled
               >
                 <Clock className="size-4 mr-2 animate-pulse" />
                 Waiting for Customer Details...
               </Button>
-              <p className="text-xs text-center text-amber-600/70 mt-2 font-medium">
+              <p className="text-xs text-center text-[var(--well-warning-text)]/70 mt-2 font-medium">
                 Customer has 24 hours to submit design details.
               </p>
             </div>

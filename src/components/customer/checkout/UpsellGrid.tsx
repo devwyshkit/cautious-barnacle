@@ -43,7 +43,7 @@ export const UpsellGrid: React.FC<UpsellGridProps> = ({
 
   return (
     <div className="py-4 space-y-3">
-      <h3 className="px-4 text-sm font-semibold text-zinc-900">
+      <h3 className="px-4 text-sm font-semibold text-[var(--text-primary)]">
         {title}
       </h3>
       <ScrollArea className="w-full">
@@ -54,7 +54,7 @@ export const UpsellGrid: React.FC<UpsellGridProps> = ({
 
             return (
               <div key={product.id} className="shrink-0 w-[140px] flex flex-col gap-2">
-                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-100">
+                <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--surface-muted)]">
                   <Image
                     src={product.image_url || '/images/logo.png'}
                     alt={product.name}
@@ -68,8 +68,8 @@ export const UpsellGrid: React.FC<UpsellGridProps> = ({
                     className={cn(
                       "absolute bottom-2 right-2 size-9 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-all",
                       isAdded
-                        ? "bg-emerald-500 text-white"
-                        : "bg-white text-zinc-900 hover:bg-zinc-50"
+                        ? "bg-[var(--success)] text-white"
+                        : "bg-[var(--surface)] text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
                     )}
                   >
                     {isAdding ? (
@@ -82,10 +82,10 @@ export const UpsellGrid: React.FC<UpsellGridProps> = ({
                   </button>
                 </div>
                 <div className="px-0.5 space-y-0.5">
-                  <p className="text-[13px] font-semibold text-zinc-900 truncate leading-tight">
+                  <p className="text-sm font-semibold text-[var(--text-primary)] truncate leading-tight">
                     {product.name}
                   </p>
-                  <p className="text-xs font-bold text-zinc-500">
+                  <p className="text-xs font-bold text-[var(--text-secondary)]">
                     ₹{product.price}
                   </p>
                 </div>

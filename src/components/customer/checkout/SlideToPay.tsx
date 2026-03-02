@@ -30,7 +30,7 @@ interface SlideToPayProps {
 /**
  * WYSHKIT 2026: Slide-to-Pay Widget
  * 
- * Swiggy 2026 Pattern: Healthy Friction
+ * WYSHKIT 2026 Pattern: Healthy Friction
  * - Dynamic threshold based on actual container width
  * - Shimmer hint encourages the gesture
  * - High-fidelity haptics provide physical confirmation
@@ -137,7 +137,7 @@ export function SlideToPay({
 
     if (isProcessing) {
         return (
-            <div className="w-full h-16 bg-[#D91B24] rounded-xl flex items-center justify-center shadow-lg shadow-red-500/20">
+            <div className="w-full h-16 bg-[var(--primary)] rounded-xl flex items-center justify-center shadow-[var(--shadow-brand)]">
                 <div className="size-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
             </div>
         );
@@ -155,7 +155,7 @@ export function SlideToPay({
                     triggerHaptic(HapticPattern.SUCCESS);
                     onPay();
                 }}
-                className="w-full h-16 rounded-xl text-[13px] font-black tracking-tight shadow-sm shadow-red-500/10 gap-3 group overflow-hidden relative"
+                className="w-full h-16 rounded-xl text-sm font-bold tracking-tight shadow-[var(--shadow-brand)] gap-3 group overflow-hidden relative"
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                 <ShieldCheck className="size-5" />
@@ -167,11 +167,11 @@ export function SlideToPay({
     return (
         <div
             ref={constraintsRef}
-            className="relative w-full h-16 bg-zinc-100 rounded-xl overflow-hidden p-1.5 select-none border border-zinc-200 shadow-inner"
+            className="relative w-full h-16 bg-[var(--surface-muted)] rounded-xl overflow-hidden p-1.5 select-none border border-[var(--border)] shadow-inner"
         >
             {/* Background Progress */}
             <div
-                className="absolute inset-y-0 left-0 bg-[#D91B24] rounded-[18px] z-0 transition-opacity duration-150"
+                className="absolute inset-y-0 left-0 bg-[var(--primary)] rounded-[var(--radius-xl)] z-0 transition-opacity duration-150"
                 style={{
                     width: `${bgWidth}px`,
                     opacity: bgOpacity
@@ -184,8 +184,8 @@ export function SlideToPay({
                     className="flex items-center gap-3 transition-opacity duration-150"
                     style={{ opacity: textOpacity }}
                 >
-                    <ChevronRight className="size-4 text-zinc-400 animate-pulse" />
-                    <span className="text-[11px] font-black tracking-tight text-zinc-500 select-none">
+                    <ChevronRight className="size-4 text-[var(--text-tertiary)] animate-pulse" />
+                    <span className="text-xs font-bold tracking-tight text-[var(--text-secondary)] select-none">
                         Slide to pay {formatCurrency(amount)}
                     </span>
                 </div>
@@ -204,7 +204,7 @@ export function SlideToPay({
                 onPointerUp={handlePointerUp}
                 onPointerCancel={handlePointerUp}
                 className={cn(
-                    "relative z-10 size-13 bg-white rounded-[18px] shadow-sm flex items-center justify-center cursor-grab active:cursor-grabbing transition-transform duration-150",
+                    "relative z-10 size-13 bg-[var(--surface)] rounded-[18px] shadow-sm flex items-center justify-center cursor-grab active:cursor-grabbing transition-transform duration-150",
                     isDragging && "scale-95",
                     isSuccess && "scale-90 opacity-0 transition-all duration-300"
                 )}
@@ -213,8 +213,8 @@ export function SlideToPay({
                     touchAction: 'none',
                 }}
             >
-                <div className="size-10 rounded-[14px] bg-zinc-50 flex items-center justify-center border border-zinc-100">
-                    <ChevronRight className="size-6 text-zinc-900" />
+                <div className="size-10 rounded-[14px] bg-[var(--surface-muted)] flex items-center justify-center border border-[var(--border)]">
+                    <ChevronRight className="size-6 text-[var(--text-primary)]" />
                 </div>
             </div>
         </div>

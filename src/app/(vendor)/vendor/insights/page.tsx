@@ -30,8 +30,8 @@ export default async function VendorInsightsPage() {
   return (
     <div className="px-4 py-6 space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">Insights</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 className="text-xl font-semibold text-[var(--text-primary)]">Insights</h1>
+        <p className="text-sm text-[var(--text-secondary)] mt-1">
           Performance analytics
         </p>
       </div>
@@ -40,14 +40,14 @@ export default async function VendorInsightsPage() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                <Package className="size-5 text-blue-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-info)] flex items-center justify-center">
+                <Package className="size-5 text-[var(--well-info-text)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-zinc-900">
+                <p className="text-xl font-semibold text-[var(--text-primary)]">
                   {allOrders.length}
                 </p>
-                <p className="text-xs text-zinc-500">Total orders</p>
+                <p className="text-xs text-[var(--text-secondary)]">Total orders</p>
               </div>
             </div>
           </CardContent>
@@ -56,14 +56,14 @@ export default async function VendorInsightsPage() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                <TrendingUp className="size-5 text-emerald-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-success)] flex items-center justify-center">
+                <TrendingUp className="size-5 text-[var(--well-success-text)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-zinc-900">
+                <p className="text-xl font-semibold text-[var(--text-primary)]">
                   ₹{totalRevenue.toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-zinc-500">Total revenue</p>
+                <p className="text-xs text-[var(--text-secondary)]">Total revenue</p>
               </div>
             </div>
           </CardContent>
@@ -72,14 +72,14 @@ export default async function VendorInsightsPage() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                <BarChart3 className="size-5 text-amber-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-warning)] flex items-center justify-center">
+                <BarChart3 className="size-5 text-[var(--well-warning-text)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-zinc-900">
+                <p className="text-xl font-semibold text-[var(--text-primary)]">
                   ₹{Math.round(avgOrderValue).toLocaleString('en-IN')}
                 </p>
-                <p className="text-xs text-zinc-500">Avg order value</p>
+                <p className="text-xs text-[var(--text-secondary)]">Avg order value</p>
               </div>
             </div>
           </CardContent>
@@ -88,14 +88,14 @@ export default async function VendorInsightsPage() {
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-purple-50 flex items-center justify-center">
-                <Star className="size-5 text-purple-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-neutral)] flex items-center justify-center">
+                <Star className="size-5 text-[var(--well-neutral-text)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-zinc-900">
+                <p className="text-xl font-semibold text-[var(--text-primary)]">
                   {stats?.avg_rating?.toFixed(1) || '-'}
                 </p>
-                <p className="text-xs text-zinc-500">Rating</p>
+                <p className="text-xs text-[var(--text-secondary)]">Rating</p>
               </div>
             </div>
           </CardContent>
@@ -109,20 +109,20 @@ export default async function VendorInsightsPage() {
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-zinc-600">Delivered</span>
-              <span className="text-sm font-medium text-emerald-600">
+              <span className="text-sm text-[var(--text-secondary)]">Delivered</span>
+              <span className="text-sm font-bold text-[var(--well-success-text)]">
                 {deliveredOrders.length}
               </span>
             </div>
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-zinc-600">Cancelled</span>
-              <span className="text-sm font-medium text-red-600">
+              <span className="text-sm text-[var(--text-secondary)]">Cancelled</span>
+              <span className="text-sm font-bold text-[var(--well-destructive-text)]">
                 {cancelledOrders.length}
               </span>
             </div>
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-zinc-600">In progress</span>
-              <span className="text-sm font-medium text-zinc-900">
+              <span className="text-sm text-[var(--text-secondary)]">In progress</span>
+              <span className="text-sm font-medium text-[var(--text-primary)]">
                 {allOrders.filter(o => !['DELIVERED', 'CANCELLED', 'REFUNDED'].includes(o.status)).length}
               </span>
             </div>
@@ -137,8 +137,8 @@ export default async function VendorInsightsPage() {
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-zinc-600">Completion rate</span>
-              <span className="text-sm font-medium text-zinc-900">
+              <span className="text-sm text-[var(--text-secondary)]">Completion rate</span>
+              <span className="text-sm font-medium text-[var(--text-primary)]">
                 {allOrders.length > 0
                   ? `${Math.round((deliveredOrders.length / allOrders.length) * 100)}% `
                   : '-'
@@ -146,8 +146,8 @@ export default async function VendorInsightsPage() {
               </span>
             </div>
             <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-zinc-600">Total ratings</span>
-              <span className="text-sm font-medium text-zinc-900">
+              <span className="text-sm text-[var(--text-secondary)]">Total ratings</span>
+              <span className="text-sm font-medium text-[var(--text-primary)]">
                 {vendor.total_ratings || 0}
               </span>
             </div>

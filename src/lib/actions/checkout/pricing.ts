@@ -8,7 +8,7 @@ import { logger } from '@/lib/logging/logger';
 /**
  * WYSHKIT 2026: Server Action for Atomic Order Total Calculation
  * 
- * Swiggy 2026 Pattern: Database as Single Source of Truth
+ * WYSHKIT 2026 Pattern: Database as Single Source of Truth
  * The RPC computes everything. We return it directly — zero shadow math.
  */
 export async function calculateOrderTotalRPC(
@@ -23,7 +23,6 @@ export async function calculateOrderTotalRPC(
   deliveryFeeOverride?: number | null,
   addressId?: string | null,
   couponCode?: string | null,
-  distanceKm?: number | null,
   useWallet: boolean = false,
   userId?: string | null
 ): Promise<{ data: PricingBreakdown | null; error?: string }> {
@@ -42,7 +41,7 @@ export async function calculateOrderTotalRPC(
       p_delivery_fee_override: deliveryFeeOverride ?? undefined,
       p_address_id: addressId || undefined,
       p_coupon_code: couponCode || undefined,
-      p_distance_km: distanceKm || undefined,
+      p_distance_km: undefined, // [HARDENED] DB must compute distance from address_id + vendor
       p_use_wallet: useWallet,
       p_user_id: userId || undefined
     });
@@ -62,7 +61,7 @@ export async function calculateOrderTotalRPC(
       return { data: null, error: response.error };
     }
 
-    // SWIGGY 2026: Trust the database. Zero shadow math.
+    // WYSHKIT 2026: Trust the database. Zero shadow math.
     const result = data as Record<string, any>;
     const discount = Number(result.discount) || 0;
     const wallet_discount = Number(result.wallet_discount) || 0;

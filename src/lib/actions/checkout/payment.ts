@@ -42,7 +42,7 @@ export async function create_payment_order(
         use_wallet?: boolean;
         delivery_instructions?: string;
         delivery_fee?: number;
-        distance_km?: number;
+        // [PURGED] WYSHKIT 2026: distance_km must be server-resolved.
     }
 ) {
     try {
@@ -54,9 +54,8 @@ export async function create_payment_order(
         if (!payload.address_id || payload.address_id === 'guest_location') return { error: 'Please select a valid delivery address.', status: 400 };
 
         // WYSHKIT 2026: Pricing and delivery fees are strictly computed by the database RPC.
-        // Redundant fetch/calc removed for Absolute Truth (DRY).
-        const distance_km = payload.distance_km || 0;
-        const delivery_fee = undefined; // Force RPC to compute from distance
+        // [PURGED] distance_km override logic.
+        const delivery_fee = undefined; // Force RPC to compute from address context
 
         // 1.5. [PURGED] WYSHKIT 2026: Manual stock reservations are superseded by atomic place_atomic_order.
 
@@ -76,7 +75,6 @@ export async function create_payment_order(
             delivery_fee, // Ensure delivery fee exactly matches the frontend override logic
             payload.address_id,
             payload.applied_coupon?.code || undefined,
-            distance_km ?? undefined,
             payload.use_wallet || false,
             user.id
         );

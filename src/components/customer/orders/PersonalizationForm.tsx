@@ -244,10 +244,10 @@ export function PersonalizationForm({
             </div>
 
             <div className="pt-4 flex flex-col gap-6">
-                <div className="bg-zinc-50 p-6 rounded-xl border border-zinc-100 shadow-inner">
+                <div className="bg-[var(--surface-muted)] p-6 rounded-xl border border-[var(--border)] shadow-inner">
                     <div className="flex justify-center gap-4 mb-6 opacity-30">
-                        <span className="flex items-center gap-1.5 text-[8px] font-black tracking-tight"><ShieldCheck className="size-3" /> Encrypted</span>
-                        <span className="flex items-center gap-1.5 text-[8px] font-black tracking-tight"><CheckCircle2 className="size-3" /> Verified</span>
+                        <span className="flex items-center gap-1.5 text-[8px] font-bold tracking-tight"><ShieldCheck className="size-3" /> Encrypted</span>
+                        <span className="flex items-center gap-1.5 text-[8px] font-bold tracking-tight"><CheckCircle2 className="size-3" /> Verified</span>
                     </div>
 
                     <ActionSlider
@@ -263,7 +263,7 @@ export function PersonalizationForm({
                 {onSkip && (
                     <button
                         onClick={onSkip}
-                        className="w-full text-center text-xs font-black text-zinc-400 tracking-tight hover:text-zinc-600 transition-colors py-2 active:scale-95"
+                        className="w-full text-center text-xs font-bold text-[var(--text-tertiary)] tracking-tight hover:text-[var(--text-secondary)] transition-colors py-2 active:scale-95"
                     >
                         {allOptional ? "Skip (Optional)" : "I'll add details later"}
                     </button>
@@ -271,9 +271,9 @@ export function PersonalizationForm({
             </div>
 
             <div className="pt-2 flex items-center justify-center gap-2 opacity-10">
-                <div className="h-px w-8 bg-zinc-950" />
+                <div className="h-px w-8 bg-[var(--foreground)]" />
                 <Sparkles className="size-4" />
-                <div className="h-px w-8 bg-zinc-950" />
+                <div className="h-px w-8 bg-[var(--foreground)]" />
             </div>
         </div>
     );

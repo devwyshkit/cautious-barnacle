@@ -1,0 +1,31 @@
+{
+  "sorted_middleware": [],
+  "middleware": {
+    "/": {
+      "files": [
+        "server/edge/chunks/Downloads_WyshkitSaltBae-Prateek_b62e24ee._.js",
+        "server/edge/chunks/[root-of-the-server]__ddb5e692._.js",
+        "server/edge/chunks/turbopack-Downloads_WyshkitSaltBae-Prateek_src_edge-wrapper_5750047d.js"
+      ],
+      "name": "middleware",
+      "page": "/",
+      "matchers": [
+        {
+          "regexp": "/:nextData(_next/data/[^/]{1,})?/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*){(\\\\.json)}?",
+          "originalSource": "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "env": {
+        "__NEXT_BUILD_ID": "development",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "wJV2NkU8PHjqMjSpOfX+ObMzzFLJKhoGy44u1IITtqU=",
+        "__NEXT_PREVIEW_MODE_ID": "40336a5fc2edd41ad34fbe7e46f2b3e6",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "46353e3d053eae1af84a3d283cab1adecfc23d8f018615259c4ec44b5fbd42d3",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "98f4d584e2623144460ae8c85b1709b3ba450ff78b720db135e08e4d542115ee"
+      }
+    }
+  },
+  "instrumentation": null,
+  "functions": {}
+}

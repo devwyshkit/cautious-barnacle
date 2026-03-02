@@ -61,7 +61,7 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
   // WYSHKIT 2026: Only fetch if initialReviews not provided (fallback)
   useEffect(() => {
     if (!initialReviews) {
-      // Table purged in Swiggy 2026 lean model. Reviews handled by external feedback engine if enabled.
+      // Table purged in WYSHKIT 2026 lean model. Reviews handled by external feedback engine if enabled.
       setReviews([]);
       setLoading(false);
     }
@@ -125,7 +125,7 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
-        <Loader2 className="size-6 animate-spin text-zinc-300" />
+        <Loader2 className="size-6 animate-spin text-[var(--text-tertiary)]" />
       </div>
     );
   }
@@ -134,7 +134,7 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h3 className="text-lg font-bold text-zinc-900">Ratings & Reviews</h3>
+          <h3 className="text-lg font-bold text-[var(--text-primary)]">Ratings & Reviews</h3>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-0.5">
               {[1, 2, 3, 4, 5].map((s) => (
@@ -142,22 +142,22 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
                   key={s}
                   className={cn(
                     "size-3.5",
-                    s <= Math.round(averageRating) ? "fill-green-600 text-green-600" : "text-zinc-200"
+                    s <= Math.round(averageRating) ? "fill-green-600 text-green-600" : "text-[var(--border)]"
                   )}
                 />
               ))}
             </div>
-            <span className="text-xs font-bold text-zinc-900">{averageRating.toFixed(1)}</span>
-            <span className="text-xs font-medium text-zinc-400">({reviews.length} reviews)</span>
+            <span className="text-xs font-bold text-[var(--text-primary)]">{averageRating.toFixed(1)}</span>
+            <span className="text-xs font-medium text-[var(--text-tertiary)]">({reviews.length} reviews)</span>
           </div>
         </div>
       </div>
 
       {user && (
-        <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-zinc-50 rounded-xl border border-zinc-100">
+        <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-[var(--surface-muted)] rounded-xl border border-[var(--border)]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase">Product Quality</label>
+              <label className="text-xs font-bold text-[var(--text-secondary)] tracking-wider uppercase">Product Quality</label>
               <div className="flex items-center gap-2">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <button
@@ -169,16 +169,16 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
                     <Star
                       className={cn(
                         "size-6",
-                        s <= rating ? "fill-green-600 text-green-600" : "text-zinc-200"
+                        s <= rating ? "fill-green-600 text-green-600" : "text-[var(--border)]"
                       )}
                     />
                   </button>
                 ))}
               </div>
             </div>
-            {/* Swiggy 2026: Personalization Moat */}
+            {/* WYSHKIT 2026: Personalization Moat */}
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase">Personalization Accuracy</label>
+              <label className="text-xs font-bold text-[var(--text-secondary)] tracking-wider uppercase">Personalization Accuracy</label>
               <div className="flex items-center gap-2">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <button
@@ -190,18 +190,18 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
                     <Star
                       className={cn(
                         "size-6",
-                        s <= personalizationRating ? "fill-amber-500 text-amber-500" : "text-zinc-200"
+                        s <= personalizationRating ? "fill-[var(--warning)] text-[var(--warning)]" : "text-[var(--border)]"
                       )}
                     />
                   </button>
                 ))}
-                <span className="text-[10px] text-zinc-400 font-bold italic ml-1">Matches Mockup</span>
+                <span className="text-xs text-[var(--text-tertiary)] font-bold italic ml-1">Matches Mockup</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase">Fidelity Tags</label>
+            <label className="text-xs font-bold text-[var(--text-secondary)] tracking-wider uppercase">Fidelity Tags</label>
             <div className="flex flex-wrap gap-2">
               {fidelityTags.map((tag) => (
                 <button
@@ -209,10 +209,10 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
                   type="button"
                   onClick={() => toggleTag(tag.label)}
                   className={cn(
-                    "px-3 py-1.5 rounded-full text-[11px] font-bold transition-all border",
+                    "px-3 py-1.5 rounded-full text-xs font-bold transition-all border",
                     selectedTags.includes(tag.label)
-                      ? "bg-zinc-900 border-zinc-900 text-white shadow-sm"
-                      : "bg-white border-zinc-200 text-zinc-600 hover:border-zinc-300"
+                      ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-white shadow-sm"
+                      : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
                   )}
                 >
                   #{tag.label.replace(' ', '')}
@@ -222,18 +222,18 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-zinc-500 tracking-wider uppercase">Your Experience</label>
+            <label className="text-xs font-bold text-[var(--text-secondary)] tracking-wider uppercase">Your Experience</label>
             <Textarea
               placeholder="Tell others what you liked or disliked. Was it just like the preview?"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              className="min-h-[100px] rounded-xl border-zinc-200 focus:border-green-600 focus:ring-green-600/10 resize-none bg-white font-medium text-sm"
+              className="min-h-[100px] rounded-xl border-[var(--border)] focus:border-green-600 focus:ring-green-600/10 resize-none bg-[var(--surface)] font-medium text-sm"
             />
           </div>
           <Button
             type="submit"
             disabled={submitting}
-            className="w-full h-11 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-bold shadow-lg shadow-black/5 active:scale-[0.98] transition-transform"
+            className="w-full h-11 bg-[var(--text-primary)] hover:bg-[var(--text-primary)] text-white rounded-xl font-bold shadow-lg shadow-black/5 active:scale-[0.98] transition-transform"
           >
             {submitting ? <Loader2 className="size-4 animate-spin" /> : "Submit Review"}
           </Button>
@@ -243,14 +243,14 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
       <div className="space-y-6">
         {reviews.length > 0 ? (
           reviews.map((review) => (
-            <div key={review.id} className="space-y-3 pb-6 border-b border-zinc-100 last:border-0">
+            <div key={review.id} className="space-y-3 pb-6 border-b border-[var(--border)] last:border-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="size-8 rounded-full bg-zinc-100 flex items-center justify-center">
-                    <User className="size-4 text-zinc-400" />
+                  <div className="size-8 rounded-full bg-[var(--surface-muted)] flex items-center justify-center">
+                    <User className="size-4 text-[var(--text-tertiary)]" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-zinc-900">
+                    <p className="text-sm font-bold text-[var(--text-primary)]">
                       {review.user?.full_name || "Anonymous User"}
                     </p>
                     <div className="flex items-center gap-2">
@@ -260,25 +260,25 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
                             key={s}
                             className={cn(
                               "size-2.5",
-                              s <= review.rating ? "fill-green-600 text-green-600" : "text-zinc-200"
+                              s <= review.rating ? "fill-green-600 text-green-600" : "text-[var(--border)]"
                             )}
                           />
                         ))}
                       </div>
-                      <span className="text-xs font-medium text-zinc-400">
+                      <span className="text-xs font-medium text-[var(--text-tertiary)]">
                         {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
-              <p className="text-sm text-zinc-600 leading-relaxed font-medium">
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
                 {review.comment}
               </p>
 
               {review.approved_mockup_url && (
-                <div className="mt-4 p-3 bg-zinc-50 rounded-xl border border-zinc-100 flex items-center gap-4">
-                  <div className="size-16 rounded-lg bg-zinc-200 overflow-hidden flex-shrink-0">
+                <div className="mt-4 p-3 bg-[var(--surface-muted)] rounded-xl border border-[var(--border)] flex items-center gap-4">
+                  <div className="size-16 rounded-lg bg-[var(--border)] overflow-hidden flex-shrink-0">
                     <img
                       src={review.approved_mockup_url}
                       alt="Original Mockup"
@@ -286,14 +286,14 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
                     />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tight">Verified Mockup Match</p>
+                    <p className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-tight">Verified Mockup Match</p>
                     <div className="flex items-center gap-1.5">
                       <div className="flex items-center gap-0.5">
                         {[1, 2, 3, 4, 5].map((s) => (
-                          <Star key={s} className={cn("size-2", s <= (review.personalization_rating || 0) ? "fill-amber-500 text-amber-500" : "text-zinc-200")} />
+                          <Star key={s} className={cn("size-2", s <= (review.personalization_rating || 0) ? "fill-[var(--warning)] text-[var(--warning)]" : "text-[var(--border)]")} />
                         ))}
                       </div>
-                      <span className="text-[10px] font-bold text-zinc-900">
+                      <span className="text-xs font-bold text-[var(--text-primary)]">
                         {review.fidelity_tags?.slice(0, 2).map((t: string) => `#${t.replace(/\s+/g, '')}`).join(' ')}
                       </span>
                     </div>
@@ -303,13 +303,13 @@ export function ProductReviews({ productId, orderProductId, approvedMockupUrl, i
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-10 space-y-3 bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
-            <div className="size-12 rounded-full bg-white flex items-center justify-center shadow-sm">
-              <MessageSquare className="size-6 text-zinc-200" />
+          <div className="flex flex-col items-center justify-center py-10 space-y-3 bg-[var(--surface-muted)] rounded-xl border border-dashed border-[var(--border)]">
+            <div className="size-12 rounded-full bg-[var(--surface)] flex items-center justify-center shadow-sm">
+              <MessageSquare className="size-6 text-[var(--border)]" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-bold text-zinc-900">No reviews yet</p>
-              <p className="text-xs font-medium text-zinc-400">Be the first to review this product!</p>
+              <p className="text-sm font-bold text-[var(--text-primary)]">No reviews yet</p>
+              <p className="text-xs font-medium text-[var(--text-tertiary)]">Be the first to review this product!</p>
             </div>
           </div>
         )}

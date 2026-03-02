@@ -35,7 +35,7 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
 
         if (order.awb_number) return { success: true };
 
-        // 2. Resolve Logistics (Swiggy 2026: Flow Completeness)
+        // 2. Resolve Logistics (WYSHKIT 2026: Flow Completeness)
         const address = (order as any).delivery_address as Record<string, any>;
         const vendor = (order as any).vendor as Record<string, any>;
         const order_products = (order as any).order_products as any[] || [];
@@ -76,8 +76,8 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
             }
         };
 
-        // 3. Persist Intent (Swiggy 2026: Absolute Persistence)
-        // Table 'dispatch_attempts' purged in favor of direct order status metadata in Swiggy 2026 lean model.
+        // 3. Persist Intent (WYSHKIT 2026: Absolute Persistence)
+        // Table 'dispatch_attempts' purged in favor of direct order status metadata in WYSHKIT 2026 lean model.
         // We bypass the outbox for now and go direct to provider.
         const attempt = { id: payload.order_id };
 

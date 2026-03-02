@@ -31,10 +31,10 @@ function formatDate(date: string | null) {
 
 function getActionBadge(action: string) {
   const colors: Record<string, string> = {
-    create: 'text-emerald-600 border-emerald-200',
+    create: 'text-[var(--success)] border-[var(--success)]/20',
     update: 'text-blue-600 border-blue-200',
     delete: 'text-red-600 border-red-200',
-    approve: 'text-green-600 border-green-200',
+    approve: 'text-[var(--success)] border-[var(--success)]/20',
     reject: 'text-red-600 border-red-200',
   }
   return <Badge variant="outline" className={colors[action.toLowerCase()] || ''}>{action}</Badge>
@@ -60,7 +60,7 @@ export function AuditLogTable({ logs, totalCount, currentPage, pageSize }: Audit
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--text-tertiary)]" />
           <Input
             placeholder="Search by action, phone, or entity..."
             value={search}
@@ -93,7 +93,7 @@ export function AuditLogTable({ logs, totalCount, currentPage, pageSize }: Audit
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-zinc-500 py-8">
+                <TableCell colSpan={5} className="text-center text-[var(--text-secondary)] py-8">
                   No audit logs yet
                 </TableCell>
               </TableRow>
@@ -105,7 +105,7 @@ export function AuditLogTable({ logs, totalCount, currentPage, pageSize }: Audit
                     <div>
                       <span className="font-medium">{log.entity_type}</span>
                       {log.entity_id && (
-                        <span className="block text-xs text-zinc-500 font-mono truncate max-w-[150px]">
+                        <span className="block text-xs text-[var(--text-secondary)] font-mono truncate max-w-[150px]">
                           {log.entity_id}
                         </span>
                       )}
@@ -116,12 +116,12 @@ export function AuditLogTable({ logs, totalCount, currentPage, pageSize }: Audit
                   </TableCell>
                   <TableCell className="hidden lg:table-cell">
                     {log.new_value ? (
-                      <span className="text-xs text-zinc-500">
+                      <span className="text-xs text-[var(--text-secondary)]">
                         {JSON.stringify(log.new_value).slice(0, 50)}...
                       </span>
                     ) : '-'}
                   </TableCell>
-                  <TableCell className="text-zinc-500 text-sm">
+                  <TableCell className="text-[var(--text-secondary)] text-sm">
                     {formatDate(log.created_at)}
                   </TableCell>
                 </TableRow>
@@ -132,8 +132,8 @@ export function AuditLogTable({ logs, totalCount, currentPage, pageSize }: Audit
       </div>
 
       {totalCount > pageSize && (
-        <div className="flex items-center justify-between px-2 py-4 border-t border-zinc-100">
-          <div className="text-sm text-zinc-500">
+        <div className="flex items-center justify-between px-2 py-4 border-t border-[var(--border)]">
+          <div className="text-sm text-[var(--text-secondary)]">
             Showing {Math.min((currentPage - 1) * pageSize + 1, totalCount)} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} entries
           </div>
           <div className="flex items-center gap-2">

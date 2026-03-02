@@ -24,7 +24,7 @@ export function PhoneInput({ value, onChange, onFocus, disabled, error }: PhoneI
         <div className="relative w-full">
           <div className={cn(
             "absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold transition-colors",
-            error ? "text-red-400" : "text-zinc-400"
+            error ? "text-red-400" : "text-[var(--text-tertiary)]"
           )}>
             +91
           </div>
@@ -41,8 +41,8 @@ export function PhoneInput({ value, onChange, onFocus, disabled, error }: PhoneI
             className={cn(
               "w-full pl-12 h-14 text-base font-semibold transition-all duration-200 rounded-xl border-none focus-visible:ring-1",
               error
-                ? "bg-red-50 text-red-900 focus-visible:ring-red-200"
-                : "bg-zinc-50 text-zinc-900 focus-visible:ring-zinc-200"
+                ? "bg-rose-50 text-rose-900 focus-visible:ring-rose-200"
+                : "bg-[var(--surface-muted)] text-[var(--text-primary)] focus-visible:ring-[var(--primary-ring)]"
             )}
             autoFocus
           />
@@ -53,7 +53,7 @@ export function PhoneInput({ value, onChange, onFocus, disabled, error }: PhoneI
           {error}
         </p>
       ) : (
-        <p className="text-xs text-zinc-400 leading-relaxed font-medium">
+        <p className="text-xs text-[var(--text-tertiary)] leading-relaxed font-medium">
           We&apos;ll send a 6-digit verification code to this number.
         </p>
       )}

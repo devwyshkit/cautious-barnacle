@@ -40,35 +40,35 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
     return (
         <div className="space-y-6 animate-in fade-in duration-700">
             <div className="flex items-center gap-2 px-1">
-                <Clock className="size-3 text-zinc-400" />
-                <span className="text-xs font-black text-zinc-400 tracking-tight">Personalization Trail</span>
+                <Clock className="size-3 text-[var(--text-tertiary)]" />
+                <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">Personalization Trail</span>
             </div>
 
             <div className="relative space-y-8 pl-6">
                 {/* Vertical Line */}
-                <div className="absolute left-[11px] top-2 bottom-2 w-px bg-zinc-100" />
+                <div className="absolute left-[11px] top-2 bottom-2 w-px bg-[var(--surface-muted)]" />
 
                 {/* Layer 1: The Briefing */}
                 {personalizedProducts.map(product => (
                     <div key={product.id} className="relative">
-                        <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-zinc-900 ring-4 ring-white shadow-sm" />
+                        <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-[var(--text-primary)] ring-4 ring-white shadow-sm" />
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <h4 className="text-xs font-black text-zinc-900 tracking-tight leading-none">Layer 1: The Briefing</h4>
-                                <span className="text-[8px] font-bold text-zinc-400 tabular-nums">
+                                <h4 className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">Layer 1: The Briefing</h4>
+                                <span className="text-[var(--text-tiny)] font-bold text-[var(--text-tertiary)] tabular-nums">
                                     {product.details_submitted_at ? format(new Date(product.details_submitted_at), 'h:mm a') : 'Pending'}
                                 </span>
                             </div>
-                            <div className="bg-white p-4 rounded-xl border border-zinc-100 shadow-sm space-y-3">
+                            <div className="bg-[var(--surface)] p-4 rounded-xl border border-[var(--border)] shadow-sm space-y-3">
                                 <div className="flex items-center gap-2">
-                                    <FileText className="size-3.5 text-zinc-400" />
-                                    <p className="text-[11px] font-bold text-zinc-900">{product.product_name}</p>
+                                    <FileText className="size-3.5 text-[var(--text-tertiary)]" />
+                                    <p className="text-xs font-bold text-[var(--text-primary)]">{product.product_name}</p>
                                 </div>
                                 {product.personalization_details?.text && (
-                                    <p className="text-xs text-zinc-500 italic leading-relaxed">&quot;{product.personalization_details.text}&quot;</p>
+                                    <p className="text-xs text-[var(--text-secondary)] italic leading-relaxed">&quot;{product.personalization_details.text}&quot;</p>
                                 )}
                                 {product.personalization_details?.image_url && (
-                                    <div className="aspect-video rounded-xl overflow-hidden border border-zinc-100">
+                                    <div className="aspect-video rounded-xl overflow-hidden border border-[var(--border)]">
                                         <img src={product.personalization_details.image_url} alt="Brief Reference" className="size-full object-cover" />
                                     </div>
                                 )}
@@ -82,36 +82,36 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                     <div key={preview.id} className="relative">
                         <div className={cn(
                             "absolute -left-[20px] top-1 size-2.5 rounded-full ring-4 ring-white shadow-sm",
-                            idx === 0 ? "bg-amber-500 animate-pulse" : "bg-zinc-200"
+                            idx === 0 ? "bg-[var(--warning)] animate-pulse" : "bg-[var(--border)]"
                         )} />
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h4 className="text-xs font-black text-zinc-900 tracking-tight leading-none">
+                                <h4 className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">
                                     {idx === 0 ? 'Latest Preview' : `Iteration ${previews.length - idx}`}
                                 </h4>
-                                <span className="text-[8px] font-bold text-zinc-400 tabular-nums">
+                                <span className="text-[var(--text-tiny)] font-bold text-[var(--text-tertiary)] tabular-nums">
                                     {format(new Date(preview.submitted_at), 'h:mm a')}
                                 </span>
                             </div>
 
-                            <div className="bg-white p-1 rounded-xl border border-zinc-100 shadow-sm shadow-zinc-200/50 overflow-hidden group">
-                                <div className="aspect-[4/3] relative rounded-[2.2rem] overflow-hidden bg-zinc-50">
+                            <div className="bg-[var(--surface)] p-1 rounded-[var(--radius-xl)] border border-[var(--border)] shadow-[var(--shadow-md)] overflow-hidden group">
+                                <div className="aspect-[4/3] relative rounded-[var(--radius-3xl)] overflow-hidden bg-[var(--surface-muted)]">
                                     <img src={preview.preview_url} alt="Design Preview" className="size-full object-cover" />
 
                                     {preview.status === 'approved' && (
-                                        <div className="absolute inset-0 bg-emerald-500/10 flex items-center justify-center backdrop-blur-[2px]">
-                                            <div className="bg-white/90 px-4 py-2 rounded-xl shadow-sm flex items-center gap-2">
-                                                <CheckCircle2 className="size-4 text-emerald-500" />
-                                                <span className="text-xs font-black text-emerald-600 tracking-tight">Approved</span>
+                                        <div className="absolute inset-0 bg-[var(--success)]/10 flex items-center justify-center backdrop-blur-[2px]">
+                                            <div className="bg-[var(--surface)]/90 px-4 py-2 rounded-xl shadow-sm flex items-center gap-2">
+                                                <CheckCircle2 className="size-4 text-[var(--success)]" />
+                                                <span className="text-xs font-bold text-[var(--success)] tracking-tight">Approved</span>
                                             </div>
                                         </div>
                                     )}
 
                                     {preview.status === 'change_requested' && (
-                                        <div className="absolute inset-0 bg-amber-500/10 flex items-center justify-center backdrop-blur-[2px]">
-                                            <div className="bg-white/90 px-4 py-2 rounded-xl shadow-sm flex items-center gap-2">
-                                                <RefreshCw className="size-4 text-amber-500" />
-                                                <span className="text-xs font-black text-amber-600 tracking-tight">Revision Requested</span>
+                                        <div className="absolute inset-0 bg-[var(--warning)]/10 flex items-center justify-center backdrop-blur-[2px]">
+                                            <div className="bg-[var(--surface)]/90 px-4 py-2 rounded-xl shadow-sm flex items-center gap-2">
+                                                <RefreshCw className="size-4 text-[var(--warning)]" />
+                                                <span className="text-xs font-bold text-[var(--warning)] tracking-tight">Revision Requested</span>
                                             </div>
                                         </div>
                                     )}
@@ -119,21 +119,21 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
 
                                 {preview.vendor_notes && (
                                     <div className="p-4 px-6">
-                                        <p className="text-xs font-bold text-zinc-400 tracking-tight mb-1.5 flex items-center gap-1.5">
+                                        <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-1.5 flex items-center gap-1.5">
                                             <Sparkles className="size-3" /> Vendor Notes
                                         </p>
-                                        <p className="text-xs text-zinc-600 leading-relaxed bg-amber-50/50 p-3 rounded-xl border border-amber-100/50">
+                                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed bg-[var(--well-warning)] p-3 rounded-xl border border-[var(--warning)]/20">
                                             {preview.vendor_notes}
                                         </p>
                                     </div>
                                 )}
 
                                 {preview.customer_feedback && (
-                                    <div className="p-4 px-6 border-t border-zinc-50 bg-zinc-50/50">
-                                        <p className="text-xs font-bold text-zinc-400 tracking-tight mb-1.5 flex items-center gap-1.5">
+                                    <div className="p-4 px-6 border-t border-[var(--surface-muted)] bg-[var(--surface-muted)]/50">
+                                        <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-1.5 flex items-center gap-1.5">
                                             <RefreshCw className="size-3" /> Your Feedback (Revision)
                                         </p>
-                                        <p className="text-xs text-zinc-600 leading-relaxed italic">
+                                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed italic">
                                             &quot;{preview.customer_feedback}&quot;
                                         </p>
                                     </div>
@@ -146,10 +146,10 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                 {/* Future layer: Final Fulfillment */}
                 {personalizedProducts.some(i => i.status === 'in_production') && (
                     <div className="relative opacity-50">
-                        <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-zinc-100 ring-4 ring-white" />
+                        <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-[var(--surface-muted)] ring-4 ring-white" />
                         <div className="space-y-2">
-                            <h4 className="text-xs font-black text-zinc-300 tracking-tight leading-none">In Production (Locked)</h4>
-                            <p className="text-[11px] font-medium text-zinc-400">Design finalized and shared with workshop.</p>
+                            <h4 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight leading-none">In Production (Locked)</h4>
+                            <p className="text-xs font-medium text-[var(--text-tertiary)]">Design finalized and shared with workshop.</p>
                         </div>
                     </div>
                 )}

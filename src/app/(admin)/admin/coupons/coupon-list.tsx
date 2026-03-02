@@ -104,14 +104,14 @@ export function CouponList({ coupons }: CouponListProps) {
           </TableHeader>
           <TableBody>
             {coupons.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center text-zinc-500 py-8">No coupons yet</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="text-center text-[var(--text-secondary)] py-8">No coupons yet</TableCell></TableRow>
             ) : (
               coupons.map((coupon) => (
                 <TableRow key={coupon.id}>
                   <TableCell><Badge variant="secondary" className="font-mono">{coupon.code}</Badge></TableCell>
                   <TableCell>
                     {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : `₹${coupon.discount_value}`}
-                    {coupon.max_discount_amount && <span className="text-xs text-zinc-500 ml-1">(max ₹{coupon.max_discount_amount})</span>}
+                    {coupon.max_discount_amount && <span className="text-xs text-[var(--text-secondary)] ml-1">(max ₹{coupon.max_discount_amount})</span>}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{coupon.min_order_value ? `₹${coupon.min_order_value}` : '-'}</TableCell>
                   <TableCell className="hidden lg:table-cell">{coupon.used_count ?? 0} / {coupon.usage_limit || '∞'}</TableCell>

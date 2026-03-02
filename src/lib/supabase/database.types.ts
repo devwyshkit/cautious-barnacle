@@ -55,6 +55,45 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          new_state: Json | null
+          operator_id: string
+          previous_state: Json | null
+          reason: string | null
+          severity: string | null
+          target_id: string | null
+          target_table: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          new_state?: Json | null
+          operator_id: string
+          previous_state?: Json | null
+          reason?: string | null
+          severity?: string | null
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          new_state?: Json | null
+          operator_id?: string
+          previous_state?: Json | null
+          reason?: string | null
+          severity?: string | null
+          target_id?: string | null
+          target_table?: string | null
+        }
+        Relationships: []
+      }
       cart_products: {
         Row: {
           cart_id: string | null
@@ -597,6 +636,7 @@ export type Database = {
           subtotal: number
           tax_amount: number | null
           total: number
+          total_savings: number | null
           updated_at: string | null
           user_id: string
           vendor_id: string
@@ -642,6 +682,7 @@ export type Database = {
           subtotal: number
           tax_amount?: number | null
           total: number
+          total_savings?: number | null
           updated_at?: string | null
           user_id: string
           vendor_id: string
@@ -687,6 +728,7 @@ export type Database = {
           subtotal?: number
           tax_amount?: number | null
           total?: number
+          total_savings?: number | null
           updated_at?: string | null
           user_id?: string
           vendor_id?: string
@@ -1881,12 +1923,15 @@ export type Database = {
           base_price: number | null
           cart_id: string | null
           created_at: string | null
+          effective_unit_price: number | null
           expires_at: string | null
           id: string | null
           personalization: Json | null
+          product_gst_percentage: number | null
           product_id: string | null
           product_image_url: string | null
           product_name: string | null
+          product_personalization_fee: number | null
           quantity: number | null
           selected_addons: Json | null
           selected_variant_id: string | null
@@ -2365,40 +2410,32 @@ export type Database = {
         Args: { p_session_id?: string; p_user_id?: string }
         Returns: Json
       }
-      get_checkout_context:
-        | {
-            Args: {
-              p_applied_coupon?: string
-              p_guest_lat?: number
-              p_guest_lng?: number
-              p_selected_address_id?: string
-              p_session_id?: string
-              p_use_wallet?: boolean
-              p_user_id?: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_applied_coupon?: string
-              p_guest_lat?: number
-              p_guest_lng?: number
-              p_selected_address_id?: string
-              p_session_id?: string
-              p_use_wallet?: boolean
-              p_user_id?: string
-            }
-            Returns: Json
-          }
-      get_home_surface:
-        | {
-            Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
-            Returns: Json
-          }
-        | {
-            Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
-            Returns: Json
-          }
+      get_checkout_context: {
+        Args: {
+          p_applied_coupon?: string
+          p_guest_lat?: number
+          p_guest_lng?: number
+          p_selected_address_id?: string
+          p_session_id?: string
+          p_use_wallet?: boolean
+          p_user_id?: string
+        }
+        Returns: Json
+      }
+      get_delivery_fee: { Args: { p_distance_km?: number }; Returns: number }
+      get_global_init_surface: {
+        Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
+        Returns: Json
+      }
+      get_home_surface: {
+        Args: {
+          p_lat?: number
+          p_lng?: number
+          p_session_id?: string
+          p_user_id?: string
+        }
+        Returns: Json
+      }
       get_nearby_products: {
         Args: {
           include_out_of_stock?: boolean
@@ -2409,8 +2446,44 @@ export type Database = {
         Returns: Json
       }
       get_personalization_status: { Args: { p_details: Json }; Returns: string }
+      get_platform_fee: { Args: never; Returns: number }
+      get_product_surface_v1: {
+        Args: { p_product_id: string; p_vendor_id_or_slug: string }
+        Returns: Json
+      }
+      get_user_orders_v1: { Args: never; Returns: Json }
       get_vendor_financials_v2: { Args: { p_vendor_id: string }; Returns: Json }
+      get_vendor_from_session: {
+        Args: { p_app_metadata?: Json; p_email?: string; p_user_id: string }
+        Returns: Json
+      }
+      get_vendor_surface: {
+        Args: { p_category_slug?: string; p_vendor_id_or_slug: string }
+        Returns: Json
+      }
       gettransactionid: { Args: never; Returns: unknown }
+      issue_wallet_credit_atomic: {
+        Args: {
+          p_amount: number
+          p_order_id?: string
+          p_reason: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      log_operator_action: {
+        Args: {
+          p_action: string
+          p_new_state?: Json
+          p_operator_id?: string
+          p_previous_state?: Json
+          p_reason?: string
+          p_severity?: string
+          p_target_id?: string
+          p_target_table?: string
+        }
+        Returns: string
+      }
       log_order_status_history:
         | {
             Args: {
@@ -2533,6 +2606,16 @@ export type Database = {
         Returns: Json
       }
       resolve_user_permissions: { Args: { p_user_id: string }; Returns: Json }
+      salvation_shift_order_atomic: {
+        Args: {
+          p_issue_token?: boolean
+          p_new_vendor_id: string
+          p_order_id: string
+          p_reason: string
+          p_token_amount?: number
+        }
+        Returns: Json
+      }
       search_products_atomic: {
         Args: {
           p_category_id?: string

@@ -34,7 +34,7 @@ export default async function VendorsPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-lg font-semibold text-zinc-900">Vendors</h1>
+      <h1 className="text-lg font-semibold text-[var(--text-primary)]">Vendors</h1>
       <VendorTable
         vendors={vendors}
         currentStatus={status}

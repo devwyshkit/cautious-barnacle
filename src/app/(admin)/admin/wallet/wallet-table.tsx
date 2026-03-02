@@ -56,7 +56,7 @@ export function WalletTable({ wallets }: WalletTableProps) {
   return (
     <div className="space-y-4">
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--text-tertiary)]" />
         <Input placeholder="Search by name or phone..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
       </div>
 
@@ -72,7 +72,7 @@ export function WalletTable({ wallets }: WalletTableProps) {
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={4} className="text-center text-zinc-500 py-8">No wallets found</TableCell></TableRow>
+              <TableRow><TableCell colSpan={4} className="text-center text-[var(--text-secondary)] py-8">No wallets found</TableCell></TableRow>
             ) : (
               filtered.map((wallet) => (
                 <TableRow key={wallet.user_id}>

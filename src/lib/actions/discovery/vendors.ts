@@ -3,6 +3,7 @@
 import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logging/logger';
+import { getServerLocation } from './location';
 import { handleActionError } from '@/lib/utils/error-handler';
 import { MappedVendor } from '@/lib/types/vendor';
 import { WyshkitProduct } from '@/lib/types/product';
@@ -14,110 +15,87 @@ import { WyshkitProduct } from '@/lib/types/product';
 /**
  * Deduplicated Vendor Fetcher
  * Wrapped in React cache() to prevent double-hydration flicker
- * 
- * WYSHKIT 2026: Server-Driven UI (SDUI)
- * Now returns a pre-computed 'blocks' array for the StorePage.
  */
-export const getVendorStoreData = cache(async (vendorId: string, category?: string | null) => {
+export const getVendorStoreData = cache(async (vendorIdOrSlug: string, category?: string | null) => {
     try {
-        if (!vendorId || vendorId.trim() === '') {
-            return { vendor: null, products: [], blocks: [], error: 'Invalid Vendor ID' };
+        if (!vendorIdOrSlug || vendorIdOrSlug.trim() === '') {
+            return { vendor: null, products: [], categories: [], error: 'Invalid Vendor ID' };
         }
 
         const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const location = await getServerLocation(user);
 
-        // 1. Fetch Vendor Basic Info
-        const { data: vendorData, error: vendorError } = await supabase
-            .from('vendors')
-            .select(`
-                id, name, image_url, rating, city, 
-                avg_prep_time_mins, base_delivery_charge, 
-                slug, business_type, is_online, description, gstin
-            `)
-            .eq('id', vendorId)
-            .maybeSingle();
+        // WYSHKIT 2026: One-Trip Vendor Surface - Now with Law 10 ETA
+        const { data, error } = await supabase.rpc('get_vendor_surface' as any, {
+            p_vendor_id_or_slug: vendorIdOrSlug,
+            p_category_slug: category,
+            p_lat: location?.lat,
+            p_lng: location?.lng
+        });
 
-        if (vendorError || !vendorData) {
-            logger.error('Vendor fetch failed in getVendorStoreData', vendorError || 'Not found', { vendorId });
-            return { vendor: null, products: [], blocks: [], error: vendorError?.message || 'Vendor not found' };
+        if (error) {
+            if (error.message?.includes('fetch failed')) {
+                logger.error('[INDIA_DNS_BLOCK] Vendor surface fetch failed.');
+            }
+            logger.error('Vendor surface RPC failed', error, { vendorId: vendorIdOrSlug });
+            return { vendor: null, products: [], categories: [], error: error.message };
         }
 
-        // Map database columns to UI-friendly MappedVendor interface
-        const vendor: MappedVendor = {
-            id: vendorData.id,
-            name: vendorData.name,
-            image_url: vendorData.image_url,
-            rating: vendorData.rating ? Number(vendorData.rating) : null,
-            city: vendorData.city,
-            prep_mins: vendorData.avg_prep_time_mins || 45,
-            delivery_fee: Number(vendorData.base_delivery_charge || 0),
-            slug: vendorData.slug,
-            business_type: vendorData.business_type,
-            is_online: vendorData.is_online ?? true,
-            description: vendorData.description,
-            gstin: vendorData.gstin
-        };
-
-        // 2. Fetch Vendor Products (Filtered by Category if provided)
-        let query = supabase
-            .from('products')
-            .select('*')
-            .eq('vendor_id', vendorId)
-            .eq('is_active', true);
-
-        if (category && category !== 'Recommended' && category !== 'All') {
-            query = query.eq('category_id', category);
+        if (!data || (data as any).error) {
+            return { vendor: null, products: [], categories: [], error: (data as any).error || 'Vendor not found' };
         }
 
-        const { data: productsData, error: productsError } = await query;
+        const raw = data as any;
+        const products = (raw.products || []) as unknown as WyshkitProduct[];
 
-        if (productsError) {
-            logger.error('Products fetch failed in getVendorStoreData', productsError, { vendorId });
-        }
-
-        const products = (productsData as unknown as WyshkitProduct[]) || [];
-
-        // 3. Fetch Distinct Categories for this Vendor (for navigation/filtering)
-        const { data: catData } = await supabase
-            .from('products')
-            .select('category_id')
-            .eq('vendor_id', vendorId)
-            .eq('is_active', true);
-
+        // Group by Category Name for the UI
         const groupedProducts = products.reduce((acc: any, product: any) => {
-            const cat = product.category_id || 'Other';
-            if (!acc[cat]) acc[cat] = [];
-            acc[cat].push({ ...product, vendor_name: vendor.name });
+            const catName = product.category_name || 'Other';
+            if (!acc[catName]) acc[catName] = [];
+            acc[catName].push(product);
             return acc;
         }, {});
 
-        const categories = Array.from(new Set(catData?.map((i: any) => i.category_id).filter(Boolean)))
-            .map(c => ({ id: c as string, name: c as string, slug: c as string }));
+        // Build Category Filters (Always include 'All')
+        const uniqueCategories = raw.categories || [];
+        const categoryFilters = [
+            { id: 'all', name: 'All', slug: 'All' },
+            ...uniqueCategories.map((c: any) => ({
+                id: c.id,
+                name: c.name,
+                slug: c.slug || c.name
+            }))
+        ];
 
         return {
-            vendor,
-            products: products.map(product => ({ ...product, vendor_name: vendor.name })),
+            vendor: raw.vendor as MappedVendor,
+            products,
             productsGroupedByCategory: groupedProducts,
-            categories: [{ id: 'all', name: 'All', slug: 'All' }, ...categories],
+            categories: categoryFilters,
             error: null
         };
-    } catch (error) {
-        logger.error('Unexpected error in getVendorStoreData', error, { vendorId });
+    } catch (error: any) {
+        logger.error('Unexpected error in getVendorStoreData', error, { vendorId: vendorIdOrSlug });
         return { vendor: null, products: [], categories: [], error: 'Failed to fetch vendor store data' };
     }
 });
 
 export async function getProductVendor(productId: string) {
-    const supabase = await createClient();
-    const query = supabase.from('products')
-        .select('vendor_id')
-        .eq('id', productId)
-        .eq('is_active', true);
+    try {
+        const supabase = await createClient();
+        const query = supabase.from('products')
+            .select('vendor_id')
+            .eq('id', productId)
+            .eq('is_active', true);
 
-    const { data, error } = await query.maybeSingle();
+        const { data, error } = await query.maybeSingle();
 
-    if (error || !data) return { data: null, error: 'Product not found' };
-    return { data: data as { vendor_id: string } };
+        if (error || !data) return { data: null, error: 'Product not found' };
+        return { data: data as { vendor_id: string } };
+    } catch (err) {
+        return { data: null, error: 'Network failure' };
+    }
 }
 
 export async function getVendorInfo(vendorId: string) {
@@ -146,4 +124,3 @@ export async function getVendorInfo(vendorId: string) {
         return { data: null, error: message };
     }
 }
-

@@ -8,16 +8,17 @@ import { SurfaceErrorBoundaryWithRouter } from "@/components/error/SurfaceErrorB
  * WYSHKIT 2026: Intent-Based Search Page (Server Component)
  * Route: /search?q=query&category=slug
  * 
- * Swiggy 2026 Pattern: "Data Should Come to User, Not User Go to Data"
+ * WYSHKIT 2026 Pattern: "Data Should Come to User, Not User Go to Data"
  * - Server Component fetches data server-side
  * - Data streams to client progressively
  * - Zero client-side data fetching waterfalls
  * 
- * Swiggy 2026 Pattern: Progressive Disclosure with Suspense
+ * WYSHKIT 2026 Pattern: Progressive Disclosure with Suspense
  * - Suspense boundary ensures progressive streaming
  * - Skeleton matches exact layout dimensions (zero CLS)
  */
 // export const experimental_ppr = true;
+export const dynamic = 'force-dynamic';
 
 export default async function SearchPage({
   searchParams,
@@ -27,7 +28,7 @@ export default async function SearchPage({
   const params = await searchParams;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[100dvh]">
       <SurfaceErrorBoundaryWithRouter surfaceName="Search" showHomeButton>
         <Suspense fallback={<SearchSkeleton />}>
           <AsyncSearchContent params={params} />

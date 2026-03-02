@@ -106,19 +106,19 @@ export function StatusCard({ order }: StatusCardProps) {
     return (
         <section className={cn(
             "rounded-xl border p-6 shadow-sm overflow-hidden relative transition-all duration-500",
-            isBreached ? "bg-rose-50/50 border-rose-100 shadow-rose-100/50" : "bg-white border-zinc-100"
+            isBreached ? "bg-rose-50/50 border-rose-100 shadow-rose-100/50" : "bg-[var(--surface)] border-[var(--border)]"
         )}>
             {/* WYSHKIT 2026: Live Pulse Header */}
             {deadline && (
                 <div className={cn(
                     "absolute top-0 right-0 px-4 py-2 flex items-center gap-2 rounded-bl-2xl",
-                    isBreached ? "bg-rose-600" : "bg-zinc-950"
+                    isBreached ? "bg-rose-600" : "bg-[var(--foreground)]"
                 )}>
                     <div className="relative flex size-2 items-center justify-center">
-                        <span className={cn("absolute inline-flex h-full w-full animate-ping rounded-full opacity-75", isBreached ? "bg-white" : "bg-emerald-400")}></span>
-                        <span className={cn("relative inline-flex size-1.5 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]", isBreached ? "bg-white" : "bg-emerald-500")}></span>
+                        <span className={cn("absolute inline-flex h-full w-full animate-ping rounded-full opacity-75", isBreached ? "bg-[var(--surface)]" : "bg-[var(--success)]/70")}></span>
+                        <span className={cn("relative inline-flex size-1.5 rounded-full shadow-[0_0_8px_rgba(var(--success-rgb),0.5)]", isBreached ? "bg-[var(--surface)]" : "bg-[var(--success)]")}></span>
                     </div>
-                    <span className="text-xs font-black text-white tracking-tight">
+                    <span className="text-xs font-bold text-white tracking-tight">
                         {isBreached ? 'SLA Breach' : 'Live Pulse'}
                     </span>
                 </div>
@@ -128,21 +128,21 @@ export function StatusCard({ order }: StatusCardProps) {
                 <div className={cn(
                     "size-14 rounded-xl flex items-center justify-center shrink-0 relative transition-all duration-500",
                     isBreached ? "bg-rose-100 text-rose-600" : (
-                        order.status === ORDER_STATUS.DELIVERED ? "bg-emerald-50 text-emerald-600" : "bg-zinc-100 text-zinc-600"
+                        order.status === ORDER_STATUS.DELIVERED ? "bg-[var(--well-success)] text-[var(--success)]" : "bg-[var(--surface-muted)] text-[var(--text-secondary)]"
                     ),
                 )}>
                     {isBreached ? <AlertCircle className="size-6 animate-bounce" /> : getStatusIcon(order.status || '')}
                     {deadline && (
-                        <div className="absolute -bottom-1 -right-1 size-5 bg-white rounded-full flex items-center justify-center shadow-sm border border-zinc-100">
-                            <Timer className={cn("size-3", isBreached ? "text-rose-600" : "text-zinc-950 animate-pulse")} />
+                        <div className="absolute -bottom-1 -right-1 size-5 bg-[var(--surface)] rounded-full flex items-center justify-center shadow-sm border border-[var(--border)]">
+                            <Timer className={cn("size-3", isBreached ? "text-rose-600" : "text-[var(--text-primary)] animate-pulse")} />
                         </div>
                     )}
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
                         <h2 className={cn(
-                            "text-lg font-black tracking-tight leading-tight",
-                            isBreached ? "text-rose-700" : "text-zinc-900"
+                            "text-lg font-bold tracking-tight leading-tight",
+                            isBreached ? "text-rose-700" : "text-[var(--text-primary)]"
                         )}>
                             {isBreached ? 'Vendor is Running Late' : getStatusText(order.status || '')}
                         </h2>
@@ -156,7 +156,7 @@ export function StatusCard({ order }: StatusCardProps) {
 
                             if (order.status === ORDER_STATUS.PLACED && pendingCount > 0) {
                                 return (
-                                    <span className="text-[11px] font-black bg-[var(--primary)] text-white px-2 py-0.5 rounded-full animate-pulse tracking-tight whitespace-nowrap">
+                                    <span className="text-xs font-bold bg-[var(--primary)] text-white px-2 py-0.5 rounded-full animate-pulse tracking-tight whitespace-nowrap">
                                         Action Req: {pendingCount} {pendingCount === 1 ? 'Product' : 'Products'}
                                     </span>
                                 );
@@ -166,9 +166,9 @@ export function StatusCard({ order }: StatusCardProps) {
                     </div>
 
                     {order.status === ORDER_STATUS.CANCELLED && order.cancellation_reason ? (
-                        <div className="mt-2 p-3 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
-                            <AlertCircle className="size-3.5 text-amber-600 shrink-0 mt-0.5" />
-                            <p className="text-[11px] font-bold text-amber-900/80 leading-relaxed italic">
+                        <div className="mt-2 p-3 bg-[var(--well-warning)] rounded-xl border border-[var(--warning)]/20 flex items-start gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                            <AlertCircle className="size-3.5 text-[var(--warning)] shrink-0 mt-0.5" />
+                            <p className="text-xs font-bold text-[var(--text-primary)]/80 leading-relaxed italic">
                                 &quot;{order.cancellation_reason}&quot;
                             </p>
                         </div>
@@ -179,17 +179,17 @@ export function StatusCard({ order }: StatusCardProps) {
                                     Our vendor missed their deadline. Our support team is intervening.
                                 </p>
                             ) : (
-                                <p className="text-xs font-bold text-zinc-900 leading-tight">{getNextStep(order.status || '', !!order.has_personalization)}</p>
+                                <p className="text-xs font-bold text-[var(--text-primary)] leading-tight">{getNextStep(order.status || '', !!order.has_personalization)}</p>
                             )}
                             {deadline && (
                                 <div className="flex flex-col gap-1">
-                                    <p className={cn("text-xs font-black tracking-tight", isBreached ? "text-rose-600" : "text-zinc-900")}>
+                                    <p className={cn("text-xs font-bold tracking-tight", isBreached ? "text-rose-600" : "text-[var(--text-primary)]")}>
                                         {formatArrivalTime(deadline)}
                                     </p>
                                     <HyperlocalTimer
                                         deadline={deadline}
                                         variant="minimal"
-                                        className={cn("text-[10px] font-bold", isBreached ? "text-rose-500" : "text-zinc-500")}
+                                        className={cn("text-xs font-bold", isBreached ? "text-rose-500" : "text-[var(--text-secondary)]")}
                                     />
                                 </div>
                             )}
@@ -199,18 +199,18 @@ export function StatusCard({ order }: StatusCardProps) {
             </div>
 
             {isBreached && (
-                <div className="mt-4 p-4 bg-white rounded-xl border border-rose-100 shadow-sm animate-in slide-in-from-bottom-2 duration-500">
-                    <p className="text-xs font-black text-rose-600 tracking-tight mb-3">Escalation Options</p>
+                <div className="mt-4 p-4 bg-[var(--surface)] rounded-xl border border-rose-100 shadow-sm animate-in slide-in-from-bottom-2 duration-500">
+                    <p className="text-xs font-bold text-rose-600 tracking-tight mb-3">Escalation Options</p>
                     <div className="flex gap-2">
                         <button
                             onClick={() => window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`}
-                            className="flex-1 py-3 bg-rose-600 text-white rounded-xl text-xs font-black tracking-tight active:scale-95 transition-all"
+                            className="flex-1 py-3 bg-rose-600 text-white rounded-xl text-xs font-bold tracking-tight active:scale-95 transition-all"
                         >
                             Priority Call
                         </button>
                         <button
                             onClick={() => toast.info("Requesting automated refund status...")}
-                            className="flex-1 py-3 bg-zinc-50 border border-rose-100 text-rose-600 rounded-xl text-xs font-black tracking-tight active:scale-95 transition-all"
+                            className="flex-1 py-3 bg-[var(--surface-muted)] border border-rose-100 text-rose-600 rounded-xl text-xs font-bold tracking-tight active:scale-95 transition-all"
                         >
                             Instant Refund
                         </button>
@@ -233,10 +233,10 @@ export function StatusCard({ order }: StatusCardProps) {
                     const isCurrent = i === currentStep;
 
                     return (
-                        <div key={i} className="flex-1 h-1 rounded-full bg-zinc-100 relative overflow-hidden">
+                        <div key={i} className="flex-1 h-1 rounded-full bg-[var(--surface-muted)] relative overflow-hidden">
                             {(isActive || isCurrent) && (
                                 <div className={cn(
-                                    "absolute inset-0 bg-zinc-900 transition-all duration-1000",
+                                    "absolute inset-0 bg-[var(--text-primary)] transition-all duration-1000",
                                     isCurrent && "animate-pulse shadow-[0_0_12px_rgba(0,0,0,0.2)]"
                                 )} />
                             )}
@@ -246,7 +246,7 @@ export function StatusCard({ order }: StatusCardProps) {
             </div>
 
             {/* WYSHKIT 2026: B2B Documents (Estimate/Invoice) */}
-            <div className="mt-6 flex flex-wrap gap-2 pt-5 border-t border-zinc-50">
+            <div className="mt-6 flex flex-wrap gap-2 pt-5 border-t border-[var(--surface-muted)]">
                 <button
                     onClick={() => {
                         const orderData = order as any;
@@ -270,7 +270,7 @@ export function StatusCard({ order }: StatusCardProps) {
                             }
                         });
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-zinc-50 border border-zinc-100 rounded-xl text-[11px] font-bold text-zinc-600 hover:bg-zinc-100 active:scale-95 transition-all"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[var(--surface-muted)] border border-[var(--border)] rounded-xl text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] active:scale-95 transition-all"
                 >
                     <FileText className="size-3.5" />
                     Estimate
@@ -299,7 +299,7 @@ export function StatusCard({ order }: StatusCardProps) {
                                 }
                             });
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl text-[11px] font-bold text-emerald-600 hover:bg-emerald-100 active:scale-95 transition-all"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[var(--well-success)] border border-[var(--success)]/20 rounded-xl text-xs font-bold text-[var(--success)] hover:bg-[var(--success)]/10 active:scale-95 transition-all"
                     >
                         <Download className="size-3.5" />
                         Invoice
@@ -307,7 +307,7 @@ export function StatusCard({ order }: StatusCardProps) {
                 )}
                 <button
                     onClick={handleShare}
-                    className="flex-1 h-11 bg-zinc-900 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-black tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-zinc-200"
+                    className="flex-1 h-11 bg-[var(--text-primary)] text-white rounded-xl flex items-center justify-center gap-2 text-xs font-bold tracking-tight hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[var(--shadow-sm)]"
                 >
                     <Share2 className="size-3.5" />
                     Share Track

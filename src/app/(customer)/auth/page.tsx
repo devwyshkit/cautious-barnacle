@@ -15,11 +15,11 @@ export default async function AuthPage({
   const returnUrl = params.returnUrl ?? '/';
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex flex-col">
+    <div className="min-h-[100dvh] bg-[var(--surface-muted)] flex flex-col">
       <Suspense
         fallback={
           <div className="flex-1 flex items-center justify-center">
-            <p className="text-sm text-zinc-500">Loading...</p>
+            <p className="text-sm text-[var(--text-secondary)]">Loading...</p>
           </div>
         }
       >

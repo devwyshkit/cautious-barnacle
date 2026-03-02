@@ -38,11 +38,11 @@ function formatDate(date: string | null) {
 function getStatusBadge(status: string | null) {
   switch (status) {
     case 'SUBMITTED':
-      return <Badge variant="outline" className="text-amber-600 border-amber-200">Awaiting review</Badge>
+      return <Badge variant="outline" className="text-[var(--warning)] border-[var(--warning)]/20">Awaiting review</Badge>
     case 'ACTIVE':
-      return <Badge variant="outline" className="text-emerald-600 border-emerald-200">Active</Badge>
+      return <Badge variant="outline" className="text-[var(--success)] border-[var(--success)]/20">Active</Badge>
     case 'REJECTED':
-      return <Badge variant="outline" className="text-red-600 border-red-200">Rejected</Badge>
+      return <Badge variant="outline" className="text-[var(--destructive)] border-[var(--border)] bg-[var(--destructive-muted)]">Rejected</Badge>
     default:
       return <Badge variant="secondary">Unknown</Badge>
   }
@@ -115,15 +115,15 @@ export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
             <h1 className="text-lg font-semibold">{vendor.business_name || 'Unnamed vendor'}</h1>
             {getStatusBadge(vendor.kyc_status as any)}
           </div>
-          <p className="text-sm text-zinc-500">Joined {formatDate(vendor.created_at)}</p>
+          <p className="text-sm text-[var(--text-secondary)]">Joined {formatDate(vendor.created_at)}</p>
         </div>
         {vendor.kyc_status === 'SUBMITTED' && (
           <div className="flex gap-2">
-            <Button onClick={handleApprove} disabled={loading} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button onClick={handleApprove} disabled={loading} className="bg-[var(--success)] hover:opacity-90">
               {loading ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4 mr-2" />}
               Approve
             </Button>
-            <Button variant="outline" onClick={() => setRejectDialogOpen(true)} disabled={loading} className="text-red-600 border-red-200 hover:bg-red-50">
+            <Button variant="outline" onClick={() => setRejectDialogOpen(true)} disabled={loading} className="text-[var(--destructive)] border-[var(--border)] hover:bg-[var(--destructive-muted)]">
               <X className="size-4 mr-2" />Reject
             </Button>
           </div>
@@ -133,15 +133,15 @@ export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-zinc-500">Total orders</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm text-[var(--text-secondary)]">Total orders</CardTitle></CardHeader>
           <CardContent><p className="text-2xl font-semibold">{stats.orders}</p></CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-zinc-500">Total GMV</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm text-[var(--text-secondary)]">Total GMV</CardTitle></CardHeader>
           <CardContent><p className="text-2xl font-semibold">{formatCurrency(stats.gmv)}</p></CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm text-zinc-500">Listed products</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-sm text-[var(--text-secondary)]">Listed products</CardTitle></CardHeader>
           <CardContent><p className="text-2xl font-semibold">{stats.products}</p></CardContent>
         </Card>
       </div>
@@ -152,20 +152,20 @@ export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
           <CardHeader><CardTitle className="text-sm font-medium">Contact information</CardTitle></CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-zinc-500">Owner name</span>
+              <span className="text-[var(--text-secondary)]">Owner name</span>
               <span>{(vendor as { owner_name?: string }).owner_name ?? vendor.business_name ?? vendor.name ?? '-'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-zinc-500">Email</span>
+              <span className="text-[var(--text-secondary)]">Email</span>
               <span>{vendor.email || '-'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-zinc-500">Phone</span>
+              <span className="text-[var(--text-secondary)]">Phone</span>
               <span className="font-mono">{vendor.whatsapp_number ?? vendor.whatsapp_phoneNumber ?? '-'}</span>
             </div>
             {addressStr && (
               <div className="flex justify-between">
-                <span className="text-zinc-500">Address</span>
+                <span className="text-[var(--text-secondary)]">Address</span>
                 <span className="text-right max-w-[200px]">
                   {addressStr}
                 </span>
@@ -179,7 +179,7 @@ export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
           <CardHeader><CardTitle className="text-sm font-medium">KYC documents</CardTitle></CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between items-center">
-              <span className="text-zinc-500">GSTIN</span>
+              <span className="text-[var(--text-secondary)]">GSTIN</span>
               <div className="flex items-center gap-2">
                 <span className="font-mono">{vendor.gstin || '-'}</span>
                 {vendor.gstin && (
@@ -187,7 +187,7 @@ export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
                     href={`https://services.gst.gov.in/services/searchtp/${vendor.gstin}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-zinc-400 hover:text-zinc-600"
+                    className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
                   >
                     <ExternalLink className="size-3" />
                   </a>
@@ -195,20 +195,20 @@ export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
               </div>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-zinc-500">PAN</span>
+              <span className="text-[var(--text-secondary)]">PAN</span>
               <span className="font-mono">{vendor.pan_number ?? '-'}</span>
             </div>
             {Boolean(vendor.bank_details) && (
               <>
                 <div className="border-t pt-3 mt-3">
-                  <span className="text-zinc-500 text-xs tracking-wide">Bank details</span>
+                  <span className="text-[var(--text-secondary)] text-xs tracking-wide">Bank details</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">Account</span>
+                  <span className="text-[var(--text-secondary)]">Account</span>
                   <span className="font-mono">{(vendor.bank_details as { account_number?: string }).account_number || '-'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500">IFSC</span>
+                  <span className="text-[var(--text-secondary)]">IFSC</span>
                   <span className="font-mono">{(vendor.bank_details as { ifsc?: string }).ifsc || '-'}</span>
                 </div>
               </>
@@ -229,7 +229,7 @@ export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
                 min="0"
                 max="100"
               />
-              <span className="text-zinc-500">%</span>
+              <span className="text-[var(--text-secondary)]">%</span>
               <Button
                 size="sm"
                 variant="outline"
@@ -239,7 +239,7 @@ export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
                 {loading ? <Loader2 className="size-4 animate-spin" /> : 'Update'}
               </Button>
             </div>
-            <p className="text-xs text-zinc-500 mt-2">Platform commission on each order</p>
+            <p className="text-xs text-[var(--text-secondary)] mt-2">Platform commission on each order</p>
           </CardContent>
         </Card>
 
@@ -250,7 +250,7 @@ export function VendorDetailView({ vendor, stats }: VendorDetailViewProps) {
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-sm font-medium">{vendor.is_active ? 'Active' : 'Disabled'}</span>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-[var(--text-secondary)]">
                   {vendor.is_active ? 'Vendor can receive orders' : 'Vendor cannot receive orders'}
                 </p>
               </div>

@@ -109,5 +109,5 @@ export interface OrderDetail extends Tables<'orders'> {
   vendor_image: string | null;
   personalization_status?: string | null;
   gst?: number | null;
-  total_savings?: number | null;
+  total_savings: number | null;
 }

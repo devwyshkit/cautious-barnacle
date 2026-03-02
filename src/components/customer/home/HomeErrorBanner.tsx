@@ -17,21 +17,21 @@ export function HomeErrorBanner({ errors, allFailed }: HomeErrorBannerProps) {
   const router = useRouter();
   if (allFailed) {
     return (
-      <div className="mx-4 md:mx-8 p-4 bg-red-50 border border-red-200 rounded-xl">
-        <div className="flex items-start gap-3">
-          <div className="size-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
-            <AlertCircle className="size-4 text-red-600" />
+      <div className="mx-[var(--space-4)] md:mx-[var(--space-8)] p-[var(--space-4)] bg-[var(--destructive-foreground)] border border-[var(--destructive)]/20 rounded-xl">
+        <div className="flex items-start gap-[var(--space-3)]">
+          <div className="size-5 rounded-full bg-[var(--destructive)]/10 flex items-center justify-center shrink-0 mt-0.5">
+            <AlertCircle className="size-4 text-[var(--destructive)]" />
           </div>
-          <div className="flex-1 space-y-2">
-            <h3 className="text-sm font-bold text-red-900">Unable to load content</h3>
-            <p className="text-xs text-red-700 leading-relaxed">
+          <div className="flex-1 space-y-[var(--space-2)]">
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">Unable to load content</h3>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
               {errors.join(', ')}. Please check your connection and try again.
             </p>
             <Button
               variant="outline"
               size="sm"
               onClick={() => router.refresh()}
-              className="h-7 text-xs border-red-300 text-red-900 hover:bg-red-100 mt-2"
+              className="h-7 text-xs border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--surface-muted)] mt-[var(--space-2)]"
             >
               <RefreshCw className="size-3 mr-1.5" />
               Reload page
@@ -44,10 +44,10 @@ export function HomeErrorBanner({ errors, allFailed }: HomeErrorBannerProps) {
 
   if (errors.length > 0) {
     return (
-      <div className="mx-4 md:mx-8 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-        <div className="flex items-start gap-2">
-          <AlertCircle className="size-4 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-xs text-amber-800 leading-relaxed">
+      <div className="mx-[var(--space-4)] md:mx-[var(--space-8)] p-[var(--space-3)] bg-[var(--warning-foreground)] border border-[var(--warning)]/20 rounded-xl">
+        <div className="flex items-start gap-[var(--space-2)]">
+          <AlertCircle className="size-4 text-[var(--warning)] shrink-0 mt-0.5" />
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             Some content couldn&apos;t be loaded: {errors.join(', ')}. Showing available content.
           </p>
         </div>

@@ -1,7 +1,6 @@
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { RealtimeProvider } from '@/providers/RealtimeProvider';
-// SurfaceScribeProvider removed - using native CSS env() for safe areas
 
 /**
  * Providers Component
@@ -10,9 +9,20 @@ import { RealtimeProvider } from '@/providers/RealtimeProvider';
  * Supabase handles caching, deduplication, and real-time updates natively.
  */
 
-export function Providers({ children }: { children: React.ReactNode }) {
+import { User } from '@supabase/supabase-js';
+import { UserPermissions } from '@/lib/auth/core';
+
+export function Providers({
+  children,
+  initialUser,
+  initialPermissions
+}: {
+  children: React.ReactNode;
+  initialUser?: User | null;
+  initialPermissions?: UserPermissions | null;
+}) {
   return (
-    <AuthProvider>
+    <AuthProvider initialUser={initialUser} initialPermissions={initialPermissions}>
       <RealtimeProvider>
         {children}
         <Toaster position="top-center" richColors />

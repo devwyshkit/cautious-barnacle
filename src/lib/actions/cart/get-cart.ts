@@ -21,12 +21,16 @@ export interface GetCartResult {
     guestSessionId?: string | null;
 }
 
-export const getCart = cache(async (): Promise<GetCartResult> => {
+export const getCart = cache(async (userParam?: any): Promise<GetCartResult> => {
     try {
         const supabase = await createClient();
 
         // 1. Resolve Auth
-        const { data: { user } } = await supabase.auth.getUser();
+        let user = userParam;
+        if (!user) {
+            const { data: { user: fetchedUser } } = await supabase.auth.getUser();
+            user = fetchedUser;
+        }
         const guestSessionId = !user ? await getGuestSessionIdReadOnly() : null;
 
         if (!user && !guestSessionId) {
@@ -38,9 +42,9 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
         }
 
         const cartSessionId = user?.id ?? guestSessionId ?? 'empty';
-        const queryClient = supabase; // Swiggy 2026: RLS handles guest reads via session_id
+        const queryClient = supabase; // WYSHKIT 2026: RLS handles guest reads via session_id
 
-        // 2. Swiggy 2026: Single Trip Context Fetch
+        // 2. WYSHKIT 2026: Single Trip Context Fetch
         const { data: context, error: contextError } = await queryClient
             .rpc('get_cart_context', {
                 p_user_id: user?.id ?? undefined,
@@ -53,7 +57,7 @@ export const getCart = cache(async (): Promise<GetCartResult> => {
         }
 
         const data = context as any;
-        const productsRows = data.products || [];  // RPC purified to 'products' (Swiggy 2026 Standard)
+        const productsRows = data.products || [];  // RPC purified to 'products' (WYSHKIT 2026 Standard)
         const dbRes = data.pricing || {};
         const sessionData = data.session || {};
 

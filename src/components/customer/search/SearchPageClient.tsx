@@ -82,32 +82,32 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
   // No local state for product selection - URL takes precedence
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      <div className="p-4 border-b border-zinc-100 flex items-center gap-3">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
+      <div className="p-4 border-b border-[var(--border)] flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => router.back()}
           className="size-9 rounded-lg shrink-0"
         >
-          <ArrowLeft className="size-5 text-zinc-600" />
+          <ArrowLeft className="size-5 text-[var(--text-secondary)]" />
         </Button>
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--text-tertiary)]" />
           <Input
             ref={inputRef}
             type="text"
             placeholder="Search products, stores..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="pl-9 h-10 bg-zinc-50 border-zinc-100 text-sm rounded-lg focus-visible:ring-zinc-200"
+            className="pl-9 h-10 bg-[var(--surface-muted)] border-[var(--border)] text-sm rounded-lg focus-visible:ring-[var(--border)]"
           />
           {(inputValue || isPending) && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-              {isPending && <Loader2 className="size-3 animate-spin text-zinc-400" />}
+              {isPending && <Loader2 className="size-3 animate-spin text-[var(--text-tertiary)]" />}
               {inputValue && (
                 <button onClick={() => { setInputValue(""); handleSearchUpdate(""); }} className="p-1">
-                  <X className="size-4 text-zinc-400" />
+                  <X className="size-4 text-[var(--text-tertiary)]" />
                 </button>
               )}
             </div>
@@ -116,13 +116,13 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
       </div>
 
       {currentCategory && (
-        <div className="px-4 py-2 border-b border-zinc-100 bg-zinc-50">
+        <div className="px-4 py-2 border-b border-[var(--border)] bg-[var(--surface-muted)]">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-zinc-600">Category:</span>
-            <span className="text-xs text-zinc-900 capitalize">{currentCategory}</span>
+            <span className="text-xs font-medium text-[var(--text-secondary)]">Category:</span>
+            <span className="text-xs text-[var(--text-primary)] capitalize">{currentCategory}</span>
             <button
               onClick={() => handleSearchUpdate(inputValue, "")}
-              className="ml-auto text-xs text-zinc-500 hover:text-zinc-900"
+              className="ml-auto text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               Clear
             </button>
@@ -137,23 +137,23 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
           </div>
         ) : !hasActiveFilters ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Search className="size-10 text-zinc-200 mb-4" />
-            <p className="text-sm font-semibold text-zinc-400">Search for products or stores</p>
+            <Search className="size-10 text-[var(--border)] mb-4" />
+            <p className="text-sm font-semibold text-[var(--text-tertiary)]">Search for products or stores</p>
           </div>
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="size-20 bg-zinc-50 rounded-full flex items-center justify-center mb-6">
-              <Search className="size-8 text-zinc-200" />
+            <div className="size-20 bg-[var(--surface-muted)] rounded-full flex items-center justify-center mb-6">
+              <Search className="size-8 text-[var(--border)]" />
             </div>
-            <p className="text-sm font-black text-zinc-900 tracking-tight mb-2">No Results</p>
-            <p className="text-xs font-medium text-zinc-500 max-w-[200px] mb-8 leading-relaxed">
+            <p className="text-sm font-bold text-[var(--text-primary)] tracking-tight mb-2">No Results</p>
+            <p className="text-xs font-medium text-[var(--text-secondary)] max-w-[200px] mb-8 leading-relaxed">
               We couldn&apos;t find {currentQ ? `&quot;${currentQ}&quot;` : 'what you were looking for'}
               {currentCategory && ` in ${currentCategory}`}.
             </p>
             <Button
               onClick={() => router.push('/')}
               variant="outline"
-              className="rounded-xl border-zinc-200 text-xs font-black tracking-tight px-8"
+              className="rounded-xl border-[var(--border)] text-xs font-bold tracking-tight px-8"
             >
               Back to Home
             </Button>
@@ -163,13 +163,13 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             <div className="space-y-8">
               {results.vendors.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-black text-zinc-400 tracking-tight mb-4 px-1">Top stores</h3>
+                  <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-4 px-1">Top stores</h3>
                   <div className="space-y-4">
                     {results.vendors.map((vendor) => (
                       <VendorCard
                         key={vendor.id}
                         data={vendor}
-                        className="bg-zinc-50/50 p-2"
+                        className="bg-[var(--surface-muted)]/50 p-2"
                       />
                     ))}
                   </div>
@@ -178,7 +178,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
 
               {results.products.length > 0 && (
                 <div className="pb-safe">
-                  <h3 className="text-xs font-black text-zinc-400 tracking-tight mb-4 px-1">Products from stores</h3>
+                  <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-4 px-1">Products from stores</h3>
                   <div className="space-y-6">
                     {Object.entries(
                       results.products.reduce((acc: Record<string, { vendorName: string, products: any[] }>, product: any) => {
@@ -190,10 +190,10 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
                     ).map(([vId, group]) => (
                       <div key={vId} className="space-y-3">
                         <div className="flex items-center justify-between px-1">
-                          <Link href={`/vendor/${vId}`} className="text-xs font-black text-zinc-900 tracking-tight hover:text-[var(--primary)] transition-colors">
-                            No results found for &apos;{searchParamsHook.get('q')}&apos;
+                          <Link href={`/vendor/${vId}`} className="text-xs font-bold text-[var(--text-primary)] tracking-tight hover:text-[var(--primary)] transition-colors">
+                            {group.vendorName}
                           </Link>
-                          <span className="text-[11px] font-bold text-zinc-400 tracking-tight">{group.products.length} Match{group.products.length > 1 ? 'es' : ''}</span>
+                          <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">{group.products.length} Match{group.products.length > 1 ? 'es' : ''}</span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-x-3 gap-y-6">

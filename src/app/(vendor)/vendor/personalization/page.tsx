@@ -12,8 +12,8 @@ export default async function VendorPersonalizationPage() {
   return (
     <div className="px-4 py-6">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-zinc-900">Preview queue</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 className="text-xl font-semibold text-[var(--text-primary)]">Preview queue</h1>
+        <p className="text-sm text-[var(--text-secondary)] mt-1">
           Upload previews for personalized orders
         </p>
       </div>

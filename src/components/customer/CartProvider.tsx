@@ -43,6 +43,8 @@ interface CartContextType {
     removeFromDraftOrder: (productId: string, variantId?: string | null) => Promise<void>;
     updateQuantity: (productId: string, variantId: string | null, quantity: number) => Promise<void>;
     clearDraftOrder: () => Promise<void>;
+    isDrawerOpen: boolean;
+    setDrawerOpen: (open: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -56,7 +58,7 @@ export function useCart() {
 /**
  * WYSHKIT 2026: Elite CartProvider (Zero Shadow State)
  * 
- * Swiggy 2026 Pattern: Pure Server Authority
+ * WYSHKIT 2026 Pattern: Pure Server Authority
  * - NO local useState for the cart. The DB/RSC is the source of truth.
  * - useOptimistic provides immediate UI feedback while the Server Action resolves.
  * - revalidateTag('cart') triggers the RSC update, which flows back into initialCart.
@@ -122,6 +124,7 @@ export function CartProvider({
 
     const [showReplaceCartDialog, setShowReplaceCartDialog] = useState(false);
     const [pendingItem, setPendingItem] = useState<any>(null);
+    const [isDrawerOpen, setDrawerOpen] = useState(false);
 
     const addToDraftOrder = async (
         product_id: string,
@@ -255,34 +258,37 @@ export function CartProvider({
         removeFromDraftOrder,
         updateQuantity,
         clearDraftOrder: clearCart,
+        isDrawerOpen,
+        setDrawerOpen,
     };
-
-    if (!mounted) return null;
 
     return (
         <CartContext.Provider value={value}>
             {children}
-            <AlertDialog open={showReplaceCartDialog} onOpenChange={setShowReplaceCartDialog}>
-                <AlertDialogContent className="rounded-xl border-none shadow-sm bg-white/95 backdrop-blur-xl">
-                    <AlertDialogHeader>
-                        <AlertDialogTitle className="text-xl font-black text-zinc-950 tracking-tight">Replace cart?</AlertDialogTitle>
-                        <AlertDialogDescription className="text-sm font-medium text-zinc-600 leading-relaxed">
-                            Your cart contains products from a different store. Adding this product will clear your current cart.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="flex-row gap-2 mt-4">
-                        <AlertDialogCancel className="flex-1 rounded-xl border-zinc-100 font-bold text-zinc-500 hover:bg-zinc-50">
-                            Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleReplaceCart}
-                            className="flex-1 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white font-bold"
-                        >
-                            Replace
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            {/* WYSHKIT 2026: Dialogs/Portals MUST wait for mount to avoid hydration mismatch */}
+            {mounted && (
+                <AlertDialog open={showReplaceCartDialog} onOpenChange={setShowReplaceCartDialog}>
+                    <AlertDialogContent className="rounded-xl border-none shadow-sm bg-[var(--surface)]/95 backdrop-blur-xl">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Replace cart?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-sm font-medium text-[var(--text-secondary)] leading-relaxed">
+                                Your cart contains products from a different store. Adding this product will clear your current cart.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="flex-row gap-2 mt-4">
+                            <AlertDialogCancel className="flex-1 rounded-xl border-[var(--border)] font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]">
+                                Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                                onClick={handleReplaceCart}
+                                className="flex-1 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white font-bold"
+                            >
+                                Replace
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
         </CartContext.Provider>
     );
 }

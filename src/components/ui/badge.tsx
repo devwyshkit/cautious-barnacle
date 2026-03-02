@@ -5,24 +5,24 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center px-2 py-0.5 text-xs font-black tracking-tight w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 transition-all rounded-lg",
+  "inline-flex items-center justify-center px-2 py-0.5 text-xs font-black uppercase tracking-widest w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 transition-all rounded-[var(--radius-sm)]",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-zinc-900 text-white shadow-sm",
+          "border-transparent bg-[var(--text-primary)] text-[var(--primary-foreground)] shadow-sm",
         secondary:
-          "border-transparent bg-zinc-100 text-zinc-600",
+          "border-transparent bg-[var(--surface-muted)] text-[var(--text-secondary)]",
         destructive:
-          "border-transparent bg-red-50 text-red-600",
+          "border-transparent bg-[var(--destructive-foreground)] text-[var(--destructive)]",
         outline:
-          "border-zinc-200 text-zinc-500 bg-transparent",
+          "border-[var(--border)] text-[var(--text-tertiary)] bg-transparent",
         premium:
-          "border-transparent bg-red-50 text-[var(--primary)] font-black tracking-[0.15em]",
+          "border-transparent bg-[var(--primary-muted)] text-[var(--primary)] font-black",
         fresh:
-          "border-transparent bg-emerald-50 text-emerald-700 font-black tracking-[0.15em]",
+          "border-transparent bg-[var(--success-foreground)] text-[var(--success)] font-black",
         brand:
-          "border-transparent bg-[var(--brand-primary)] text-white shadow-lg shadow-[var(--brand-primary)]/20",
+          "border-transparent bg-[var(--primary)] text-[var(--primary-foreground)] shadow-lg shadow-[var(--primary)]/20",
       },
     },
     defaultVariants: {

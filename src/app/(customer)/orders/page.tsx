@@ -1,92 +1,101 @@
+import { Suspense } from "react";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { Package, ChevronRight, Calendar, MapPin } from "lucide-react";
+import { Package, ChevronRight, Calendar, MapPin, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { OrderList } from "@/components/customer/orders/OrderList";
+import { logger } from "@/lib/logging/logger";
+import { SurfaceErrorBoundaryWithRouter } from "@/components/error/SurfaceErrorBoundary";
 import type { OrderProductListItem } from "@/lib/types/order";
 
 export default async function OrdersPage() {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const headerList = await headers();
+    const userId = headerList.get('x-wyshkit-user-id');
 
-    if (!user) {
+    if (!userId) {
         redirect("/auth?intent=signin&returnUrl=/orders");
     }
 
-    // WYSHKIT 2026: Direct lookup on orders table
-    const { data: dbOrders, error } = await supabase
-        .from('orders')
-        .select('id, order_number, status, total, created_at, delivery_address, has_personalization, vendors(name, image_url), order_products(product_name, personalization_details)')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+    return (
+        <SurfaceErrorBoundaryWithRouter surfaceName="Orders" showHomeButton>
+            <div className="bg-[var(--surface-muted)]/50 min-h-[100dvh] py-6 font-sans">
+                <div className="max-w-xl mx-auto px-4">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-2">
+                                My Orders
+                            </h1>
+                            <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mt-0.5 uppercase">
+                                Track and manage your orders
+                            </p>
+                        </div>
+                    </div>
 
+                    <Suspense fallback={<OrdersSkeleton />}>
+                        <AsyncOrderList userId={userId} />
+                    </Suspense>
+                </div>
+            </div>
+        </SurfaceErrorBoundaryWithRouter>
+    );
+}
 
-    // Map DB orders to OrderProductListItem for the component
-    const mappedOrders = ((dbOrders as any[]) || []).map((row) => {
-        let p_status = null;
-        if (row.has_personalization && row.order_products) {
-            const hasSubmitted = row.order_products.some((i: any) => i.personalization_details?.text || i.personalization_details?.image_url);
-            const isPreviewReady = row.order_products.some((i: any) => i.personalization_details?.preview_ready);
-            const isApproved = row.order_products.every((i: any) => i.personalization_details?.approved || !i.personalization_details);
+async function AsyncOrderList({ userId }: { userId: string }) {
+    const supabase = await createClient();
 
-            if (isApproved) p_status = 'approved';
-            else if (isPreviewReady) p_status = 'preview_ready';
-            else if (hasSubmitted) p_status = 'submitted';
-            else p_status = 'pending';
-        }
+    // WYSHKIT 2026: One-Trip Orders Surface
+    const { data: orders, error } = await supabase.rpc('get_user_orders_v1' as any);
 
-        return {
-            ...row,
-            order_number: row.order_number ?? null,
-            created_at: row.created_at ?? null,
-            vendor_name: row.vendors?.name ?? null,
-            product_count: row.order_products?.length || 1,
-            first_product_name: row.vendors?.image_url || row.order_products?.[0]?.product_name || null,
-            has_personalization: row.has_personalization || false,
-            personalization_status: p_status,
-        };
-    });
+    if (error) {
+        logger.error('Failed to fetch orders in AsyncOrderList', error);
+        throw error;
+    }
 
+    if (!orders || (orders as any[]).length === 0) {
+        return (
+            <div className="p-[var(--space-12)] text-center bg-[var(--surface)] rounded-[var(--radius-3xl)] border border-[var(--border)] shadow-[var(--shadow-sm)] animate-in fade-in slide-in-from-bottom-2">
+                <div className="size-16 rounded-full bg-[var(--surface-muted)] flex items-center justify-center mx-auto mb-4 border border-[var(--border)]">
+                    <Package className="size-8 text-[var(--text-tertiary)]" />
+                </div>
+                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">No orders yet</h3>
+                <p className="text-xs font-medium text-[var(--text-tertiary)] mb-8 max-w-[200px] mx-auto">Start exploring the best premium stores in your city!</p>
+                <Link href="/">
+                    <button className="bg-[var(--text-primary)] text-white rounded-2xl px-10 py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]">
+                        Browse Stores
+                    </button>
+                </Link>
+            </div>
+        );
+    }
+
+    const orderList = orders as unknown as OrderProductListItem[];
 
     return (
-        <div className="bg-zinc-50/50 min-h-screen py-6">
-            <div className="max-w-xl mx-auto px-4">
-                <div className="flex items-center justify-between mb-8">
-                    <div>
-                        <h1 className="text-2xl font-black text-zinc-900 tracking-tight flex items-center gap-2">
-                            My Orders
-                        </h1>
-                        <p className="text-[11px] font-bold text-zinc-400 tracking-tight mt-0.5">
-                            Track and manage your orders
-                        </p>
-                    </div>
-                    <span className="text-xs font-black text-zinc-500 tracking-tight bg-white px-3 py-1.5 rounded-full border border-zinc-100 shadow-sm">
-                        {dbOrders?.length || 0} Total
-                    </span>
-                </div>
-
-                {error ? (
-                    <div className="p-8 text-center bg-white rounded-xl border border-zinc-100 shadow-sm">
-                        <p className="text-sm font-medium text-zinc-500">Failed to load orders. Please try again.</p>
-                    </div>
-                ) : !dbOrders || dbOrders.length === 0 ? (
-                    <div className="p-12 text-center bg-white rounded-xl border border-zinc-100 shadow-sm">
-                        <div className="size-16 rounded-full bg-zinc-50 flex items-center justify-center mx-auto mb-4 border border-zinc-100">
-                            <Package className="size-8 text-zinc-300" />
-                        </div>
-                        <h3 className="text-lg font-bold text-zinc-900 mb-2">No orders yet</h3>
-                        <p className="text-sm text-zinc-500 mb-6 max-w-[200px] mx-auto">Start exploring the best stores in Bangalore!</p>
-                        <Link href="/">
-                            <button className="bg-zinc-900 text-white rounded-xl px-8 py-3 font-bold text-sm active:scale-95 transition-all">
-                                Browse Stores
-                            </button>
-                        </Link>
-                    </div>
-                ) : (
-                    <OrderList initialOrders={mappedOrders as OrderProductListItem[]} />
-                )}
+        <div className="space-y-4 animate-in fade-in duration-500">
+            <div className="flex justify-end mb-2">
+                <span className="text-xs font-black text-[var(--text-tertiary)] tracking-widest uppercase bg-[var(--surface-muted)]/50 px-2 py-1 rounded">
+                    {orderList.length} Total Orders
+                </span>
             </div>
+            <OrderList initialOrders={orderList} />
+        </div>
+    );
+}
+
+function OrdersSkeleton() {
+    return (
+        <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+                <div key={i} className="h-32 bg-[var(--surface)] rounded-[var(--radius-3xl)] border border-[var(--border)] animate-pulse flex items-center px-[var(--space-6)] gap-[var(--space-4)]">
+                    <div className="size-16 rounded-2xl bg-[var(--surface-muted)]" />
+                    <div className="flex-1 space-y-2">
+                        <div className="h-4 w-1/3 bg-[var(--surface-muted)] rounded" />
+                        <div className="h-3 w-1/2 bg-[var(--surface-muted)] rounded" />
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }

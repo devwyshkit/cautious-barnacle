@@ -49,7 +49,7 @@ export function usePaymentFlow({
         const finalOrderId = orderId || order?.id;
         const finalHasPersonalization = hasPersonalization ?? order?.has_personalization;
 
-        // SWIGGY 2026: Zero-Delay Redirect — no pre-fetching.
+        // WYSHKIT 2026: Zero-Delay Redirect — no pre-fetching.
         // OrderTracker's useOrderRealtime handles data loading.
         // Clear cart in background, don't block redirect.
         clearDraftOrder().catch(e => logger.error("Failed to clear cart, proceeding anyway", { error: e }));
@@ -59,7 +59,7 @@ export function usePaymentFlow({
             params.set('success', 'true');
             if (finalHasPersonalization) params.set('auth', 'true');
 
-            // SWIGGY 2026: Success Ripple Glory Time.
+            // WYSHKIT 2026: Success Ripple Glory Time.
             // We allow the success overlay to breathe before redirecting.
             setTimeout(() => {
                 router.replace(`/orders/${finalOrderId}?${params.toString()}`);
@@ -95,7 +95,7 @@ export function usePaymentFlow({
                     use_wallet: data.use_wallet,
                     wallet_discount: data.pricing.wallet_discount || 0,
                     delivery_instructions: deliveryInstructions || undefined,
-                    distance_km: data.distance_km || undefined,
+                    // [PURGED] WYSHKIT 2026: distance_km resolved by kernel.
                     gstin: data.gstin || undefined,
                 }
             );

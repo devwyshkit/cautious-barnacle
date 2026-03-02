@@ -33,7 +33,7 @@ const NAV_LINKS = [
   { label: 'Orders', href: '/admin/orders', icon: ShoppingCart },
   { label: 'Deliveries', href: '/admin/deliveries', icon: Truck },
   { label: 'Vendors', href: '/admin/vendors', icon: Store },
-  { label: 'Catalog', href: '/admin/catalog', icon: Package },
+  { label: 'Products', href: '/admin/products', icon: Package },
   { label: 'Categories', href: '/admin/categories', icon: Layers },
   { label: 'Customers', href: '/admin/customers', icon: Users },
   { label: 'Wyshkit money', href: '/admin/wallet', icon: Wallet },
@@ -59,8 +59,8 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: typeof Layou
       className={cn(
         'flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors',
         isActive
-          ? 'bg-zinc-100 text-zinc-900 font-medium'
-          : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
+          ? 'bg-[var(--primary)] text-white shadow-brand font-medium'
+          : 'text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]'
       )}
     >
       <Icon className="size-4" />
@@ -89,15 +89,15 @@ export function AdminShell({ admin, children }: AdminShellProps) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-[100dvh] bg-[var(--surface-muted)]">
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-56 border-r border-zinc-200 bg-white lg:block">
-        <div className="flex h-14 items-center border-b border-zinc-200 px-4">
+      <aside className="fixed inset-y-0 left-0 z-[var(--z-nav)] hidden w-56 border-r border-[var(--border)] bg-[var(--surface)] lg:block">
+        <div className="flex h-14 items-center border-b border-[var(--border)] px-4">
           <Link href="/admin" className="flex items-center gap-2">
-            <div className="size-7 rounded bg-zinc-900 flex items-center justify-center">
+            <div className="size-7 rounded bg-[var(--primary)] flex items-center justify-center">
               <span className="text-white text-xs font-semibold">W</span>
             </div>
-            <span className="font-semibold text-zinc-900">Wyshkit</span>
+            <span className="font-semibold text-[var(--text-primary)]">Wyshkit Admin</span>
           </Link>
         </div>
         <Sidebar />
@@ -105,7 +105,7 @@ export function AdminShell({ admin, children }: AdminShellProps) {
 
       {/* Main content */}
       <div className="lg:pl-56">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-zinc-200 bg-white px-4">
+        <header className="sticky top-0 z-[var(--z-nav)] flex h-14 items-center gap-4 border-b border-[var(--border)] bg-[var(--surface)] px-4">
           {/* Mobile menu */}
           <Sheet>
             <SheetTrigger asChild>
@@ -115,8 +115,8 @@ export function AdminShell({ admin, children }: AdminShellProps) {
             </SheetTrigger>
             <SheetContent side="left" className="w-56 p-0">
               <SheetTitle className="sr-only">Main Menu</SheetTitle>
-              <div className="flex h-14 items-center border-b border-zinc-200 px-4">
-                <span className="font-semibold text-zinc-900">Wyshkit</span>
+              <div className="flex h-14 items-center border-b border-[var(--border)] px-4">
+                <span className="font-semibold text-[var(--text-primary)]">Wyshkit</span>
               </div>
               <Sidebar />
             </SheetContent>
@@ -125,7 +125,7 @@ export function AdminShell({ admin, children }: AdminShellProps) {
           <div className="flex-1" />
 
           <div className="flex items-center gap-3">
-            <span className="text-sm text-zinc-600 hidden sm:block">
+            <span className="text-sm text-[var(--text-secondary)] hidden sm:block">
               {admin.name || admin.phone}
             </span>
             <Button variant="ghost" size="icon" onClick={handleLogout}>

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 /**
  * WYSHKIT 2026: Mobile Bottom Navigation
  * Persistent tab bar for mobile-first experience.
+ * REFRESHED: Enhanced active state with brand color and better accessibility.
  */
 const navItems = [
   { label: "Home", href: "/", icon: Home },
@@ -20,8 +21,8 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white/95 backdrop-blur-md border-t border-zinc-100 pb-safe">
-      <div className="flex items-center justify-around h-14 px-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-[var(--z-nav)] md:hidden bg-[var(--surface-glass)] backdrop-blur-3xl border-t border-[var(--border)] pb-safe shadow-[var(--shadow-lg)]">
+      <div className="flex items-center justify-around h-[var(--bottom-nav-height)] px-2">
         {navItems.map(({ label, href, icon: Icon }) => {
           const isActive = href === "/"
             ? pathname === "/"
@@ -31,25 +32,26 @@ export function BottomNav() {
             <Link
               key={label}
               href={href}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 flex-1 py-1 transition-all duration-200",
-                isActive ? "text-zinc-950" : "text-zinc-400"
+                "flex flex-col items-center justify-center gap-1 flex-1 py-1 transition-all duration-200 outline-none",
+                isActive ? "text-[var(--primary)]" : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
               )}
             >
-              <div className="relative">
+              <div className="relative flex items-center justify-center">
+                {isActive && (
+                  <div className="absolute inset-0 -m-2 bg-[var(--primary)]/10 rounded-full animate-in zoom-in-50 duration-300" />
+                )}
                 <Icon
                   className={cn(
-                    "size-5.5 transition-transform duration-300",
+                    "size-5 transition-all duration-300 relative z-10",
                     isActive ? "stroke-[3px] scale-110" : "stroke-[2px]"
                   )}
                 />
-                {isActive && (
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-zinc-950" />
-                )}
               </div>
               <span className={cn(
-                "text-[10px] font-black uppercase tracking-widest",
-                isActive ? "opacity-100" : "opacity-60"
+                "text-xs font-bold uppercase tracking-wide relative z-10 mt-0.5",
+                isActive ? "opacity-100" : "opacity-70"
               )}>
                 {label}
               </span>
