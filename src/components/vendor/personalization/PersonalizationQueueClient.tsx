@@ -76,25 +76,25 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
     if (!parsed) return null;
 
     return (
-      <div className="space-y-1 mt-2 p-2 bg-blue-50 rounded-[var(--radius-sm)]">
+      <div className="space-y-1 mt-2 p-2 bg-[var(--well-info)] rounded-[var(--radius-sm)]">
         {parsed.text && (
-          <p className="text-xs text-blue-800">
+          <p className="text-xs text-[var(--info-text)]">
             <span className="font-medium">Text:</span> {parsed.text}
           </p>
         )}
         {parsed.name && (
-          <p className="text-xs text-blue-800">
+          <p className="text-xs text-[var(--info-text)]">
             <span className="font-medium">Name:</span> {parsed.name}
           </p>
         )}
         {parsed.message && (
-          <p className="text-xs text-blue-800">
+          <p className="text-xs text-[var(--info-text)]">
             <span className="font-medium">Message:</span> {parsed.message}
           </p>
         )}
         {parsed.image_url && (
           <div className="mt-2">
-            <p className="text-xs text-blue-800 font-medium mb-1">Customer image:</p>
+            <p className="text-xs text-[var(--info-text)] font-medium mb-1">Customer image:</p>
             <div className="relative w-20 h-20 rounded-[var(--radius-sm)] overflow-hidden bg-[var(--surface)]">
               <Image
                 src={parsed.image_url}
@@ -128,9 +128,9 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                   className={cn(
                     'text-xs',
                     order.personalization_status === 'revision_requested'
-                      ? 'bg-orange-50 text-orange-700 border-orange-200'
+                      ? 'bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20'
                       : order.personalization_status === 'preview_ready'
-                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                        ? 'bg-[var(--well-info)] text-[var(--info-text)] border-[var(--info-border)]'
                         : 'bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20'
                   )}
                 >
@@ -154,7 +154,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 text-xs font-bold tracking-tight text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        className="h-8 text-xs font-bold tracking-tight text-[var(--primary)] hover:text-[var(--primary)] hover:bg-[var(--primary)]/10"
                         onClick={() => handleUploadClick(order.id, product.id, order.order_number || '')}
                       >
                         <Upload className="size-3.5 mr-1" />
@@ -174,7 +174,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
                   {/* Show Product-Specific Preview if available */}
                   {product.personalization_entry?.preview_ready && (
                     <div className="mt-2 flex items-center gap-2">
-                      <div className="size-10 relative rounded-md overflow-hidden bg-[var(--surface)] border border-[var(--border)]">
+                      <div className="size-10 relative rounded-[var(--radius-md)] overflow-hidden bg-[var(--surface)] border border-[var(--border)]">
                         <Image
                           src={order.latest_preview?.preview_url || ''}
                           alt="Preview"
@@ -328,11 +328,11 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-[var(--radius-md)] bg-orange-50 flex items-center justify-center">
-                <RotateCcw className="size-5 text-orange-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-warning)] flex items-center justify-center">
+                <RotateCcw className="size-5 text-[var(--warning)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-orange-600">{revisionRequested.length}</p>
+                <p className="text-xl font-semibold text-[var(--warning)]">{revisionRequested.length}</p>
                 <p className="text-xs text-[var(--text-secondary)]">Revision needed</p>
               </div>
             </div>
@@ -341,11 +341,11 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-[var(--radius-md)] bg-blue-50 flex items-center justify-center">
-                <Eye className="size-5 text-blue-600" />
+              <div className="size-10 rounded-[var(--radius-md)] bg-[var(--well-info)] flex items-center justify-center">
+                <Eye className="size-5 text-[var(--info-text)]" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-blue-600">{awaitingApproval.length}</p>
+                <p className="text-xl font-semibold text-[var(--info-text)]">{awaitingApproval.length}</p>
                 <p className="text-xs text-[var(--text-secondary)]">Awaiting approval</p>
               </div>
             </div>
@@ -370,7 +370,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
       {revisionRequested.length > 0 && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-            <RotateCcw className="size-4 text-orange-500" />
+            <RotateCcw className="size-4 text-[var(--warning)]" />
             Revision requested ({revisionRequested.length})
           </h2>
           <div className="space-y-3">
@@ -384,7 +384,7 @@ export function PersonalizationQueueClient({ initialOrders }: PersonalizationQue
       {awaitingApproval.length > 0 && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-3 flex items-center gap-2">
-            <Eye className="size-4 text-blue-500" />
+            <Eye className="size-4 text-[var(--info-text)]" />
             Awaiting customer approval ({awaitingApproval.length})
           </h2>
           <div className="space-y-3">

@@ -83,7 +83,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                                         <p className="text-sm font-bold text-[var(--text-primary)] truncate">{product.product_name}</p>
                                         <Link
                                             href={`/vendor/${product.vendor_id}/product/${product.product_id}?edit=true&cartProductId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${product.selected_addons?.map((a: any) => a.id).join(',') || ''}&returnUrl=/checkout`}
-                                            className="text-xs font-bold text-[var(--primary)] uppercase tracking-tight px-2 py-1 bg-[var(--well-destructive)] rounded-md hover:opacity-80 transition-colors"
+                                            className="text-xs font-bold text-[var(--primary)] uppercase tracking-tight px-2 py-1 bg-[var(--well-destructive)] rounded-[var(--radius-md)] hover:opacity-80 transition-colors"
                                         >
                                             Edit
                                         </Link>

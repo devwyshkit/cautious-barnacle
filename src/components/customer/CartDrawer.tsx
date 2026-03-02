@@ -138,7 +138,7 @@ export function CartDrawer() {
                                                                 removeFromDraftOrder(entry.product_id, entry.variant_id);
                                                             }
                                                         }}
-                                                        className="size-7 flex items-center justify-center hover:bg-[var(--surface)] rounded-md transition-colors"
+                                                        className="size-7 flex items-center justify-center hover:bg-[var(--surface)] rounded-[var(--radius-md)] transition-colors"
                                                     >
                                                         {entry.quantity === 1 ? <Trash2 className="size-3.5 text-[var(--destructive)]" /> : <Minus className="size-3.5 text-[var(--text-primary)]" />}
                                                     </button>
@@ -150,7 +150,7 @@ export function CartDrawer() {
                                                             triggerHaptic(HapticPattern.ACTION);
                                                             updateQuantity(entry.product_id, entry.variant_id || null, entry.quantity + 1);
                                                         }}
-                                                        className="size-7 flex items-center justify-center hover:bg-[var(--surface)] rounded-md transition-colors"
+                                                        className="size-7 flex items-center justify-center hover:bg-[var(--surface)] rounded-[var(--radius-md)] transition-colors"
                                                     >
                                                         <Plus className="size-3.5 text-[var(--text-primary)]" />
                                                     </button>

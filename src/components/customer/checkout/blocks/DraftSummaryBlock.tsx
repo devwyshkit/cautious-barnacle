@@ -85,7 +85,7 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
                       <button
                         onClick={() => handleQuantityChange(product.product_id || '', product.variant_id ?? null, product.quantity, -1)}
                         className={cn(
-                          "size-6 flex items-center justify-center rounded-md transition-colors",
+                          "size-6 flex items-center justify-center rounded-[var(--radius-md)] transition-colors",
                           product.quantity === 1
                             ? "bg-[var(--well-warning)] text-[var(--primary)] hover:bg-[var(--warning)]/10"
                             : "bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:bg-[var(--border)]"
@@ -98,7 +98,7 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
                       </span>
                       <button
                         onClick={() => handleQuantityChange(product.product_id || '', product.variant_id ?? null, product.quantity, 1)}
-                        className="size-6 flex items-center justify-center rounded-md bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:bg-[var(--border)] transition-colors"
+                        className="size-6 flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:bg-[var(--border)] transition-colors"
                       >
                         <Plus className="size-3" />
                       </button>
