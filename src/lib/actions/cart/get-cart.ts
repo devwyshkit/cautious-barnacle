@@ -106,6 +106,7 @@ export const getCart = cache(async (userParam?: any): Promise<GetCartResult> => 
             discount: Number(dbRes.discount) || 0,
             wallet_discount: Number(dbRes.wallet_discount) || 0,
             total: Number(dbRes.total) || 0,
+            total_paise: Math.round(Number(dbRes.total || 0) * 100),
             cashback_amount: Number(dbRes.cashback_amount) || 0,
             wyshkit_money_earned: Number(dbRes.wyshkit_money_earned) || 0,
             total_savings: Number(dbRes.total_savings) || 0,

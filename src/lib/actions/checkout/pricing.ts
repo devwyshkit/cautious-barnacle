@@ -76,6 +76,7 @@ export async function calculateOrderTotalRPC(
         discount: discount,
         wallet_discount: wallet_discount,
         total: Number(result.total) || 0,
+        total_paise: Number(result.total_paise) || Math.round(Number(result.total || 0) * 100),
         cashback_amount: Number(result.cashback_amount) || 0,
         wyshkit_money_earned: Number(result.cashback_amount) || 0,
         total_savings: discount + wallet_discount

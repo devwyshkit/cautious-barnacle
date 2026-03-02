@@ -80,12 +80,15 @@ async function AsyncLayoutContent({
     const supabase = await createClient();
 
     // WYSHKIT 2026: Zero-Trip Auth Resolution
-    user = await getZeroTripUser();
+    // If middleware injected a real ID, use it. If 'PENDING', we resolve in Stage 2.
+    if (injectedUserId && injectedUserId !== 'PENDING') {
+      user = await getZeroTripUser();
+    }
 
-    // Fallback Path: Standard resolution (only if cookie exists but header missing)
-    if (!user && hasAuthCookie) {
-      const { data: { user: fetchedUser } } = await supabase.auth.getUser();
-      user = fetchedUser;
+    // Fallback Path: Standard resolution (only if cookie exists but header is PENDING/missing)
+    if (!user && (hasAuthCookie || injectedUserId === 'PENDING')) {
+      // NOTE: We don't block here anymore. We will resolve this inside the Parallel Stage 
+      // to avoid delaying the start of the layout render.
     }
 
     // Stage 2: Parallel fetch: No waterfall, shared user context
@@ -97,14 +100,15 @@ async function AsyncLayoutContent({
         return { name: 'Select location', address: '', pincode: '' };
       }),
       // CONSOLIDATED TRIP: getGlobalInitSurface fetches both home and cart data.
-      getGlobalInitSurface(undefined, undefined, user?.id).catch(err => {
+      // It also now handles user resolution if it was 'PENDING'.
+      getGlobalInitSurface(undefined, undefined, user?.id || (injectedUserId === 'PENDING' ? 'RESOLVE' : undefined)).catch(err => {
         logger.error('getGlobalInitSurface failed:', err);
         return { home: null, cart: { cart: EMPTY_CART, cartSessionId: 'error' } };
       }),
       user ? resolveUserPermissionsWithTimeout(supabase, user.id).catch(err => {
         logger.error('resolveUserPermissions failed:', err);
         return null;
-      }) : Promise.resolve(null)
+      }) : (injectedUserId === 'PENDING' ? Promise.resolve('DEFERRED') : Promise.resolve(null))
     ]);
 
     location = locRes;
@@ -115,7 +119,7 @@ async function AsyncLayoutContent({
       cartSessionId: mappedCartResult.cartSessionId,
       guestSessionId: null // Handled by RPC internally
     };
-    permissions = permsRes;
+    permissions = typeof permsRes === 'object' ? permsRes : null;
     activeOrders = home?.activeOrders || [];
   } catch (error) {
     logger.error('AsyncLayoutContent Error:', error);

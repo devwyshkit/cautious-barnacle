@@ -85,8 +85,9 @@ export async function create_payment_order(
             return { error: pricingErrorMsg || 'Pricing verification failed', status: 400 };
         }
 
-        // 3. SECURE VALIDATION
-        const server_amount = Math.round(pricing.total * 100);
+        // 3. SECURE VALIDATION (WYSHKIT 2026: Absolute Arithmetic)
+        // We trust the total_paise directly from the kernel RPC result for payment.
+        const server_amount = pricing.total_paise || Math.round(pricing.total * 100);
         const client_amount = Math.round(amount);
 
         if (Math.abs(server_amount - client_amount) > 100) {

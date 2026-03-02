@@ -2330,6 +2330,10 @@ export type Database = {
         Args: { p_order_id: string; p_reason: string }
         Returns: Json
       }
+      calculate_vendor_settlement: {
+        Args: { p_order_id: string }
+        Returns: Json
+      }
       cancel_order_product_atomic: {
         Args: {
           p_order_id: string
@@ -2531,15 +2535,6 @@ export type Database = {
         Args: { p_lat?: number; p_lng?: number; p_user_id?: string }
         Returns: Json
       }
-      get_home_surface: {
-        Args: {
-          p_lat?: number
-          p_lng?: number
-          p_session_id?: string
-          p_user_id?: string
-        }
-        Returns: Json
-      }
       get_nearby_products: {
         Args: {
           include_out_of_stock?: boolean
@@ -2561,20 +2556,15 @@ export type Database = {
         Args: { p_app_metadata?: Json; p_email?: string; p_user_id: string }
         Returns: Json
       }
-      get_vendor_surface:
-        | {
-            Args: { p_category_slug?: string; p_vendor_id_or_slug: string }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_category_slug?: string
-              p_lat?: number
-              p_lng?: number
-              p_vendor_id_or_slug: string
-            }
-            Returns: Json
-          }
+      get_vendor_surface: {
+        Args: {
+          p_category_slug?: string
+          p_lat?: number
+          p_lng?: number
+          p_vendor_id_or_slug: string
+        }
+        Returns: Json
+      }
       gettransactionid: { Args: never; Returns: unknown }
       issue_wallet_credit_atomic: {
         Args: {
@@ -2620,38 +2610,24 @@ export type Database = {
             Returns: Json
           }
       longtransactionsenabled: { Args: never; Returns: boolean }
-      merge_guest_to_user:
-        | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
-        | { Args: { p_session_id: string; p_user_id: string }; Returns: Json }
-      place_atomic_order:
-        | {
-            Args: {
-              p_address_id: string
-              p_coupon_code?: string
-              p_delivery_instructions?: string
-              p_distance_km?: number
-              p_gstin?: string
-              p_items: Json
-              p_payment_id?: string
-              p_razorpay_order_id: string
-              p_use_wallet?: boolean
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_address_id: string
-              p_coupon_code?: string
-              p_delivery_instructions?: string
-              p_distance_km?: number
-              p_gstin?: string
-              p_items?: Json
-              p_payment_id: string
-              p_razorpay_order_id: string
-              p_use_wallet?: boolean
-            }
-            Returns: Json
-          }
+      merge_guest_to_user: {
+        Args: { p_session_id: string; p_user_id: string }
+        Returns: Json
+      }
+      place_atomic_order: {
+        Args: {
+          p_address_id: string
+          p_coupon_code?: string
+          p_delivery_instructions?: string
+          p_distance_km?: number
+          p_gstin?: string
+          p_items: Json
+          p_payment_id?: string
+          p_razorpay_order_id: string
+          p_use_wallet?: boolean
+        }
+        Returns: Json
+      }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
         | { Args: { use_typmod?: boolean }; Returns: string }

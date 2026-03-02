@@ -25,15 +25,23 @@ export const getGlobalInitSurface = cache(async function getGlobalInitSurface(
 ) {
     const supabase = await createClient();
 
-    logger.info('One-Trip: Fetching Global Init Surface', { userId, lat, lng });
+    // WYSHKIT 2026: Enhanced One-Trip Telemetry
+    logger.info('One-Trip: Fetching Global Init Surface', {
+        userId: userId === 'RESOLVE' ? 'DEFERRED_RESOLUTION' : userId,
+        lat,
+        lng
+    });
 
+    // If userId is 'RESOLVE', the RPC will internally call auth.uid() 
+    // This is the core of the Zero-Trip + One-Trip strategy.
     const { data, error } = await supabase.rpc('get_global_init_surface', {
         p_lat: lat,
         p_lng: lng,
-        p_user_id: userId
+        p_user_id: userId === 'RESOLVE' ? undefined : userId
     });
 
     if (error) {
+        logger.error('One-Trip RPC Failure:', { error, userId });
         const sanitizedError = error.message?.includes('check constraint') ? 'INVALID_INPUT' : 'CONNECTION_FAILURE';
         return {
             home: mapHomeSurface(null),

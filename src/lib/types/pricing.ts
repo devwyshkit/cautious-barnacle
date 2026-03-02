@@ -13,6 +13,7 @@ export interface PricingBreakdown {
     discount: number;
     wallet_discount: number;
     total: number;
+    total_paise: number; // WYSHKIT 2026: Precise amount for Razorpay (Law 1)
     cashback_amount: number;
     wyshkit_money_earned: number;
     total_savings: number;

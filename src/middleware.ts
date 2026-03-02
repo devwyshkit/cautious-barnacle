@@ -17,15 +17,37 @@ export const config = {
 
 export async function middleware(request: NextRequest) {
   try {
-    // 1. Resolve Session and Auth context
-    const { supabaseResponse, user, roles } = await updateSession(request)
+    // 1. Resolve Session and Auth context (WYSHKIT 2026: Low-Latency Mode)
+    // We only perform a full getUser() if we are on a PROTECTED route or AUTH route.
+    // For the general home/search feed, we rely on cookie presence for x-header injection.
+    const supabaseProjectRef = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').match(/https:\/\/([^.]+)\./)?.[1] || '';
+    const authCookieName = `sb-${supabaseProjectRef}-auth-token`;
+    const hasAuthCookie = request.cookies.has(authCookieName);
 
-    // 2. Resolve Location Context
+    let user = null;
+    let roles: string[] = ['customer'];
+    let supabaseResponse = NextResponse.next({ request });
+
+    // WYSHKIT 2026: Fast-Path Auth (Zero-Trip)
+    // If we're on a public surface (Home) and have a cookie, we just assume "User" 
+    // and let the Layout's One-Trip fetch do the heavy lifting.
+    const isPublicSurface = ['/', '/search', '/vendor/'].includes(request.nextUrl.pathname) ||
+      request.nextUrl.pathname.startsWith('/vendor/') ||
+      request.nextUrl.pathname.startsWith('/product/');
+
+    if (!isPublicSurface || request.nextUrl.pathname.startsWith('/profile') || request.nextUrl.pathname.startsWith('/checkout')) {
+      // Full session update only for protected/internal routes
+      const sessionResult = await updateSession(request);
+      supabaseResponse = sessionResult.supabaseResponse;
+      user = sessionResult.user;
+      roles = sessionResult.roles;
+    }
+
+    // 2. Resolve Location Context (Zero-Trip)
     const lat = request.cookies.get('wyshkit_lat')?.value
     const lng = request.cookies.get('wyshkit_lng')?.value
     const name = request.cookies.get('wyshkit_location_name')?.value
 
-    // WYSHKIT 2026: Edge Context Injection (Request Patching)
     const requestHeaders = new Headers(request.headers)
     if (lat && lng) {
       requestHeaders.set('x-wyshkit-location-lat', lat)
@@ -35,38 +57,29 @@ export async function middleware(request: NextRequest) {
       }
     }
 
-    // WYSHKIT 2026: Route Context Injection (for Layout-based Conditional Logic)
     requestHeaders.set('x-url', request.nextUrl.pathname)
 
-    // Auth Context Injection (Request Patching for One-Trip)
+    // WYSHKIT 2026: Zero-Trip Header Injection
+    // If we have an auth cookie but skipped the DB check, we inject a 'USER_PENDING' state
+    // This allows the Layout to know it MUST fetch the user in its One-Trip.
     if (user) {
       requestHeaders.set('x-wyshkit-user-id', user.id)
       requestHeaders.set('x-wyshkit-user-role', roles?.[0] || 'customer')
       requestHeaders.set('x-wyshkit-user-email', user.email || '')
+    } else if (hasAuthCookie) {
+      requestHeaders.set('x-wyshkit-user-id', 'PENDING')
     }
 
-    // 3. Handle Redirects from updateSession (Auth/Access Control)
     const isRedirect = supabaseResponse.status >= 300 && supabaseResponse.status < 400
-    if (isRedirect) {
-      return supabaseResponse
-    }
+    if (isRedirect) return supabaseResponse
 
-    // 4. Create path-through response with updated request headers
     const finalResponse = NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
+      request: { headers: requestHeaders },
     })
 
-    // 4. Merge cookies/headers from supabaseResponse (important for auth sessions)
+    // Sync cookies back to client
     supabaseResponse.cookies.getAll().forEach((cookie) => {
       finalResponse.cookies.set(cookie.name, cookie.value, cookie)
-    })
-
-    supabaseResponse.headers.forEach((value, key) => {
-      if (key.toLowerCase() !== 'content-type') {
-        finalResponse.headers.set(key, value)
-      }
     })
 
     return finalResponse

@@ -86,6 +86,7 @@ export function mapCartContext(data: RawCartContext | null): { cart: DraftTransa
         discount: Number(dbRes.discount) || 0,
         wallet_discount: Number(dbRes.wallet_discount) || 0,
         total: Number(dbRes.total) || 0,
+        total_paise: Number(dbRes.total_paise) || 0,
         cashback_amount: Number(dbRes.cashback_amount) || 0,
         wyshkit_money_earned: Number(dbRes.wyshkit_money_earned) || 0,
         total_savings: Number(dbRes.total_savings) || 0,

@@ -43,8 +43,9 @@ export async function resilientFetch(input: RequestInfo | URL, options: Resilien
 
         try {
             const controller = new AbortController();
-            // WYSHKIT 2026: More reasonable timeouts for initial attempt
-            const currentTimeout = i === 0 ? 7000 : 10000;
+            // WYSHKIT 2026: Zero-Trip Performance Standards 
+            // We escalation fast to mirror if initial DNS/ISP block is detected.
+            const currentTimeout = i === 0 ? 1500 : 5000;
             const timeoutId = setTimeout(() => controller.abort(), currentTimeout);
 
             const response = await fetch(attemptUrl, {

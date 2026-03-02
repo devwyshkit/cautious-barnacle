@@ -39,25 +39,25 @@ export async function trigger_post_delivery_events(order_id: string) {
             return { success: true, message: 'Already settled' };
         }
 
-        // 2. SETTLEMENT CALCULATION (WYSHKIT 2026 Model)
-        // [PURIFIED] trust vendor.commission_percentage for settlement authority
-        const vendor = order.vendor as any;
-        const commission_rate = Number(vendor?.commission_percentage ?? 18) / 100;
+        // 2. SETTLEMENT CALCULATION (WYSHKIT 2026 Model - Enforcing Law 1)
+        // [PURIFIED] Authority moves to Postgres Kernel.
+        const { data: rawSettlementData, error: settlementError } = await supabase.rpc('calculate_vendor_settlement', {
+            p_order_id: order_id
+        });
 
-        const total = Number(order.total);
-        const subtotal = Number(order.subtotal);
-        const personalization_charges = Number(order.personalization_charges || 0);
-        const platform_fee = Number(order.platform_fee || 0);
+        const settlementData = rawSettlementData as {
+            success: boolean;
+            net_settlement_amount: number;
+            commission_amount: number;
+        } | null;
 
-        // commission_basis = products + personalization (service fee)
-        const commission_basis = subtotal + personalization_charges;
-        const commission_amount = Math.round(commission_basis * commission_rate);
+        if (settlementError || !settlementData?.success) {
+            logger.error('Kernel settlement calculation failed', { settlementError, order_id });
+            throw new Error('Kernel settlement calculation failed');
+        }
 
-        // Razorpay Fees (Approx 2% + GST) - captured during payment or estimated if missing
-        const razorpay_fees = Math.round(total * 0.02);
-
-        // Net to Vendor = Total - Commission - RP Fees - Platform Fee
-        const net_settlement = total - commission_amount - razorpay_fees - platform_fee;
+        const net_settlement = settlementData.net_settlement_amount;
+        const commission_amount = settlementData.commission_amount;
 
         // 3. PERSIST SETTLEMENT & TRIGGER POST-DELIVERY STATE
         const { error: update_error } = await supabase
@@ -74,7 +74,7 @@ export async function trigger_post_delivery_events(order_id: string) {
 
         // 4. CREDIT WYSHKIT MONEY (Customer Reward)
         try {
-            await credit_wyshkit_money_on_delivery(order_id, order.user_id, total);
+            await credit_wyshkit_money_on_delivery(order_id, order.user_id, Number(order.total));
         } catch (wyshkit_money_error) {
             // Minor failure, don't crash the whole flow but log it
             logger.error('WyshKit Money credit failed', wyshkit_money_error, { order_id });
