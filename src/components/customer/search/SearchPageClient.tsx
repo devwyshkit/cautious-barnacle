@@ -12,6 +12,7 @@ import { logger } from '@/lib/logging/logger';
 import { VendorCard } from "@/components/ui/VendorCard";
 import { ProductCard } from "@/components/ui/ProductCard";
 import Link from 'next/link';
+import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 interface SearchPageClientProps {
   searchParams: Promise<{ q?: string; category?: string }>;
@@ -87,8 +88,11 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => router.back()}
-          className="size-9 rounded-lg shrink-0"
+          onClick={() => {
+            triggerHaptic(HapticPattern.ACTION);
+            router.back();
+          }}
+          className="size-9 rounded-[var(--radius-md)] shrink-0"
         >
           <ArrowLeft className="size-5 text-[var(--text-secondary)]" />
         </Button>
@@ -100,13 +104,20 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             placeholder="Search products, stores..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="pl-9 h-10 bg-[var(--surface-muted)] border-[var(--border)] text-sm rounded-lg focus-visible:ring-[var(--border)]"
+            className="pl-9 h-10 bg-[var(--surface-muted)] border-[var(--border)] text-sm rounded-[var(--radius-md)] focus-visible:ring-[var(--primary-ring)]"
           />
           {(inputValue || isPending) && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
               {isPending && <Loader2 className="size-3 animate-spin text-[var(--text-tertiary)]" />}
               {inputValue && (
-                <button onClick={() => { setInputValue(""); handleSearchUpdate(""); }} className="p-1">
+                <button
+                  onClick={() => {
+                    triggerHaptic(HapticPattern.ACTION);
+                    setInputValue("");
+                    handleSearchUpdate("");
+                  }}
+                  className="p-1"
+                >
                   <X className="size-4 text-[var(--text-tertiary)]" />
                 </button>
               )}
@@ -118,11 +129,14 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
       {currentCategory && (
         <div className="px-4 py-2 border-b border-[var(--border)] bg-[var(--surface-muted)]">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-[var(--text-secondary)]">Category:</span>
-            <span className="text-xs text-[var(--text-primary)] capitalize">{currentCategory}</span>
+            <span className="text-xs font-black uppercase tracking-widest text-[var(--text-tertiary)]">Category:</span>
+            <span className="text-xs font-bold text-[var(--text-primary)] uppercase">{currentCategory}</span>
             <button
-              onClick={() => handleSearchUpdate(inputValue, "")}
-              className="ml-auto text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              onClick={() => {
+                triggerHaptic(HapticPattern.ACTION);
+                handleSearchUpdate(inputValue, "");
+              }}
+              className="ml-auto text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors"
             >
               Clear
             </button>
@@ -138,22 +152,25 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
         ) : !hasActiveFilters ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Search className="size-10 text-[var(--border)] mb-4" />
-            <p className="text-sm font-semibold text-[var(--text-tertiary)]">Search for products or stores</p>
+            <p className="text-sm font-black uppercase tracking-tight text-[var(--text-tertiary)]">Search for products or stores</p>
           </div>
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="size-20 bg-[var(--surface-muted)] rounded-full flex items-center justify-center mb-6">
               <Search className="size-8 text-[var(--border)]" />
             </div>
-            <p className="text-sm font-bold text-[var(--text-primary)] tracking-tight mb-2">No Results</p>
-            <p className="text-xs font-medium text-[var(--text-secondary)] max-w-[200px] mb-8 leading-relaxed">
+            <p className="text-sm font-black uppercase tracking-tight text-[var(--text-primary)] mb-2">No Results</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] max-w-[200px] mb-8 leading-relaxed">
               We couldn&apos;t find {currentQ ? `&quot;${currentQ}&quot;` : 'what you were looking for'}
               {currentCategory && ` in ${currentCategory}`}.
             </p>
             <Button
-              onClick={() => router.push('/')}
+              onClick={() => {
+                triggerHaptic(HapticPattern.ACTION);
+                router.push('/');
+              }}
               variant="outline"
-              className="rounded-xl border-[var(--border)] text-xs font-bold tracking-tight px-8"
+              className="rounded-[var(--radius-xl)] border-[var(--border)] text-xs font-black uppercase tracking-tight px-8 h-10"
             >
               Back to Home
             </Button>

@@ -110,7 +110,7 @@ export function AddToCartButton({
             ) : justAdded ? (
                 <div className="flex items-center gap-1">
                     <Check className="size-3 stroke-[3]" />
-                    <span className="uppercase italic">Added</span>
+                    <span className="uppercase">Added</span>
                 </div>
             ) : showCustomize ? (
                 <div className="flex items-center gap-1">

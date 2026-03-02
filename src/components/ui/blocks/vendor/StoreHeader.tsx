@@ -53,8 +53,8 @@ export function StoreHeader({ data }: StoreHeaderProps) {
             <div className="-mt-12 relative z-10 px-4 max-w-[1200px] mx-auto">
                 <div className="flex items-end justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                            <div className="size-16 rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-xl overflow-hidden shrink-0 relative">
+                        <div className="flex items-center gap-3 mb-1">
+                            <div className="size-16 rounded-[var(--radius-2xl)] bg-[var(--surface)] border border-[var(--border)] shadow-[var(--shadow-xl)] overflow-hidden shrink-0 relative">
                                 <Image
                                     src={data.image_url || FALLBACK_IMAGE}
                                     alt={data.name}
@@ -63,11 +63,11 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                                 />
                             </div>
                             <div className="flex flex-col">
-                                <h1 className="text-xl md:text-2xl font-bold text-[var(--text-primary)] tracking-tighter leading-none mb-1">
+                                <h1 className="text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tighter leading-none mb-1">
                                     {data.name}
                                 </h1>
-                                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-widest">
-                                    <MapPin className="size-3 text-[var(--text-tertiary)]" />
+                                <div className="flex items-center gap-1.5 text-[10px] font-black text-[var(--text-tertiary)] uppercase tracking-widest">
+                                    <MapPin className="size-2.5 text-[var(--primary)]" />
                                     <span>{data.city || 'Local Store'}</span>
                                 </div>
                             </div>
@@ -78,28 +78,28 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                         <ShareButton
                             title={data.name}
                             url={`/vendor/${data.id}`}
-                            className="bg-[var(--surface-muted)] size-9 rounded-xl flex items-center justify-center text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--surface-muted)] transition-all"
+                            className="bg-[var(--surface-muted)] size-9 rounded-[var(--radius-xl)] flex items-center justify-center text-[var(--text-primary)] border border-[var(--border)] hover:bg-[var(--surface)] transition-all"
                         />
                         {data.rating && (
-                            <div className="bg-[var(--foreground)] px-2.5 py-1.5 rounded-xl shadow-lg flex flex-col items-center min-w-[44px]">
+                            <div className="bg-[var(--foreground)] px-2.5 py-1.5 rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] flex flex-col items-center min-w-[44px]">
                                 <div className="flex items-center gap-0.5">
-                                    <span className="text-sm font-bold text-white leading-none">{data.rating.toFixed(1)}</span>
+                                    <span className="text-sm font-black text-white leading-none">{data.rating.toFixed(1)}</span>
                                     <Star className="size-2.5 fill-white text-white" />
                                 </div>
-                                <span className="text-[var(--text-tiny)] font-bold text-[var(--text-secondary)] uppercase tracking-tighter mt-0.5 whitespace-nowrap">Rating</span>
+                                <span className="text-[var(--text-tiny)] font-black text-white/60 uppercase tracking-tighter mt-0.5 whitespace-nowrap">Rating</span>
                             </div>
                         )}
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3 mt-4">
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[var(--well-success)] border border-[var(--success)]/20">
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[var(--radius-md)] bg-[var(--well-success)] border border-[var(--success)]/10">
                         <Clock className="size-3 text-[var(--success)]" />
-                        <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-tight">{etaText}</span>
+                        <span className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest">{etaText}</span>
                     </div>
                     {distanceText && (
-                        <div className="px-2 py-1 rounded-lg bg-[var(--surface-muted)] border border-[var(--border)]">
-                            <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-tight">{distanceText}</span>
+                        <div className="px-2.5 py-1.5 rounded-[var(--radius-md)] bg-[var(--surface-muted)] border border-[var(--border)]">
+                            <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">{distanceText}</span>
                         </div>
                     )}
                 </div>
