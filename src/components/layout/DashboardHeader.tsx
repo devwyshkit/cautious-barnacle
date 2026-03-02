@@ -22,30 +22,30 @@ export function DashboardHeader({ type }: DashboardHeaderProps) {
               className="h-8 w-auto"
               priority
             />
-            <span className="text-xs font-bold tracking-tight text-primary block -mt-1">
+            <span className="text-[10px] uppercase font-black tracking-[0.05em] text-[var(--primary)] block -mt-1 opacity-80">
               {type === 'admin' ? 'Control Center' : 'Vendor Manager'}
             </span>
           </Link>
         </div>
 
         <div className="flex items-center gap-3 sm:gap-6">
-          <button className="p-2 hover:bg-[var(--surface-muted)] rounded-full transition-opacity">
-            <Search className="w-5 h-5 text-[var(--text-secondary)]" />
+          <button className="p-2 hover:bg-[var(--surface-muted)] rounded-full transition-all active:scale-95">
+            <Search className="w-5 h-5 text-[var(--text-tertiary)] hover:text-[var(--text-primary)]" />
           </button>
 
-          <button className="relative p-2 hover:bg-[var(--surface-muted)] rounded-full transition-opacity group">
-            <Bell className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-primary" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full border-2 border-white" />
+          <button className="relative p-2 hover:bg-[var(--surface-muted)] rounded-full transition-all active:scale-95 group">
+            <Bell className="w-5 h-5 text-[var(--text-tertiary)] group-hover:text-[var(--primary)]" />
+            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-[var(--primary)] rounded-full border border-[var(--surface)] shadow-[0_0_8px_var(--primary)]" />
           </button>
 
           <Link
             href={`/${type}/profile`}
-            className="flex items-center gap-2 text-sm font-bold hover:text-primary transition-opacity"
+            className="flex items-center gap-2 text-sm font-bold text-[var(--text-secondary)] hover:text-[var(--primary)] transition-all group"
           >
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="w-4 h-4 text-primary" />
+            <div className="w-8 h-8 rounded-full bg-[var(--primary-muted)] flex items-center justify-center group-hover:bg-[var(--primary-ring)] transition-colors">
+              <User className="w-4 h-4 text-[var(--primary)]" />
             </div>
-            <span className="hidden sm:inline capitalize">{type}</span>
+            <span className="hidden sm:inline capitalize font-black tracking-tight">{type}</span>
           </Link>
         </div>
       </div>

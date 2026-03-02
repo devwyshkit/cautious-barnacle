@@ -62,23 +62,23 @@ export function OrderTrackingBar({ initialOrders = [] }: { initialOrders?: any[]
                     onKeyDown={(e) => e.key === 'Enter' && handleOpen()}
                     className={cn(
                         "w-full transition-all duration-300 ease-out cursor-pointer active:scale-[0.98]",
-                        "rounded-xl shadow-[var(--shadow-sm)] border overflow-hidden flex items-center p-3 gap-3 min-h-[56px]",
+                        "rounded-[var(--radius-2xl)] shadow-[var(--shadow-lg)] border overflow-hidden flex items-center p-3 gap-3 min-h-[56px]",
                         isUrgent
                             ? "bg-[var(--well-destructive)] border-[var(--destructive)]/20"
-                            : "bg-[var(--foreground)]/95 backdrop-blur-3xl border-[var(--border)]/10"
+                            : "bg-[var(--surface-overlay)] backdrop-blur-3xl border-[var(--border)]"
                     )}
                 >
                     {/* Status Icon with Heartbeat */}
                     <div className={cn(
-                        "size-8 rounded-full flex items-center justify-center relative shrink-0",
-                        isUrgent ? "bg-[var(--destructive)]/10" : "bg-[var(--surface-muted)]/20"
+                        "size-9 rounded-[var(--radius-xl)] flex items-center justify-center relative shrink-0",
+                        isUrgent ? "bg-[var(--destructive)]/10" : "bg-[var(--primary-muted)]"
                     )}>
                         {isUrgent && (
-                            <div className="absolute inset-0 rounded-full bg-[var(--destructive)]/20 animate-ping" />
+                            <div className="absolute inset-0 rounded-[var(--radius-xl)] bg-[var(--destructive)]/20 animate-ping" />
                         )}
                         <div className={cn(
-                            "relative z-10 scale-75 origin-center",
-                            isUrgent ? "text-[var(--destructive)]" : "text-white"
+                            "relative z-10 scale-90 origin-center",
+                            isUrgent ? "text-[var(--destructive)]" : "text-[var(--primary)]"
                         )}>
                             {isUrgent ? <AlertCircle className="size-6" /> : config.icon}
                         </div>
@@ -87,14 +87,14 @@ export function OrderTrackingBar({ initialOrders = [] }: { initialOrders?: any[]
                     {/* Content */}
                     <div className="flex-1 text-left min-w-0 pr-2">
                         <h4 className={cn(
-                            "text-sm font-bold truncate leading-none",
-                            isUrgent ? "text-[var(--text-primary)]" : "text-white"
+                            "text-[13px] font-black uppercase tracking-tight truncate leading-none",
+                            isUrgent ? "text-[var(--destructive)]" : "text-[var(--text-primary)]"
                         )}>
-                            {isUrgent ? "Complete Auth Now" : (orderToShow.vendor_name || config.label)}
+                            {isUrgent ? "Action Required" : (orderToShow.vendor_name || config.label)}
                         </h4>
                         <p className={cn(
-                            "text-xs truncate font-medium mt-1 leading-none",
-                            isUrgent ? "text-[var(--destructive)]" : "text-[var(--text-tertiary)]"
+                            "text-xs truncate font-medium mt-1.5 leading-none opacity-70",
+                            isUrgent ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"
                         )}>
                             {isUrgent ? config.label : config.subLabel}
                         </p>
@@ -102,13 +102,15 @@ export function OrderTrackingBar({ initialOrders = [] }: { initialOrders?: any[]
 
                     {/* Tracking Pill / Action Pill */}
                     <div className={cn(
-                        "shrink-0 px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-md transition-colors",
-                        isUrgent ? "bg-[var(--destructive)] text-white" : "bg-[var(--surface-muted)]/20 text-white"
+                        "shrink-0 px-3 py-2 rounded-full flex items-center gap-1.5 backdrop-blur-md transition-all border",
+                        isUrgent
+                            ? "bg-[var(--destructive)] text-[var(--white)] border-[var(--destructive)]"
+                            : "bg-[var(--surface-muted)] text-[var(--text-primary)] border-[var(--border)]"
                     )}>
-                        <span className="text-xs font-bold leading-none">
-                            {isUrgent ? "Action required" : "Live"}
+                        <span className="text-[10px] font-black uppercase tracking-wider leading-none">
+                            {isUrgent ? "Fix Now" : "Live"}
                         </span>
-                        {!isUrgent && <div className="size-1.5 rounded-full bg-[var(--success)] animate-pulse ml-0.5" />}
+                        {!isUrgent && <div className="size-1.5 rounded-full bg-[var(--success)] animate-pulse ml-0.5 shadow-[0_0_6px_var(--success)]" />}
                         {isUrgent && <ChevronRight className="size-3" />}
                     </div>
                 </div>

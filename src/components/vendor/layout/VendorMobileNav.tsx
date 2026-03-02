@@ -35,14 +35,24 @@ export function VendorMobileNav() {
               key={link.href}
               href={link.href}
               className={cn(
-                'flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors min-w-[56px]',
+                'flex flex-col items-center gap-1.5 px-3 py-2 rounded-[var(--radius-lg)] transition-all min-w-[64px] relative group',
                 isActive
-                  ? 'text-[var(--text-primary)]'
-                  : 'text-[var(--text-tertiary)]'
+                  ? 'text-[var(--primary)]'
+                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]'
               )}
             >
-              <Icon className={cn("size-5", isActive && "stroke-[2.5px]")} />
-              <span className="text-xs font-medium">{link.label}</span>
+              <div className={cn(
+                "p-1.5 rounded-[var(--radius-md)] transition-colors",
+                isActive ? "bg-[var(--primary-muted)]" : "group-hover:bg-[var(--surface-muted)]"
+              )}>
+                <Icon className={cn("size-5", isActive && "stroke-[2.5px]")} />
+              </div>
+              <span className={cn(
+                "text-[10px] font-black uppercase tracking-tight",
+                isActive ? "opacity-100" : "opacity-60"
+              )}>
+                {link.label}
+              </span>
             </Link>
           );
         })}
