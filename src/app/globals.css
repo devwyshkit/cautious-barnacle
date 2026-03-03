@@ -43,9 +43,9 @@
   --text-tertiary: #A1A1AA;
   --text-inverse: #FFFFFF;
 
-  /* Extreme Density Mobile Typography (7px-10px) */
-  --text-tiny: 8px;
-  --text-xxs: 10px;
+  /* Performance Typography - Swiggy 2026 High Density */
+  --text-tiny: 11px;
+  --text-xxs: 12px;
 
   /* WYSHKIT 2026 Radius Scale - Elite Standard */
   --radius-xs: 4px;
@@ -94,8 +94,11 @@
   --star-rating: #f59e0b;
 
   /* Layout Tokens */
-  --top-header-height-mobile: 168px;
-  /* High Density Header (72px + 48px + gaps) */
+  --top-header-base-mobile: 120px;
+  --top-masthead-height: 48px;
+  --top-header-height-mobile-with-masthead: 168px;
+  --top-header-height-mobile: var(--top-header-base-mobile);
+  /* Default fallback */
   --top-header-height: 64px;
   --bottom-nav-height: 64px;
   /* Increased for better thumb ergonomics */

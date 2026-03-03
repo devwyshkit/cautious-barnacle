@@ -14,13 +14,13 @@ import { Grid } from "@/components/ui/blocks/discovery/Grid";
 import { BannerBento } from "@/components/ui/blocks/discovery/BannerBento";
 
 import { getZeroTripUser } from '@/lib/auth/server';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 interface HomePageProps {
   searchParams: Promise<{ category?: string }>;
 }
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic'; // Inherited from CustomerLayout
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   try {
@@ -29,12 +29,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     // WYSHKIT 2026: Zero-Trip Auth Resolution
     const user = await getZeroTripUser();
 
-    // WYSHKIT 2026: One-Trip Promise - Home data is fetched in Layout.
-    // React.cache handles deduplication for concurrent RSC execution.
-    const [location, globalInit] = await Promise.all([
-      getServerLocation(user),
-      getGlobalInitSurface(undefined, undefined, user?.id)
-    ]);
+    // WYSHKIT 2026: One-Trip Handshake logic duplication
+    // To hit React.cache, the arguments must be IDENTICAL to Layout's call.
+    const headerList = await headers();
+    const injectedUserId = headerList.get('x-wyshkit-user-id');
+    const location = await getServerLocation(user);
+
+    const globalInit = await getGlobalInitSurface(
+      location.lat,
+      location.lng,
+      user?.id || (injectedUserId === 'PENDING' ? 'RESOLVE' : undefined)
+    );
 
     const discovery = globalInit.home;
     const error = (globalInit as any).error;

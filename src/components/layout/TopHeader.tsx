@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { Logo } from '@/components/ui/Logo';
 import { HeaderCart } from './HeaderCart';
 import { LocationData } from '@/lib/actions/discovery/location';
-import { LocationSheet } from '@/components/customer/LocationSheet';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { Masthead } from '@/components/customer/home/Masthead';
 
@@ -35,23 +34,12 @@ export function TopHeader({ initialLocation, mastheadProps }: TopHeaderProps) {
   const { status, etaMinutes, locationName } = mastheadProps || {};
   const router = useRouter();
   const { user, loading } = useAuth();
-  const [isLocationOpen, setIsLocationOpen] = useState(false);
 
   // Default fallback if initialLocation is missing (should not happen in 2026)
   const [location, setLocation] = useState<LocationData>(
     initialLocation || { name: 'Select location', address: '', pincode: '' }
   );
 
-  useEffect(() => {
-    // Listen for custom event from LocationSheet
-    const handleLocationUpdate = () => {
-      if (typeof window !== 'undefined') {
-        router.refresh();
-      }
-    };
-    window.addEventListener('locationUpdate', handleLocationUpdate);
-    return () => window.removeEventListener('locationUpdate', handleLocationUpdate);
-  }, []);
 
   return (
     <>
@@ -68,7 +56,7 @@ export function TopHeader({ initialLocation, mastheadProps }: TopHeaderProps) {
               aria-label="Delivery Location"
               onClick={() => {
                 triggerHaptic(HapticPattern.ACTION);
-                setIsLocationOpen(true);
+                router.push('/location');
               }}
               className="flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)] hover:bg-[var(--surface-muted)] rounded-[var(--radius-md)] transition-all group"
             >
@@ -136,7 +124,7 @@ export function TopHeader({ initialLocation, mastheadProps }: TopHeaderProps) {
               id="location-trigger-mobile"
               onClick={() => {
                 triggerHaptic(HapticPattern.ACTION);
-                setIsLocationOpen(true);
+                router.push('/location');
               }}
               className="flex items-center gap-[var(--space-2)] group overflow-hidden"
             >
@@ -180,10 +168,6 @@ export function TopHeader({ initialLocation, mastheadProps }: TopHeaderProps) {
         </div>
       </header >
 
-      <LocationSheet
-        isOpen={isLocationOpen}
-        onOpenChange={setIsLocationOpen}
-      />
     </>
   );
 }

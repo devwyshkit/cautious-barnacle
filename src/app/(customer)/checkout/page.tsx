@@ -4,9 +4,16 @@ import { getCheckoutData } from '@/lib/actions/checkout/checkout';
 import { CheckoutClient } from '@/components/customer/checkout/CheckoutClient';
 import { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
+import { getZeroTripUser } from '@/lib/auth/server';
+
 
 export default async function CheckoutPage() {
+    // WYSHKIT 2026: Zero-Trip Auth Gate
+    const user = await getZeroTripUser();
+    if (!user) {
+        redirect('/auth?returnUrl=/checkout');
+    }
+
     const checkoutData = await getCheckoutData();
 
     // If cart is empty, send back to home

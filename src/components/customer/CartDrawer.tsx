@@ -170,16 +170,16 @@ export function CartDrawer() {
                             {/* Brief Bill Summary */}
                             <div className="pt-[var(--space-6)] border-t border-[var(--surface-muted)] space-y-[var(--space-2)]">
                                 <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
-                                    <span>Subtotal</span>
+                                    <span>Item Total</span>
                                     <span>{formatCurrency(draftOrder?.subtotal || 0)}</span>
                                 </div>
                                 <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
                                     <span>Taxes & Charges</span>
                                     <span className="text-[var(--text-tertiary)] font-medium">Calculated at checkout</span>
                                 </div>
-                                <div className="flex justify-between items-center pt-[var(--space-2)]">
-                                    <span className="text-sm font-bold text-[var(--text-primary)]">Subtotal</span>
-                                    <span className="text-lg font-bold text-[var(--text-primary)]">
+                                <div className="flex justify-between items-center pt-[var(--space-2)] border-t border-dashed border-[var(--border)] mt-[var(--space-2)]">
+                                    <span className="text-sm font-black text-[var(--text-primary)]">Subtotal</span>
+                                    <span className="text-lg font-black text-[var(--text-primary)]">
                                         {formatCurrency(draftOrder?.subtotal || 0)}
                                     </span>
                                 </div>

@@ -94,14 +94,15 @@ async function AsyncLayoutContent({
     // Stage 2: Parallel fetch: No waterfall, shared user context
     // WYSHKIT 2026: One-Trip Promise - Home + Cart + Location resolution in parallel
     // Location resolution is Zero-Trip if headers exist.
-    const [locRes, globalInit, permsRes] = await Promise.all([
-      getServerLocation(user).catch(err => {
-        logger.error('getServerLocation failed:', err);
-        return { name: 'Select location', address: '', pincode: '' };
-      }),
+    const locRes = await getServerLocation(user).catch(err => {
+      logger.error('getServerLocation failed:', err);
+      return { name: 'Select location', address: '', pincode: '', lat: undefined, lng: undefined };
+    });
+
+    const [globalInit, permsRes] = await Promise.all([
       // CONSOLIDATED TRIP: getGlobalInitSurface fetches both home and cart data.
       // It also now handles user resolution if it was 'PENDING'.
-      getGlobalInitSurface(undefined, undefined, user?.id || (injectedUserId === 'PENDING' ? 'RESOLVE' : undefined)).catch(err => {
+      getGlobalInitSurface(locRes.lat, locRes.lng, user?.id || (injectedUserId === 'PENDING' ? 'RESOLVE' : undefined)).catch(err => {
         logger.error('getGlobalInitSurface failed:', err);
         return { home: null, cart: { cart: EMPTY_CART, cartSessionId: 'error' } };
       }),

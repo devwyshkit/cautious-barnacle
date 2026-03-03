@@ -84,17 +84,7 @@ export const getServerLocation = cache(async function getServerLocation(userPara
             }
         }
 
-        // 4. Fallback default (Dev Experience)
-        if (process.env.NODE_ENV === 'development') {
-            return {
-                name: 'Bangalore (Dev)',
-                address: 'Koramangala, Bangalore',
-                pincode: '560034',
-                lat: 12.9716,
-                lng: 77.5946
-            }
-        }
-
+        // 4. Fallback default
         return { name: 'Select location', address: '', pincode: '' }
     } catch (error) {
         return { name: 'Select location', address: '', pincode: '' }

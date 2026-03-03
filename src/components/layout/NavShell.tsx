@@ -13,6 +13,7 @@ interface NavShellProps {
         status?: 'normal' | 'delayed' | 'capacity';
         etaMinutes?: number;
         locationName?: string;
+        isVisible?: boolean;
     };
     children: React.ReactNode;
 }
@@ -42,14 +43,20 @@ export function NavShell({ initialLocation, mastheadProps, children }: NavShellP
         pathname.startsWith('/collection/');
 
     const hideHeader = isImmersive || pathname === '/search';
+    const hasMasthead = !!(mastheadProps?.status || mastheadProps?.etaMinutes || mastheadProps?.locationName) && !hideHeader;
 
     return (
         <div data-immersive={isImmersive} className="flex flex-col min-h-[100dvh]">
             {!hideHeader && <TopHeader initialLocation={initialLocation} mastheadProps={mastheadProps} />}
-            <main className={cn(
-                "flex-1 transition-all duration-300",
-                !hideHeader && "pt-[var(--top-header-height-mobile)] md:pt-[var(--top-header-height)]"
-            )}>
+            <main
+                className={cn(
+                    "flex-1 transition-all duration-300",
+                    !hideHeader && "pt-[var(--top-header-base-mobile)] md:pt-[var(--top-header-height)]"
+                )}
+                style={(!hideHeader && hasMasthead) ? {
+                    paddingTop: 'var(--top-header-height-mobile-with-masthead, 168px)'
+                } : undefined}
+            >
                 {children}
                 {/* Legal Footer (Desktop/Mobile - Bottom of page content) */}
                 {!isImmersive && showFooter && <ComplianceFooter className="hidden md:block" />}

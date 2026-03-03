@@ -16,7 +16,9 @@ import { formatCurrency } from '@/lib/utils/pricing';
  * REFRESHED: Switched from Swiggy Emerald to WyshKit Red.
  */
 export function FloatingCartBar() {
-  const { draftOrder, loading, setDrawerOpen } = useCart();
+  const router = useRouter();
+  const { draftOrder, loading: cartLoading, setDrawerOpen } = useCart();
+  const { user, loading: authLoading } = useAuth();
 
   const displayCart = draftOrder;
   const hasProducts = displayCart && displayCart.product_count > 0;
@@ -25,13 +27,17 @@ export function FloatingCartBar() {
   const handleOpenCart = (e: React.MouseEvent) => {
     e.preventDefault();
     triggerHaptic(HapticPattern.ACTION);
-    setDrawerOpen(true);
+    if (!user) {
+      router.push('/auth?returnUrl=/checkout');
+      return;
+    }
+    router.push('/checkout');
   };
 
   const hasPersonalization = hasAnyPersonalization((displayCart?.products || []) as any[]);
   const productCount = displayCart?.product_count || 0;
   const displayTotal = displayCart?.total || 0;
-  const isLoading = loading;
+  const isLoading = cartLoading || authLoading;
 
   const [shouldPulse, setShouldPulse] = useState(false);
   const [visualCount, setVisualCount] = useState(productCount);

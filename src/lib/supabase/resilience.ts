@@ -20,67 +20,47 @@ export async function resilientFetch(input: RequestInfo | URL, options: Resilien
     const inputUrl = typeof input === 'string' ? input : 'url' in input ? input.url : input.toString();
 
     const {
-        timeoutMs = 7000,
+        timeoutMs = 10000,
         maxAttempts = 3,
         traceName = 'SUPABASE_RESILIENCE',
         ...fetchOptions
     } = options;
 
     let lastError: any;
-    const getMirrorUrl = (url: string) => null; // WYSHKIT 2026: Mirror disabled to prevent ENOTFOUND on spoofed domains
 
     for (let i = 0; i < maxAttempts; i++) {
-        const mirrorUrl = getMirrorUrl(inputUrl);
-
-        /**
-         * WYSHKIT 2026: Fast-Failover Strategy
-         * 1. Attempt 1: Standard URL (Fast timeout: 2.5s)
-         * 2. Attempt 2+: If attempt 1 failed, use .com Mirror immediately
-         */
-        const useMirror = i > 0 && mirrorUrl;
-        const attemptUrl = useMirror ? mirrorUrl : inputUrl;
-        const isFallback = attemptUrl !== inputUrl;
-
         try {
             const controller = new AbortController();
-            // WYSHKIT 2026: Zero-Trip Performance Standards 
-            // We escalation fast to mirror if initial DNS/ISP block is detected.
-            const currentTimeout = i === 0 ? 1500 : 5000;
+            // WYSHKIT 2026: Balanced Reliability
+            // 1.5s was too aggressive for initial DNS resolution in some regions.
+            // Using 5s for first attempt, 10s for retries.
+            const currentTimeout = i === 0 ? 5000 : timeoutMs;
             const timeoutId = setTimeout(() => controller.abort(), currentTimeout);
 
-            const response = await fetch(attemptUrl, {
+            const response = await fetch(inputUrl, {
                 ...fetchOptions,
                 signal: controller.signal,
                 headers: {
                     ...fetchOptions.headers,
                     'x-wyshkit-resilience': 'true',
                     'x-wyshkit-attempt': (i + 1).toString(),
-                    'x-wyshkit-fallback': isFallback.toString(),
                 }
             } as any);
 
             clearTimeout(timeoutId);
-
-            if (isFallback) {
-                logger.info(`[${traceName}] DNS Failover SUCCESS via ${attemptUrl}`);
-            }
-
             return response;
         } catch (err: any) {
             lastError = err;
-            const isDnsFailure = err.message?.includes('fetch failed') ||
-                err.message?.includes('ENOTFOUND') ||
-                err.name === 'AbortError';
+            const isTimeout = err.name === 'AbortError';
 
-            if (isDnsFailure) {
-                logger.warn(`[${traceName}] DNS/Timeout on attempt ${i + 1} for ${attemptUrl}. ${i === 0 ? 'FAST ESCALATING TO MIRROR' : 'Retrying...'}`);
+            if (isTimeout) {
+                logger.warn(`[${traceName}] Timeout on attempt ${i + 1} for ${inputUrl}. Retrying...`);
             } else {
-                logger.error(`[${traceName}] Network error on attempt ${i + 1} (${attemptUrl})`, err.message);
+                logger.error(`[${traceName}] Network error on attempt ${i + 1}`, err.message);
             }
 
-            // Faster backoff for DNS failures 
             if (i < maxAttempts - 1) {
-                const backoff = isDnsFailure ? 100 : 300 * (i + 1);
+                const backoff = 200 * (i + 1);
                 await new Promise(res => setTimeout(res, backoff));
             }
         }

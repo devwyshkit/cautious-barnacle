@@ -23,46 +23,65 @@ export const getGlobalInitSurface = cache(async function getGlobalInitSurface(
     lng?: number,
     userId?: string
 ) {
-    const supabase = await createClient();
+    try {
+        const supabase = await createClient();
 
-    // WYSHKIT 2026: Enhanced One-Trip Telemetry
-    logger.info('One-Trip: Fetching Global Init Surface', {
-        userId: userId === 'RESOLVE' ? 'DEFERRED_RESOLUTION' : userId,
-        lat,
-        lng
-    });
+        // WYSHKIT 2026: Enhanced One-Trip Telemetry with short timeout
+        logger.info('One-Trip: Fetching Global Init Surface', {
+            userId: userId === 'RESOLVE' ? 'DEFERRED_RESOLUTION' : userId,
+            lat,
+            lng
+        });
 
-    // If userId is 'RESOLVE', the RPC will internally call auth.uid() 
-    // This is the core of the Zero-Trip + One-Trip strategy.
-    const { data, error } = await supabase.rpc('get_global_init_surface', {
-        p_lat: lat,
-        p_lng: lng,
-        p_user_id: userId === 'RESOLVE' ? undefined : userId
-    });
+        // WYSHKIT 2026: The "One-Trip" Promise
+        // We call the multi-surface RPC with a strict timeout to prevent 26s hung states
+        const { data, error } = await Promise.race([
+            supabase.rpc('get_global_init_surface', {
+                p_lat: lat,
+                p_lng: lng,
+                p_user_id: userId === 'RESOLVE' ? undefined : userId
+            }),
+            new Promise<any>((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 8000))
+        ]);
 
-    if (error) {
-        logger.error('One-Trip RPC Failure:', { error, userId });
-        const sanitizedError = error.message?.includes('check constraint') ? 'INVALID_INPUT' : 'CONNECTION_FAILURE';
+        if (error) {
+            logger.error('One-Trip RPC Failure:', { error, userId });
+            const sanitizedError = error.message?.includes('check constraint') ? 'INVALID_INPUT' : 'CONNECTION_FAILURE';
+            return {
+                home: mapHomeSurface(null),
+                cart: mapCartContext(null),
+                error: sanitizedError
+            };
+        }
+
+        if (!data) {
+            return {
+                home: mapHomeSurface(null),
+                cart: mapCartContext(null),
+                error: 'No data returned from get_global_init_surface'
+            };
+        }
+
+        const raw = data as unknown as RawGlobalInitSurface;
+
+        // WYSHKIT 2026: Adaptive Mapping
+        // If the backend returns wrapped surfaces (preferred), we decompose.
+        // If it returns a flat home surface (legacy), we adapt.
+        const homeData = raw.home || ((raw as any).featuredVendors ? raw : null);
+        const cartData = raw.cart || null;
+
+        return {
+            home: mapHomeSurface(homeData),
+            cart: mapCartContext(cartData),
+            server_timestamp: raw.server_timestamp
+        };
+    } catch (error) {
+        const isTimeout = error instanceof Error && error.message === 'TIMEOUT';
+        logger.error(isTimeout ? 'One-Trip RPC Timeout' : 'One-Trip RPC Unexpected Failure', error);
         return {
             home: mapHomeSurface(null),
             cart: mapCartContext(null),
-            error: sanitizedError
+            error: isTimeout ? 'TIMEOUT' : 'CONNECTION_FAILURE'
         };
     }
-
-    if (!data) {
-        return {
-            home: mapHomeSurface(null),
-            cart: mapCartContext(null),
-            error: 'No data returned from get_global_init_surface'
-        };
-    }
-
-    const raw = data as unknown as RawGlobalInitSurface;
-
-    return {
-        home: mapHomeSurface(raw.home),
-        cart: mapCartContext(raw.cart),
-        server_timestamp: raw.server_timestamp
-    };
 });

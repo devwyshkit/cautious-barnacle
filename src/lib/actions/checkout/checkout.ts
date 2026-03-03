@@ -142,7 +142,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
             gstin: gstin || null,
             user: user ? { id: user.id, email: user.email } : null,
             vendor_name: products[0]?.vendor_name || undefined,
-            vendor_city: products[0]?.vendor_city || 'Bangalore',
+            vendor_city: products[0]?.vendor_city || '',
             vendor_prep_mins: products[0]?.vendor_prep_mins || 30,
             distance_km: distanceKm,
             eta_minutes: typedContext.eta_minutes ? Number(typedContext.eta_minutes) : null,

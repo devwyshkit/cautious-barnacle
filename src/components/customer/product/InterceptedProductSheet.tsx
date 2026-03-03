@@ -35,10 +35,7 @@ export function InterceptedProductSheet({ product, onCloseOverride }: Intercepte
         const vendorPath = `/vendor/${product.vendor_id || searchParams.get('id')}`;
         const targetPath = returnUrl || onCloseOverride || vendorPath;
 
-        // Small delay to allow drawer closing animation
-        setTimeout(() => {
-            router.push(targetPath);
-        }, 150);
+        router.push(targetPath);
     }, [product.vendor_id, onCloseOverride, router, searchParams]);
 
     const params = Object.fromEntries(searchParams.entries());

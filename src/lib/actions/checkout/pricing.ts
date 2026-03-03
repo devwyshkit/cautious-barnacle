@@ -78,8 +78,8 @@ export async function calculateOrderTotalRPC(
         total: Number(result.total) || 0,
         total_paise: Number(result.total_paise) || Math.round(Number(result.total || 0) * 100),
         cashback_amount: Number(result.cashback_amount) || 0,
-        wyshkit_money_earned: Number(result.cashback_amount) || 0,
-        total_savings: discount + wallet_discount
+        wyshkit_money_earned: Number(result.wyshkit_money_earned) || 0,
+        total_savings: Number(result.total_savings) || 0
       },
     };
   } catch (error) {
