@@ -2,12 +2,14 @@ import { Suspense } from "react";
 import { FloatingCartBar } from "@/components/customer/FloatingCartBar";
 import { OrderTrackingBar } from "@/components/customer/OrderTrackingBar";
 import { CartProvider } from "@/components/customer/CartProvider";
-import { CartDrawer } from "@/components/customer/CartDrawer";
 import { CartErrorBoundary } from "@/components/error/CartErrorBoundary";
 import { getCart } from "@/lib/actions/cart/get-cart";
 import { getServerLocation } from "@/lib/actions/discovery/location";
 import { getGlobalInitSurface } from "@/lib/actions/discovery/init";
 import { NavShell } from "@/components/layout/NavShell";
+import { CartDrawer } from "@/components/customer/CartDrawer";
+import { LocationSheet } from "@/components/customer/LocationSheet";
+import { SupportSheet } from "@/components/customer/SupportSheet";
 import { logger } from "@/lib/logging/logger";
 import { DraftTransaction } from "@/lib/types/personalization";
 import { LocationData } from "@/lib/actions/discovery/location";
@@ -102,7 +104,12 @@ async function AsyncLayoutContent({
     const [globalInit, permsRes] = await Promise.all([
       // CONSOLIDATED TRIP: getGlobalInitSurface fetches both home and cart data.
       // It also now handles user resolution if it was 'PENDING'.
-      getGlobalInitSurface(locRes.lat, locRes.lng, user?.id || (injectedUserId === 'PENDING' ? 'RESOLVE' : undefined)).catch(err => {
+      getGlobalInitSurface(
+        locRes.lat,
+        locRes.lng,
+        user?.id || (injectedUserId === 'PENDING' ? 'RESOLVE' : undefined),
+        (await (await import('@/lib/session')).getGuestSessionIdReadOnly()) ?? undefined
+      ).catch(err => {
         logger.error('getGlobalInitSurface failed:', err);
         return { home: null, cart: { cart: EMPTY_CART, cartSessionId: 'error' } };
       }),
@@ -130,6 +137,8 @@ async function AsyncLayoutContent({
   const initialCart = cartResult.cart || EMPTY_CART;
   const guestSessionId = cartResult.guestSessionId ?? null;
 
+  // WYSHKIT 2026: Global UI Sheets
+  // These are handled by UIProvider state, but mounted here for layout context.
   return (
     <CartProvider initialCart={initialCart} guestSessionId={guestSessionId}>
       <NavShell
@@ -145,9 +154,13 @@ async function AsyncLayoutContent({
       </NavShell>
       <CartErrorBoundary>
         <FloatingCartBar key={cartResult.cartSessionId} />
-        <CartDrawer />
       </CartErrorBoundary>
       <OrderTrackingBar initialOrders={activeOrders} />
+
+      {/* Global Intent-Based Sheets */}
+      <CartDrawer />
+      <LocationSheet />
+      <SupportSheet />
     </CartProvider>
   );
 }

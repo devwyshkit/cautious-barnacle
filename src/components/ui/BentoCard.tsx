@@ -15,12 +15,18 @@ export function BentoCard({ data, variant = 'small', priority = false }: BentoCa
 
     const isLarge = variant === 'large';
 
+    const vendorSlug = data.slug || data.vendor_slug;
+    if (!data.href && !vendorSlug) {
+        console.warn(`[WYSHKIT 2026] Missing slug for BentoCard ${data.id}. Law 11 Violation.`);
+    }
+    const href = data.href || (vendorSlug ? `/vendor/${vendorSlug}` : '#');
+
     return (
         <Link
-            href={data.href || `/vendor/${data.id || data.vendor_id}`}
+            href={href}
             className={cn(
-                "relative overflow-hidden rounded-[var(--radius-lg)] group active:scale-[0.98] transition-all duration-300",
-                isLarge ? "col-span-2 aspect-[16/9]" : "aspect-square"
+                "relative overflow-hidden rounded-[var(--radius-xl)] group active:scale-[0.98] transition-all duration-300 block w-full",
+                isLarge ? "aspect-[16/9]" : "aspect-square"
             )}
         >
             <Card className="h-full border-none shadow-none bg-[var(--surface-muted)]">

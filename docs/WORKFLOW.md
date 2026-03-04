@@ -17,11 +17,11 @@
 
 | Surface | Pattern | Reason |
 |---|---|---|
-| Product detail | **Sheet** (intercepted route) | Browsing context — no domain shift |
-| Cart | **Floating bar + CartDrawer (Sheet)** | Transient; immersive review; no URL needed |
-| Location picker | **Sheet** | Sub-decision within home |
+| Product detail | **Sheet** (`@modal` intercepted) | Browsing context — no domain shift |
+| Cart | **Floating bar → Checkout Page** | Real-time summary; no intermediate drawer. Full-page navigation for domain shift. |
+| Auth | **Full Page** `/auth` | No intercepting sheets. Trust must be established in a dedicated domain. |
 | Address picker | **Sheet** (within checkout) | Sub-decision within checkout |
-| Vendor storefront | **Page** `/vendor/[id]` | Domain shift |
+| Vendor storefront | **Page** `/vendor/[slug]` | Domain shift; Slug-first architecture |
 | Checkout | **Page** `/checkout` | Money commitment |
 | Order tracking | **Page** `/orders/[id]` | URL-addressable; supports deep-links |
 | Preview mockup | **Inline** in tracking page | Never a new screen |
@@ -34,10 +34,11 @@
 
 ### Step 1 — HOME FEED `/`
 
-- Location resolved at session start (once per session, not per page).
-- Feed: `BANNER_BENTO → CIRCLE_RAIL (categories, max 8) → VENDOR_GROUPED_GRID`
-- If user has an active order: **order status widget appears above the Banner Bento** (Zeigarnik Effect — no exceptions).
+- Location resolved per-request via headers/cookies (edge-injected). Defaults to Bengaluru center if unresolved.
+- Feed: `CIRCLE_RAIL (categories, max 8) → BANNER_BENTO (promos) → CARD_RAIL (trending) → GRID (vendors)`
+- If user has an active order: **order status widget appears above the categories** (Zeigarnik Effect — no exceptions).
 - Each product card: photo · name · price · "~40 min" ETA chip (never km) · add button.
+- All links MUST use slugs (`/vendor/sourdough-loft`) instead of UUIDs. Using a UUID in a customer-facing URL is an architectural failure.
 - First tap "Add" → opens product sheet.
 
 ---
@@ -51,7 +52,7 @@ Content order (mandatory):
 3. Price (large, prominent)
 4. Variants — size / colour / material chips (max 6 visible; collapse rest)
 5. Add-ons — toggles or steppers (gift wrap, express prep)
-6. "Add personalisation +₹X" — toggle only. No input here. (Commitment Before Creativity)
+6. **Personalisation** — Schema-driven fields (text, select, image) rendered inline. (Commitment Before Creativity)
 7. Product info — dimensions, weight, material (collapsible)
 8. ETA — "Arriving by 5:15 PM"
 9. Return policy — "Personalised: no returns after preview approval | All others: 24 hrs (damaged/wrong only)"
@@ -62,12 +63,14 @@ Content order (mandatory):
 ---
 
 ### Step 3 — CART
-
-- Persistent floating bar: product count · total.
-- Tap → expands to **CartDrawer** (Sheet): product list · quantity controls · subtotal · "Checkout Now."
-- One vendor per cart. Always.
-- Pricing fetched via `v_active_cart_totals`. Database = Single Source of Truth.
-- "Checkout Now" → navigates to `/checkout` (full page — domain shift).
+ 
+ - Persistent floating bar: product count · total.
+ - Tap → navigates to `/checkout` (full page — domain shift).
+ - **No Interceptors**: The auth flow from cart is a direct full-page redirect to `/auth?returnUrl=/checkout`. Sheets are for discovery, not for commitment.
+ - One vendor per cart. Always.
+ - Pricing fetched via `getGlobalInitSurface` (One-Trip). Database = Single Source of Truth.
+ - "Checkout Now" → navigates to `/checkout`.
+ - **Hardening 2026**: All return links (Edit, Browse More) must strictly follow Law 11 (Slug-First). No UUID leakage.
 
 ---
 
@@ -327,15 +330,13 @@ No push ever links to the home feed.
 
 ```sql
 notifications {
-  user_id:     UUID,        -- recipient (customer or vendor)
-  type:        TEXT,        -- 'PREVIEW_READY', 'ORDER_PLACED', etc.
-  title:       TEXT,        -- push title
-  body:        TEXT,        -- push body / WhatsApp message
-  entity_type: TEXT,        -- 'ORDER', 'ORDER_PRODUCT', 'PAYOUT'
-  entity_id:   UUID,        -- deep link target
-  channel:     TEXT,        -- 'PUSH', 'WHATSAPP', 'IN_APP'
-  is_read:     BOOLEAN,
-  sent_at:     TIMESTAMPTZ,
-  read_at:     TIMESTAMPTZ
+  user_id:       UUID,        -- Recipient (Customer or Vendor)
+  type:          TEXT,        -- 'PREVIEW_READY', 'ORDER_PLACED', etc.
+  metadata:      JSONB,       -- {order_id, product_id, vendor_name, etc.}
+  image_url:     TEXT,        -- Optional thumbnail
+  is_persistent: BOOLEAN,     -- Stays in bell icon history?
+  priority:      INTEGER,     -- UI sorting
+  read_at:       TIMESTAMPTZ, -- Not NULL if clicked
+  expires_at:    TIMESTAMPTZ  -- Auto-cleanup
 }
 ```

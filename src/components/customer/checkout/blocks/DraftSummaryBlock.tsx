@@ -126,9 +126,10 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
                   {editable && (
                     <button
                       onClick={() => {
-                        const vendorId = product.vendor_id || '';
+                        const vendorIdentifier = product.vendor_slug || product.vendor_id || '';
+                        const productIdentifier = product.product_slug || product.product_id;
                         const addonIds = (product.selected_addons || []).map((a: any) => a.id).join(',');
-                        router.push(`/vendor/${vendorId}/product/${product.product_id}?edit=true&cartProductId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${addonIds}`);
+                        router.push(`/vendor/${vendorIdentifier}/product/${productIdentifier}?edit=true&cartProductId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${addonIds}`);
                       }}
                       className="text-xs font-bold text-[var(--primary)] flex items-center gap-0.5 hover:underline"
                     >

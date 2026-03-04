@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, ShoppingBag, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
 
 /**
  * WYSHKIT 2026: Mobile Bottom Navigation
  * Persistent tab bar for mobile-first experience.
- * REFRESHED: Enhanced active state with brand color and better accessibility.
  */
 const navItems = [
   { label: "Home", href: "/", icon: Home },
@@ -30,31 +30,24 @@ export function BottomNav() {
 
           return (
             <Link
-              key={label}
+              key={href}
               href={href}
-              aria-current={isActive ? "page" : undefined}
+              onClick={() => triggerHaptic(HapticPattern.SOFT)}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 flex-1 py-1 transition-all duration-200 outline-none",
+                "flex flex-col items-center justify-center gap-[var(--space-1)] w-full h-full relative transition-all active:scale-90",
                 isActive ? "text-[var(--primary)]" : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
               )}
             >
-              <div className="relative flex items-center justify-center">
-                {isActive && (
-                  <div className="absolute inset-0 -m-2 bg-[var(--primary)]/10 rounded-full animate-in zoom-in-50 duration-300" />
-                )}
-                <Icon
-                  className={cn(
-                    "size-5 transition-all duration-300 relative z-10",
-                    isActive ? "stroke-[3px] scale-110" : "stroke-[2px]"
-                  )}
-                />
-              </div>
+              <Icon className={cn("size-[var(--space-5)]", isActive ? "stroke-[3px]" : "stroke-[2.5px]")} />
               <span className={cn(
-                "text-xs font-bold uppercase tracking-wide relative z-10 mt-0.5",
+                "text-[10px] font-black uppercase tracking-tighter leading-none",
                 isActive ? "opacity-100" : "opacity-70"
               )}>
                 {label}
               </span>
+              {isActive && (
+                <div className="absolute top-[var(--space-1)] right-[var(--space-4)] size-1 bg-[var(--primary)] rounded-full animate-in zoom-in duration-300" />
+              )}
             </Link>
           );
         })}

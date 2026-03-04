@@ -50,12 +50,13 @@ export function mapCartContext(data: RawCartContext | null): { cart: DraftTransa
             id: row.id || '',
             product_id: row.product_id || '',
             product_name: row.product_name || 'Product',
-            product_image: (Array.isArray(row.product_images) && row.product_images[0]) || row.product_image || '/images/logo.png',
+            product_slug: row.product_slug || null,
+            product_image: (Array.isArray(row.product_images) && row.product_images[0]) || row.product_image || row.product_image_url || '/images/logo.png',
             quantity: quantity,
-            unit_price: Number(row.calculated_unit_price || 0),
+            unit_price: Number(row.calculated_unit_price || row.effective_unit_price || 0),
             line_total: Number(row.calculated_line_total || 0),
             personalization_fee: Number(row.personalization_fee || 0),
-            variant_id: row.variant_id,
+            variant_id: row.variant_id || row.selected_variant_id,
             personalization: personalization,
             selected_addons: (row.selected_addons as unknown as SelectedAddon[]) || [],
             vendor_name: row.vendor_name || 'Store',
@@ -80,6 +81,7 @@ export function mapCartContext(data: RawCartContext | null): { cart: DraftTransa
         vendor_id: vendorId,
         subtotal: Number(dbRes.subtotal) || 0,
         personalization_charges: Number(dbRes.personalization_charges) || 0,
+        addons_price: Number(dbRes.addons_price) || 0,
         delivery_fee: Number(dbRes.delivery_fee) || 0,
         platform_fee: Number(dbRes.platform_fee) || 0,
         gst: Number(dbRes.gst) || 0,
@@ -103,7 +105,7 @@ export function mapCartContext(data: RawCartContext | null): { cart: DraftTransa
     };
 }
 
-export function mapHomeSurface(data: RawHomeSurface | null) {
+export function mapHomeSurface(data: any | null) {
     if (!data) return {
         categories: [],
         trendingProducts: [],
@@ -118,12 +120,26 @@ export function mapHomeSurface(data: RawHomeSurface | null) {
 
     return {
         categories: raw.categories || [],
-        trendingProducts: raw.featured_products || sectionsData.best_sellers || [],
-        newArrivals: sectionsData.new_arrivals || [],
-        featuredVendors: raw.vendors || sectionsData.vendors || [],
-        activeOrders: raw.active_orders || [],
-        recentOrders: raw.recent_orders || [],
-        cartCount: raw.cart_count || 0,
+        trendingProducts: (raw.trendingProducts || raw.featured_products || sectionsData.best_sellers || []).map((p: any) => ({
+            ...p,
+            vendor_id: p.vendor_id || p.vendors?.id,
+            vendor_slug: p.vendor_slug || p.vendors?.slug,
+            vendor_name: p.vendor_name || p.vendors?.name
+        })),
+        newArrivals: (raw.newArrivals || sectionsData.new_arrivals || []).map((p: any) => ({
+            ...p,
+            vendor_id: p.vendor_id || p.vendors?.id,
+            vendor_slug: p.vendor_slug || p.vendors?.slug,
+            vendor_name: p.vendor_name || p.vendors?.name
+        })),
+        featuredVendors: (raw.featuredVendors || raw.vendors || sectionsData.vendors || []).map((v: any) => ({
+            ...v,
+            id: v.id || v.vendor_id,
+            slug: v.slug || v.vendor_slug
+        })),
+        activeOrders: raw.activeOrders || raw.active_orders || [],
+        recentOrders: raw.recentOrders || raw.recent_orders || [],
+        cartCount: raw.cartCount || raw.cart_count || 0,
         metadata: {
             system_status: raw.system_status || 'normal',
             location_name: raw.metadata?.location_name,

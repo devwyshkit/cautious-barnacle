@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { logger } from '@/lib/logging/logger'
 
+const GUEST_SESSION_COOKIE = 'wyshkit_guest_session'
+
 export const config = {
   matcher: [
     /*
@@ -11,7 +13,7 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    '/((?!_next/static|_next/image|favicon.ico|vendor/login|admin/login|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api/|_next/static|_next/image|favicon.ico|vendor/login|admin/login|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
 
@@ -27,6 +29,17 @@ export async function middleware(request: NextRequest) {
     let user = null;
     let roles: string[] = ['customer'];
     let supabaseResponse = NextResponse.next({ request });
+
+    // 1.5 Create Guest Session if missing (WYSHKIT 2026: Identity Consistency)
+    if (!request.cookies.has(GUEST_SESSION_COOKIE)) {
+      const sessionId = crypto.randomUUID();
+      supabaseResponse.cookies.set(GUEST_SESSION_COOKIE, sessionId, {
+        maxAge: 30 * 24 * 60 * 60,
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+      });
+    }
 
     // WYSHKIT 2026: Fast-Path Auth (Zero-Trip)
     // If we're on a public surface (Home) and have a cookie, we just assume "User" 

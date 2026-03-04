@@ -21,7 +21,8 @@ interface RawGlobalInitSurface {
 export const getGlobalInitSurface = cache(async function getGlobalInitSurface(
     lat?: number,
     lng?: number,
-    userId?: string
+    userId?: string,
+    sessionId?: string
 ) {
     try {
         const supabase = await createClient();
@@ -30,18 +31,28 @@ export const getGlobalInitSurface = cache(async function getGlobalInitSurface(
         logger.info('One-Trip: Fetching Global Init Surface', {
             userId: userId === 'RESOLVE' ? 'DEFERRED_RESOLUTION' : userId,
             lat,
-            lng
+            lng,
+            sessionId: sessionId ? 'PRESENT' : 'MISSING'
         });
 
         // WYSHKIT 2026: The "One-Trip" Promise
+        // If userId is 'RESOLVE', we perform a standard auth lookup once.
+        let resolvedUserId: string | undefined = (userId === 'RESOLVE' || !userId) ? undefined : userId;
+
+        if (userId === 'RESOLVE') {
+            const { data: { user } } = await supabase.auth.getUser();
+            resolvedUserId = user?.id ?? undefined;
+        }
+
         // We call the multi-surface RPC with a strict timeout to prevent 26s hung states
         const { data, error } = await Promise.race([
             supabase.rpc('get_global_init_surface', {
                 p_lat: lat,
                 p_lng: lng,
-                p_user_id: userId === 'RESOLVE' ? undefined : userId
+                p_user_id: resolvedUserId,
+                p_session_id: sessionId
             }),
-            new Promise<any>((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 8000))
+            new Promise<any>((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 4000))
         ]);
 
         if (error) {
@@ -70,11 +81,13 @@ export const getGlobalInitSurface = cache(async function getGlobalInitSurface(
         const homeData = raw.home || ((raw as any).featuredVendors ? raw : null);
         const cartData = raw.cart || null;
 
-        return {
+        const result = {
             home: mapHomeSurface(homeData),
             cart: mapCartContext(cartData),
             server_timestamp: raw.server_timestamp
         };
+
+        return result;
     } catch (error) {
         const isTimeout = error instanceof Error && error.message === 'TIMEOUT';
         logger.error(isTimeout ? 'One-Trip RPC Timeout' : 'One-Trip RPC Unexpected Failure', error);

@@ -58,8 +58,8 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
     setSearching(true);
     const result = await setLocationFromPlaceId(placeId);
     if (result.success) {
-      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('locationUpdate'));
       toast.success(`Location set: ${result.name}`);
+      router.refresh(); // WYSHKIT 2026: Force server component re-hydration
       goBack();
     } else {
       toast.error(result.error || 'Failed to set location');
@@ -94,7 +94,7 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
       if (result.success) {
         if (addr?.latitude != null && addr?.longitude != null) {
           await setLocationCookies(addr.latitude, addr.longitude, addr.name || addr.city || 'Saved address');
-          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('locationUpdate'));
+          router.refresh(); // WYSHKIT 2026: Force server component re-hydration
         }
         toast.success("Delivery location updated");
         goBack();
@@ -118,9 +118,9 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
         const { latitude, longitude } = position.coords;
         const result = await setLocationFromCoords(latitude, longitude);
         if (result.success) {
-          if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('locationUpdate'));
           triggerHaptic(HapticPattern.SUCCESS);
           toast.success(`Location set: ${result.name}`);
+          router.refresh(); // WYSHKIT 2026: Force server component re-hydration
           goBack();
         } else {
           toast.error(result.error || 'Could not set location');
@@ -220,7 +220,11 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
   );
 }
 
-export function LocationSheet({ isOpen, onOpenChange, onSelect, isRouteContext }: { isOpen?: boolean; onOpenChange?: (open: boolean) => void; onSelect?: () => void; isRouteContext?: boolean }) {
+import { useUI } from '@/providers/UIProvider';
+
+export function LocationSheet({ isRouteContext, onSelect }: { onSelect?: () => void; isRouteContext?: boolean }) {
+  const { isLocationSheetOpen, closeLocationSheet } = useUI();
+
   if (isRouteContext) {
     return (
       <div className="flex flex-col h-[100dvh] bg-[var(--surface)]">
@@ -233,8 +237,8 @@ export function LocationSheet({ isOpen, onOpenChange, onSelect, isRouteContext }
 
   return (
     <ResponsiveSurface
-      open={isOpen}
-      onOpenChange={onOpenChange}
+      open={isLocationSheetOpen}
+      onOpenChange={closeLocationSheet}
       title="Delivery Location"
       description="Where should we send your Wysh?"
       className="md:max-w-lg"
@@ -242,7 +246,7 @@ export function LocationSheet({ isOpen, onOpenChange, onSelect, isRouteContext }
       <div className="">
         <LocationContent onSelect={() => {
           if (onSelect) onSelect();
-          if (onOpenChange) onOpenChange(false);
+          closeLocationSheet();
         }} />
       </div>
     </ResponsiveSurface>

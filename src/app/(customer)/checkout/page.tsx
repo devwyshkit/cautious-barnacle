@@ -8,11 +8,9 @@ import { getZeroTripUser } from '@/lib/auth/server';
 
 
 export default async function CheckoutPage() {
-    // WYSHKIT 2026: Zero-Trip Auth Gate
+    // WYSHKIT 2026: Zero-Trip Auth Gate (Optional for Checkout)
     const user = await getZeroTripUser();
-    if (!user) {
-        redirect('/auth?returnUrl=/checkout');
-    }
+    // Guests are allowed to see checkout context.
 
     const checkoutData = await getCheckoutData();
 
@@ -22,7 +20,7 @@ export default async function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-[100dvh] bg-[var(--surface-muted)]">
+        <div className="bg-[var(--surface-muted)]">
             <Suspense fallback={
                 <div className="max-w-lg mx-auto px-4 pt-6 pb-24 space-y-4">
                     {[...Array(3)].map((_, i) => (

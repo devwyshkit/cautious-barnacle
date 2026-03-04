@@ -12,7 +12,7 @@ import type { Tables } from '@/lib/supabase/types';
 import { ValidatedWyshkitProduct } from '../validations/discovery';
 
 export type { Product } from '@/lib/supabase/types';
-export type ProductListItem = Tables<'products'> & {
+export type ProductSummary = Tables<'products'> & {
   price?: number;
   image_url?: string;
   vendor_name?: string;
@@ -33,17 +33,23 @@ export interface WyshkitProduct extends Omit<Tables<'products'>, 'variants' | 'p
   price?: number; // Normalized price (base_price or variant price)
   image_url?: string;
   vendor_name?: string;
+  vendor_slug?: string;
+  category_name?: string;
+  category_slug?: string;
   distance_km?: number | null;
   distance_meters?: number | null;
   is_promoted: boolean | null;
+  vendor_prep_time?: number;
 
   // Joins
   vendors?: {
     id: string;
     name: string;
+    slug: string;
     city?: string;
     rating?: number;
     image_url?: string;
+    is_active?: boolean;
   } | null;
   product_variants?: Array<Tables<'product_variants'> & { price: number | null; stock_quantity: number | null }>;
 

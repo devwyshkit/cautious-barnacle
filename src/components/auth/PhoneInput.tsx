@@ -14,7 +14,13 @@ interface PhoneInputProps {
 
 export function PhoneInput({ value, onChange, onFocus, disabled, error }: PhoneInputProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+    let val = e.target.value;
+    // Allow leading +, then only digits (standard E.164-ish or test format)
+    if (val.startsWith('+')) {
+      val = '+' + val.slice(1).replace(/\D/g, "");
+    } else {
+      val = val.replace(/\D/g, "");
+    }
     onChange(val);
   };
 
@@ -22,12 +28,14 @@ export function PhoneInput({ value, onChange, onFocus, disabled, error }: PhoneI
     <div className="w-full md:max-w-md space-y-4">
       <div className="w-full space-y-1.5">
         <div className="relative w-full">
-          <div className={cn(
-            "absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold transition-colors",
-            error ? "text-red-400" : "text-[var(--text-tertiary)]"
-          )}>
-            +91
-          </div>
+          {!value.startsWith('+') && (
+            <div className={cn(
+              "absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold transition-colors",
+              error ? "text-red-400" : "text-[var(--text-tertiary)]"
+            )}>
+              +91
+            </div>
+          )}
           <Input
             id="phone"
             type="tel"
@@ -39,7 +47,8 @@ export function PhoneInput({ value, onChange, onFocus, disabled, error }: PhoneI
             placeholder="Enter phone number"
             disabled={disabled}
             className={cn(
-              "w-full pl-12 h-14 text-base font-semibold transition-all duration-200 rounded-[var(--radius-md)] border-none focus-visible:ring-1",
+              "w-full h-14 text-base font-semibold transition-all duration-200 rounded-[var(--radius-md)] border-none focus-visible:ring-1",
+              !value.startsWith('+') ? "pl-12" : "pl-4",
               error
                 ? "bg-rose-50 text-rose-900 focus-visible:ring-rose-200"
                 : "bg-[var(--surface-muted)] text-[var(--text-primary)] focus-visible:ring-[var(--primary-ring)]"

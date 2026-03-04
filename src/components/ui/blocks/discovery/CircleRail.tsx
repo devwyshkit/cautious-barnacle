@@ -13,17 +13,19 @@ interface CircleRailProps {
     context?: any;
 }
 
-export function CircleRail({ data, context }: CircleRailProps) {
+function CircleRailContent({ data, context }: CircleRailProps) {
     const searchParams = useSearchParams();
     const selectedCategory = context?.selected_category || searchParams?.get('category') || null;
 
-    // Robustness: If no data, show Recommended.
-    const categories = data && data.length > 0 ? data : [
-        { id: 'all', name: 'Recommended', slug: 'Recommended', image_url: null }
-    ];
+    // WYSHKIT 2026: Hick's Law - Max 8 categories in CIRCLE_RAIL
+    const categories = data && data.length > 0
+        ? data.slice(0, 8)
+        : [
+            { id: 'all', name: 'Recommended', slug: 'Recommended', image_url: null }
+        ];
 
     return (
-        <div className="flex gap-3 md:gap-5 overflow-x-auto no-scrollbar py-2 px-0.5">
+        <div className="flex gap-3 md:gap-5 overflow-x-auto no-scrollbar py-4 -mx-4 px-4 md:mx-0 md:px-0">
             {/* Dynamic Categories */}
             {categories.map((product: any) => {
                 const isSelected = selectedCategory === product.slug;
@@ -52,7 +54,7 @@ export function CircleRail({ data, context }: CircleRailProps) {
                         scroll={!href.startsWith('#')}
                         className="outline-none"
                     >
-                        <div className="flex flex-col items-center gap-1.5 shrink-0 group active:scale-95 transition-all duration-300">
+                        <div className="flex flex-col items-center gap-[var(--space-1-5)] shrink-0 group active:scale-95 transition-all duration-300">
                             <div className={cn(
                                 "size-14 md:size-16 rounded-full overflow-hidden relative transition-all duration-500 border-2",
                                 isSelected
@@ -77,7 +79,7 @@ export function CircleRail({ data, context }: CircleRailProps) {
                                 )}
                             </div>
                             <span className={cn(
-                                "text-xs font-bold tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
+                                "text-[var(--text-tiny)] font-bold tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
                                 isSelected ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]"
                             )}>
                                 {product.name === 'ALL' ? (
@@ -93,15 +95,23 @@ export function CircleRail({ data, context }: CircleRailProps) {
 
             {/* Empty State Fallback if totally empty */}
             {categories.length === 0 && (
-                <div className="flex gap-4 animate-pulse">
+                <div className="flex gap-[var(--space-4)] animate-pulse">
                     {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="flex flex-col items-center gap-1.5 shrink-0">
+                        <div key={i} className="flex flex-col items-center gap-[var(--space-1-5)] shrink-0">
                             <div className="size-[68px] md:size-[80px] rounded-full bg-[var(--surface-muted)]" />
-                            <div className="h-2 w-10 bg-[var(--surface-muted)] rounded" />
+                            <div className="h-2 w-10 bg-[var(--surface-muted)] rounded-[var(--radius-xs)]" />
                         </div>
                     ))}
                 </div>
             )}
         </div>
+    );
+}
+
+export function CircleRail(props: CircleRailProps) {
+    return (
+        <React.Suspense fallback={<div className="h-24" />}>
+            <CircleRailContent {...props} />
+        </React.Suspense>
     );
 }

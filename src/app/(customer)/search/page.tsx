@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { SearchPageClient } from "@/components/customer/search/SearchPageClient";
 import { searchFiltered } from "@/lib/actions/discovery/search";
+import { getServerLocation } from "@/lib/actions/discovery/location";
 import { SearchSkeleton } from "@/components/customer/search/SearchSkeleton";
 import { SurfaceErrorBoundaryWithRouter } from "@/components/error/SurfaceErrorBoundary";
 
@@ -40,9 +41,10 @@ export default async function SearchPage({
 
 async function AsyncSearchContent({ params }: { params: { q?: string; category?: string } }) {
   const { q, category } = params;
+  const location = await getServerLocation();
 
   const initialResults = (q && q.length >= 2) || category
-    ? await searchFiltered({ q, category, limit: 20 })
+    ? await searchFiltered({ q, category, limit: 20, lat: location.lat, lng: location.lng })
     : { products: [], vendors: [], total: 0 };
 
   return (

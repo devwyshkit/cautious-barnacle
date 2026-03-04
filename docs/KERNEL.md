@@ -6,7 +6,7 @@
 
 ## The 7 Laws of 2026
 
-1. **Zero Shadow Math** — All commerce arithmetic (GST, platform fees, delivery, coupons, wallet) is the exclusive domain of the Postgres kernel. Frontend math is prohibited.
+1. **Zero Shadow Math** — All commerce arithmetic (GST, platform fees, delivery, coupons, wallet) is the exclusive domain of the Postgres kernel. Frontend math is prohibited. *Total price on "Add to Cart" must be indicative or server-fetched.*
 2. **Atomic Intent** — Every user decision maps to exactly one RPC round-trip. No chaining. No "Shadow Sessions."
 3. **Perpetual State Purity** — The UI is a stateless projection of the database. The first render is always the Authored Source.
 4. **Flush Symmetry** — No padding leakage. No Drawer-within-a-Drawer. Borders and headers form one surface.
@@ -39,8 +39,11 @@
     - Formula: `ETA = vendor.avg_prep_time_mins + (distance_km × 5) + 5 [buffer]`
     - Product Card: "~40 min" | Checkout: "Arriving in ~45 mins" | Tracking: "Arriving by 5:15 PM"
     - Never show km. Ever.
-11. **Realtime-First** — Order tracking uses Supabase Realtime (`public:orders:id=eq.$order_id`). Fallback: 30s polling if WebSocket fails.
-12. **Anti-Fragile State** — A Shadowfax/Porter API failure must NOT block a vendor from marking an order `PACKED`. Decouple 3PL from the order state machine.
+11. **Slug-First Architecture** — All customer-facing URLs must use human-readable slugs (`/vendor/bakery-name/product/chocolate-cake`) instead of standard IDs/UUIDs for SEO and trust. *Passing a UUID to a slug-based route results in a 400 architecture guard.*
+    - **HARDENING 2026**: Fallback to UUID in customer-facing links is a P0 failure. Always fetch `vendor_slug` and `product_slug` (aliased as `slug`) in the One-Trip context. 
+    - **POLYMORPHIC RESOLUTION**: RPCs like `get_product_surface_v1` and `get_vendor_surface` MUST support dual resolution (ID or Slug) via regex-based input detection to prevent routing failures during the 2026 transition. 
+12. **Realtime-First** — Order tracking uses Supabase Realtime (`public:orders:id=eq.$order_id`). Fallback: 30s polling if WebSocket fails.
+13. **Anti-Fragile State** — A Shadowfax/Porter API failure must NOT block a vendor from marking an order `PACKED`. Decouple 3PL from the order state machine.
 
 ---
 
@@ -54,7 +57,7 @@ type CommerceIntent =
   | { intent: 'PLACE_ORDER';      payload: { razorpay_order_id, ... } }
   | { intent: 'TRANSITION_ORDER'; payload: { order_id, target_status } }
   | { intent: 'APPLY_COUPON';     payload: { code } }
-  | { intent: 'TOGGLE_WALLET';    payload: { use_wallet } }
+  | { intent: 'TOGGLE_WALLET';    payload: { enabled } }
   // ... 9 more intents
 
 executeCommerceIntent(intent) // Zod-validated → OpenTelemetry-traced → single RPC
@@ -70,7 +73,7 @@ Every surface loads its entire context in exactly **one** database round-trip:
 
 | Surface | RPC |
 |---|---|
-| Home feed | `get_home_surface()` |
+| Home / Global Init | `get_global_init_surface()` |
 | Vendor storefront | `get_vendor_surface()` |
 | Product detail | `get_product_surface_v1()` |
 | Checkout | `get_checkout_context()` |
@@ -102,7 +105,7 @@ The database is the Single Source of Truth. Never hand-roll types.
 | Rider | **Delivery Executive** | Delivery Partner, Driver |
 | Order ref | **`#WK-YYYYMMDD-XXXX`** | `#WSH-` or any other prefix |
 
-**Automated guard**: `npm run lint:nomenclature` fails CI if any forbidden term is detected in `src/`.
+**Automated guard [Phase 2]**: `npm run lint:nomenclature` will fail CI if any forbidden term is detected in `src/`.
 
 ---
 
@@ -128,4 +131,4 @@ The database is the Single Source of Truth. Never hand-roll types.
 
 - **Unit tests** (Vitest): All RPC callers in `src/lib/actions/`. Coverage gate: 80%.
 - **Mutation testing**: All commerce intent functions tested for error branches (`VENDOR_OFFLINE`, `INSUFFICIENT_STOCK`, `VENDOR_MISMATCH`).
-- **Nomenclature CI**: `npm run lint:nomenclature` runs on every PR. Zero forbidden terms = green.
+- **Nomenclature Standards**: Zero forbidden terms = green.

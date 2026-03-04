@@ -82,7 +82,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                                     <div className="flex items-center justify-between gap-2">
                                         <p className="text-sm font-bold text-[var(--text-primary)] truncate">{product.product_name}</p>
                                         <Link
-                                            href={`/vendor/${product.vendor_id}/product/${product.product_id}?edit=true&cartProductId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${product.selected_addons?.map((a: any) => a.id).join(',') || ''}&returnUrl=/checkout`}
+                                            href={`/vendor/${product.vendor_slug}/product/${product.product_slug || product.product_id}?edit=true&cartProductId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${product.selected_addons?.map((a: any) => a.id).join(',') || ''}&returnUrl=/checkout`}
                                             className="text-xs font-bold text-[var(--primary)] uppercase tracking-tight px-2 py-1 bg-[var(--well-destructive)] rounded-[var(--radius-md)] hover:opacity-80 transition-colors"
                                         >
                                             Edit
@@ -175,6 +175,18 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                                 <span>Products</span>
                                 <span>{formatCurrency(checkoutData.pricing.subtotal)}</span>
                             </div>
+                            {checkoutData.pricing.personalization_charges > 0 && (
+                                <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
+                                    <span>Personalization</span>
+                                    <span>{formatCurrency(checkoutData.pricing.personalization_charges)}</span>
+                                </div>
+                            )}
+                            {checkoutData.pricing.addons_price > 0 && (
+                                <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
+                                    <span>Add-ons</span>
+                                    <span>{formatCurrency(checkoutData.pricing.addons_price)}</span>
+                                </div>
+                            )}
                             {checkoutData.pricing.delivery_fee > 0 && (
                                 <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
                                     <span>Delivery</span>
@@ -249,7 +261,9 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                 <SlideToPay
                     onPay={() => {
                         if (!authUser) {
-                            router.push('/auth?returnUrl=/checkout');
+                            // WYSHKIT 2026: Delayed Logic - Only force login on payment intent
+                            triggerHaptic(HapticPattern.WARNING);
+                            router.push(`/auth?returnUrl=/checkout`);
                             return;
                         }
                         paymentFlow.handlePayment();

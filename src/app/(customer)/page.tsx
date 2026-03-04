@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import { createClient } from '@/lib/supabase/server';
 import { getGlobalInitSurface } from "@/lib/actions/discovery/init";
 import { getServerLocation } from "@/lib/actions/discovery/location";
 import { HomeSkeleton } from "@/components/customer/home/HomeSkeleton";
@@ -35,10 +34,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     const injectedUserId = headerList.get('x-wyshkit-user-id');
     const location = await getServerLocation(user);
 
+    const effectiveUserId = user?.id === 'PENDING' ? 'RESOLVE' : (user?.id || (injectedUserId === 'PENDING' ? 'RESOLVE' : undefined));
+
     const globalInit = await getGlobalInitSurface(
       location.lat,
       location.lng,
-      user?.id || (injectedUserId === 'PENDING' ? 'RESOLVE' : undefined)
+      effectiveUserId
     );
 
     const discovery = globalInit.home;
@@ -46,12 +47,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     const displayLocationName = location.name || 'Your Area';
 
     return (
-      <div className="min-h-[100dvh] animate-in font-sans selection:bg-[#D91B24]/10 bg-[var(--background)]">
+      <div className="animate-in font-sans selection:bg-[#D91B24]/10 bg-[var(--background)]">
         <main className="pb-24">
           <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
 
-          <div className="max-w-[1440px] mx-auto">
-            {!category && (
+          <div className="flex flex-col gap-8">
+            {/* Categories - WYSHKIT 2026: High Density Discovery (Hick's Law) */}
+            <section className="relative px-4 md:px-8 z-10">
+              <CircleRail data={discovery.categories} context={{ selected_category: category }} />
+            </section>
+
+            {(!category || category.toLowerCase() === 'recommended' || category.toLowerCase() === 'all') && (
               <div className="px-4 md:px-8 space-y-8">
                 {/* WYSHKIT 2026: Zeigarnik Banner (High Priority) */}
                 {discovery.activeOrders?.length > 0 && (
@@ -59,7 +65,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 )}
 
                 {/* WYSHKIT 2026: BannerBento (The Hook) */}
-                <BannerBento data={discovery.trendingProducts} />
+                <BannerBento
+                  data={discovery.featuredVendors}
+                  title="Top Picks"
+                  subtitle="Curated for your location"
+                />
 
                 {/* WYSHKIT 2026: Reorder Rail (Low Priority / Discovery) */}
                 {discovery.recentOrders?.length > 0 && (
@@ -78,7 +88,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   Discovery Engine: {String(error)}
                 </div>
                 <p className="text-sm font-medium opacity-80 leading-relaxed max-w-lg">
-                  We're having trouble reaching our stores. Please try refreshing or checking your location settings.
+                  We&apos;re having trouble reaching our stores. Please try refreshing or checking your location settings.
                 </p>
                 {process.env.NODE_ENV === 'development' && (
                   <div className="flex flex-col gap-2 mt-2">
@@ -91,15 +101,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </div>
             )}
 
-            <div className="mt-8 flex flex-col gap-8">
-              {/* Categories */}
-              <section className="px-4 md:px-8">
-                <CircleRail data={discovery.categories} context={{ selected_category: category }} />
-              </section>
-
+            <div className="flex flex-col gap-8">
               {/* Trending Products */}
               {discovery.trendingProducts?.length > 0 && (
-                <section className="px-4 md:px-8">
+                <section className="relative px-4 md:px-8 z-10">
                   <div className="flex flex-col gap-4">
                     <h2 className="text-xl font-black text-[var(--text-primary)] tracking-tighter">Trending Around You</h2>
                     <CardRail data={discovery.trendingProducts} />
@@ -109,14 +114,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
               {/* Featured Stores */}
               {discovery.featuredVendors?.length > 0 ? (
-                <section className="px-4 md:px-8">
+                <section className="relative px-4 md:px-8 z-10">
                   <div className="flex flex-col gap-4">
                     <h2 className="text-xl font-black text-[var(--text-primary)] tracking-tighter">Top Stores Near You</h2>
                     <Grid data={discovery.featuredVendors} />
                   </div>
                 </section>
               ) : !error && (
-                <section className="px-[var(--space-4)] md:px-[var(--space-8)] py-[var(--space-20)] text-center border-2 border-dashed border-[var(--border)] rounded-[var(--radius-3xl)] mx-[var(--space-4)]">
+                <section className="relative px-[var(--space-4)] md:px-[var(--space-8)] py-[var(--space-20)] text-center border-2 border-dashed border-[var(--border)] rounded-[var(--radius-3xl)] mx-[var(--space-4)] z-10">
                   <div className="max-w-xs mx-auto flex flex-col gap-2">
                     <p className="font-bold text-[var(--text-primary)]">No stores found nearby</p>
                     <p className="text-sm text-[var(--text-secondary)] italic">&quot;Coming soon to {location.name}...&quot;</p>
@@ -130,7 +135,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     );
   } catch (err: any) {
     return (
-      <div className="px-4 py-20 text-center min-h-[100dvh] bg-[var(--background)] flex flex-col items-center justify-center gap-4">
+      <div className="px-4 py-20 text-center bg-[var(--background)] flex flex-col items-center justify-center gap-4">
         <h1 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">Something went wrong</h1>
         <p className="text-sm text-[var(--text-secondary)] max-w-sm">We encountered an error while loading the home feed. Please refresh the page.</p>
         {process.env.NODE_ENV === 'development' && (

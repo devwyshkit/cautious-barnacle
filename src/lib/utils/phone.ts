@@ -3,30 +3,42 @@
  * Removes all non-numeric characters except the leading +.
  */
 export function normalizePhone(phone: string): string {
+  if (!phone) return "";
+
+  // 1. Preserve explicit international numbers (e.g. Supabase test numbers like +911234567890)
+  if (phone.startsWith('+')) return phone;
+
   // Remove all non-digit characters
   const digits = phone.replace(/\D/g, '');
-  
-  // Handle 10 digit number
-  if (digits.length === 10) {
-    return `+91${digits}`;
+
+  // CHECK FOR TEST NUMBERS (WYSHKIT 2026: Zero Friction for Devs)
+  // If the number is clearly a test number (starts with 123, 555, 000) or is exactly 10 digits (India local),
+  // we pass it raw if it doesn't already have a plus, to avoid double-prefixing or prefixing test accounts.
+  if (digits.length === 10 && (digits.startsWith('123') || digits.startsWith('555') || digits.startsWith('000'))) {
+    return digits; // Return raw 10 digits for local/test numbers
   }
-  
-  // Handle 12 digit number starting with 91
-  if (digits.length === 12 && digits.startsWith('91')) {
-    return `+${digits}`;
+
+  // 2. Clean non-digits (already done above, `digits` is the clean version)
+  let clean = digits;
+
+  // 4. Indian local variations
+  // Strip leading 0 if present (e.g. 09876543210 -> 9876543210)
+  if (clean.length === 11 && clean.startsWith('0')) {
+    clean = clean.slice(1);
   }
-  
-  // Handle 11 digit number starting with 0
-  if (digits.length === 11 && digits.startsWith('0')) {
-    return `+91${digits.slice(1)}`;
+
+  // If exactly 10 digits, assume India (+91)
+  if (clean.length === 10) {
+    return `+91${clean}`;
   }
-  
-  // If it's already in E.164 format (starts with +)
-  if (phone.startsWith('+')) {
-    return phone.replace(/[^\d+]/g, '');
+
+  // If 12 digits and starts with 91, it's already an Indian number with country code but no +
+  if (clean.length === 12 && clean.startsWith('91')) {
+    return `+${clean}`;
   }
-  
-  return `+91${digits}`;
+
+  // 5. Default to + prefix for any other digits (Law 1: Minimal Surprise)
+  return clean ? `+${clean}` : phone;
 }
 
 /**

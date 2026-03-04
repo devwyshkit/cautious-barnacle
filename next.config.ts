@@ -46,13 +46,13 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value: [
-              "default-src 'self' https://*.supabase.co https://*.razorpay.com",
+              "default-src 'self' https://*.supabase.co https://*.supabase.com https://*.razorpay.com",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://va.vercel-scripts.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' blob: data: https://*.supabase.co https://*.razorpay.com https://lh3.googleusercontent.com",
+              "img-src 'self' blob: data: https://*.supabase.co https://*.supabase.com https://*.razorpay.com https://lh3.googleusercontent.com",
               "frame-src https://*.razorpay.com",
-              "connect-src 'self' https://*.supabase.co https://*.razorpay.com https://vitals.vercel-insights.com"
+              "connect-src 'self' https://*.supabase.co https://*.supabase.com https://*.razorpay.com https://vitals.vercel-insights.com"
             ].join('; ')
           },
           {
@@ -69,7 +69,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
+            value: 'camera=(), microphone=(), geolocation=(self)'
           }
         ]
       }

@@ -37,6 +37,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
     const [quantity, setQuantity] = useState(initialState?.quantity ?? 1);
     const [selectedVariantId, setSelectedVariantId] = useState<string | null>(initialState?.variantId ?? null);
     const [selectedAddonIds, setSelectedAddonIds] = useState<Set<string>>(new Set(initialState?.addonIds ?? []));
+    const [personalizationFields, setPersonalizationFields] = useState<Record<string, string>>({});
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const imageContainerRef = useRef<HTMLDivElement>(null);
 
@@ -58,6 +59,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
     const variantsArray = Array.isArray(product?.variants) ? product.variants : [];
     const addonsArray: any[] = []; // Deprecated table
     const personalizationArray: any[] = Array.isArray(product?.personalization_options) ? product.personalization_options as any[] : [];
+    const personalizationSchema = (product as any)?.personalization_schema?.fields || [];
 
     const selectedVariant = useMemo(() => {
         return (variantsArray as any[]).find((v: any) => String(v.id) === selectedVariantId) || null;
@@ -82,12 +84,8 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
 
     const unitPrice = useMemo(() => {
         const basePrice = Number(product.base_price) || 0;
-        const effectiveBasePrice = selectedVariant ? (Number(selectedVariant.price) || 0) : basePrice;
-
-        const addonsSum = selectedAddons.reduce((sum, addon) => sum + (Number(addon.price) || 0), 0);
-        const personalizationSum = selectedPersonalizations.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
-        return effectiveBasePrice + addonsSum + personalizationSum;
-    }, [product.base_price, selectedVariant, selectedAddons, selectedPersonalizations]);
+        return selectedVariant ? (Number(selectedVariant.price) || 0) : basePrice;
+    }, [product.base_price, selectedVariant]);
 
     const totalPrice = unitPrice * quantity;
 
@@ -118,15 +116,18 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                 result = await addToDraftOrder(
                     product.id,
                     selectedVariantId,
-                    { enabled: false },
+                    {
+                        enabled: personalizationArray.length > 0 || personalizationSchema.length > 0,
+                        fields: personalizationFields
+                    },
                     allSelectedAddons,
                     quantity,
                     {
                         product_name: product.name,
                         product_image: product.images?.[0] || FALLBACK_IMAGE,
-                        unit_price: unitPrice,
+                        unit_price: Number(unitPrice) || 0,
                         vendor_id: product.vendor_id!,
-                        vendor_name: product.vendors?.name || vendorId,
+                        vendor_name: (product as any).vendor_name || 'Store',
                         update_product_id: initialState.cartProductId
                     }
                 );
@@ -134,15 +135,18 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                 result = await addToDraftOrder(
                     product.id,
                     selectedVariantId,
-                    { enabled: false },
+                    {
+                        enabled: personalizationArray.length > 0 || personalizationSchema.length > 0,
+                        fields: personalizationFields
+                    },
                     allSelectedAddons,
                     quantity,
                     {
                         product_name: product.name,
                         product_image: product.images?.[0] || FALLBACK_IMAGE,
-                        unit_price: unitPrice,
+                        unit_price: Number(unitPrice) || 0,
                         vendor_id: product.vendor_id!,
-                        vendor_name: product.vendors?.name || vendorId,
+                        vendor_name: (product as any).vendor_name || 'Store',
                     }
                 );
             }
@@ -170,9 +174,9 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
     }, [selectedVariant, product.images]);
 
     return (
-        <div className="flex flex-col h-full bg-[var(--surface)] font-sans overflow-hidden">
+        <div className="flex flex-col h-full min-h-0 bg-[var(--surface)] font-sans overflow-hidden">
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar" data-vaul-no-drag>
+            <div className="flex-1 overflow-y-auto overscroll-contain">
                 {/* Immersive Navigation Bar */}
                 <div className="sticky top-0 left-0 right-0 z-[var(--z-nav)] p-4 pointer-events-none">
                     <button
@@ -180,7 +184,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         className="size-11 rounded-full bg-[var(--surface)]/80 backdrop-blur-md shadow-sm flex items-center justify-center pointer-events-auto active:scale-90 transition-all border border-[var(--border)]"
                         aria-label="Back"
                     >
-                        <Plus className="size-5 rotate-45 text-[var(--text-primary)]" />
+                        <ArrowLeft className="size-5 text-[var(--text-primary)]" />
                     </button>
                 </div>
 
@@ -246,9 +250,9 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         <div className="flex items-start justify-between gap-4">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <p className="text-sm font-semibold text-[var(--text-secondary)] tracking-tight">{(product as any).category || product.category_id || 'Product'}</p>
+                                    <p className="text-sm font-semibold text-[var(--text-secondary)] tracking-tight">{(product as any).category_name || 'Product'}</p>
                                     <div className="size-1 rounded-full bg-[var(--border)]" />
-                                    <p className="text-sm font-semibold text-[var(--text-secondary)] tracking-tight">{product.vendors?.name || vendorId}</p>
+                                    <p className="text-sm font-semibold text-[var(--text-secondary)] tracking-tight">{(product as any).vendor_name || product.vendors?.name || 'Store'}</p>
                                 </div>
                                 <h2 className="text-2xl font-bold text-[var(--text-primary)] leading-tight tracking-tight">
                                     {product.name}
@@ -327,13 +331,13 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         </section>
                     )}
 
-                    {/* Auth Section */}
-                    {personalizationArray.length > 0 && (
+                    {/* Personalization Section */}
+                    {(personalizationArray.length > 0 || personalizationSchema.length > 0) && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Add Personalization</h3>
-                                    {personalizationArray.some(p => ('is_required' in p && (p as any).is_required)) && (
+                                    <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Personalize your {product.name}</h3>
+                                    {(personalizationArray.some(p => ('is_required' in p && (p as any).is_required)) || personalizationSchema.some((p: any) => p.required)) && (
                                         <span className="text-xs font-semibold text-[var(--well-warning-text)] bg-[var(--well-warning)] px-2 py-0.5 rounded-[var(--radius-sm)] border border-[var(--well-warning-text)]/20 tracking-tight">Required</span>
                                     )}
                                 </div>
@@ -346,44 +350,102 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                 </p>
                             </div>
 
-                            <div className="space-y-3">
-                                {personalizationArray.map((p) => {
-                                    const isSelected = selectedAddonIds.has(p.id);
-                                    return (
-                                        <button
-                                            key={p.id}
-                                            onClick={() => {
-                                                const next = new Set(selectedAddonIds);
-                                                if (next.has(p.id)) next.delete(p.id);
-                                                else { next.add(p.id); triggerHaptic(HapticPattern.SUCCESS); }
-                                                setSelectedAddonIds(next);
-                                            }}
-                                            className={cn(
-                                                "w-full flex items-center justify-between p-4 rounded-[var(--radius-lg)] border transition-all active:scale-[0.99]",
-                                                isSelected
-                                                    ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
-                                                    : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
-                                            )}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className={cn(
-                                                    "size-5 rounded-[var(--radius-sm)] border flex items-center justify-center transition-colors",
-                                                    isSelected ? "bg-[var(--surface)] border-[var(--background)]" : "bg-[var(--surface-muted)] border-[var(--border)]"
-                                                )}>
-                                                    {isSelected && <Check className="size-3 text-[var(--text-primary)]" strokeWidth={4} />}
+                            {/* Schema-based fields */}
+                            {personalizationSchema.length > 0 && (
+                                <div className="space-y-4">
+                                    {personalizationSchema.map((field: any) => (
+                                        <div key={field.id} className="space-y-2">
+                                            <label className="text-xs font-bold text-[var(--text-primary)] tracking-tight block px-1">
+                                                {field.label} {field.required && <span className="text-rose-500">*</span>}
+                                            </label>
+                                            {field.type === 'select' && Array.isArray(field.options) ? (
+                                                /* WYSHKIT 2026: Vendor-defined presets (Swiggy pattern — tap, don't type) */
+                                                <div className="flex flex-wrap gap-2">
+                                                    {field.options.map((option: string) => {
+                                                        const isSelected = personalizationFields[field.id] === option;
+                                                        return (
+                                                            <button
+                                                                key={option}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    triggerHaptic(HapticPattern.ACTION);
+                                                                    setPersonalizationFields(prev => ({ ...prev, [field.id]: option }));
+                                                                }}
+                                                                className={cn(
+                                                                    "px-4 py-2.5 rounded-[var(--radius-lg)] border text-sm font-semibold transition-all active:scale-[0.97]",
+                                                                    isSelected
+                                                                        ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
+                                                                        : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--text-tertiary)]"
+                                                                )}
+                                                            >
+                                                                {option}
+                                                            </button>
+                                                        );
+                                                    })}
                                                 </div>
-                                                <span className="text-sm font-semibold">{p.name}</span>
-                                            </div>
-                                            <span className={cn(
-                                                "text-xs font-bold tabular-nums",
-                                                isSelected ? "text-[var(--text-inverse)]/60" : "text-[var(--text-tertiary)]"
-                                            )}>
-                                                +{formatCurrency(p.price || 0)}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                                            ) : field.type === 'textarea' ? (
+                                                <textarea
+                                                    value={personalizationFields[field.id] || ''}
+                                                    onChange={(e) => setPersonalizationFields(prev => ({ ...prev, [field.id]: e.target.value }))}
+                                                    placeholder={field.placeholder}
+                                                    className="w-full bg-[var(--surface-muted)] border-[var(--border)] rounded-[var(--radius-md)] p-3 text-sm focus:bg-[var(--surface)] focus:border-[var(--text-primary)] transition-all outline-none border min-h-[80px] font-sans"
+                                                />
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    value={personalizationFields[field.id] || ''}
+                                                    onChange={(e) => setPersonalizationFields(prev => ({ ...prev, [field.id]: e.target.value }))}
+                                                    placeholder={field.placeholder}
+                                                    maxLength={field.max_chars || undefined}
+                                                    className="w-full bg-[var(--surface-muted)] border-[var(--border)] rounded-[var(--radius-md)] p-3 text-sm focus:bg-[var(--surface)] focus:border-[var(--text-primary)] transition-all outline-none border font-sans"
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Toggleable options */}
+                            {personalizationArray.length > 0 && (
+                                <div className="space-y-3">
+                                    {personalizationArray.map((p) => {
+                                        const isSelected = selectedAddonIds.has(p.id);
+                                        return (
+                                            <button
+                                                key={p.id}
+                                                onClick={() => {
+                                                    const next = new Set(selectedAddonIds);
+                                                    if (next.has(p.id)) next.delete(p.id);
+                                                    else { next.add(p.id); triggerHaptic(HapticPattern.SUCCESS); }
+                                                    setSelectedAddonIds(next);
+                                                }}
+                                                className={cn(
+                                                    "w-full flex items-center justify-between p-4 rounded-[var(--radius-lg)] border transition-all active:scale-[0.99]",
+                                                    isSelected
+                                                        ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
+                                                        : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
+                                                )}
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <div className={cn(
+                                                        "size-5 rounded-[var(--radius-sm)] border flex items-center justify-center transition-colors",
+                                                        isSelected ? "bg-[var(--surface)] border-[var(--background)]" : "bg-[var(--surface-muted)] border-[var(--border)]"
+                                                    )}>
+                                                        {isSelected && <Check className="size-3 text-[var(--text-primary)]" strokeWidth={4} />}
+                                                    </div>
+                                                    <span className="text-sm font-semibold">{p.name}</span>
+                                                </div>
+                                                <span className={cn(
+                                                    "text-xs font-bold tabular-nums",
+                                                    isSelected ? "text-[var(--text-inverse)]/60" : "text-[var(--text-tertiary)]"
+                                                )}>
+                                                    +{formatCurrency(p.price || 0)}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </section>
                     )}
 
@@ -537,7 +599,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
 
                     {/* Add to Cart Button */}
                     <button
-                        className="flex-1 h-12 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--background)] font-semibold text-sm tracking-tight rounded-[var(--radius-lg)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                        className="flex-1 h-12 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--background)] font-semibold text-sm tracking-tight rounded-[var(--radius-lg)] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                         onClick={handleAddToCart}
                         data-testid="add-to-cart-drawer"
                         disabled={continuing || !canAdd}
@@ -550,7 +612,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                             <>
                                 <span>{isEditMode ? 'Update Product' : 'Add to Cart'}</span>
                                 <div className="h-4 w-px bg-[var(--surface)]/20" />
-                                <span>{formatCurrency(totalPrice)}</span>
+                                <span>{formatCurrency(Number(totalPrice) || 0)}</span>
                             </>
                         )}
                     </button>

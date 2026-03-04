@@ -28,10 +28,10 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
 
   if (!initialData || !products) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] p-6 text-center bg-background">
+      <div className="flex flex-col items-center justify-center h-[60vh] p-[var(--space-6)] text-center bg-[var(--background)]">
         <p className="text-sm font-medium text-[var(--text-primary)]">Vendor data not available</p>
-        <p className="text-xs text-[var(--text-secondary)] mt-1">Try again in a moment</p>
-        <Button onClick={() => router.refresh()} variant="link" className="text-xs mt-2">Try Again</Button>
+        <p className="text-xs text-[var(--text-secondary)] mt-[var(--space-1)]">Try again in a moment</p>
+        <Button onClick={() => router.refresh()} variant="link" className="text-xs mt-[var(--space-2)]">Try Again</Button>
       </div>
     );
   }
@@ -40,8 +40,8 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
     <div className="animate-in fade-in duration-500 min-h-[100dvh] bg-[var(--surface)] pb-24">
       {/* WYSHKIT 2026: Proactive Mismatch Nudge */}
       {isMismatch && (
-        <div className="px-4 py-3 bg-[var(--well-warning)] border-b border-[var(--warning)]/10 flex items-center justify-between gap-3 sticky top-0 z-[var(--z-nav)]">
-          <div className="flex items-center gap-2">
+        <div className="px-[var(--space-4)] py-[var(--space-3)] bg-[var(--well-warning)] border-b border-[var(--warning)]/10 flex items-center justify-between gap-[var(--space-3)] sticky top-0 z-[var(--z-nav)]">
+          <div className="flex items-center gap-[var(--space-2)]">
             <AlertCircle className="size-3.5 text-[var(--warning)]" />
             <p className="text-xs font-bold text-[var(--text-primary)] tracking-widest">Active cart at another vendor</p>
           </div>
@@ -52,7 +52,7 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
               triggerHaptic(HapticPattern.ACTION);
               router.push('/checkout');
             }}
-            className="h-7 px-3 text-xs font-bold tracking-widest border-[var(--warning)]/20 bg-[var(--surface)] text-[var(--warning)]"
+            className="h-7 px-[var(--space-3)] text-xs font-bold tracking-widest border-[var(--warning)]/20 bg-[var(--surface)] text-[var(--warning)]"
           >
             View cart
           </Button>
@@ -60,30 +60,31 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
       )}
 
       {/* CORE STORE UI - ZERO SDUI LEAKS */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-[var(--space-6)]">
         <StoreHeader data={{
           id: initialData.id,
           name: initialData.name,
+          slug: initialData.slug ?? '',
           image_url: initialData.image_url ?? undefined,
           rating: initialData.rating ?? undefined,
           city: initialData.city ?? undefined,
           prep_mins: initialData.prep_mins ?? undefined
         }} />
 
-        <section className="px-4 md:px-8 max-w-[1440px] mx-auto w-full">
+        <section className="px-[var(--space-4)] md:px-[var(--space-8)] max-w-[1440px] mx-auto w-full">
           <CircleRail data={categories} context={{ vendor_id: vendorId }} />
         </section>
 
-        <div className="flex flex-col gap-10 px-4 md:px-8 max-w-[1440px] mx-auto w-full pb-12">
+        <div className="flex flex-col gap-[var(--space-10)] px-[var(--space-4)] md:px-[var(--space-8)] max-w-[1440px] mx-auto w-full pb-[var(--space-12)]">
           {Object.entries(productsGroupedByCategory).map(([category, categoryProducts]) => (
-            <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="flex flex-col gap-4">
-              <div className="flex items-center gap-3">
+            <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="flex flex-col gap-[var(--space-4)]">
+              <div className="flex items-center gap-[var(--space-3)]">
                 <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tighter capitalize">{category}</h2>
-                <span className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-widest bg-[var(--surface-muted)] px-2 py-0.5 rounded-full border border-[var(--border)]">
+                <span className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-widest bg-[var(--surface-muted)] px-[var(--space-2)] py-[var(--space-0-5)] rounded-full border border-[var(--border)]">
                   {categoryProducts.length} {categoryProducts.length === 1 ? 'Product' : 'Products'}
                 </span>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-[var(--space-3)] md:gap-[var(--space-4)]">
                 {categoryProducts.map((product) => (
                   <ProductCard key={product.id} data={product} variant="portrait" />
                 ))}

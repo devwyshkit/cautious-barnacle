@@ -7,6 +7,7 @@
 export interface PricingBreakdown {
     subtotal: number;
     personalization_charges: number;
+    addons_price: number;
     delivery_fee: number;
     platform_fee: number;
     gst: number;

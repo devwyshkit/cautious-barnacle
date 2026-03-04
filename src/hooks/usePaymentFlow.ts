@@ -85,7 +85,7 @@ export function usePaymentFlow({
             const { create_payment_order, verify_payment_signature } = await import('@/lib/actions/checkout/payment');
 
             const response = await create_payment_order(
-                Math.round(data.pricing.total * 100),
+                data.pricing.total_paise,
                 'INR',
                 {
                     address_id: selectedAddressId || '',
@@ -152,7 +152,7 @@ export function usePaymentFlow({
                     prefill: {
                         name: authUser?.user_metadata?.full_name, phone: authUser?.phone
                     },
-                    theme: { color: '#18181b' },
+                    theme: { color: '#D91B24' },
                     modal: {
                         ondismiss: () => {
                             setIsProcessing(false);

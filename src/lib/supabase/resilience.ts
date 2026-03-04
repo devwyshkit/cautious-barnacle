@@ -37,14 +37,14 @@ export async function resilientFetch(input: RequestInfo | URL, options: Resilien
             const currentTimeout = i === 0 ? 5000 : timeoutMs;
             const timeoutId = setTimeout(() => controller.abort(), currentTimeout);
 
+            const headers = new Headers(fetchOptions.headers || {});
+            headers.set('x-wyshkit-resilience', 'true');
+            headers.set('x-wyshkit-attempt', (i + 1).toString());
+
             const response = await fetch(inputUrl, {
                 ...fetchOptions,
                 signal: controller.signal,
-                headers: {
-                    ...fetchOptions.headers,
-                    'x-wyshkit-resilience': 'true',
-                    'x-wyshkit-attempt': (i + 1).toString(),
-                }
+                headers
             } as any);
 
             clearTimeout(timeoutId);

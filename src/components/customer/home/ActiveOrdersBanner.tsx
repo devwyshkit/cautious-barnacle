@@ -47,32 +47,31 @@ export function ActiveOrdersBanner({ orders }: ActiveOrdersBannerProps) {
         <div className="mx-4 md:mx-8 animate-in fade-in slide-in-from-top-4 duration-700">
             <button
                 onClick={() => router.push(`/orders/${order.id}`)}
-                className="w-full bg-[var(--foreground)] rounded-[var(--radius-3xl)] p-1 shadow-xl shadow-[var(--shadow-sm)] group relative overflow-hidden active:scale-[0.99] transition-all"
+                className="w-full bg-[var(--foreground)] rounded-full p-1 shadow-lg shadow-[var(--shadow-sm)] group relative overflow-hidden active:scale-[0.98] transition-all border border-white/5"
             >
-                <div className="bg-[var(--surface-muted)]/10 absolute inset-0 pointer-events-none" />
-
-                <div className="flex items-center gap-4 p-4">
-                    <div className={cn("size-14 rounded-[var(--radius-lg)] flex items-center justify-center shrink-0 shadow-inner", statusInfo.color)}>
-                        <StatusIcon className="size-7" />
+                <div className="flex items-center gap-3 pl-1.5 pr-4 py-1.5">
+                    <div className={cn("size-9 rounded-full flex items-center justify-center shrink-0 shadow-inner", statusInfo.color)}>
+                        <StatusIcon className="size-4.5" />
                     </div>
 
-                    <div className="flex-1 text-left">
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-[var(--text-inverse)]/40 uppercase tracking-widest">Active Order #{order.order_number}</span>
+                    <div className="flex-1 text-left min-w-0">
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-[9px] font-black text-[var(--text-inverse)]/40 uppercase tracking-widest whitespace-nowrap">#{order.order_number}</span>
                             <div className="h-1 w-1 rounded-full bg-[var(--success)] animate-pulse" />
                         </div>
-                        <h3 className="text-xl font-bold text-[var(--text-inverse)] tracking-tighter leading-tight mt-0.5">
+                        <h3 className="text-sm font-black text-[var(--text-inverse)] tracking-tight truncate leading-none mt-0.5">
                             {displayLabel}
                         </h3>
                     </div>
 
-                    <div className="size-10 rounded-full bg-[var(--surface-muted)]/20 flex items-center justify-center text-[var(--text-inverse)] group-hover:bg-[var(--surface-muted)]/40 transition-colors">
-                        <ChevronRight className="size-5" />
+                    <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[10px] font-black text-[var(--text-inverse)] uppercase tracking-wider bg-white/10 px-2 py-1 rounded-full">Track</span>
+                        <ChevronRight className="size-4 text-[var(--text-inverse)]/60" />
                     </div>
                 </div>
 
-                {/* Progress Bar (Simulated) */}
-                <div className="h-1 bg-[var(--surface-muted)]/20 w-full overflow-hidden">
+                {/* Progress Bar (Integrated) */}
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5 w-full overflow-hidden">
                     <div className="h-full bg-[var(--primary)] w-1/2 animate-progress-glow" />
                 </div>
             </button>

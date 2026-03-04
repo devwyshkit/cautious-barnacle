@@ -19,6 +19,7 @@ export interface SelectedPersonalization {
   file_url?: string;
   instructions?: string;
   price?: number;
+  fields?: Record<string, any>;
 }
 
 export interface SelectedAddon {
@@ -38,6 +39,7 @@ export interface DraftProduct {
   id: string;
   product_id: string;
   product_name: string;
+  product_slug?: string | null;
   product_image: string;
 
   // Session routing
@@ -62,6 +64,7 @@ export interface DraftProduct {
 
   // Vendor context (DB-aligned v_active_cart_detailed column names)
   vendor_id?: string | null;
+  vendor_slug?: string | null;
   vendor_name?: string | null;
   vendor_city?: string | null;
   vendor_prep_mins?: number | null;

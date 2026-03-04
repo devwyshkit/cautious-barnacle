@@ -6,7 +6,6 @@ import type { Database } from '@/lib/supabase/database.types';
 import { calculateOrderTotalRPC } from './pricing'
 import { logError } from '@/lib/utils/error-handler'
 import { logger } from '@/lib/logging/logger';
-import { calculateHaversineDistance } from '@/lib/utils/sla'
 import { hasProductPersonalization } from '@/lib/utils/personalization'
 import type { PricingBreakdown } from '@/components/customer/checkout/types'
 import type { CartProduct } from '@/lib/types/personalization'
@@ -102,12 +101,38 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
             throw new Error(contextError.message);
         }
 
-        const typedContext = context as unknown as CheckoutContext; // Typed from JSONB RPC
+        const typedContext = context as unknown as CheckoutContext;
         const products = (typedContext.products || []) as CartProduct[];
         const addresses = (typedContext.addresses || []) as Address[];
-        const pricing = typedContext.pricing as PricingBreakdown | null;
+        let pricing = typedContext.pricing as PricingBreakdown | null;
+
+        // 3. WYSHKIT 2026: Address Pre-selection (Frictionless Logic)
+        // If no address is selected but addresses exist, pre-select the first one.
+        let efSelectedAddressId = selectedAddressId;
+        if (!efSelectedAddressId && addresses.length > 0) {
+            efSelectedAddressId = addresses[0].id;
+
+            // Proactively refresh pricing with the new address to avoid "NaN" or zero fees
+            // Zero Shadow Math: Recalculate server-side to ensure distances/fees are correct
+            const { data: refreshedPricing } = await calculateOrderTotalRPC(
+                products.map(p => ({
+                    product_id: p.product_id,
+                    quantity: p.quantity,
+                    variant_id: p.variant_id,
+                    selected_addons: p.selected_addons
+                })),
+                null,
+                efSelectedAddressId,
+                appliedCouponCode,
+                useWallet,
+                user?.id
+            );
+            if (refreshedPricing) {
+                pricing = refreshedPricing;
+            }
+        }
+
         const distanceKm = typedContext.distance_km ? Number(typedContext.distance_km) : null;
-        const etaMinutes = typedContext.eta_minutes ? Number(typedContext.eta_minutes) : null;
 
         if (products.length === 0) {
             return {
@@ -117,17 +142,17 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
                 pricing: null,
                 applied_coupon: null,
                 use_wallet: useWallet,
-                selected_address_id: selectedAddressId,
+                selected_address_id: efSelectedAddressId,
                 user: user ? { id: user.id, email: user.email } : null,
                 error: 'Cart is empty'
             }
         }
 
         let appliedCoupon: { code: string; discount: number } | null = null;
-        if (appliedCouponCode && pricing && pricing.discount > 0) {
+        if (appliedCouponCode && pricing && (Number(pricing.discount) || 0) > 0) {
             appliedCoupon = {
                 code: appliedCouponCode,
-                discount: pricing.discount
+                discount: Number(pricing.discount) || 0
             }
         }
 
@@ -135,10 +160,19 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
             products: products,
             addresses: addresses,
             wallet_info: typedContext.wallet_info,
-            pricing: pricing,
+            pricing: pricing ? {
+                ...pricing,
+                subtotal: Number(pricing.subtotal) || 0,
+                total: Number(pricing.total) || 0,
+                delivery_fee: Number(pricing.delivery_fee) || 0,
+                platform_fee: Number(pricing.platform_fee) || 0,
+                gst: Number(pricing.gst) || 0,
+                discount: Number(pricing.discount) || 0,
+                wallet_discount: Number(pricing.wallet_discount) || 0
+            } : null,
             applied_coupon: appliedCoupon,
             use_wallet: useWallet,
-            selected_address_id: selectedAddressId,
+            selected_address_id: efSelectedAddressId,
             gstin: gstin || null,
             user: user ? { id: user.id, email: user.email } : null,
             vendor_name: products[0]?.vendor_name || undefined,

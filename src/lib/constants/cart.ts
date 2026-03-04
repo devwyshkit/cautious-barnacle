@@ -5,6 +5,7 @@ export const EMPTY_CART: DraftTransaction = {
     vendor_id: null,
     subtotal: 0,
     personalization_charges: 0,
+    addons_price: 0,
     delivery_fee: 0,
     platform_fee: 0,
     gst: 0,

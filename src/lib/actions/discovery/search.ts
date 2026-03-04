@@ -61,12 +61,31 @@ export async function searchFiltered(options: {
         }
 
         // Results from RPC are already sorted by proximity and relevance
+        const products = (results as any[] || []).map((p: any) => ({
+            ...p,
+            image_url: p.images?.[0] || '/images/logo.png',
+            vendor_name: p.vendor_name,
+            vendor_slug: p.vendor_slug,
+            vendors: {
+                id: p.vendor_id,
+                name: p.vendor_name,
+                slug: p.vendor_slug,
+                image_url: p.vendor_image_url,
+                is_active: p.vendor_is_active
+            }
+        }));
+
+        // Deduplicate vendors for the vendors list
+        const vendorMap = new Map();
+        products.forEach(p => {
+            if (p.vendors && !vendorMap.has(p.vendors.id)) {
+                vendorMap.set(p.vendors.id, p.vendors);
+            }
+        });
+
         const rawResults = {
-            products: (results as any[] || []).map((p: any) => ({
-                ...p,
-                image_url: p.images?.[0] || '/images/logo.png'
-            })),
-            vendors: [], // We'll handle vendor separation if needed, but the unified list is better for the UI
+            products,
+            vendors: Array.from(vendorMap.values()),
             total: (results as any[] || []).length > 0 ? (results as any[])[0].total_count : 0
         };
 
@@ -118,11 +137,14 @@ export async function getFilteredProducts(options: {
             throw error;
         }
 
-        const totalCount = (data as any[] || [])[0]?.total_count || 0;
+        const totalCount = (data as any[] || []).length > 0 ? (data as any[])[0].total_count : 0;
         const productsRaw = (data as any[] || []).map((p: any) => ({
             ...p,
             image_url: p.images?.[0] || '/images/logo.png',
+            vendor_name: p.vendor_name,
+            vendor_slug: p.vendor_slug,
             vendors: {
+                id: p.vendor_id,
                 name: p.vendor_name,
                 slug: p.vendor_slug,
                 image_url: p.vendor_image_url,
@@ -132,7 +154,7 @@ export async function getFilteredProducts(options: {
 
         const validated = z.array(WyshkitProductSchema).safeParse(productsRaw);
         if (!validated.success) {
-            logger.error('Zod Validation Failed: getFilteredProducts', validated.error);
+            logger.error('Zod Validation Failed: getFilteredProducts', { error: validated.error, data: productsRaw });
             return { data: { products: productsRaw as unknown as WyshkitProduct[], total: totalCount } };
         }
 

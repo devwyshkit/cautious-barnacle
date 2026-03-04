@@ -84,10 +84,46 @@ export const getServerLocation = cache(async function getServerLocation(userPara
             }
         }
 
-        // 4. Fallback default
-        return { name: 'Select location', address: '', pincode: '' }
+        // 4. IP-based Coarse Location (Tier 1 Fallback - WYSHKIT 2026)
+        try {
+            // Check if we already have an IP-based location in a short-lived cache or session if needed
+            // For now, call ipapi.co if all else fails.
+            const ipResponse = await fetch('https://ipapi.co/json/', { next: { revalidate: 3600 } });
+            if (ipResponse.ok) {
+                const data = await ipResponse.json();
+                if (data.latitude && data.longitude) {
+                    return {
+                        name: data.city || 'Near you',
+                        address: `${data.city}, ${data.region}`,
+                        pincode: data.postal || '',
+                        lat: parseFloat(data.latitude),
+                        lng: parseFloat(data.longitude)
+                    };
+                }
+            }
+        } catch (ipErr) {
+            logger.error('IP Location Fallback failed:', ipErr);
+        }
+
+        // 5. Fallback default: Bengaluru (HSR Layout)
+        // WYSHKIT 2026: If all else fails, default to Bengaluru center to ensure commerce discovery
+        // This fixes BUG-01 where empty feed is shown for non-BLR IPs
+        return {
+            name: 'Bengaluru',
+            address: 'Bengaluru, Karnataka',
+            pincode: '560034',
+            lat: 12.9352,
+            lng: 77.6245
+        }
     } catch (error) {
-        return { name: 'Select location', address: '', pincode: '' }
+        logger.error('getServerLocation critical failure:', error);
+        return {
+            name: 'Bengaluru',
+            address: 'Bengaluru, Karnataka',
+            pincode: '560034',
+            lat: 12.9352,
+            lng: 77.6245
+        }
     }
 });
 

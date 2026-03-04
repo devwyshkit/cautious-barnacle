@@ -19,7 +19,7 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
 
   y += 10;
   doc.setFontSize(10);
-  doc.setTextColor(104, 107, 120); // #686B78
+  doc.setTextColor(82, 82, 91); // var(--text-secondary)
   doc.setFont('helvetica', 'normal');
   doc.text(`Order #${order.order_number} • ${new Date(order.created_at).toLocaleDateString('en-IN')}`, margin, y);
 
@@ -31,7 +31,7 @@ export function generateEstimatePDF(order: OrderForPDF): Blob {
   y += 15;
   // Order Details Section
   doc.setFontSize(12);
-  doc.setTextColor(40, 44, 63); // #282C3F
+  doc.setTextColor(9, 9, 11); // var(--text-primary)
   doc.setFont('helvetica', 'bold');
   doc.text('ORDER DETAILS', margin, y);
 
@@ -111,7 +111,7 @@ export function generateGSTINPDF(order: OrderForPDF, vendor: VendorForPDF): Blob
   doc.rect(margin, y, 170, 40);
 
   doc.setFontSize(12);
-  doc.setTextColor(104, 107, 120);
+  doc.setTextColor(82, 82, 91);
   doc.text('GST Identification Number', 105, y + 12, { align: 'center' });
   doc.setFontSize(24);
   doc.setTextColor(197, 160, 89);
@@ -119,7 +119,7 @@ export function generateGSTINPDF(order: OrderForPDF, vendor: VendorForPDF): Blob
 
   y += 60;
   doc.setFontSize(12);
-  doc.setTextColor(40, 44, 63);
+  doc.setTextColor(9, 9, 11);
   doc.setFont('helvetica', 'normal');
 
   const details = [

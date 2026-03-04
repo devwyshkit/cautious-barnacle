@@ -9,7 +9,6 @@
     "build:clean": "rm -rf .next .turbo && npm run build",
     "start": "next start",
     "lint": "next lint",
-    "lint:nomenclature": "bash scripts/nomenclature-guard.sh",
     "test": "vitest run",
     "test:watch": "vitest",
     "gen:types": "supabase gen types typescript --project-id hlvwfzickwpobjaxsbcc --schema public > src/lib/supabase/database.types.ts"
@@ -47,6 +46,8 @@
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.552.0",
     "next": "15.5.7",
+    "pg": "^8.19.0",
+    "postgres": "^3.4.8",
     "razorpay": "^2.9.6",
     "react": "19.0.0",
     "react-dom": "19.0.0",

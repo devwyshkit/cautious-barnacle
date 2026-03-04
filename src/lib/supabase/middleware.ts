@@ -78,8 +78,8 @@ export async function updateSession(request: NextRequest): Promise<{
         const isGlobalLogin = ['/login', '/signup', '/auth/login'].includes(pathname)
 
         // Path-based fallback for local dev
-        const isAdminSurface = isAdminHost || pathname.startsWith('/admin')
-        const isVendorSurface = isVendorHost || (pathname === '/vendor' || pathname.startsWith('/vendor/'))
+        const isAdminSurface = isAdminHost || pathname === '/admin' || pathname.startsWith('/admin/')
+        const isVendorSurface = isVendorHost || isVendorAdminRoute
 
         // WYSHKIT 2026: Middleware Diet - Session refresh only, no DB queries
         let user = null
@@ -105,7 +105,7 @@ export async function updateSession(request: NextRequest): Promise<{
                 return { supabaseResponse: createRedirectResponse('/vendor/login'), user: null, roles: ['customer'] }
             }
 
-            const isCustomerProtected = ['/profile', '/orders', '/checkout'].some(p => pathname.startsWith(p));
+            const isCustomerProtected = ['/profile', '/orders'].some(p => pathname.startsWith(p));
             if (isCustomerProtected) {
                 const url = new URL('/auth', request.url)
                 url.searchParams.set('intent', 'signin')

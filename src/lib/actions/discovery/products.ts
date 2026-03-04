@@ -14,61 +14,9 @@ import {
  * WYSHKIT 2026: Product Detail & Enrichment Actions
  */
 
-export const getTrendingProducts = cache(async (): Promise<WyshkitProduct[]> => {
-    const supabase = await createClient();
-    const { data } = await supabase
-        .from('products')
-        .select('*, vendors!inner(name, slug, city, is_active)')
-        .eq('is_active', true)
-        .eq('vendors.is_active', true)
-        .order('rating', { ascending: false })
-        .limit(15);
-
-    return (data || []) as unknown as WyshkitProduct[];
-});
 
 /**
- * Get Product with Full Specification (Purified)
- * Zero-waterfall parallel fetch of all relational data.
- */
-export async function getProductWithFullSpec(productId: string) {
-    try {
-        if (!productId || productId.trim() === '') {
-            return { data: null, error: 'Invalid Product ID' };
-        }
-        const supabase = await createClient();
-
-        // WYSHKIT 2026: Single Atomic Trip for Product Context
-        const { data, error } = await supabase.rpc('get_product_surface_v1' as any, {
-            p_product_id: productId,
-            p_vendor_id_or_slug: null // Fetch standalone spec if vendor unknown
-        });
-
-        if (error) {
-            logger.error('RPC Failure: get_product_surface_v1', error, { productId });
-            return { data: null, error: error.message };
-        }
-
-        const raw = data as any;
-        if (!raw || !raw.product_spec) {
-            return { data: null, error: 'Product not found' };
-        }
-
-        const validated = WyshkitProductSchema.safeParse(raw.product_spec);
-        if (!validated.success) {
-            logger.error('Zod Validation Failed: getProductWithFullSpec', validated.error);
-            return { data: raw.product_spec as any, error: undefined };
-        }
-
-        return { data: validated.data, error: undefined };
-    } catch (error) {
-        logger.error('Failed to get product surface', error, { productId });
-        return { data: null, error: 'Internal server error' };
-    }
-}
-
-/**
- * Get upsell products (same vendor or category)
+ * upsell products (same vendor or category)
  */
 export async function getUpsellProducts(
     productId: string,
@@ -107,21 +55,31 @@ export async function getUpsellProducts(
 export async function getProductSurface(productId: string, vendorIdOrSlug: string) {
     try {
         const supabase = await createClient();
-        const { data, error } = await supabase.rpc('get_product_surface_v1' as any, {
-            p_product_id: productId,
+        const { data, error } = await supabase.rpc('get_product_surface_v1', {
+            p_product_id_or_slug: productId,
             p_vendor_id_or_slug: vendorIdOrSlug
         });
 
         if (error) {
-            logger.error('Failed to fetch product surface', error, { productId, vendorIdOrSlug });
+            logger.error('Failed to fetch product surface: RPC Error', error, { productId, vendorIdOrSlug });
             return { data: null, error: error.message };
         }
 
         const raw = data as any;
-        if (raw.error) return { data: null, error: raw.error };
+        if (!raw || raw.error) {
+            logger.warn('Product Surface: Data Missing or Business Error', { error: raw?.error, productId, vendorIdOrSlug });
+            return { data: null, error: raw?.error || 'PRODUCT_NOT_FOUND' };
+        }
+
+        // WYSHKIT 2026: Law 11 Scoped Data Resolution
+        const vendorSurface = raw.vendor_surface;
+        if (!vendorSurface || vendorSurface.error || !vendorSurface.vendor) {
+            logger.error('Product Surface: Background Vendor Context Missing', { vendorSurface, productId, vendorIdOrSlug });
+            return { data: null, error: vendorSurface?.error || 'VENDOR_CONTEXT_MISSING' };
+        }
 
         // Process vendor surface for the UI (reuse grouping logic)
-        const products = (raw.vendor_surface.products || []) as unknown as WyshkitProduct[];
+        const products = (vendorSurface.products || []) as unknown as WyshkitProduct[];
         const groupedProducts = products.reduce((acc: any, product: any) => {
             const catName = product.category_name || 'Other';
             if (!acc[catName]) acc[catName] = [];
@@ -130,15 +88,19 @@ export async function getProductSurface(productId: string, vendorIdOrSlug: strin
         }, {});
 
         const categories = [
-            { id: 'all', name: 'All', slug: 'All' },
-            ...(raw.vendor_surface.categories || []).map((c: any) => ({ id: c.id, name: c.name, slug: c.slug }))
+            { id: 'all', name: 'All', slug: 'all' },
+            ...(vendorSurface.categories || []).map((c: any) => ({
+                id: c.id,
+                name: c.name,
+                slug: c.slug
+            }))
         ];
 
         return {
             data: {
                 product: raw.product_spec as unknown as WyshkitProduct,
                 vendorContext: {
-                    vendor: raw.vendor_surface.vendor as MappedVendor,
+                    vendor: vendorSurface.vendor as MappedVendor,
                     products,
                     productsGroupedByCategory: groupedProducts,
                     categories
@@ -147,7 +109,7 @@ export async function getProductSurface(productId: string, vendorIdOrSlug: strin
             error: null
         };
     } catch (err: any) {
-        logger.error('Unexpected error in getProductSurface', err);
-        return { data: null, error: 'Failed to fetch immersive context' };
+        logger.error('Unexpected failure in getProductSurface', err);
+        return { data: null, error: 'SERVICE_UNAVAILABLE' };
     }
 }

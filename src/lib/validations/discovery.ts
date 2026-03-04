@@ -41,6 +41,7 @@ export const VendorSchema = z.object({
     slug: z.string().nullable().optional(),
     business_type: z.string().nullable().optional(),
     is_online: z.boolean().optional().default(true),
+    is_active: z.boolean().optional().default(true),
     description: z.string().nullable().optional(),
     elite_signals: EliteSignalsSchema.optional(),
     gstin: z.string().nullable().optional(),

@@ -8,14 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function HomeSkeleton() {
   return (
     <div className="min-h-[100dvh] bg-[var(--surface)]">
-      {/* Masthead Skeleton */}
-      <header className="px-[var(--space-4)] py-[var(--space-4)] md:px-[var(--space-8)] flex items-center justify-between border-b border-[var(--surface-muted)]">
-        <div className="flex flex-col gap-[var(--space-1)]">
-          <Skeleton className="h-3 w-16 rounded-full" />
-          <Skeleton className="h-5 w-40 rounded-full" />
-        </div>
-        <Skeleton className="size-10 rounded-full" />
-      </header>
+
 
       <main className="pb-24 max-w-[1440px] mx-auto">
         <div className="px-[var(--space-4)] md:px-[var(--space-8)] space-y-[var(--space-8)] mt-[var(--space-6)]">

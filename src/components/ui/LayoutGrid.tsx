@@ -16,11 +16,11 @@ export function LayoutGrid({
 }: LayoutGridProps) {
     const colClasses = {
         1: 'grid-cols-1',
-        2: 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-        3: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
-        4: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
-        5: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
-        6: 'grid-cols-2 md:grid-cols-4 lg:grid-cols-6'
+        2: 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-[var(--space-1)]',
+        3: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-[var(--space-1)]',
+        4: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 px-[var(--space-1)]',
+        5: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 px-[var(--space-1)]',
+        6: 'grid-cols-2 md:grid-cols-4 lg:grid-cols-6 px-[var(--space-1)]'
     };
 
     const gapClasses = {

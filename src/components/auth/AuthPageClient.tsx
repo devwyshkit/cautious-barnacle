@@ -45,8 +45,8 @@ export function AuthPageClient({
   const [isWarning, setIsWarning] = useState(false);
 
   const handleSendOTP = async () => {
-    if (!phone || phone.length !== 10) {
-      setError("Enter a valid 10-digit number");
+    if (!phone || phone.length < 5) {
+      setError("Enter a valid phone number");
       return;
     }
 
@@ -55,25 +55,29 @@ export function AuthPageClient({
 
     try {
       triggerHaptic(HapticPattern.ACTION);
+      logger.info(`[AUTH] Attempting OTP send for ${phone}`);
       const result = await signInWithPhone(phone);
       setLoading(false);
 
       if (result.success) {
+        logger.info(`[AUTH] OTP sent successfully to ${phone}`);
         setStep("otp");
         setOtp("");
       } else {
-        const isRetryable = result.isRetryable || result.error?.includes("500");
+        logger.warn(`[AUTH] OTP send failed for ${phone}`, { error: result.error });
+        const isRetryable = result.isRetryable || result.error?.includes("500") || result.error?.includes("service_unavailable");
         if (isRetryable) {
           setError("OTP might be delayed. Please wait a moment.");
           setIsWarning(true);
-          setStep("otp");
+          setStep("otp"); // Allow proceeding to OTP entry if we think it might have been sent
         } else if (result.error?.includes("rate limit")) {
           setError("Too many attempts. Wait 60s.");
         } else {
           setError(result.error || "Failed to send OTP");
         }
       }
-    } catch {
+    } catch (err) {
+      logger.error(`[AUTH] Unexpected error sending OTP to ${phone}`, err);
       setLoading(false);
       setError("Connection issue. If you got an OTP, proceed.");
       setStep("otp");
@@ -158,7 +162,7 @@ export function AuthPageClient({
           {step === "phone" ? title : "Verify OTP"}
         </h2>
         <p className="text-sm text-[var(--text-secondary)] mt-1.5">
-          {step === "phone" ? description : `Code sent to +91 ${phone}`}
+          {step === "phone" ? description : `Code sent to ${phone.startsWith('+') ? phone : '+91 ' + phone}`}
         </p>
       </div>
 
@@ -172,10 +176,10 @@ export function AuthPageClient({
           />
           <Button
             onClick={handleSendOTP}
-            disabled={loading || phone.length !== 10}
+            disabled={loading || phone.length < 5}
             className={cn(
               "w-full h-14 rounded-[var(--radius-md)] font-bold text-base transition-all shadow-none",
-              phone.length === 10 ? "bg-[var(--text-primary)] hover:opacity-90 active:scale-95 text-[var(--text-inverse)]" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)]"
+              phone.length >= 5 ? "bg-[var(--text-primary)] hover:opacity-90 active:scale-95 text-[var(--text-inverse)]" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)]"
             )}
           >
             {loading ? "Sending..." : "Continue"}

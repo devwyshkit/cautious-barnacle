@@ -88,7 +88,7 @@ function SheetHeader({
     <div
       data-slot="sheet-header"
       className={cn(
-        "flex flex-col gap-[var(--space-2)] p-[var(--space-6)] border-b border-[var(--border)] sticky top-0 bg-[var(--surface-glass)] backdrop-blur-xl z-20 rounded-t-[var(--radius-3xl)]",
+        "flex flex-col gap-[var(--space-2)] p-[var(--space-5)] border-b border-[var(--border)] sticky top-0 bg-[var(--surface-glass)] backdrop-blur-xl z-20 rounded-t-[var(--radius-3xl)]",
         className
       )}
       {...props}

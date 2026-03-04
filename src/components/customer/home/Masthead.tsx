@@ -60,7 +60,7 @@ export function Masthead({
         <div
             id="global-masthead"
             className={cn(
-                "w-full px-4 md:px-8 py-2.5 transition-all duration-700 ease-in-out",
+                "w-full px-4 md:px-8 py-1.5 transition-all duration-700 ease-in-out",
                 config.bg,
                 className
             )}
@@ -70,7 +70,7 @@ export function Masthead({
                 <div className="flex items-center gap-2 overflow-hidden">
                     {config.icon}
                     <span className={cn(
-                        "text-[10px] md:text-xs font-black uppercase tracking-tight truncate",
+                        "text-[9px] md:text-xs font-black uppercase tracking-tight truncate",
                         config.text
                     )}>
                         {config.label}
@@ -78,13 +78,13 @@ export function Masthead({
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-[var(--surface-glass)] backdrop-blur-sm border border-[var(--text-inverse)]/20">
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--surface-glass)] backdrop-blur-sm border border-[var(--text-inverse)]/20">
                         <div className={cn(
-                            "size-1.5 rounded-full animate-pulse shadow-[0_0_8px_currentColor]",
+                            "size-1 rounded-full animate-pulse shadow-[0_0_8px_currentColor]",
                             status === 'normal' ? 'bg-[var(--success)] text-[var(--success)]' : status === 'delayed' ? 'bg-[var(--destructive)] text-[var(--destructive)]' : 'bg-[var(--warning)] text-[var(--warning)]'
                         )} />
                         <span className={cn(
-                            "text-[9px] font-black uppercase tracking-wider",
+                            "text-[8px] font-black uppercase tracking-wider",
                             status === 'normal' ? 'text-[var(--success)]' : status === 'delayed' ? 'text-[var(--destructive)]' : 'text-[var(--warning)]'
                         )}>
                             {config.tag}

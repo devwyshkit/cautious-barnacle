@@ -29,7 +29,7 @@ export interface OrderDetail extends Omit<Views<'v_order_detail'>, 'order_produc
   change_request_count?: number | null;
 }
 
-export interface OrderProductListItem extends Omit<Views<'v_order_tracking'>, 'personalization_status' | 'first_product_name' | 'vendor_name'> {
+export interface OrderProductSummary extends Omit<Views<'v_order_tracking'>, 'personalization_status' | 'first_product_name' | 'vendor_name'> {
   products?: any[];
   personalization_status?: string | null;
   product_count: number | null;

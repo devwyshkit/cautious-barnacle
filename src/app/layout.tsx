@@ -62,8 +62,8 @@ export default function RootLayout({
 }>) {
   try {
     return (
-      <html lang="en" style={{ colorScheme: 'light' }} className={cn("min-h-screen w-full selection:bg-[var(--primary-muted)] selection:text-[var(--primary)]", inter.variable)}>
-        <body className="font-sans antialiased min-h-screen w-full bg-[var(--background)]">
+      <html lang="en" style={{ colorScheme: 'light' }} className={cn("min-h-screen w-full selection:bg-[var(--primary-muted)] selection:text-[var(--primary)]", inter.variable)} suppressHydrationWarning>
+        <body className="font-sans antialiased min-h-[100dvh] w-full bg-[var(--background)]">
           <ErrorReporter />
           <Providers>
             {children}

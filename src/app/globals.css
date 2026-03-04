@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 :root {
+  scroll-behavior: smooth;
   color-scheme: light;
   --background: #FFFFFF;
   --foreground: #09090B;
@@ -64,6 +65,7 @@
   --space-2: 8px;
   --space-2-5: 10px;
   --space-3: 12px;
+  --space-3-5: 14px;
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
@@ -94,9 +96,9 @@
   --star-rating: #f59e0b;
 
   /* Layout Tokens */
-  --top-header-base-mobile: 120px;
-  --top-masthead-height: 48px;
-  --top-header-height-mobile-with-masthead: 168px;
+  --top-header-base-mobile: 104px;
+  --top-masthead-height: 44px;
+  --top-header-height-mobile-with-masthead: 148px;
   --top-header-height-mobile: var(--top-header-base-mobile);
   /* Default fallback */
   --top-header-height: 64px;
@@ -167,4 +169,19 @@ h6 {
 
 p {
   color: var(--text-secondary);
+}
+
+body {
+  /* WYSHKIT 2026: Mobile-First Scroll Policy - Standardize for performance */
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }

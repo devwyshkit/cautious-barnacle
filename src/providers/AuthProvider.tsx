@@ -125,6 +125,7 @@ export function AuthProvider({
     const signInWithPhone = useCallback(async (phone: string) => {
         try {
             const authPhone = normalizePhone(phone);
+            console.log(`[AUTH DEBUG] signInWithPhone original: "${phone}", normalized: "${authPhone}"`);
             const { error } = await supabase.auth.signInWithOtp({
                 phone: authPhone,
                 options: { channel: "sms" },
@@ -133,6 +134,7 @@ export function AuthProvider({
             return { success: true };
         } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : 'Failed to send OTP';
+            console.error(`[AUTH DEBUG] signInWithPhone Error:`, { original: phone, message: errorMessage });
             const isRetryable = errorMessage.includes("500") || errorMessage.includes("Twilio");
             return { success: false, error: errorMessage, isRetryable };
         }
@@ -141,6 +143,7 @@ export function AuthProvider({
     const verifyOTP = useCallback(async (phone: string, token: string) => {
         try {
             const authPhone = normalizePhone(phone);
+            console.log(`[AUTH DEBUG] verifyOTP original: "${phone}", normalized: "${authPhone}", token: "${token}"`);
             const result = await supabase.auth.verifyOtp({
                 phone: authPhone,
                 token,

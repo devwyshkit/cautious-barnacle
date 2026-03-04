@@ -11,15 +11,15 @@ import { HeaderCart } from './HeaderCart';
 import { LocationData } from '@/lib/actions/discovery/location';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { Masthead } from '@/components/customer/home/Masthead';
+import { useUI } from '@/providers/UIProvider';
 
 
 interface TopHeaderProps {
-  initialLocation?: LocationData;
-  mastheadProps?: {
-    status?: 'normal' | 'delayed' | 'capacity';
-    etaMinutes?: number;
-    locationName?: string;
-  };
+  location: LocationData;
+  status?: 'normal' | 'delayed' | 'capacity';
+  etaMinutes?: number;
+  locationName?: string;
+  hasMasthead?: boolean;
 }
 
 /**
@@ -30,16 +30,11 @@ interface TopHeaderProps {
  * - Zero useEffect for initial load
  * - No localStorage reliance
  */
-export function TopHeader({ initialLocation, mastheadProps }: TopHeaderProps) {
-  const { status, etaMinutes, locationName } = mastheadProps || {};
+export function TopHeader({ location, status, etaMinutes, locationName, hasMasthead: hasMastheadProp }: TopHeaderProps) {
   const router = useRouter();
   const { user, loading } = useAuth();
-
-  // Default fallback if initialLocation is missing (should not happen in 2026)
-  const [location, setLocation] = useState<LocationData>(
-    initialLocation || { name: 'Select location', address: '', pincode: '' }
-  );
-
+  const { openLocationSheet } = useUI();
+  const hasMasthead = hasMastheadProp ?? !!(status || etaMinutes || locationName);
 
   return (
     <>
@@ -56,7 +51,7 @@ export function TopHeader({ initialLocation, mastheadProps }: TopHeaderProps) {
               aria-label="Delivery Location"
               onClick={() => {
                 triggerHaptic(HapticPattern.ACTION);
-                router.push('/location');
+                openLocationSheet();
               }}
               className="flex items-center gap-[var(--space-2)] px-[var(--space-3)] py-[var(--space-2)] hover:bg-[var(--surface-muted)] rounded-[var(--radius-md)] transition-all group"
             >
@@ -118,23 +113,23 @@ export function TopHeader({ initialLocation, mastheadProps }: TopHeaderProps) {
         </div>
 
         {/* Mobile Header: High Density WYSHKIT 2026 Style */}
-        <div className="md:hidden flex flex-col gap-2.5 px-4 pt-3 pb-2.5">
-          <div className="flex items-center justify-between gap-4">
+        <div className="md:hidden flex flex-col gap-[var(--space-2)] px-[var(--space-4)] pt-[var(--space-3)] pb-[var(--space-2)] h-[var(--top-header-base-mobile)]">
+          <div className="flex items-center justify-between gap-[var(--space-4)]">
             <button
               id="location-trigger-mobile"
               onClick={() => {
                 triggerHaptic(HapticPattern.ACTION);
-                router.push('/location');
+                openLocationSheet();
               }}
               className="flex items-center gap-[var(--space-2)] group overflow-hidden"
             >
               <MapPin className="size-5 text-[var(--primary)] shrink-0" />
               <div className="flex flex-col items-start min-w-0">
-                <div className="flex items-center gap-1 w-full">
+                <div className="flex items-center gap-[var(--space-1)] w-full leading-none">
                   <span className="text-sm font-bold text-[var(--text-primary)] truncate tracking-tight">{location.name}</span>
                   <ChevronDown className="size-3.5 text-[var(--text-tertiary)] group-active:text-[var(--text-primary)] transition-colors" />
                 </div>
-                <span className="text-xs font-semibold text-[var(--text-tertiary)] truncate w-full tracking-tight">{location.address}</span>
+                <span className="text-[10px] font-bold text-[var(--text-tertiary)] truncate w-full tracking-tight">{location.address}</span>
               </div>
             </button>
             <Link
@@ -151,18 +146,21 @@ export function TopHeader({ initialLocation, mastheadProps }: TopHeaderProps) {
               triggerHaptic(HapticPattern.ACTION);
               router.push('/search');
             }}
-            className="w-full flex items-center gap-[var(--space-3)] h-11 px-[var(--space-4)] bg-[var(--surface-muted)] rounded-[var(--radius-md)] hover:bg-[var(--input)] transition-all group"
+            className="w-full flex items-center gap-[var(--space-3)] h-11 px-[var(--space-4)] bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius-md)] active:bg-[var(--input)] transition-all group"
           >
-            <Search className="size-4.5 text-[var(--primary)]" />
+            <Search className="size-4 text-[var(--primary)]" />
             <span className="text-sm font-bold text-[var(--text-tertiary)]">Search &quot;Best Birthday Cakes&quot;</span>
           </button>
+        </div>
 
-          {(status || etaMinutes || locationName) && (
+        {/* Masthead Extension */}
+        <div className="md:hidden">
+          {hasMasthead && (
             <Masthead
               status={status}
               etaMinutes={etaMinutes}
               locationName={locationName}
-              className="py-1.5 px-0 border-none bg-transparent"
+              className="py-1 px-4 border-none bg-transparent h-[var(--top-masthead-height)] flex items-center"
             />
           )}
         </div>

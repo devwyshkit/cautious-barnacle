@@ -11,10 +11,12 @@ import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 interface AddToCartButtonProps {
     product_id: string;
     product_name: string;
+    product_slug?: string | null;
     product_image?: string | null;
     unit_price: number;
     vendor_id: string;
     vendor_name: string;
+    vendor_slug?: string | null;
     className?: string;
     has_personalization?: boolean;
 }
@@ -27,10 +29,12 @@ interface AddToCartButtonProps {
 export function AddToCartButton({
     product_id,
     product_name,
+    product_slug,
     product_image,
     unit_price,
     vendor_id,
     vendor_name,
+    vendor_slug,
     className,
     has_personalization = false,
 }: AddToCartButtonProps) {
@@ -43,21 +47,42 @@ export function AddToCartButton({
         e.preventDefault();
         e.stopPropagation();
 
-        if (has_personalization && !justAdded) {
-            triggerHaptic(HapticPattern.ACTION);
-            router.push(`/vendor/${vendor_id}/product/${product_id}`);
-            return;
-        }
+        const vSlug = vendor_slug;
+        const pSlug = product_slug;
 
-        setLocalPending(true);
         const optimistic_data = {
             product_name,
             product_image: product_image || '/images/logo.png',
             unit_price,
             vendor_id: vendor_id || '',
-            vendor_name: vendor_name || 'Store'
+            vendor_name: vendor_name || 'Store',
+            vendor_slug: vSlug,
+            product_slug: pSlug
         };
 
+        if (has_personalization && !justAdded) {
+            triggerHaptic(HapticPattern.ACTION);
+
+            // WYSHKIT 2026: Law 11 P0 Hardening
+            // Intercepted routes REQUIRE exact slug matching. UUID fallbacks will break interception.
+            if (!vSlug || !pSlug) {
+                console.error(`[WYSHKIT 2026 P0] Slug-First Violation: Missing slugs for intercepted navigation. Interception will fail.`, {
+                    vendor: vSlug,
+                    product: pSlug,
+                    product_id
+                });
+                // Fallback to ID for functionality, but Law 11 is violated.
+                const vRef = vSlug || vendor_id;
+                const pRef = pSlug || product_id;
+                router.push(`/vendor/${vRef}/product/${pRef}`);
+                return;
+            }
+
+            router.push(`/vendor/${vSlug}/product/${pSlug}`);
+            return;
+        }
+
+        setLocalPending(true);
         const result = await addToDraftOrder(
             product_id,
             null,
@@ -73,8 +98,9 @@ export function AddToCartButton({
             triggerHaptic(HapticPattern.SUCCESS);
             setJustAdded(true);
         } else {
-            if (result?.error !== 'VENDOR_MISMATCH') {
+            if (result?.error && result.error !== 'VENDOR_MISMATCH') {
                 triggerHaptic(HapticPattern.ERROR);
+                import('sonner').then(({ toast }) => toast.error(result.error));
             }
         }
     };

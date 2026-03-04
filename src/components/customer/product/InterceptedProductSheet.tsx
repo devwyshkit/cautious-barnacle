@@ -32,11 +32,16 @@ export function InterceptedProductSheet({ product, onCloseOverride }: Intercepte
         // We favor explicit paths over history.back() for intercepted sheets
         // to ensure we never land on a "dead end" or redirect loop.
         const returnUrl = searchParams.get('returnUrl');
-        const vendorPath = `/vendor/${product.vendor_id || searchParams.get('id')}`;
+        // WYSHKIT 2026: Explicit slug-first navigation
+        const vendorSlug = product.vendor_slug || searchParams.get('vendor_slug');
+        if (!vendorSlug) {
+            console.warn(`[WYSHKIT 2026] Missing vendor_slug for product ${product.id}. Law 11 Violation.`);
+        }
+        const vendorPath = vendorSlug ? `/vendor/${vendorSlug}` : '/';
         const targetPath = returnUrl || onCloseOverride || vendorPath;
 
         router.push(targetPath);
-    }, [product.vendor_id, onCloseOverride, router, searchParams]);
+    }, [product.id, product.vendor_slug, onCloseOverride, router, searchParams]);
 
     const params = Object.fromEntries(searchParams.entries());
     const validated = checkoutStateSchema.safeParse(params);
@@ -58,7 +63,7 @@ export function InterceptedProductSheet({ product, onCloseOverride }: Intercepte
             className="md:max-w-[520px]"
             lean
         >
-            <div className="flex-1 relative h-full">
+            <div className="flex-1 flex flex-col min-h-0 relative h-full w-full">
                 <ProductDetailView
                     product={product}
                     onBack={handleClose}

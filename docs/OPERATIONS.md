@@ -97,28 +97,22 @@ SUSPENDED   → (permanent)              → TERMINATED
 **Personalisation Schema (if enabled)**:
 
 ```json
-{
-  "personalization_schema": [
-    {
-      "field_id": "engraving_text",
-      "type": "text",
-      "label": "Text to engrave",
-      "max_chars": 20,
-      "instructions": "English only. No special characters except hyphens."
-    },
-    {
-      "field_id": "logo",
-      "type": "image_upload",
-      "label": "Upload your logo (optional)",
-      "instructions": "PNG with transparent background, min 300×300px",
-      "required": false
-    }
-  ],
-  "max_free_revisions": 2,
-  "paid_revision_fee": 49,
-  "preview_sla_hours": 2,
-  "production_sla_mins": 10
-}
+[
+  {
+    "id": "engraving_text",
+    "type": "text",
+    "label": "Text to engrave",
+    "placeholder": "Enter text",
+    "validation": "^.{1,20}$",
+    "instructions": "English only. Max 20 chars."
+  },
+  {
+    "id": "color_choice",
+    "type": "select",
+    "label": "Primary Color",
+    "options": ["Royal Gold", "Midnight Silver", "Rosewood"]
+  }
+]
 ```
 
 **Maximum 3 fields per product.** Hick's Law applies to vendor setup too.

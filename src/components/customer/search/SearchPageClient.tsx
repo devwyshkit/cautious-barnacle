@@ -84,7 +84,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
 
   return (
     <div className="flex flex-col h-full bg-[var(--surface)]">
-      <div className="p-4 border-b border-[var(--border)] flex items-center gap-3">
+      <div className="p-[var(--space-4)] border-b border-[var(--border)] flex items-center gap-[var(--space-3)]">
         <Button
           variant="ghost"
           size="icon"
@@ -107,7 +107,7 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             className="pl-9 h-10 bg-[var(--surface-muted)] border-[var(--border)] text-sm rounded-[var(--radius-md)] focus-visible:ring-[var(--primary-ring)]"
           />
           {(inputValue || isPending) && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            <div className="absolute right-[var(--space-3)] top-1/2 -translate-y-1/2 flex items-center gap-[var(--space-2)]">
               {isPending && <Loader2 className="size-3 animate-spin text-[var(--text-tertiary)]" />}
               {inputValue && (
                 <button
@@ -127,8 +127,8 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
       </div>
 
       {currentCategory && (
-        <div className="px-4 py-2 border-b border-[var(--border)] bg-[var(--surface-muted)]">
-          <div className="flex items-center gap-2">
+        <div className="px-[var(--space-4)] py-[var(--space-2)] border-b border-[var(--border)] bg-[var(--surface-muted)]">
+          <div className="flex items-center gap-[var(--space-2)]">
             <span className="text-xs font-black uppercase tracking-widest text-[var(--text-tertiary)]">Category:</span>
             <span className="text-xs font-bold text-[var(--text-primary)] uppercase">{currentCategory}</span>
             <button
@@ -144,23 +144,23 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-[var(--space-4)]">
         {isPending && !hasResults ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="size-6 animate-spin text-[var(--primary)]" />
           </div>
         ) : !hasActiveFilters ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Search className="size-10 text-[var(--border)] mb-4" />
+            <Search className="size-10 text-[var(--border)] mb-[var(--space-4)]" />
             <p className="text-sm font-black uppercase tracking-tight text-[var(--text-tertiary)]">Search for products or stores</p>
           </div>
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="size-20 bg-[var(--surface-muted)] rounded-full flex items-center justify-center mb-6">
+            <div className="size-20 bg-[var(--surface-muted)] rounded-full flex items-center justify-center mb-[var(--space-6)]">
               <Search className="size-8 text-[var(--border)]" />
             </div>
-            <p className="text-sm font-black uppercase tracking-tight text-[var(--text-primary)] mb-2">No Results</p>
-            <p className="text-xs font-bold text-[var(--text-secondary)] max-w-[200px] mb-8 leading-relaxed">
+            <p className="text-sm font-black uppercase tracking-tight text-[var(--text-primary)] mb-[var(--space-2)]">No Results</p>
+            <p className="text-xs font-bold text-[var(--text-secondary)] max-w-[200px] mb-[var(--space-8)] leading-relaxed">
               We couldn&apos;t find {currentQ ? `&quot;${currentQ}&quot;` : 'what you were looking for'}
               {currentCategory && ` in ${currentCategory}`}.
             </p>
@@ -176,12 +176,12 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
             </Button>
           </div>
         ) : (
-          <div className={cn("space-y-6 transition-opacity", isPending ? "opacity-50" : "opacity-100")}>
-            <div className="space-y-8">
+          <div className={cn("space-y-[var(--space-6)] transition-opacity", isPending ? "opacity-50" : "opacity-100")}>
+            <div className="space-y-[var(--space-8)]">
               {results.vendors.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-4 px-1">Top stores</h3>
-                  <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-[var(--space-4)] px-[var(--space-1)]">Top stores</h3>
+                  <div className="space-y-[var(--space-4)]">
                     {results.vendors.map((vendor) => (
                       <VendorCard
                         key={vendor.id}
@@ -195,25 +195,35 @@ export function SearchPageClient({ searchParams, initialResults }: SearchPageCli
 
               {results.products.length > 0 && (
                 <div className="pb-safe">
-                  <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-4 px-1">Products from stores</h3>
-                  <div className="space-y-6">
+                  <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-[var(--space-4)] px-[var(--space-1)]">Products from stores</h3>
+                  <div className="space-y-[var(--space-6)]">
                     {Object.entries(
-                      results.products.reduce((acc: Record<string, { vendorName: string, products: any[] }>, product: any) => {
-                        const vId = product.vendor_id || '';
-                        if (!acc[vId]) acc[vId] = { vendorName: product.vendor_name || 'Vendor', products: [] };
+                      results.products.reduce((acc: Record<string, { vendorName: string, vendorSlug: string, products: any[] }>, product: any) => {
+                        const vId = product.vendor_slug || product.vendor_id || '';
+                        if (!acc[vId]) acc[vId] = {
+                          vendorName: product.vendor_name || 'Vendor',
+                          vendorSlug: product.vendor_slug || '',
+                          products: []
+                        };
                         acc[vId].products.push(product);
                         return acc;
-                      }, {})
-                    ).map(([vId, group]) => (
-                      <div key={vId} className="space-y-3">
-                        <div className="flex items-center justify-between px-1">
-                          <Link href={`/vendor/${vId}`} className="text-xs font-bold text-[var(--text-primary)] tracking-tight hover:text-[var(--primary)] transition-colors">
-                            {group.vendorName}
-                          </Link>
+                      }, {} as Record<string, { vendorName: string, vendorSlug: string, products: any[] }>)
+                    ).map(([vKey, group]) => (
+                      <div key={vKey} className="space-y-[var(--space-3)]">
+                        <div className="flex items-center justify-between px-[var(--space-1)]">
+                          {group.vendorSlug ? (
+                            <Link href={`/vendor/${group.vendorSlug}`} className="text-xs font-bold text-[var(--text-primary)] tracking-tight hover:text-[var(--primary)] transition-colors">
+                              {group.vendorName}
+                            </Link>
+                          ) : (
+                            <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">
+                              {group.vendorName} (Missing Slug)
+                            </span>
+                          )}
                           <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">{group.products.length} Match{group.products.length > 1 ? 'es' : ''}</span>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-6">
+                        <div className="grid grid-cols-2 gap-x-[var(--space-3)] gap-y-[var(--space-6)]">
                           {group.products.map((product) => (
                             <ProductCard
                               key={product.id}

@@ -17,20 +17,26 @@ import { formatCurrency } from '@/lib/utils/pricing';
  */
 export function FloatingCartBar() {
   const router = useRouter();
-  const { draftOrder, loading: cartLoading, setDrawerOpen } = useCart();
+  const pathname = usePathname();
+  const { draftOrder, loading: cartLoading } = useCart();
   const { user, loading: authLoading } = useAuth();
 
   const displayCart = draftOrder;
   const hasProducts = displayCart && displayCart.product_count > 0;
-  const isVisible = hasProducts;
+
+  // WYSHKIT 2026: UI Isolation Pattern
+  // Hide on transactional pages where primary action is already on-page.
+  const isTransactionalPage = [
+    '/checkout',
+    '/auth',
+    '/orders/',
+  ].some(path => pathname.startsWith(path));
+
+  const isVisible = hasProducts && !isTransactionalPage;
 
   const handleOpenCart = (e: React.MouseEvent) => {
     e.preventDefault();
     triggerHaptic(HapticPattern.ACTION);
-    if (!user) {
-      router.push('/auth?returnUrl=/checkout');
-      return;
-    }
     router.push('/checkout');
   };
 
@@ -45,15 +51,16 @@ export function FloatingCartBar() {
 
   useEffect(() => {
     setVisualCount(productCount);
-    if (productCount !== prevCount.current && productCount > 0) {
-      if (productCount > prevCount.current) {
-        setShouldPulse(true);
-        triggerHaptic(HapticPattern.ACTION);
-        const timer = setTimeout(() => setShouldPulse(false), 300);
-        return () => clearTimeout(timer);
-      }
+    if (productCount > prevCount.current) {
+      // Item was added — pulse the bar
+      setShouldPulse(true);
+      triggerHaptic(HapticPattern.ACTION);
+      const timer = setTimeout(() => setShouldPulse(false), 300);
       prevCount.current = productCount;
+      return () => clearTimeout(timer);
     }
+    // Always sync ref so remove+re-add works correctly
+    prevCount.current = productCount;
   }, [productCount]);
 
   return (
@@ -73,46 +80,51 @@ export function FloatingCartBar() {
         type="button"
         aria-label={`View cart: ${visualCount} items, ${formatCurrency(displayTotal)}`}
         className={cn(
-          "w-full bg-[var(--primary)] backdrop-blur-3xl rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] border border-[var(--primary-hover)]/30 overflow-hidden",
+          "w-full bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] backdrop-blur-3xl rounded-[var(--radius-2xl)] shadow-[var(--shadow-xl)] border border-[var(--primary-hover)]/20 overflow-hidden",
           "transition-all duration-300 cursor-pointer active:scale-[0.98] text-left",
-          shouldPulse && "scale-[1.02] bg-[var(--primary-hover)]",
+          shouldPulse && "scale-[1.02] brightness-110",
           isLoading && "opacity-70 pointer-events-none"
         )}
       >
-        <div className="flex items-center justify-between px-[var(--space-4)] py-[var(--space-3)] min-h-[56px]">
-          <div className="flex items-center gap-[var(--space-3)]">
+        <div className="flex items-center justify-between px-[var(--space-5)] py-[var(--space-3-5)] min-h-[64px]">
+          <div className="flex items-center gap-[var(--space-4)]">
             <div className="relative">
-              <ShoppingBag className="size-5 text-[var(--primary-foreground)]/90" />
-              <div className="absolute -top-1.5 -right-1.5 size-4 rounded-full bg-[var(--surface)] flex items-center justify-center shadow-[var(--shadow-sm)]">
-                <span className="text-xs font-bold text-[var(--primary)]">{visualCount}</span>
+              <div className="size-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                <ShoppingBag className="size-5 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 size-5 rounded-full bg-white flex items-center justify-center shadow-[var(--shadow-sm)] border-2 border-[var(--primary)]">
+                <span className="text-[10px] font-black text-[var(--primary)] tabular-nums">{visualCount}</span>
               </div>
             </div>
 
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-[var(--primary-foreground)] leading-none">
-                {visualCount} {visualCount === 1 ? 'product' : 'products'}
+              <span className="text-sm font-black text-white tracking-tight leading-none">
+                {visualCount} {visualCount === 1 ? 'Product' : 'Products'}
               </span>
-              <div className="flex items-center gap-[var(--space-2)] mt-0.5">
-                <span className="text-xs font-medium text-[var(--primary-foreground)]/80 truncate max-w-[120px]">
-                  {displayCart?.products?.[0]?.vendor_name || 'Local store'}
+              <div className="flex items-center gap-[var(--space-2)] mt-1">
+                <span className="text-[11px] font-bold text-white/70 truncate max-w-[140px] uppercase tracking-widest">
+                  {displayCart?.products?.[0]?.vendor_name || 'Local Store'}
                 </span>
                 {hasPersonalization && (
-                  <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[var(--surface)]/20">
-                    <Sparkles className="size-2 text-[var(--text-inverse)]" />
-                    <span className="text-xs font-bold text-[var(--text-inverse)] tracking-tight leading-none uppercase">Personalized</span>
+                  <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/20 border border-white/10">
+                    <Sparkles className="size-2 text-white" />
+                    <span className="text-[9px] font-black text-white tracking-tighter leading-none uppercase">Personalized</span>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-[var(--space-2)]">
-            <span className="text-sm font-bold text-[var(--primary-foreground)] tabular-nums">
-              {formatCurrency(displayTotal)}
-            </span>
-            <div className="flex items-center gap-1 bg-[var(--surface)]/20 px-2.5 py-1 rounded-full text-[var(--text-inverse)] font-bold text-xs">
-              View
-              <ChevronRight className="size-3 stroke-[3]" />
+          <div className="flex items-center gap-[var(--space-4)]">
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest leading-none">To Pay</span>
+              <span className="text-base font-black text-white tabular-nums mt-0.5">
+                {formatCurrency(displayTotal)}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-white px-4 py-2 rounded-full text-[var(--primary)] font-black text-[11px] uppercase tracking-widest shadow-sm hover:bg-white/90 transition-colors">
+              Checkout
+              <ChevronRight className="size-3.5 stroke-[4]" />
             </div>
           </div>
         </div>

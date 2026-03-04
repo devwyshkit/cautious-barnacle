@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useOptimistic, useTransition, useEffect } from "react";
+import React, { createContext, useContext, useState, useOptimistic, useTransition, useEffect, useCallback, useMemo } from "react";
 import { DraftTransaction as Cart, SelectedPersonalization, SelectedAddon, CartProduct } from "@/lib/types/personalization";
 import { EMPTY_CART } from "@/lib/constants/cart";
 import { useAuth } from "@/providers/AuthProvider";
@@ -43,8 +43,6 @@ interface CartContextType {
     removeFromDraftOrder: (productId: string, variantId?: string | null) => Promise<void>;
     updateQuantity: (productId: string, variantId: string | null, quantity: number) => Promise<void>;
     clearDraftOrder: () => Promise<void>;
-    isDrawerOpen: boolean;
-    setDrawerOpen: (open: boolean) => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -124,9 +122,7 @@ export function CartProvider({
 
     const [showReplaceCartDialog, setShowReplaceCartDialog] = useState(false);
     const [pendingItem, setPendingItem] = useState<any>(null);
-    const [isDrawerOpen, setDrawerOpen] = useState(false);
-
-    const addToDraftOrder = async (
+    const addToDraftOrder = useCallback(async (
         product_id: string,
         variant_id: string | null,
         personalization: SelectedPersonalization,
@@ -173,9 +169,9 @@ export function CartProvider({
                 }
             });
         });
-    };
+    }, [startTransition, setOptimisticCart]);
 
-    const removeFromDraftOrder = async (productId: string, variantId?: string | null) => {
+    const removeFromDraftOrder = useCallback(async (productId: string, variantId?: string | null) => {
         const normalizedVariantId = variantId ?? null;
         const cartItem = optimisticCart.products.find(
             (i: CartProduct) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
@@ -197,9 +193,9 @@ export function CartProvider({
                 logger.error('Remove Transition Error', err as Error);
             }
         });
-    };
+    }, [optimisticCart.products, startTransition, setOptimisticCart]);
 
-    const updateQuantity = async (productId: string, variantId: string | null, quantity: number) => {
+    const updateQuantity = useCallback(async (productId: string, variantId: string | null, quantity: number) => {
         const normalizedVariantId = variantId ?? null;
         const cartItem = optimisticCart.products.find(
             (i: CartProduct) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
@@ -221,9 +217,10 @@ export function CartProvider({
                 logger.error('Update Transition Error', err as Error);
             }
         });
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [optimisticCart.products, startTransition, setOptimisticCart]);
 
-    const clearCart = async () => {
+    const clearCart = useCallback(async () => {
         startTransition(async () => {
             setOptimisticCart({ type: 'clear', payload: null });
             try {
@@ -232,9 +229,9 @@ export function CartProvider({
                 logger.error('Clear Transition Error', err as Error);
             }
         });
-    };
+    }, []);
 
-    const handleReplaceCart = async () => {
+    const handleReplaceCart = useCallback(async () => {
         if (!pendingItem) return;
         setShowReplaceCartDialog(false);
         await clearCart();
@@ -246,10 +243,12 @@ export function CartProvider({
             pendingItem.quantity,
             pendingItem.optimistic_data
         );
-    };
+    }, [pendingItem, clearCart, addToDraftOrder]);
 
 
-    const value = {
+    const clearDraftOrder = useCallback(clearCart, [clearCart]);
+
+    const value = React.useMemo(() => ({
         draftOrder: optimisticCart,
         loading: isPending,
         isPending,
@@ -257,10 +256,8 @@ export function CartProvider({
         addToDraftOrder,
         removeFromDraftOrder,
         updateQuantity,
-        clearDraftOrder: clearCart,
-        isDrawerOpen,
-        setDrawerOpen,
-    };
+        clearDraftOrder,
+    }), [optimisticCart, isPending, user, addToDraftOrder, removeFromDraftOrder, updateQuantity, clearDraftOrder]);
 
     return (
         <CartContext.Provider value={value}>

@@ -166,6 +166,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_selected_addons: (validated.payload.selected_addons as any) || []
                     });
                     if (error) throw error;
+                    revalidatePath('/', 'layout');
                     return { success: true, data };
                 }
 
@@ -182,7 +183,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     if (data && !(data as any).success) {
                         throw new Error((data as any).error || 'Failed to update quantity');
                     }
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     break;
                 }
 
@@ -193,7 +194,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     break;
                 }
 
@@ -204,7 +205,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     break;
                 }
 
@@ -215,7 +216,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     break;
                 }
 
@@ -226,7 +227,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     break;
                 }
 
@@ -237,7 +238,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     break;
                 }
 
@@ -256,7 +257,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     if (error) throw error;
 
                     revalidateTag('orders');
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     return { success: true, data };
                 }
 
@@ -275,7 +276,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                     if (data && !(data as any).success) {
                         throw new Error((data as any).error || 'Failed to update product');
                     }
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     break;
                 }
 
@@ -330,7 +331,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_reuse_personalization: validated.payload.reuse_personalization
                     });
                     if (error) throw error;
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     return { success: true, data };
                 }
 
@@ -340,7 +341,7 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_session_id: sessionId ?? undefined
                     });
                     if (error) throw error;
-                    revalidateTag('cart');
+                    revalidatePath('/', 'layout');
                     break;
                 }
             }

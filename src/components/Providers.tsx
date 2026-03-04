@@ -12,6 +12,8 @@ import { RealtimeProvider } from '@/providers/RealtimeProvider';
 import { User } from '@supabase/supabase-js';
 import { UserPermissions } from '@/lib/auth/core';
 
+import { UIProvider } from '@/providers/UIProvider';
+
 export function Providers({
   children,
   initialUser,
@@ -24,8 +26,10 @@ export function Providers({
   return (
     <AuthProvider initialUser={initialUser} initialPermissions={initialPermissions}>
       <RealtimeProvider>
-        {children}
-        <Toaster position="top-center" richColors />
+        <UIProvider>
+          {children}
+          <Toaster position="top-center" richColors />
+        </UIProvider>
       </RealtimeProvider>
     </AuthProvider>
   );

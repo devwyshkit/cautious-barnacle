@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Star, Clock } from 'lucide-react';
+import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { cn } from '@/lib/utils';
 import { formatPrepTime } from '@/lib/utils/sla';
 import type { Tables } from '@/lib/supabase/database.types';
@@ -16,16 +17,19 @@ interface VendorCardProps {
 
 export function VendorCard({ data, className }: VendorCardProps) {
     const prepTime = data.avg_prep_time_mins
-        ? formatPrepTime(data.avg_prep_time_mins / 60)
+        ? formatPrepTime(data.avg_prep_time_mins)
         : null;
 
     return (
-        <Link href={`/vendor/${data.id}`}>
+        <Link
+            href={`/vendor/${data.slug}`}
+            onClick={() => triggerHaptic(HapticPattern.ACTION)}
+        >
             <Card className={cn(
-                "overflow-hidden border-none shadow-none group flex flex-col gap-[var(--space-2)] active:scale-[0.98] transition-all duration-200",
+                "overflow-hidden border border-[var(--border)] shadow-[var(--shadow-sm)] group flex flex-col gap-0 active:scale-[0.98] transition-all duration-300 rounded-[var(--radius-xl)] bg-[var(--surface)] hover:shadow-[var(--shadow-md)] hover:border-[var(--primary-ring)]",
                 className
             )}>
-                <div className="relative aspect-[4/3] w-full rounded-[var(--radius-lg)] overflow-hidden bg-[var(--surface-muted)]">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--surface-muted)] rounded-t-[var(--radius-xl)]">
                     {data.image_url ? (
                         <Image
                             src={data.image_url}
@@ -48,18 +52,18 @@ export function VendorCard({ data, className }: VendorCardProps) {
                     )}
                 </div>
 
-                <div className="px-[var(--space-1)] flex flex-col gap-[var(--space-1)]">
+                <div className="px-[var(--space-2)] pb-[var(--space-3)] flex flex-col gap-[var(--space-1)]">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-tight group-hover:text-[var(--primary)] transition-colors">{data.name}</h3>
+                        <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-tight group-hover:text-[var(--primary)] transition-colors truncate">{data.name}</h3>
                         {data.rating && (
-                            <div className="flex items-center gap-[var(--space-1)] px-[var(--space-2)] py-[var(--space-1)] bg-[var(--success-foreground)] rounded-[var(--radius-sm)]">
+                            <div className="flex items-center gap-[var(--space-1)] px-[var(--space-1-5)] py-[var(--space-0-5)] bg-[var(--success-foreground)] rounded-[var(--radius-xs)] shrink-0">
                                 <Star className="size-2.5 fill-[var(--success)] text-[var(--success)]" />
-                                <span className="text-xs font-bold text-[var(--success)] leading-none">{data.rating}</span>
+                                <span className="text-[10px] font-black text-[var(--success)] leading-none">{data.rating}</span>
                             </div>
                         )}
                     </div>
                     <div className="flex items-center gap-[var(--space-1)]">
-                        <span className="text-xs font-medium text-[var(--text-secondary)] tracking-tight">{data.city || 'Local Store'}</span>
+                        <span className="text-[10px] font-bold text-[var(--text-tertiary)] uppercase tracking-tight">{data.city || 'Local Store'}</span>
                     </div>
                 </div>
             </Card>
