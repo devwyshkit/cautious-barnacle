@@ -28,6 +28,15 @@ const addressSchema = z.object({
     manualCity: z.string().optional(),
     manualState: z.string().optional(),
     manualPincode: z.string().optional(),
+}).refine((data) => {
+    // If pincode is provided, it must be 6 digits
+    if (data.manualPincode && !/^\d{6}$/.test(data.manualPincode)) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Pincode must be exactly 6 digits",
+    path: ["manualPincode"]
 });
 
 type AddressFormValues = z.infer<typeof addressSchema>;
@@ -53,7 +62,10 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [placeData, setPlaceData] = useState<PlaceData | null>(null);
     const [isGettingLocation, setIsGettingLocation] = useState(false);
-    const [entryMode, setEntryMode] = useState<'search' | 'manual'>('search');
+    // WYSHKIT 2026: Default to manual entry when no Google Maps API key configured.
+    // This ensures address save is NEVER blocked by a missing ENV variable.
+    const hasGoogleMapsKey = typeof process !== 'undefined' && !!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const [entryMode, setEntryMode] = useState<'search' | 'manual'>(hasGoogleMapsKey ? 'search' : 'manual');
 
     const form = useForm<AddressFormValues>({
         resolver: zodResolver(addressSchema),
@@ -288,6 +300,9 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                                     {...form.register('manualArea')}
                                     className="bg-[var(--surface-muted)]/50 border-[var(--border)] focus:bg-[var(--surface)]"
                                 />
+                                {form.formState.errors.manualArea && (
+                                    <p className="text-xs font-bold text-rose-500 ml-1">{form.formState.errors.manualArea.message}</p>
+                                )}
                                 <div className="grid grid-cols-2 gap-3">
                                     <Input
                                         placeholder="City"
@@ -307,6 +322,9 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                                     maxLength={6}
                                     inputMode="numeric"
                                 />
+                                {form.formState.errors.manualPincode && (
+                                    <p className="text-xs font-bold text-rose-500 ml-1">{form.formState.errors.manualPincode.message}</p>
+                                )}
                             </div>
                             <button
                                 type="button"
@@ -353,13 +371,7 @@ export function AddressForm({ onSuccess, onCancel, initialValues }: AddressFormP
                 <Button
                     type="submit"
                     className="flex-[2] rounded-[var(--radius-md)] h-12 font-bold bg-[var(--text-primary)] text-[var(--text-inverse)] hover:bg-[var(--text-primary)]"
-                    disabled={
-                        isSubmitting ||
-                        (entryMode === 'search' ? !placeData : false) ||
-                        (entryMode === 'manual'
-                            ? !((form.watch('manualArea')?.trim()?.length ?? 0) >= 3 && /^\d{6}$/.test(form.watch('manualPincode') || ''))
-                            : false)
-                    }
+                    disabled={isSubmitting}
                 >
                     {isSubmitting ? (
                         <>

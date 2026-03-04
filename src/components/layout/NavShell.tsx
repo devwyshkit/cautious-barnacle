@@ -34,20 +34,18 @@ export function NavShell({ initialLocation, mastheadProps, children, modal }: Na
     // Immersive routes where we hide the global header/nav
     // WYSHKIT 2026: Focused transactional environments
     const isImmersive =
-        pathname.startsWith('/auth') ||
         pathname.startsWith('/checkout') ||
         pathname.startsWith('/orders/') || // Matches /orders/[id] but not /orders
         pathname.startsWith('/onboarding');
 
     // WYSHKIT 2026: Footer Allowlist (Strict Mode)
     // Only show on Hub pages. Never on transactional pages.
-    const showFooter = ['/', '/search', '/profile'].includes(pathname) ||
+    const showFooter = pathname === '/' ||
+        pathname.startsWith('/vendor/') ||
         pathname.startsWith('/category/') ||
         pathname.startsWith('/collection/');
 
-    const hideHeader = isImmersive ||
-        pathname?.startsWith('/search') ||
-        pathname?.startsWith('/location');
+    const hideHeader = isImmersive;
     const hasMasthead = !!(mastheadProps?.status || mastheadProps?.etaMinutes || mastheadProps?.locationName) && !hideHeader;
 
     return (

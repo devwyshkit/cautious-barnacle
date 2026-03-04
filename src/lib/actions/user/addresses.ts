@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { logger } from '@/lib/logging/logger'
 
 export async function getAddresses() {
   const supabase = await createClient()
@@ -67,7 +68,10 @@ export async function createAddress(payload: {
     .select('id, type, name, phone, address_line1, address_line2, city, state, pincode, country, is_default, latitude, longitude, gstin')
     .single()
 
-  if (error) return { error: 'Failed to create address' }
+  if (error) {
+    logger.error('createAddress DB failure', error as Error, { userId: user.id });
+    return { error: `Failed to create address: ${error.message}` };
+  }
 
   revalidatePath('/')
   revalidatePath('/profile')

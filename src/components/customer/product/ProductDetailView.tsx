@@ -37,7 +37,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
     const [quantity, setQuantity] = useState(initialState?.quantity ?? 1);
     const [selectedVariantId, setSelectedVariantId] = useState<string | null>(initialState?.variantId ?? null);
     const [selectedAddonIds, setSelectedAddonIds] = useState<Set<string>>(new Set(initialState?.addonIds ?? []));
-    const [personalizationFields, setPersonalizationFields] = useState<Record<string, string>>({});
+    const [isPersonalizationEnabled, setIsPersonalizationEnabled] = useState(initialState?.addonIds?.some(id => id === 'wysh_personalization') ?? false);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const imageContainerRef = useRef<HTMLDivElement>(null);
 
@@ -57,21 +57,18 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
 
 
     const variantsArray = Array.isArray(product?.variants) ? product.variants : [];
-    const addonsArray: any[] = []; // Deprecated table
-    const personalizationArray: any[] = Array.isArray(product?.personalization_options) ? product.personalization_options as any[] : [];
-    const personalizationSchema = (product as any)?.personalization_schema?.fields || [];
+    // WYSHKIT 2026: Strictly defined personalization as a post-payment service
+    const hasPersonalizationService = !!(product as any).has_personalization || (product as any).personalization_options?.length > 0;
+    const personalizationPrice = (product as any).personalization_fee || 0;
 
     const selectedVariant = useMemo(() => {
         return (variantsArray as any[]).find((v: any) => String(v.id) === selectedVariantId) || null;
     }, [variantsArray, selectedVariantId]);
 
     const selectedAddons = useMemo(() => {
-        return addonsArray.filter(addon => selectedAddonIds.has(String(addon.id)));
-    }, [addonsArray, selectedAddonIds]);
-
-    const selectedPersonalizations = useMemo(() => {
-        return personalizationArray.filter(p => selectedAddonIds.has(String(p.id)));
-    }, [personalizationArray, selectedAddonIds]);
+        // WYSHKIT 2026: Combined Add-ons (Limit 8 total)
+        return []; // Simple list for now
+    }, []);
 
     const isOutOfStock = useMemo(() => {
         if (variantsArray.length > 0) {
@@ -87,7 +84,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
         return selectedVariant ? (Number(selectedVariant.price) || 0) : basePrice;
     }, [product.base_price, selectedVariant]);
 
-    const totalPrice = unitPrice * quantity;
+    const totalPrice = (unitPrice * quantity) + (isPersonalizationEnabled ? personalizationPrice : 0);
 
     const isEditMode = !!initialState?.cartProductId;
 
@@ -96,60 +93,31 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
 
         setContinuing(true);
         try {
-            const allSelectedAddons = [
-                ...selectedAddons.map(a => ({
-                    id: String(a.id),
-                    name: a.name || 'Add-on',
-                    price: Number(a.price) || 0,
-                    requires_preview: a.requires_preview || false
-                })),
-                ...selectedPersonalizations.map(p => ({
-                    id: String(p.id),
-                    name: p.name || 'Personalization',
-                    price: Number(p.price) || 0,
-                    requires_preview: true
-                }))
-            ];
+            const allSelectedAddons = Array.from(selectedAddonIds).map(id => ({
+                id,
+                name: id === 'wysh_personalization' ? 'Personalisation Service' : 'Add-on',
+                price: id === 'wysh_personalization' ? personalizationPrice : 0,
+                requires_preview: id === 'wysh_personalization'
+            }));
 
-            let result;
-            if (isEditMode && initialState?.cartProductId) {
-                result = await addToDraftOrder(
-                    product.id,
-                    selectedVariantId,
-                    {
-                        enabled: personalizationArray.length > 0 || personalizationSchema.length > 0,
-                        fields: personalizationFields
-                    },
-                    allSelectedAddons,
-                    quantity,
-                    {
-                        product_name: product.name,
-                        product_image: product.images?.[0] || FALLBACK_IMAGE,
-                        unit_price: Number(unitPrice) || 0,
-                        vendor_id: product.vendor_id!,
-                        vendor_name: (product as any).vendor_name || 'Store',
-                        update_product_id: initialState.cartProductId
-                    }
-                );
-            } else {
-                result = await addToDraftOrder(
-                    product.id,
-                    selectedVariantId,
-                    {
-                        enabled: personalizationArray.length > 0 || personalizationSchema.length > 0,
-                        fields: personalizationFields
-                    },
-                    allSelectedAddons,
-                    quantity,
-                    {
-                        product_name: product.name,
-                        product_image: product.images?.[0] || FALLBACK_IMAGE,
-                        unit_price: Number(unitPrice) || 0,
-                        vendor_id: product.vendor_id!,
-                        vendor_name: (product as any).vendor_name || 'Store',
-                    }
-                );
-            }
+            const result = await addToDraftOrder(
+                product.id,
+                selectedVariantId,
+                {
+                    enabled: isPersonalizationEnabled,
+                    fields: {} // EMPTY: To be filled post-payment in tracking
+                },
+                allSelectedAddons,
+                quantity,
+                {
+                    product_name: product.name,
+                    product_image: product.images?.[0] || FALLBACK_IMAGE,
+                    unit_price: Number(unitPrice) || 0,
+                    vendor_id: product.vendor_id!,
+                    vendor_name: (product as any).vendor_name || 'Store',
+                    update_product_id: initialState?.cartProductId
+                }
+            );
 
             if (result && result.success) {
                 triggerHaptic(HapticPattern.SUCCESS);
@@ -287,7 +255,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         </div>
                     </div>
 
-                    {/* Variants Selection */}
+                    {/* Variants Selection (4x4 Standardized Grid) */}
                     {variantsArray.length > 0 && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
@@ -295,7 +263,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                 <span className="text-xs font-semibold text-[var(--well-warning-text)] bg-[var(--well-warning)] px-2 py-0.5 rounded-[var(--radius-sm)] border border-[var(--well-warning-text)]/20 tracking-tight">Required</span>
                             </div>
                             <div className="grid grid-cols-2 gap-3">
-                                {(variantsArray as any[]).map((v: any) => {
+                                {variantsArray.slice(0, 16).map((v: any) => {
                                     const isSelected = selectedVariantId === String(v.id);
                                     const isOutOfStock = typeof v.stock_quantity === 'number' && v.stock_quantity <= 0;
                                     return (
@@ -317,13 +285,15 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                             )}
                                         >
                                             <span className="text-xs font-semibold leading-tight mb-1">{v.name}</span>
-                                            <span className={cn(
-                                                "text-xs font-bold tabular-nums",
-                                                isSelected ? "text-[var(--text-inverse)]/80" : isOutOfStock ? "text-[var(--text-tertiary)]" : "text-[var(--text-tertiary)]"
-                                            )}>
-                                                {formatCurrency(v.price || 0)}
-                                            </span>
-                                            {isOutOfStock && <span className="text-xs font-semibold text-rose-500 tracking-tight ml-1">Sold Out</span>}
+                                            <div className="flex items-center justify-between w-full">
+                                                <span className={cn(
+                                                    "text-xs font-bold tabular-nums",
+                                                    isSelected ? "text-[var(--text-inverse)]/80" : "text-[var(--text-tertiary)]"
+                                                )}>
+                                                    {formatCurrency(v.price || 0)}
+                                                </span>
+                                                {isOutOfStock && <span className="text-[10px] font-bold text-rose-500 uppercase tracking-tight">Sold Out</span>}
+                                            </div>
                                         </button>
                                     );
                                 })}
@@ -331,183 +301,55 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         </section>
                     )}
 
-                    {/* Personalization Section */}
-                    {(personalizationArray.length > 0 || personalizationSchema.length > 0) && (
+                    {/* Personalization Section (Post-Payment Strategy) */}
+                    {hasPersonalizationService && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Personalize your {product.name}</h3>
-                                    {(personalizationArray.some(p => ('is_required' in p && (p as any).is_required)) || personalizationSchema.some((p: any) => p.required)) && (
-                                        <span className="text-xs font-semibold text-[var(--well-warning-text)] bg-[var(--well-warning)] px-2 py-0.5 rounded-[var(--radius-sm)] border border-[var(--well-warning-text)]/20 tracking-tight">Required</span>
-                                    )}
+                                    <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Add Personalisation</h3>
+                                    <Sparkles className="size-3.5 text-[var(--warning)]" />
                                 </div>
+                                <span className="text-xs font-bold text-[var(--primary)]">{formatCurrency(personalizationPrice)}</span>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 bg-[var(--well-destructive)] border border-[var(--well-destructive-text)]/10 rounded-[var(--radius-lg)] mb-2">
-                                <AlertTriangle className="size-4 text-[var(--well-destructive-text)] shrink-0" />
-                                <p className="text-xs font-semibold text-[var(--well-destructive-text)] leading-tight">
-                                    Personalized products are crafted specially for you and are non-returnable.
-                                </p>
-                            </div>
-
-                            {/* Schema-based fields */}
-                            {personalizationSchema.length > 0 && (
-                                <div className="space-y-4">
-                                    {personalizationSchema.map((field: any) => (
-                                        <div key={field.id} className="space-y-2">
-                                            <label className="text-xs font-bold text-[var(--text-primary)] tracking-tight block px-1">
-                                                {field.label} {field.required && <span className="text-rose-500">*</span>}
-                                            </label>
-                                            {field.type === 'select' && Array.isArray(field.options) ? (
-                                                /* WYSHKIT 2026: Vendor-defined presets (Swiggy pattern — tap, don't type) */
-                                                <div className="flex flex-wrap gap-2">
-                                                    {field.options.map((option: string) => {
-                                                        const isSelected = personalizationFields[field.id] === option;
-                                                        return (
-                                                            <button
-                                                                key={option}
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    triggerHaptic(HapticPattern.ACTION);
-                                                                    setPersonalizationFields(prev => ({ ...prev, [field.id]: option }));
-                                                                }}
-                                                                className={cn(
-                                                                    "px-4 py-2.5 rounded-[var(--radius-lg)] border text-sm font-semibold transition-all active:scale-[0.97]",
-                                                                    isSelected
-                                                                        ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
-                                                                        : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--text-tertiary)]"
-                                                                )}
-                                                            >
-                                                                {option}
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            ) : field.type === 'textarea' ? (
-                                                <textarea
-                                                    value={personalizationFields[field.id] || ''}
-                                                    onChange={(e) => setPersonalizationFields(prev => ({ ...prev, [field.id]: e.target.value }))}
-                                                    placeholder={field.placeholder}
-                                                    className="w-full bg-[var(--surface-muted)] border-[var(--border)] rounded-[var(--radius-md)] p-3 text-sm focus:bg-[var(--surface)] focus:border-[var(--text-primary)] transition-all outline-none border min-h-[80px] font-sans"
-                                                />
-                                            ) : (
-                                                <input
-                                                    type="text"
-                                                    value={personalizationFields[field.id] || ''}
-                                                    onChange={(e) => setPersonalizationFields(prev => ({ ...prev, [field.id]: e.target.value }))}
-                                                    placeholder={field.placeholder}
-                                                    maxLength={field.max_chars || undefined}
-                                                    className="w-full bg-[var(--surface-muted)] border-[var(--border)] rounded-[var(--radius-md)] p-3 text-sm focus:bg-[var(--surface)] focus:border-[var(--text-primary)] transition-all outline-none border font-sans"
-                                                />
-                                            )}
+                            <button
+                                onClick={() => {
+                                    setIsPersonalizationEnabled(!isPersonalizationEnabled);
+                                    const next = new Set(selectedAddonIds);
+                                    if (isPersonalizationEnabled) next.delete('wysh_personalization');
+                                    else { next.add('wysh_personalization'); triggerHaptic(HapticPattern.SUCCESS); }
+                                    setSelectedAddonIds(next);
+                                }}
+                                className={cn(
+                                    "w-full flex items-center justify-between p-4 rounded-[var(--radius-lg)] border transition-all active:scale-[0.99]",
+                                    isPersonalizationEnabled
+                                        ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
+                                        : "bg-[var(--surface-muted)] border-[var(--border)] text-[var(--text-secondary)]"
+                                )}
+                            >
+                                <div className="flex flex-col items-start gap-1">
+                                    <div className="flex items-center gap-3">
+                                        <div className={cn(
+                                            "size-5 rounded-[var(--radius-sm)] border flex items-center justify-center transition-colors",
+                                            isPersonalizationEnabled ? "bg-[var(--surface)] border-[var(--background)]" : "bg-[var(--surface)] border-[var(--border)]"
+                                        )}>
+                                            {isPersonalizationEnabled && <Check className="size-3 text-[var(--text-primary)]" strokeWidth={4} />}
                                         </div>
-                                    ))}
+                                        <span className="text-sm font-semibold">Make it special</span>
+                                    </div>
+                                    <p className={cn(
+                                        "text-[10px] font-bold tracking-tight pl-8",
+                                        isPersonalizationEnabled ? "text-[var(--text-inverse)]/70" : "text-[var(--text-tertiary)]"
+                                    )}>
+                                        Details will be collected post-payment
+                                    </p>
                                 </div>
-                            )}
-
-                            {/* Toggleable options */}
-                            {personalizationArray.length > 0 && (
-                                <div className="space-y-3">
-                                    {personalizationArray.map((p) => {
-                                        const isSelected = selectedAddonIds.has(p.id);
-                                        return (
-                                            <button
-                                                key={p.id}
-                                                onClick={() => {
-                                                    const next = new Set(selectedAddonIds);
-                                                    if (next.has(p.id)) next.delete(p.id);
-                                                    else { next.add(p.id); triggerHaptic(HapticPattern.SUCCESS); }
-                                                    setSelectedAddonIds(next);
-                                                }}
-                                                className={cn(
-                                                    "w-full flex items-center justify-between p-4 rounded-[var(--radius-lg)] border transition-all active:scale-[0.99]",
-                                                    isSelected
-                                                        ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
-                                                        : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
-                                                )}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <div className={cn(
-                                                        "size-5 rounded-[var(--radius-sm)] border flex items-center justify-center transition-colors",
-                                                        isSelected ? "bg-[var(--surface)] border-[var(--background)]" : "bg-[var(--surface-muted)] border-[var(--border)]"
-                                                    )}>
-                                                        {isSelected && <Check className="size-3 text-[var(--text-primary)]" strokeWidth={4} />}
-                                                    </div>
-                                                    <span className="text-sm font-semibold">{p.name}</span>
-                                                </div>
-                                                <span className={cn(
-                                                    "text-xs font-bold tabular-nums",
-                                                    isSelected ? "text-[var(--text-inverse)]/60" : "text-[var(--text-tertiary)]"
-                                                )}>
-                                                    +{formatCurrency(p.price || 0)}
-                                                </span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
+                            </button>
                         </section>
                     )}
 
-                    {/* Standard Add-ons Section */}
-                    {addonsArray.length > 0 && (
-                        <section className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Add Extras</h3>
-                                <span className="text-xs font-semibold text-[var(--text-tertiary)] bg-[var(--surface-muted)] px-2 py-0.5 rounded-[var(--radius-sm)] border border-[var(--border)] tracking-tight">Optional</span>
-                            </div>
-                            <div className="space-y-3">
-                                {addonsArray.map((addon) => {
-                                    const isSelected = selectedAddonIds.has(addon.id);
-                                    return (
-                                        <button
-                                            key={addon.id}
-                                            onClick={() => {
-                                                const next = new Set(selectedAddonIds);
-                                                if (next.has(addon.id)) {
-                                                    next.delete(addon.id);
-                                                    triggerHaptic(HapticPattern.ACTION);
-                                                } else {
-                                                    next.add(addon.id);
-                                                    triggerHaptic(HapticPattern.SUCCESS);
-                                                }
-                                                setSelectedAddonIds(next);
-                                            }}
-                                            className={cn(
-                                                "w-full flex items-center justify-between p-4 rounded-[var(--radius-lg)] border transition-all active:scale-[0.99]",
-                                                isSelected
-                                                    ? "bg-[var(--primary)] border-[var(--primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
-                                                    : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
-                                            )}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className={cn(
-                                                    "size-5 rounded-[var(--radius-sm)] border flex items-center justify-center transition-colors",
-                                                    isSelected ? "bg-[var(--surface)] border-[var(--background)]" : "bg-[var(--surface-muted)] border-[var(--border)]"
-                                                )}>
-                                                    {isSelected && <Check className="size-3 text-[var(--primary)]" strokeWidth={4} />}
-                                                </div>
-                                                <div className="flex flex-col items-start">
-                                                    <span className="text-sm font-semibold">{addon.name}</span>
-                                                    {isSelected && (
-                                                        <p className="text-xs font-bold text-[var(--text-inverse)]/80 leading-tight tracking-tight">
-                                                            Added to your gift
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <span className={cn(
-                                                "text-xs font-bold tabular-nums",
-                                                isSelected ? "text-[var(--text-inverse)]/80" : "text-[var(--text-tertiary)]"
-                                            )}>
-                                                +{formatCurrency(addon.price || 0)}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </section>
-                    )}
+                    {/* description for the fixed footer */}
+                    <div className="h-4" />
 
                     {/* Technical Metadata Table */}
                     <section className="space-y-4 pt-6 border-t border-[var(--border)]">

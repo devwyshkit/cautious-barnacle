@@ -9,7 +9,12 @@ import { getGlobalInitSurface } from "@/lib/actions/discovery/init";
 import { NavShell } from "@/components/layout/NavShell";
 import { CartDrawer } from "@/components/customer/CartDrawer";
 import { LocationSheet } from "@/components/customer/LocationSheet";
-import { SupportSheet } from "@/components/customer/SupportSheet";
+import { ProfileSheet } from "@/components/customer/ProfileSheet";
+import { SearchSheet } from "@/components/customer/SearchSheet";
+import { ProductSheet } from "@/components/customer/ProductSheet";
+import { OTPSheet } from "@/components/auth/OTPSheet";
+import { AuthAutoTrigger } from "@/components/auth/AuthAutoTrigger";
+import { CartSwitchSheet } from "@/components/customer/CartSwitchSheet";
 import { logger } from "@/lib/logging/logger";
 import { DraftTransaction } from "@/lib/types/personalization";
 import { LocationData } from "@/lib/actions/discovery/location";
@@ -157,10 +162,18 @@ async function AsyncLayoutContent({
       </CartErrorBoundary>
       <OrderTrackingBar initialOrders={activeOrders} />
 
-      {/* Global Intent-Based Sheets */}
+      {/* Global Intent-Based Sheets (The 7 Sheets Mandate) */}
       <CartDrawer />
       <LocationSheet />
-      <SupportSheet />
+      <ProfileSheet />
+      <SearchSheet />
+      <OTPSheet />
+      <ProductSheet />
+      <CartSwitchSheet />
+
+      <Suspense fallback={null}>
+        <AuthAutoTrigger />
+      </Suspense>
     </CartProvider>
   );
 }

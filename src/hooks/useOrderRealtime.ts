@@ -48,6 +48,7 @@ export function useOrderRealtime({
 
   // WYSHKIT 2026: Track previous isConnected to only re-fetch on RECONNECT, not on initial mount.
   const prevConnectedRef = useRef<boolean | null>(null);
+  const isFetchingRef = useRef(false);
 
   /**
    * WYSHKIT 2026: Single-trip fetch using v_order_detail view.
@@ -56,6 +57,9 @@ export function useOrderRealtime({
   const fetchOrderData = useCallback(async (retryCount = 0) => {
     const supabase = createClient();
     const MAX_RETRIES = 5;
+
+    if (isFetchingRef.current && retryCount === 0) return null;
+    if (retryCount === 0) isFetchingRef.current = true;
 
     try {
       if (retryCount > 0) setIsPolling(true);
@@ -90,6 +94,7 @@ export function useOrderRealtime({
       }
 
       setIsPolling(false);
+      if (retryCount === 0) isFetchingRef.current = false;
       return data;
     } catch (err) {
       if (retryCount < MAX_RETRIES) {
@@ -98,6 +103,7 @@ export function useOrderRealtime({
       }
       setError(err instanceof Error ? err.message : 'Failed to fetch order');
       setIsPolling(false);
+      if (retryCount === 0) isFetchingRef.current = false;
       return null;
     }
   }, [orderId]);
@@ -175,16 +181,14 @@ export function useOrderRealtime({
       }
     );
 
-    // 4. Dispatch Heartbeat — targeted re-fetch on logistical movement
-    orderChannel.on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'dispatch_attempts', filter: `order_id=eq.${orderId}` },
-      () => {
-        fetchOrderData();
-      }
-    );
 
-    orderChannel.subscribe();
+    orderChannel.subscribe((status, err) => {
+      if (status === 'CHANNEL_ERROR') {
+        console.error(`[WYSHKIT 2026 Realtime] Channel error for order ${orderId}:`, err);
+      } else if (status === 'CLOSED') {
+        console.warn(`[WYSHKIT 2026 Realtime] Channel closed for order ${orderId}`);
+      }
+    });
 
     return () => {
       supabase.removeChannel(orderChannel);

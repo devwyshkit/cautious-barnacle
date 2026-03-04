@@ -29,7 +29,7 @@ export async function calculateOrderTotalRPC(
   try {
     const supabase = await createClient();
 
-    const { data, error } = await supabase.rpc('calculate_order_total', {
+    const { data, error } = await (supabase.rpc as any)('calculate_order_total', {
       p_items: cartProducts.map(product => ({
         product_id: product.product_id,
         quantity: product.quantity,
@@ -38,12 +38,13 @@ export async function calculateOrderTotalRPC(
         has_personalization: product.has_personalization ?? false,
         selected_addons: product.selected_addons ?? []
       })) as unknown as Json,
-      p_delivery_fee_override: deliveryFeeOverride ?? undefined,
-      p_address_id: addressId || undefined,
-      p_coupon_code: couponCode || undefined,
-      p_distance_km: undefined, // [HARDENED] DB must compute distance from address_id + vendor
+      p_user_id: userId || null,
+      p_session_id: null,
+      p_address_id: addressId || null,
+      p_coupon_code: couponCode || null,
       p_use_wallet: useWallet,
-      p_user_id: userId || undefined
+      p_delivery_fee_override: deliveryFeeOverride ?? null,
+      p_distance_km: null
     });
 
     if (error) {

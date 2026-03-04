@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Home, Briefcase, MapPin, Check, Plus, Loader2, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useUI } from '@/providers/UIProvider';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ interface FulfilmentBlockProps {
 
 export function FulfilmentBlock({ addressState, onCommit, userId, initialAddresses, initialSelectedAddressId }: FulfilmentBlockProps) {
   const router = useRouter();
+  const { openProfileSheet } = useUI();
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses || []);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(() => {
     if (initialSelectedAddressId) return initialSelectedAddressId;
@@ -215,7 +217,7 @@ export function FulfilmentBlock({ addressState, onCommit, userId, initialAddress
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem onClick={() => router.push('/profile?tab=addresses')}>
+                      <DropdownMenuItem onClick={() => openProfileSheet('addresses')}>
                         <Pencil className="size-3.5 mr-2" />
                         Edit
                       </DropdownMenuItem>

@@ -6,13 +6,12 @@ import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { toast } from 'sonner';
 import { SubmittedPersonalization } from './SubmittedPersonalization';
-import { PreviewSubmission } from '@/lib/types/order';
 import Image from 'next/image';
 import { HistoryTrail } from './HistoryTrail';
 
 import { ORDER_STATUS } from '@/lib/types/order-status';
 import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
-import { OrderDetail } from '@/lib/types/order';
+import { OrderDetail, PreviewSubmission, OrderProductDetail } from '@/lib/types/order';
 
 interface CreativeBriefProps {
     order: OrderDetail;
@@ -20,6 +19,7 @@ interface CreativeBriefProps {
     timeline: any[];
     onOpenPersonalization?: () => void;
     isOptimisticSubmitted?: boolean;
+    onOpenPreview?: (product: OrderProductDetail) => void;
 }
 
 /**
@@ -30,7 +30,7 @@ interface CreativeBriefProps {
  * - Add "Approval SLA" countdown (15m) when preview is ready.
  * - Momentum UI: Micro-animations for high-intent states.
  */
-export function CreativeBrief({ order, previews, timeline, onOpenPersonalization, isOptimisticSubmitted }: CreativeBriefProps) {
+export function CreativeBrief({ order, previews, timeline, onOpenPersonalization, isOptimisticSubmitted, onOpenPreview }: CreativeBriefProps) {
     const latestPreview = previews[0];
     const personalizedProducts = order.order_products?.filter(i => i.is_personalized) || [];
 
@@ -96,6 +96,24 @@ export function CreativeBrief({ order, previews, timeline, onOpenPersonalization
                                 </div>
                             ))}
                         </div>
+
+                        {/* WYSHKIT 2026: 1-Tap Actionability */}
+                        {order.personalization_status === 'preview_ready' && onOpenPreview && (
+                            <button
+                                onClick={() => {
+                                    triggerHaptic(HapticPattern.ACTION);
+                                    const previewProduct = personalizedProducts.find(p => p.status === 'MOCKUP_READY' || p.personalization_status === 'preview_ready');
+                                    if (previewProduct) {
+                                        onOpenPreview(previewProduct as OrderProductDetail);
+                                    }
+                                }}
+                                className="w-full h-12 mt-2 bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-md)] flex items-center justify-center gap-2 text-sm font-bold tracking-tight active:scale-95 transition-all shadow-sm shadow-[var(--text-primary)]/10 group"
+                            >
+                                <Eye className="size-4" />
+                                Review & Approve
+                                <ChevronRight className="size-4 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                        )}
                     </div>
                 ) : (
                     <div className="py-12 flex flex-col items-center justify-center text-center gap-4 bg-[var(--surface-muted)]/50 rounded-[var(--radius-md)] border border-[var(--border)] overflow-hidden relative">

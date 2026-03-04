@@ -69,6 +69,7 @@ function DialogContent({
         aria-describedby="dialog-description-fallback"
         {...props}
       >
+        <DialogTitle className="sr-only">Order Details</DialogTitle>
         {children}
         <DialogDescription id="dialog-description-fallback" className="sr-only">
           Dialog content

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/providers/AuthProvider';
 import { useCart } from '@/components/customer/CartProvider';
 import { usePaymentFlow } from '@/hooks/usePaymentFlow';
+import { useRazorpay } from '@/hooks/useRazorpay';
 import { CheckoutData } from '@/lib/actions/checkout/checkout';
 import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
 import { CheckoutAddressProvider, useCheckoutAddress } from './CheckoutAddressContext';
@@ -24,11 +25,15 @@ interface CheckoutClientProps {
     initialData: CheckoutData;
 }
 
+import { useUI } from '@/providers/UIProvider';
+
 function CheckoutClientInner({ initialData }: CheckoutClientProps) {
     const router = useRouter();
     const { user: authUser } = useAuth();
     const { clearDraftOrder } = useCart();
     const addressCtx = useCheckoutAddress();
+    const { openOTPSheet, openProductSheet } = useUI();
+    const { loadRazorpay } = useRazorpay();
 
     // WYSHKIT 2026: Zero Shadow State 
     // We strictly use initialData (refreshed via router.refresh)
@@ -41,6 +46,11 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
         clearDraftOrder: clearDraftOrder,
         authUser: authUser ?? null,
     });
+
+    // WYSHKIT 2026: Pre-load Razorpay SDK on mount
+    React.useEffect(() => {
+        loadRazorpay();
+    }, [loadRazorpay]);
 
     const canPay = !!checkoutData.selected_address_id && !!checkoutData.pricing && !paymentFlow.isProcessing;
     const payTotal = checkoutData.pricing?.total ?? 0;
@@ -81,12 +91,15 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between gap-2">
                                         <p className="text-sm font-bold text-[var(--text-primary)] truncate">{product.product_name}</p>
-                                        <Link
-                                            href={`/vendor/${product.vendor_slug}/product/${product.product_slug || product.product_id}?edit=true&cartProductId=${product.id}&variantId=${product.variant_id || ''}&quantity=${product.quantity}&addons=${product.selected_addons?.map((a: any) => a.id).join(',') || ''}&returnUrl=/checkout`}
+                                        <button
+                                            onClick={() => {
+                                                triggerHaptic(HapticPattern.ACTION);
+                                                openProductSheet(product.product_id);
+                                            }}
                                             className="text-xs font-bold text-[var(--primary)] uppercase tracking-tight px-2 py-1 bg-[var(--well-destructive)] rounded-[var(--radius-md)] hover:opacity-80 transition-colors"
                                         >
                                             Edit
-                                        </Link>
+                                        </button>
                                     </div>
                                     <div className="flex items-center gap-1.5 mt-0.5">
                                         <span className="text-xs text-[var(--text-secondary)]">Qty {product.quantity}</span>
@@ -176,9 +189,12 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                                 <span>{formatCurrency(checkoutData.pricing.subtotal)}</span>
                             </div>
                             {checkoutData.pricing.personalization_charges > 0 && (
-                                <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
-                                    <span>Personalization</span>
-                                    <span>{formatCurrency(checkoutData.pricing.personalization_charges)}</span>
+                                <div className="flex flex-col gap-0.5">
+                                    <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
+                                        <span>Personalization Service</span>
+                                        <span>{formatCurrency(checkoutData.pricing.personalization_charges)}</span>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-[var(--success)]">Details to be provided after payment</span>
                                 </div>
                             )}
                             {checkoutData.pricing.addons_price > 0 && (
@@ -263,7 +279,7 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                         if (!authUser) {
                             // WYSHKIT 2026: Delayed Logic - Only force login on payment intent
                             triggerHaptic(HapticPattern.WARNING);
-                            router.push(`/auth?returnUrl=/checkout`);
+                            openOTPSheet();
                             return;
                         }
                         paymentFlow.handlePayment();

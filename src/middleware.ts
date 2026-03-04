@@ -45,10 +45,9 @@ export async function middleware(request: NextRequest) {
     // If we're on a public surface (Home) and have a cookie, we just assume "User" 
     // and let the Layout's One-Trip fetch do the heavy lifting.
     const isPublicSurface = ['/', '/search', '/vendor/'].includes(request.nextUrl.pathname) ||
-      request.nextUrl.pathname.startsWith('/vendor/') ||
-      request.nextUrl.pathname.startsWith('/product/');
+      request.nextUrl.pathname.startsWith('/vendor/');
 
-    if (!isPublicSurface || request.nextUrl.pathname.startsWith('/profile') || request.nextUrl.pathname.startsWith('/checkout')) {
+    if (!isPublicSurface || request.nextUrl.pathname.startsWith('/orders') || request.nextUrl.pathname.startsWith('/checkout')) {
       // Full session update only for protected/internal routes
       const sessionResult = await updateSession(request);
       supabaseResponse = sessionResult.supabaseResponse;

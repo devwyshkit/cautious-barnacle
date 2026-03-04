@@ -14,6 +14,10 @@ const ERROR_MAP: Record<string, string> = {
   'OUT_OF_STOCK': 'Sorry, this product is currently out of stock.',
   'VENDOR_MISMATCH': 'You already have products from another store. Clear your cart to switch.',
   'INSUFFICIENT_WALLET_BALANCE': 'You don\'t have enough WyshKit Money for this selection.',
+  'VENDOR_OFFLINE': 'This store is currently closed and not accepting orders.',
+  'INSUFFICIENT_STOCK': 'One or more items in your cart just went out of stock.',
+  'INVALID_ADDRESS': 'Please select a valid delivery address to proceed.',
+  'UNAUTHORIZED': 'Please log in again to complete your order.',
 };
 
 /**

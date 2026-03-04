@@ -11,19 +11,24 @@ import {
   MapPin,
   Settings,
   LogOut,
-  ChevronRight,
   Package,
   Sparkles,
   ShieldCheck,
-  Store
+  Store,
+  MessageCircle,
+  Phone,
+  Info,
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
 import { OrderList } from '@/components/customer/orders/OrderList';
+import { useUI } from '@/providers/UIProvider';
 import { AddressManager } from './AddressManager';
 import type { Address } from '@/lib/types/address';
 
-type ProfileTab = 'account' | 'orders' | 'addresses' | 'settings';
+type ProfileTab = 'account' | 'orders' | 'addresses' | 'support' | 'settings';
 
 interface ProfileSurfaceProps {
   initialAddresses?: Address[];
@@ -33,23 +38,23 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, permissions, signOut } = useAuth();
+  const { profileTab, openProfileSheet, openOTPSheet } = useUI();
 
-  const activeTab = (searchParams.get('tab') as ProfileTab) || 'account';
+  const activeTab = (profileTab as ProfileTab) || 'account';
   const action = searchParams.get('action');
-  const isAddingAddress = action === 'add';
+  const [localIsAdding, setLocalIsAdding] = React.useState(false);
+
+  const isAddingAddress = action === 'add' || localIsAdding;
 
   const setActiveTab = (tab: ProfileTab) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('tab', tab);
-    params.delete('action');
-    router.replace(`/profile?${params.toString()}`);
+    openProfileSheet(tab);
+    setLocalIsAdding(false);
   };
 
   const setAction = (newAction: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (newAction) params.set('action', newAction);
-    else params.delete('action');
-    router.push(`/profile?${params.toString()}`);
+    // WYSHKIT 2026: Profile is a sheet. Avoid manipulating URL for tabs.
+    // Use local state for nested component views.
+    setLocalIsAdding(newAction === 'add');
   };
 
   if (!user) {
@@ -59,7 +64,7 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
           <User className="size-8 text-[var(--text-tertiary)]" />
         </div>
         <h2 className="text-xl font-bold text-[var(--text-primary)]">Sign in to view profile</h2>
-        <Button onClick={() => router.push('/auth?intent=signin&returnUrl=/profile')} className="bg-[var(--primary)] text-[var(--primary-foreground)] rounded-[var(--radius-xl)] px-8 mt-6">
+        <Button onClick={() => openOTPSheet()} className="bg-[var(--primary)] text-[var(--primary-foreground)] rounded-[var(--radius-xl)] px-8 mt-6">
           Sign In
         </Button>
       </div>
@@ -70,6 +75,7 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
     { id: 'account', label: 'My Account', icon: User },
     { id: 'orders', label: 'Orders', icon: ShoppingBag },
     { id: 'addresses', label: 'Addresses', icon: MapPin },
+    { id: 'support', label: 'Support', icon: MessageCircle },
     { id: 'settings', label: 'Settings', icon: Settings },
   ] as const;
 
@@ -194,6 +200,62 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
         {activeTab === 'addresses' && (
           <div className="p-6">
             <AddressManager initialAddresses={initialAddresses} isAdding={isAddingAddress} onToggleAdding={(adding) => setAction(adding ? 'add' : null)} />
+          </div>
+        )}
+
+        {activeTab === 'support' && (
+          <div className="px-6 py-4 space-y-4">
+            <button
+              onClick={() => { }}
+              className="w-full flex items-center justify-between p-4 rounded-[var(--radius-xl)] bg-[var(--surface-muted)] border border-[var(--border)] hover:bg-[var(--surface)] transition-all group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="size-10 rounded-[var(--radius-lg)] bg-[var(--primary)]/5 flex items-center justify-center text-[var(--primary)]">
+                  <MessageCircle className="size-5" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-[var(--text-primary)]">Chat with us</p>
+                  <p className="text-xs text-[var(--text-tertiary)]">Response time: ~2 mins</p>
+                </div>
+              </div>
+              <ChevronRight className="size-4 text-[var(--text-tertiary)] group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            <button
+              onClick={() => { }}
+              className="w-full flex items-center justify-between p-4 rounded-[var(--radius-xl)] bg-[var(--surface-muted)] border border-[var(--border)] hover:bg-[var(--surface)] transition-all group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="size-10 rounded-[var(--radius-lg)] bg-[var(--info)]/5 flex items-center justify-center text-[var(--info)]">
+                  <Phone className="size-5" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-[var(--text-primary)]">Call for Order Support</p>
+                  <p className="text-xs text-[var(--text-tertiary)]">Available 9 AM - 11 PM</p>
+                </div>
+              </div>
+              <ChevronRight className="size-4 text-[var(--text-tertiary)] group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            <div className="pt-4 space-y-2">
+              <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest px-1">Resources</p>
+              <div className="space-y-1">
+                <button className="w-full flex items-center justify-between py-3 px-1 hover:text-[var(--primary)] transition-colors group">
+                  <div className="flex items-center gap-3">
+                    <Info className="size-4 opacity-50" />
+                    <span className="text-sm font-bold">Frequently Asked Questions</span>
+                  </div>
+                  <ExternalLink className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+                <button className="w-full flex items-center justify-between py-3 px-1 hover:text-[var(--primary)] transition-colors group">
+                  <div className="flex items-center gap-3">
+                    <Info className="size-4 opacity-50" />
+                    <span className="text-sm font-bold">Shipping & Returns Policy</span>
+                  </div>
+                  <ExternalLink className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

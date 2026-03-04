@@ -21,6 +21,7 @@ import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
 export function LocationContent({ onSelect }: { onSelect?: () => void }) {
   const router = useRouter();
   const { user } = useAuth();
+  const { closeLocationSheet, openProfileSheet, openOTPSheet } = useUI();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -50,8 +51,7 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
 
   const goBack = () => {
     if (onSelect) onSelect();
-    else if (window.history.length > 1) router.back();
-    else router.push('/');
+    closeLocationSheet();
   };
 
   const handleSelectPlace = async (placeId: string) => {
@@ -187,8 +187,12 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
                 setDeletingId(null);
                 toast.success('Address removed');
               }}
-              onEdit={(id) => router.push(`/profile?tab=addresses&action=edit&id=${id}`)}
-              onAdd={() => router.push('/profile?tab=addresses&action=add')}
+              onEdit={(id) => {
+                openProfileSheet('addresses');
+              }}
+              onAdd={() => {
+                openProfileSheet('addresses');
+              }}
             />
           )}
 
@@ -206,7 +210,11 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
               <button
                 onClick={() => {
                   triggerHaptic(HapticPattern.ACTION);
-                  user ? router.push('/profile?tab=addresses&action=add') : router.push('/auth');
+                  if (user) {
+                    openProfileSheet('addresses');
+                  } else {
+                    openOTPSheet();
+                  }
                 }}
                 className="mt-2 px-6 py-2.5 rounded-[var(--radius-xl)] bg-[var(--text-primary)] text-[var(--text-inverse)] text-xs font-bold active:scale-95 transition-all shadow-[var(--shadow-lg)]"
               >
@@ -222,18 +230,8 @@ export function LocationContent({ onSelect }: { onSelect?: () => void }) {
 
 import { useUI } from '@/providers/UIProvider';
 
-export function LocationSheet({ isRouteContext, onSelect }: { onSelect?: () => void; isRouteContext?: boolean }) {
+export function LocationSheet({ onSelect }: { onSelect?: () => void }) {
   const { isLocationSheetOpen, closeLocationSheet } = useUI();
-
-  if (isRouteContext) {
-    return (
-      <div className="flex flex-col h-[100dvh] bg-[var(--surface)]">
-        <div className="flex-1 min-h-0">
-          <LocationContent onSelect={onSelect} />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <ResponsiveSurface

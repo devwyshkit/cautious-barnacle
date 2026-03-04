@@ -309,9 +309,9 @@ export async function get_order_with_history(order_id: string): Promise<{ order:
     // WYSHKIT 2026: All status logic moved to Postgres get_personalization_status()
     const mapped_order: OrderDetails = {
       ...raw_order,
-      vendor_name: raw_order.vendors?.name || 'Vendor',
-      vendor_image: raw_order.vendors?.image_url || null,
-      order_products: (raw_order.order_products || []).map((p: any) => ({
+      vendor_name: (raw_order as any).vendors?.name || 'Vendor',
+      vendor_image: (raw_order as any).vendors?.image_url || null,
+      order_products: ((raw_order as any).order_products || []).map((p: any) => ({
         ...p,
         personalization_status: (p as any).personalization_status // Added in DB view or computed
       })),

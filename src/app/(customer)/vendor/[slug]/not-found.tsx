@@ -1,12 +1,18 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Store, Search } from 'lucide-react';
+import { useUI } from '@/providers/UIProvider';
+import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 /**
  * WYSHKIT 2026: Vendor Not Found Page
  * WYSHKIT 2026 Pattern: Proper 404 handling with helpful navigation
  */
 export default function VendorNotFound() {
+  const { openSearchSheet } = useUI();
+
   return (
     <div className="min-h-[100dvh] flex items-center justify-center p-6 bg-background">
       <div className="text-center space-y-4 max-w-md">
@@ -18,14 +24,18 @@ export default function VendorNotFound() {
           The store you&apos;re looking for doesn&apos;t exist or is no longer available.
         </p>
         <div className="flex gap-3 justify-center pt-4">
-          <Button asChild variant="default">
+          <Button asChild variant="default" onClick={() => triggerHaptic(HapticPattern.ACTION)}>
             <Link href="/">Browse Stores</Link>
           </Button>
-          <Button asChild variant="outline">
-            <Link href="/search">
-              <Search className="size-4 mr-2" />
-              Search
-            </Link>
+          <Button
+            variant="outline"
+            onClick={() => {
+              triggerHaptic(HapticPattern.ACTION);
+              openSearchSheet();
+            }}
+          >
+            <Search className="size-4 mr-2" />
+            Search
           </Button>
         </div>
       </div>

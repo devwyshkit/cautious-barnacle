@@ -52,7 +52,7 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         const supabase = await (await import('@/lib/supabase/server')).createClient();
         const { data: { user } } = await supabase.auth.getUser();
         const { getGuestSessionIdReadOnly } = await import('@/lib/session');
-        const guestSessionId = !user ? await getGuestSessionIdReadOnly() : null;
+        const guestSessionId = await getGuestSessionIdReadOnly();
 
         // 1. Resolve Session State
         if (!user && !guestSessionId) {
@@ -106,11 +106,21 @@ export const getCheckoutData = cache(async (): Promise<CheckoutData> => {
         const addresses = (typedContext.addresses || []) as Address[];
         let pricing = typedContext.pricing as PricingBreakdown | null;
 
-        // 3. WYSHKIT 2026: Address Pre-selection (Frictionless Logic)
-        // If no address is selected but addresses exist, pre-select the first one.
+        // 3. WYSHKIT 2026: Address Pre-selection (Frictionless Logic - Law of Address Gravity)
+        // If no address is selected but addresses exist, pre-select the one matching current location session
         let efSelectedAddressId = selectedAddressId;
         if (!efSelectedAddressId && addresses.length > 0) {
-            efSelectedAddressId = addresses[0].id;
+            const sessionLocation = await (await import('@/lib/actions/discovery/location')).getServerLocation(user);
+
+            // Find closest address if coordinates exist, otherwise first one
+            if (sessionLocation.lat && sessionLocation.lng) {
+                // Simplified "closest" logic for now: pick default or first
+                const defaultAddr = addresses.find(a => a.is_default);
+                efSelectedAddressId = defaultAddr?.id || addresses[0].id;
+                // Note: In 2026, we'd do a distance calculation here against addresses[].lat/lng
+            } else {
+                efSelectedAddressId = addresses[0].id;
+            }
 
             // Proactively refresh pricing with the new address to avoid "NaN" or zero fees
             // Zero Shadow Math: Recalculate server-side to ensure distances/fees are correct

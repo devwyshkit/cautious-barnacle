@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Home, Search, ShoppingBag, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { triggerHaptic, HapticPattern } from "@/lib/utils/haptic";
+import { useUI } from "@/providers/UIProvider";
 
 /**
  * WYSHKIT 2026: Mobile Bottom Navigation
@@ -19,6 +20,7 @@ const navItems = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { openProfileSheet, openSearchSheet } = useUI();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-[var(--z-nav)] md:hidden bg-[var(--surface-glass)] backdrop-blur-3xl border-t border-[var(--border)] pb-safe shadow-[var(--shadow-lg)]">
@@ -26,18 +28,10 @@ export function BottomNav() {
         {navItems.map(({ label, href, icon: Icon }) => {
           const isActive = href === "/"
             ? pathname === "/"
-            : pathname.startsWith(href.split('?')[0]);
+            : pathname === href || pathname.startsWith(`${href}/`);
 
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => triggerHaptic(HapticPattern.SOFT)}
-              className={cn(
-                "flex flex-col items-center justify-center gap-[var(--space-1)] w-full h-full relative transition-all active:scale-90",
-                isActive ? "text-[var(--primary)]" : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
-              )}
-            >
+          const content = (
+            <>
               <Icon className={cn("size-[var(--space-5)]", isActive ? "stroke-[3px]" : "stroke-[2.5px]")} />
               <span className={cn(
                 "text-[10px] font-black uppercase tracking-tighter leading-none",
@@ -48,6 +42,39 @@ export function BottomNav() {
               {isActive && (
                 <div className="absolute top-[var(--space-1)] right-[var(--space-4)] size-1 bg-[var(--primary)] rounded-full animate-in zoom-in duration-300" />
               )}
+            </>
+          );
+
+          if (href === '/profile' || href === '/search') {
+            return (
+              <button
+                key={href}
+                onClick={() => {
+                  triggerHaptic(HapticPattern.ACTION);
+                  if (href === '/profile') openProfileSheet();
+                  else openSearchSheet();
+                }}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-[var(--space-1)] w-full h-full relative transition-all active:scale-90",
+                  "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                )}
+              >
+                {content}
+              </button>
+            );
+          }
+
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => triggerHaptic(HapticPattern.ACTION)}
+              className={cn(
+                "flex flex-col items-center justify-center gap-[var(--space-1)] w-full h-full relative transition-all active:scale-90",
+                isActive ? "text-[var(--primary)]" : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+              )}
+            >
+              {content}
             </Link>
           );
         })}
@@ -55,3 +82,4 @@ export function BottomNav() {
     </nav>
   );
 }
+

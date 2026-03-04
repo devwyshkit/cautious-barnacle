@@ -15,7 +15,7 @@ export default async function OrdersPage() {
     const userId = headerList.get('x-wyshkit-user-id');
 
     if (!userId) {
-        redirect("/auth?intent=signin&returnUrl=/orders");
+        redirect("/?auth=true&returnUrl=/orders");
     }
 
     return (

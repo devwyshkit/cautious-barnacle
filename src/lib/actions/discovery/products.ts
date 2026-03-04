@@ -48,6 +48,39 @@ export async function getUpsellProducts(
         return { data: null, error: 'Failed to fetch upsell products' };
     }
 }
+
+/**
+ * Get Standalone Product with Full Specification
+ * Used primarily for Vendor Dashboard forms where vendor is already known contextually.
+ */
+export async function getProductWithFullSpec(productId: string) {
+    try {
+        if (!productId || productId.trim() === '') {
+            return { data: null, error: 'Invalid Product ID' };
+        }
+        const supabase = await createClient();
+
+        // Single Atomic Trip for Product Context
+        const { data, error } = await supabase.rpc('get_product_surface_v1', {
+            p_product_id_or_slug: productId,
+            p_vendor_id_or_slug: ''
+        });
+
+        if (error) {
+            logger.error('RPC Failure: get_product_surface_v1', error, { productId });
+            return { data: null, error: error.message };
+        }
+
+        const raw = data as any;
+        if (!raw || raw.error) return { data: null, error: raw?.error || 'PRODUCT_NOT_FOUND' };
+
+        return { data: raw.product_spec as unknown as WyshkitProduct, error: null };
+    } catch (e: any) {
+        logger.error('Unexpected failure in getProductWithFullSpec', e);
+        return { data: null, error: 'SERVICE_UNAVAILABLE' };
+    }
+}
+
 /**
  * Get Product Surface (One-Trip deep link context)
  * Consolidates product, variants, and background vendor store.

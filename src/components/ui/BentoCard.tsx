@@ -16,10 +16,16 @@ export function BentoCard({ data, variant = 'small', priority = false }: BentoCa
     const isLarge = variant === 'large';
 
     const vendorSlug = data.slug || data.vendor_slug;
-    if (!data.href && !vendorSlug) {
-        console.warn(`[WYSHKIT 2026] Missing slug for BentoCard ${data.id}. Law 11 Violation.`);
+    let href = data.href || (vendorSlug ? `/vendor/${vendorSlug}` : '#');
+
+    // WYSHKIT 2026: Route Interception (Mapping legacy routes to global sheets)
+    if (href === '/search') {
+        href = '/?search=true';
+    } else if (href === '/profile') {
+        href = '/?profile=true';
+    } else if (href === '/auth') {
+        href = '/?auth=true';
     }
-    const href = data.href || (vendorSlug ? `/vendor/${vendorSlug}` : '#');
 
     return (
         <Link

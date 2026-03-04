@@ -8,6 +8,7 @@ import { Clock } from 'lucide-react';
 import { triggerHaptic, HapticPattern, cn, formatCurrency, formatPrepTime } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { AddToCartButton } from '@/components/customer/AddToCartButton';
+import { useUI } from '@/providers/UIProvider';
 import type { WyshkitProduct } from '@/lib/types/product';
 
 interface ProductCardProps {
@@ -32,9 +33,16 @@ export function ProductCard({ data, className, variant = 'portrait' }: ProductCa
         });
     }
 
+    const { openProductSheet } = useUI();
     const productPath = vendorIdentifier && productSlug ? `/vendor/${vendorIdentifier}/product/${productSlug}` : '#';
     const etaMins = data.vendor_prep_time;
     const router = useRouter();
+
+    const handleProductClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        triggerHaptic(HapticPattern.ACTION);
+        openProductSheet(data);
+    };
 
     return (
         <Card className={cn(
@@ -42,11 +50,10 @@ export function ProductCard({ data, className, variant = 'portrait' }: ProductCa
             isRow ? "flex flex-row gap-[var(--space-4)] p-[var(--space-2)]" : "flex flex-col gap-[var(--space-2)]",
             className
         )}>
-            {/* Background Link for Interception Resilience */}
-            <Link
-                href={productPath}
-                onClick={() => triggerHaptic(HapticPattern.ACTION)}
-                className="absolute inset-0 z-0"
+            {/* Background Action for Product Sheet */}
+            <button
+                onClick={handleProductClick}
+                className="absolute inset-0 z-0 text-left cursor-pointer appearance-none bg-transparent border-none p-0 w-full"
                 aria-label={`View ${data.name}`}
             />
             <div className={cn(

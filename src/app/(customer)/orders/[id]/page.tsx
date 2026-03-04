@@ -25,7 +25,7 @@ export default async function OrderDetailsPage({
 
   if (!userId) {
     const { id } = await params;
-    redirect(`/auth?intent=signin&returnUrl=/orders/${id}`);
+    redirect(`/?auth=true&returnUrl=/orders/${id}`);
   }
 
   const { id } = await params;

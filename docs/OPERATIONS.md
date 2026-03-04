@@ -80,6 +80,8 @@ SUSPENDED   → (permanent)              → TERMINATED
 
 `vendors.is_active` = computed from `status = ACTIVE AND kyc_status = VERIFIED AND is_online = true`.
 
+> **Bridge**: After onboarding completes (`LIVE` in the table above), the vendor enters the runtime lifecycle below as `ACTIVE`. The onboarding stages (`PENDING_DOCS` → `LIVE`) are pre-launch. The runtime states (`ACTIVE` → `ELITE` / `SUSPENDED` / `TERMINATED`) are post-launch.
+
 ---
 
 ### Stage 4: Product Listing
@@ -91,11 +93,16 @@ SUSPENDED   → (permanent)              → TERMINATED
 - GST % (verify with CA: 18% for most handicrafts; 12% for some)
 - Min 3 images (1200×1200px, white/neutral background)
 - Production time in minutes (realistic, not aspirational)
-- Stock quantity (or NULL for unlimited)
-- Personalisation: enabled/disabled + fee
+- Stock quantity — `NULL` = unlimited (default). Must be `NULL` by default, never `0`. Only set an integer when the vendor has finite stock.
+- **Add-ons**: Extra physical products (Gift wrap). Stockable.
+- **Personalisation Service**: This is a **Price Toggle** on the product sheet (pre-payment), and a **Requirements Form** on the order tracking page (post-payment).
+- **Constraints**: Max 4 variant groups. Max 4 options per group. (Hick's Law — enforced at listing time.)
 
 **Personalisation Schema (if enabled)**:
 
+Maximum 3 fields per product. These fields are collected **POST-PAYMENT** on `/orders/[id]`.
+
+**Example 1 — Trophy/Engraving Vendor:**
 ```json
 [
   {
@@ -104,7 +111,7 @@ SUSPENDED   → (permanent)              → TERMINATED
     "label": "Text to engrave",
     "placeholder": "Enter text",
     "validation": "^.{1,20}$",
-    "instructions": "English only. Max 20 chars."
+    "instructions": "English only. Max 20 chars. Hyphens allowed."
   },
   {
     "id": "color_choice",
@@ -115,9 +122,31 @@ SUSPENDED   → (permanent)              → TERMINATED
 ]
 ```
 
-**Maximum 3 fields per product.** Hick's Law applies to vendor setup too.
-
-**Anticipatory presets**: Vendors should configure common personalisation themes ("Birthday", "Anniversary") as one-tap presets to reduce customer typing.
+**Example 2 — Embroidery Vendor:**
+```json
+[
+  {
+    "id": "embroidery_name",
+    "type": "text",
+    "label": "Name to embroider",
+    "placeholder": "e.g. Priya",
+    "validation": "^[A-Za-z ]{1,15}$",
+    "instructions": "English letters only. Max 15 chars."
+  },
+  {
+    "id": "logo_upload",
+    "type": "image",
+    "label": "Upload logo (optional)",
+    "instructions": "PNG, transparent background, min 300×300px"
+  },
+  {
+    "id": "thread_color",
+    "type": "select",
+    "label": "Thread Colour",
+    "options": ["Navy Blue", "Burgundy", "Forest Green", "Black"]
+  }
+]
+```
 
 ---
 
@@ -126,10 +155,10 @@ SUSPENDED   → (permanent)              → TERMINATED
 **Purpose**: Verify the vendor can complete the full workflow before real money is involved.
 
 **Steps**:
-1. Ops places test order (internal credit or bypass flag)
+1. Ops places test order using a **test customer account** (internal credit or bypass flag — never a real customer account)
 2. Vendor receives notification → accepts
-3. Ops submits dummy personalisation details
-4. Vendor uploads a mockup within their stated SLA
+3. **Post-payment requirements**: Ops lands on tracking page and submits dummy personalisation details
+4. Vendor uploads a preview within their stated SLA
 5. Ops approves preview via "Slide to Approve"
 6. Vendor marks order `PACKED`
 7. Internal rider (or ops) picks up → marks `DELIVERED`
@@ -177,8 +206,6 @@ Stored in `platform_settings` table. **Never hardcoded.**
 
 ---
 
----
-
 ## Operator Runbook
 
 > *"The system handles the happy path. Operators handle everything else."*
@@ -196,19 +223,7 @@ Stored in `platform_settings` table. **Never hardcoded.**
 
 **Trigger**: Ops Slack alert (`SLA_BREACH_CRITICAL`)
 
-**If another vendor can fulfill — Active Salvation (Shift + Credit)**:
-> **⚠️ Phase 2 — `salvation_shift_order_atomic` not yet deployed.** Escalate to engineering before attempting this runbook step.
-```sql
-SELECT salvation_shift_order_atomic(
-  p_order_id    => '[ORDER_ID]',
-  p_new_vendor_id => '[NEW_VENDOR_ID]',
-  p_reason      => 'Original vendor breached SLA. Shifting to save order.',
-  p_issue_token => true,
-  p_token_amount => 50.00
-);
-```
-
-**If no shift is possible — Passive Salvation (Refund + Credit)**:
+**Passive Salvation (Refund + Credit)** — the standard response:
 ```sql
 -- Step A: Cancel
 SELECT transition_order('[ORDER_ID]', 'CANCELLED', '{"reason": "SLA_BREACH_AUTO_CANCEL"}');
@@ -221,6 +236,22 @@ SELECT issue_wallet_credit_atomic(
   p_order_id => '[ORDER_ID]'
 );
 ```
+
+---
+
+> **Phase 2 — Not Yet Deployed**
+>
+> **Active Salvation (Shift + Credit)** — when another vendor can fulfill:
+> `salvation_shift_order_atomic` is not yet deployed. Escalate to engineering before attempting.
+> ```sql
+> SELECT salvation_shift_order_atomic(
+>   p_order_id    => '[ORDER_ID]',
+>   p_new_vendor_id => '[NEW_VENDOR_ID]',
+>   p_reason      => 'Original vendor breached SLA. Shifting to save order.',
+>   p_issue_token => true,
+>   p_token_amount => 50.00
+> );
+> ```
 
 ---
 
@@ -260,7 +291,6 @@ SELECT issue_wallet_credit_atomic(
 **Symptom**: "Processing..." stuck on customer screen; Razorpay dashboard shows success.
 
 **Never run a raw UPDATE on orders.** Use the atomic recovery RPC:
-> **⚠️ Phase 2 — verify `recover_payment_atomic` exists before running.** See CAUTION block below.
 ```sql
 SELECT recover_payment_atomic(
   p_razorpay_order_id   => '[razorpay_order_id]',
@@ -270,7 +300,12 @@ SELECT recover_payment_atomic(
 ```
 
 > [!CAUTION]
-> If `recover_payment_atomic` does not exist: log in Slack and escalate to engineering. **Do NOT run a raw UPDATE.** A partial write without the state machine creates phantom state that is harder to debug than the stuck order.
+> If `recover_payment_atomic` does not exist:
+> 1. **Do NOT run a raw UPDATE.** A partial write without the state machine creates phantom state.
+> 2. Log in Slack with order ID + Razorpay payment ID.
+> 3. Escalate to engineering immediately.
+> 4. Inform the customer: "Payment confirmed. Order processing. Our team is resolving a sync delay."
+> 5. Engineering deploys the RPC → ops retries this runbook.
 
 ---
 

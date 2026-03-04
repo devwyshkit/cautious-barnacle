@@ -2,12 +2,11 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { ShoppingBag, Sparkles, Clock, Camera, Package, CheckCircle2, X } from 'lucide-react';
+import { ShoppingBag, Sparkles, Package, CheckCircle2 } from 'lucide-react';
 import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/pricing';
-import { ORDER_STATUS, getProductStatusConfig } from '@/lib/types/order-status';
-import { PersonalizationForm } from '../PersonalizationForm';
+import { getOrderStatusDisplay, getOrderStatusColor } from '@/lib/types/order-status';
 import { SubmittedPersonalization } from './SubmittedPersonalization';
 import { PreviewApproval } from '../PreviewApproval';
 import { approve_preview, request_change } from '@/lib/actions/commerce/orders';
@@ -19,47 +18,60 @@ interface OrderProductsListProps {
     order: OrderDetail;
     productPreviews: Record<string, PreviewSubmission>;
     onPersonalizationSubmitted: () => void;
+    selectedPreviewProduct?: OrderProductDetail | null;
+    setSelectedPreviewProduct?: (product: OrderProductDetail | null) => void;
 }
 
-export function OrderProductsList({ order, productPreviews, onPersonalizationSubmitted }: OrderProductsListProps) {
-    const [selectedPreviewProduct, setSelectedPreviewProduct] = useState<OrderProductDetail | null>(null);
+export function OrderProductsList({ order, productPreviews, onPersonalizationSubmitted, selectedPreviewProduct, setSelectedPreviewProduct }: OrderProductsListProps) {
     const [isApproving, setIsApproving] = useState(false);
     const [isRequestingChange, setIsRequestingChange] = useState(false);
 
-    const renderProductStatus = (product: OrderProductDetail) => {
-        const productStatus = product.status || order.status;
-        const config = getProductStatusConfig(productStatus || 'PLACED');
-        const Icon = config.icon as any;
+    const products = (order.order_products as unknown as OrderProductDetail[] || []);
 
+    // Determine the label & color for a product status pill.
+    // Non-personalized products stuck at PENDING_PERSONALIZATION should show the parent order status.
+    const getProductStatusDisplay = (product: OrderProductDetail) => {
+        const rawStatus = (!product.is_personalized && product.status === 'PENDING_PERSONALIZATION')
+            ? (order.status || 'PLACED')
+            : (product.status || order.status || 'PLACED');
+        return { label: getOrderStatusDisplay(rawStatus), colorClass: getOrderStatusColor(rawStatus) };
+    };
+
+    const renderStatusPill = (product: OrderProductDetail) => {
+        const { label, colorClass } = getProductStatusDisplay(product);
         return (
-            <div className={cn("flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-xs font-bold tracking-tight", config.color)}>
-                <Icon className="size-3" />
-                <span>{config.label}</span>
+            <div className={cn('flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-[10px] font-bold tracking-tight', colorClass)}>
+                <Package className="size-2.5" />
+                <span>{label}</span>
             </div>
         );
     };
+
+    const hasPreview = selectedPreviewProduct && productPreviews[selectedPreviewProduct.id];
+    const isNonPersonalized = selectedPreviewProduct && !selectedPreviewProduct.is_personalized;
+    const hasSubmittedDetails = selectedPreviewProduct &&
+        selectedPreviewProduct.personalization_details &&
+        typeof selectedPreviewProduct.personalization_details === 'object' &&
+        Object.keys(((selectedPreviewProduct.personalization_details as any)?.fields) || {}).length > 0;
 
     return (
         <>
             <section className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] overflow-hidden">
                 <div className="px-5 py-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
                     <h3 className="text-xs font-bold text-[var(--text-primary)] tracking-tight">Order Contents</h3>
-                    <span className="text-xs font-bold text-[var(--text-tertiary)] tabular-nums">#{order.order_number}</span>
+                    <span className="text-xs font-bold text-[var(--text-tertiary)] tabular-nums">{order.order_number}</span>
                 </div>
                 <div className="divide-y divide-[var(--surface-muted)]">
-                    {(order.order_products as unknown as OrderProductDetail[] || []).map((product) => (
+                    {products.map((product) => (
                         <div key={product.id} className="group/product">
                             <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedPreviewProduct(product);
-                                }}
-                                className="w-full p-4 flex gap-4 text-left hover:bg-[var(--surface-muted)] active:scale-[0.99] transition-all outline-none relative z-10"
+                                onClick={() => setSelectedPreviewProduct?.(product)}
+                                className="w-full p-4 flex gap-4 text-left hover:bg-[var(--surface-muted)]/60 active:scale-[0.99] transition-all outline-none"
                             >
                                 <div className="size-16 bg-[var(--surface-muted)] rounded-[var(--radius-md)] relative overflow-hidden border border-[var(--border)] shrink-0">
-                                    {product.product_image_url ? (
+                                    {(product as any).product_image_url ? (
                                         <Image
-                                            src={product.product_image_url}
+                                            src={(product as any).product_image_url}
                                             alt={product.product_name}
                                             fill
                                             className="object-cover"
@@ -73,23 +85,12 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-start justify-between gap-2 mb-1">
                                         <p className="text-sm font-bold text-[var(--text-primary)] line-clamp-2 leading-tight">{product.product_name}</p>
-                                        <p className="text-xs font-bold text-[var(--text-primary)] tabular-nums">x{product.quantity}</p>
+                                        <p className="text-xs font-bold text-[var(--text-primary)] tabular-nums shrink-0">x{product.quantity}</p>
                                     </div>
-
                                     <div className="flex items-center justify-between mt-2">
-                                        {renderProductStatus(product)}
+                                        {renderStatusPill(product)}
                                         <span className="text-xs font-bold text-[var(--text-primary)]">{formatCurrency(product.total_price)}</span>
                                     </div>
-
-                                    {/* WYSHKIT 2026: Details Peek (When not in full review) */}
-                                    {product.is_personalized && product.personalization_details && product.status !== 'preview_ready' && (
-                                        <div className="mt-4 pt-4 border-t border-[var(--surface-muted)]/50">
-                                            <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-2">Submitted Brief</p>
-                                            <div className="line-clamp-2 text-xs text-[var(--text-secondary)] italic">
-                                                {Object.values(product.personalization_details).filter(v => typeof v === 'string').join(', ')}
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </button>
                         </div>
@@ -97,21 +98,52 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                 </div>
             </section>
 
-            {/* WYSHKIT 2026: Preview Surface */}
+            {/* WYSHKIT 2026: Product Detail Surface — Always shows when a product is selected */}
             <ResponsiveSurface
                 open={!!selectedPreviewProduct}
-                onOpenChange={(open) => !open && setSelectedPreviewProduct(null)}
-                className="p-0 sm:max-w-xl h-[85dvh] sm:h-[90dvh] bg-[var(--surface-muted)] border-none"
+                onOpenChange={(open) => !open && setSelectedPreviewProduct?.(null)}
+                title={selectedPreviewProduct?.product_name || 'Product Details'}
+                className="p-0 sm:max-w-xl h-[85dvh] sm:h-[90dvh]"
             >
-                {selectedPreviewProduct && productPreviews[selectedPreviewProduct.id] && (
+                {selectedPreviewProduct && (
                     <div className="h-full overflow-y-auto overscroll-contain pb-safe scrollbar-hide">
-                        <div className="p-4 sticky top-0 bg-[var(--surface)]/80 backdrop-blur-md z-10 border-b border-[var(--border)] flex items-center justify-between">
-                            <h3 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">
-                                {selectedPreviewProduct.status === 'preview_ready' ? 'Review Design' : 'Product Details'}
-                            </h3>
+                        {/* Product Header */}
+                        <div className="p-5 border-b border-[var(--border)] bg-[var(--surface)] flex items-start gap-4">
+                            <div className="size-16 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)] relative overflow-hidden shrink-0">
+                                {(selectedPreviewProduct as any).product_image_url ? (
+                                    <Image src={(selectedPreviewProduct as any).product_image_url} alt={selectedPreviewProduct.product_name} fill className="object-cover" />
+                                ) : (
+                                    <div className="size-full flex items-center justify-center">
+                                        <ShoppingBag className="size-7 text-[var(--border)]" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-base font-bold text-[var(--text-primary)] tracking-tight leading-tight">{selectedPreviewProduct.product_name}</p>
+                                <div className="flex items-center justify-between mt-2">
+                                    {renderStatusPill(selectedPreviewProduct)}
+                                    <span className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(selectedPreviewProduct.total_price)}</span>
+                                </div>
+                                <p className="text-xs text-[var(--text-tertiary)] font-bold mt-1.5">Qty: {selectedPreviewProduct.quantity} unit{selectedPreviewProduct.quantity > 1 ? 's' : ''}</p>
+                            </div>
                         </div>
-                        <div className="p-4">
-                            {selectedPreviewProduct.status === 'preview_ready' ? (
+
+                        <div className="p-4 space-y-4">
+                            {/* 1. Non-personalized product — clear status card */}
+                            {isNonPersonalized && (
+                                <div className="p-4 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)] flex items-start gap-3">
+                                    <CheckCircle2 className="size-5 text-[var(--success)] shrink-0 mt-0.5" />
+                                    <div>
+                                        <p className="text-sm font-bold text-[var(--text-primary)] tracking-tight">No personalisation required</p>
+                                        <p className="text-xs font-bold text-[var(--text-tertiary)] mt-1 leading-relaxed">
+                                            This item will be prepared as-is. No action needed from you — the vendor handles everything.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 2. Personalized with preview ready — show approval flow */}
+                            {hasPreview && selectedPreviewProduct.status === 'preview_ready' && (
                                 <PreviewApproval
                                     preview={productPreviews[selectedPreviewProduct.id]}
                                     orderProduct={selectedPreviewProduct}
@@ -121,7 +153,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                             const result = await approve_preview(productPreviews[selectedPreviewProduct.id].id, order.id!);
                                             if (result.success) {
                                                 toast.success('Product approved! Production has started.');
-                                                setSelectedPreviewProduct(null);
+                                                setSelectedPreviewProduct?.(null);
                                             } else {
                                                 toast.error(result.error ?? 'Failed to approve');
                                             }
@@ -139,7 +171,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                             const result = await request_change(productPreviews[selectedPreviewProduct.id].id, order.id!, feedback);
                                             if (result.success) {
                                                 toast.success('Feedback sent. Vendor will upload a new preview.');
-                                                setSelectedPreviewProduct(null);
+                                                setSelectedPreviewProduct?.(null);
                                             } else {
                                                 toast.error(result.error ?? 'Failed to send feedback');
                                             }
@@ -155,39 +187,33 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                     maxChanges={order.max_change_requests ?? 2}
                                     changeCount={order.change_request_count ?? 0}
                                 />
-                            ) : (
-                                <div className="space-y-6">
-                                    <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight px-1">Tracking Status</span>
-                                        <div className="p-4 bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center border border-[var(--border)]">
-                                                    <Package className="size-5 text-[var(--text-tertiary)]" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs font-bold text-[var(--text-primary)] tracking-tight">{selectedPreviewProduct.status || order.status}</p>
-                                                    <p className="text-xs text-[var(--text-secondary)] font-medium">Last updated recently</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            )}
 
-                                    {selectedPreviewProduct.is_personalized && (
-                                        <div className="space-y-3">
-                                            <span className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight px-1">Personalisation Details</span>
-                                            {selectedPreviewProduct.personalization_details ? (
-                                                <SubmittedPersonalization
-                                                    details={selectedPreviewProduct.personalization_details as any}
-                                                    itemName={selectedPreviewProduct.product_name}
-                                                />
-                                            ) : (
-                                                <div className="p-8 text-center bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)]">
-                                                    <Sparkles className="size-8 text-[var(--border)] mx-auto mb-3" />
-                                                    <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">Awaiting Personalisation Brief</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
+                            {/* 3. Personalized — brief submitted, waiting for preview */}
+                            {selectedPreviewProduct.is_personalized && hasSubmittedDetails && !hasPreview && (
+                                <div className="space-y-3">
+                                    <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight uppercase">Brief Submitted</p>
+                                    <SubmittedPersonalization
+                                        details={selectedPreviewProduct.personalization_details as any}
+                                        itemName={selectedPreviewProduct.product_name}
+                                    />
+                                    <div className="flex items-center gap-2 p-3 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)]">
+                                        <div className="size-2 rounded-full bg-[var(--success)] animate-pulse" />
+                                        <p className="text-xs font-bold text-[var(--text-secondary)] tracking-tight">Vendor is preparing your design preview</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 4. Personalized — brief not yet submitted */}
+                            {selectedPreviewProduct.is_personalized && !hasSubmittedDetails && !hasPreview && (
+                                <div className="p-4 bg-[var(--well-warning)] rounded-[var(--radius-md)] border border-[var(--warning)]/20 flex items-start gap-3">
+                                    <Sparkles className="size-5 text-[var(--warning)] shrink-0 mt-0.5" />
+                                    <div>
+                                        <p className="text-sm font-bold text-[var(--text-primary)] tracking-tight">Personalisation brief needed</p>
+                                        <p className="text-xs font-bold text-[var(--text-tertiary)] mt-1 leading-relaxed">
+                                            Close this panel and scroll up to fill in your personalisation details so the vendor can start your design.
+                                        </p>
+                                    </div>
                                 </div>
                             )}
                         </div>

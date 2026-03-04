@@ -18,29 +18,45 @@ WyshKit is built on the **Swiggy 2026 substrate**: hyperlocal logistics, SLA dis
 | **Disappointment Tax** | Low | Very high (wrong name engraved = destroyed product) |
 | **Solution** | Standard delivery SLA | **Preview Workflow** — customer approves before production |
 
-**The Preview Moat**: Once a customer sees their name engraved on a digital mockup and taps "Slide to Approve," the product is theirs. Return rate → ~0. Premium pricing justified. Vendor inventory protected. This is Fiverr's model applied to physical goods at Blinkit speeds.
-
-**What we borrow from Swiggy** (Zero reinvention):
-- SLA as the only unit of distance
-- Hyperlocal node density model
-- Cashback flywheel (Hook Model enforcement)
-- One-tap ordering pattern
-- Realtime status updates
-
-**What we do NOT reinvent**:
-- Auth → Supabase
-- Delivery fleet → Shadowfax / Porter
-- Payments → Razorpay
-- Design system → shadcn/ui + Radix
+**The Preview Moat**: Once a customer sees their name engraved on a digital mockup and taps "Slide to Approve," the product is theirs. Return rate → ~0. Premium pricing justified.
 
 ---
 
-## The 4 Business Laws
+## The Cleartax Insight: Inventory + Service
 
-1. **Commitment Before Creativity** — Pay first, personalise after. Zero ghost orders. Zero unpaid vendor work.
-2. **Time > Distance** — SLA is the only unit. "Arriving by 5:15 PM." Never "2.4 km away."
-3. **Preview > Price** — A digital mockup before production is the moat. The customer approves it. The sale is then final.
-4. **Density > Reach** — 50 vendors in 5km is a business. 50 vendors in 50km is a logistics nightmare. Win the neighbourhood before expanding.
+The WyshKit mental model was born from 5 years of corporate gifting data. The industry error is treating personalized products as "custom manufacturing" (slow, expensive, centralized).
+
+The **WyshKit Reality** is the Apple Pattern: **Inventory + 10-minute Services.** 
+- We hold/source the item (AirPods pattern).
+- We apply a high-speed service (Laser engraving pattern).
+- We deliver at hyperlocal speed (Swiggy pattern).
+
+---
+
+## The 7 Product Laws of Swiggy 2026
+
+> These are the **implementation rules** (the HOW). For the **product beliefs** (the WHY), see [WORKFLOW.md → The Four Beliefs](./WORKFLOW.md).
+
+1. **Commitment Before Creativity** — Pay first, personalise after. Eliminate the "Creative Tax" pre-payment.
+2. **Law of the One-Page Checkout** — Address, Bill, Coupon, GST, and Payment on ONE scroll. No drawers. No intermediate screens. 
+3. **Law of Address Gravity** — Pre-select the destination. State "Delivering to [X]", don't ask "Where?".
+4. **Law of Late-Bind Auth** — Guests are kings. Login is the final gate at checkout entry (OTPSheet over `/checkout`). Browse and cart are fully anonymous.
+5. **Instamart Cataloging** — Selection via Chips/Toggles only. **Zero pre-payment typing.**
+6. **One-Trip Promise** — Every data point needed for checkout (Pricing, ETA, Addresses) must load in ONE RPC.
+7. **Law of Physical Transparency** — Dimensions, Weight, Material, and Return Window are mandatory chips on the product sheet.
+
+---
+
+## The Master Principle: Zero Reinvention
+WyshKit is the hyperlocal marketplace for products with **optional personalization**. We treat personalization not as custom manufacturing, but as a **10-minute service applied to existing inventory**. We mirror Swiggy Food (Operations), Instamart (Cataloging), and Fiverr (Creativity).
+
+---
+
+## Engineering & Product Ideology
+We follow the **DRY KISS YAGNI** triad:
+- **DRY (Don't Repeat Yourself)**: Single Source of Truth in the Database. UI is a stateless projection.
+- **KISS (Keep It Simple, Stupid)**: If it takes more than 5 seconds to understand a screen, the design has failed.
+- **YAGNI (You Ain't Gonna Need It)**: No "Future-proofing" features. Build only what drives the current order.
 
 ---
 
@@ -73,10 +89,11 @@ Every product decision must pass the 4W test. If one W is missing, the feature i
 ## Behavioral Science Laws (Implementation-Backed)
 
 ### Hick's Law — Every Extra Choice is a Conversion Tax
-- Max 6 variant chips visible; "Show more" collapses the rest.
+- Max 4 variant groups, max 4 options per group (matches WORKFLOW + OPERATIONS).
 - Max 8 categories in CIRCLE_RAIL.
 - Single payment method: Razorpay. No COD. Ever.
-- Personalisation schema: ≤3 fields per product.
+- Personalisation selection: Single toggle on Product Sheet.
+- Personalisation requirements: ≤3 fields per product (**Post-Payment ONLY**).
 
 ### Miller's Law — 7±2 Cognitive Slots
 Never show more than 7 primary items in a single view. All secondary options collapse via Progressive Disclosure.
@@ -102,8 +119,8 @@ Users remember the peak moment and the final moment. Not the average.
 
 | Moment | What it must feel like |
 |---|---|
-| **Peak** (Preview Approval) | Full-bleed mockup, haptic on slide, instant animation. Not a plain button. |
-| **End** (Delivery + Cashback) | Brief confetti (≤2s), large cashback credit display, "Share your gift" prompt. Not a plain toast. |
+| **Peak** (Preview Approval) | Full-bleed preview, haptic on slide, instant animation. Not a plain button. |
+| **End** (Delivery + Cashback) | Brief confetti (≤2s), large cashback credit display, wallet balance update. Not a plain toast. |
 
 ### Zeigarnik Effect — Open Loops Pull Users Back
 A user with an active order MUST see their order status widget at the top of the home feed, above the Banner Bento. It creates psychological open loops. Never de-prioritise it.
@@ -132,9 +149,20 @@ Every user action must produce visual feedback within 400ms. Below this, users e
 |---|---|
 | GST (5/12/18/28% per HSN) | `calculate_order_total` RPC. User sees: "GST: ₹XX." |
 | Delivery fee (distance, vendor, min order) | Postgres. User sees: "Delivery: ₹30" or "FREE." |
-| Personalisation schema (text / image / select) | `personalization_schema` JSONB drives the form dynamically. |
 | Commission tiers | `platform_settings` table. Vendor sees "Commission: 12%." |
 | Coupon validation (min order, expiry, usage limit) | Atomic RPC. User taps "Apply" → sees green or red. |
+
+### Customisation vs. Personalisation
+
+> Full definition in [WORKFLOW.md](./WORKFLOW.md). Summary below.
+
+| Term | Meaning | When | Where |
+|---|---|---|---|
+| **Customisation** | Selecting pre-defined options (Size/Color) | Before payment | Product Sheet |
+| **Personalisation Add-on** | Toggling the "Add Engraving" service | Before payment | Product Sheet |
+| **Personalisation Details** | Submitting text/image/name | After payment | Order Tracking |
+| **Personalisation Preview** | Seeing the digital render | After payment | Order Tracking |
+| **Personalisation Approval** | Tapping "Slide to Approve" | After payment | Order Tracking |
 
 ### Von Restorff Effect — The Isolation Rule
 If everything is highlighted, nothing is highlighted. One primary CTA per screen. One primary colour per screen. Everything else is muted.
@@ -147,12 +175,17 @@ If everything is highlighted, nothing is highlighted. One primary CTA per screen
 ### Anti-Dark-Pattern Doctrine (Absolute)
 | Dark Pattern | WyshKit Position |
 |---|---|
-| Confirmshaming | Decline CTAs say "No thanks." Never guilt-laden copy. |
-| Hidden fees | Delivery fee visible on the product card chip. No surprises at payment. |
-| Urgency theatre | "Only 3 left!" must reflect true `stock_quantity`. Never fabricated. |
+| Confirmshaming | **Forbidden**. Decline CTAs say "No thanks." Never guilt-laden copy or tiny "I don't need this" text. |
+| Hidden fees | **Forbidden**. Delivery fee visible on the product card chip. No surprises at payment. |
+| Cancellation | 100% fee after order placement for personalised items. Must be clearly stated at pay-slide. |
+| Return Window | 24 hours for damaged/incorrect physical items. Visible on product sheet. |
+| Mandatory Sign-up | **Forbidden**. Late-bind auth only. Let them see the bill before asking for ID. |
+| Urgency theatre | "Only 3 left!" requires `stock_quantity <= 3 AND stock_quantity IS NOT NULL`. Never fabricated. Technical enforcement: query must verify real stock before rendering any scarcity indicator. |
 | Forced continuity | No subscription tiers for customers. Zero. |
 | Disguised ads | Promoted vendors carry a visible "Promoted" badge. Always. |
 | Pre-checked opt-ins | All checkboxes unchecked by default. Always. |
+| `window.confirm()` | **Forbidden**. All destructive confirmations use inline styled double-confirm. Never native browser dialogs. |
+| Promotional push 10PM–8AM | **Forbidden**. DND window enforced in notification scheduler. |
 
 ---
 
@@ -191,3 +224,17 @@ If everything is highlighted, nothing is highlighted. One primary CTA per screen
 **Vendor acquisition**: Direct BD to trophy shops, print studios, engraving shops. Pitch: *"You have the machine. We have the customers."* Zero commission on first 10 orders.
 
 **Market position**: *"We are what Swiggy would be if they delivered personalised gifts instead of biryani."*
+
+---
+
+## Operational Guardrails
+
+### Wallet Balance Display Rule
+Wallet balance shown on home screen for logged-in users. Position: above Banner Bento. Format: "₹48 WyshKit Money — use today."
+
+Hidden wallet = broken Hook Model. If the user can't see their balance, the Investment phase of the Hook cycle fails silently.
+
+### Minimum Vendor Density
+`platform_settings.min_vendor_density_per_zone` — ops alert if < 5 live vendors per 3km zone.
+
+Below this threshold, delivery ETAs become unreliable and the hyperlocal promise breaks. Alert triggers Slack notification to BD team for that zone.

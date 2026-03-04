@@ -3335,6 +3335,15 @@ export type Database = {
         Returns: Json
       }
       unlockrows: { Args: { "": string }; Returns: number }
+      vendor_upload_preview: {
+        Args: {
+          p_order_id: string
+          p_order_product_id: string
+          p_preview_data: Json
+        }
+        Returns: Json
+      }
+
       update_checkout_session: {
         Args: {
           p_applied_coupon?: string

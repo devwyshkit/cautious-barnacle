@@ -20,7 +20,9 @@ import {
   FileText,
   RefreshCw,
   X,
-  Phone
+  Phone,
+  ArrowLeft,
+  Home
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import Image from 'next/image';
@@ -70,6 +72,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   const [proactivePersonalizationOpen, setProactivePersonalizationOpen] = useState(showPersonalizationParam);
   const [hasAutoOpened, setHasAutoOpened] = useState(showPersonalizationParam);
   const [isPersonalizationSubmittedOptimistic, setIsPersonalizationSubmittedOptimistic] = useState(false);
+  const [selectedPreviewProduct, setSelectedPreviewProduct] = useState<OrderProductDetail | null>(null);
 
   const personalizedProductsPending = useMemo(() => {
     return (orderProducts || []).filter((product) => {
@@ -164,6 +167,23 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   return (
     <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker" showHomeButton>
       <div className="mx-auto bg-[var(--surface-muted)]/50 pb-safe transition-all duration-500 overflow-y-auto scrollbar-hide overscroll-contain max-w-md min-h-[100dvh]">
+        {/* WYSHKIT 2026: Sticky Nav Header */}
+        <div className="sticky top-0 z-[var(--z-nav)] bg-[var(--surface)]/80 backdrop-blur-md border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 text-sm font-bold text-[var(--text-primary)] active:scale-95 transition-all hover:text-[var(--primary)]"
+          >
+            <ArrowLeft className="size-5" />
+            <Home className="size-4" />
+          </button>
+          <div className="flex flex-col items-center">
+            <span className="text-xs font-bold tracking-tight text-[var(--text-secondary)]">
+              {order?.order_number ? order.order_number : 'Order Tracking'}
+            </span>
+          </div>
+          <div className="w-12" />{/* Spacer for centering */}
+        </div>
+
         {!isConnected && (
           <div className="glass-morphism bg-[var(--primary)] text-[var(--text-inverse)] text-xs font-bold tracking-tight py-3 px-4 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-300 z-[var(--z-nav)] sticky top-0">
             <RefreshCw className="size-3 animate-spin" />
@@ -228,6 +248,29 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
             <StatusCard order={order as OrderDetail} orderProducts={orderProducts} />
           </SurfaceErrorBoundaryWithRouter>
 
+          {/* WYSHKIT 2026: Non-personalized order — simple progress card */}
+          {!order.has_personalization && !showPersonalizationForm && (
+            <SurfaceErrorBoundaryWithRouter surfaceName="Standard Progress">
+              <section className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] p-5 flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center border border-[var(--border)]">
+                    <Package className="size-5 text-[var(--text-tertiary)]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[var(--text-primary)] tracking-tight">No personalisation required</p>
+                    <p className="text-xs font-bold text-[var(--text-tertiary)] mt-0.5">Your order is being prepared as-is</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-2.5 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)]">
+                  <CheckCircle2 className="size-4 text-[var(--success)] shrink-0" />
+                  <p className="text-xs font-bold text-[var(--text-secondary)] tracking-tight">
+                    Nothing to submit — vendor is handling production directly
+                  </p>
+                </div>
+              </section>
+            </SurfaceErrorBoundaryWithRouter>
+          )}
+
           {!showPersonalizationForm && (
             <SurfaceErrorBoundaryWithRouter surfaceName="Creative Brief">
               <CreativeBrief
@@ -236,6 +279,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                 timeline={events}
                 isOptimisticSubmitted={isPersonalizationSubmittedOptimistic}
                 onOpenPersonalization={() => setProactivePersonalizationOpen(true)}
+                onOpenPreview={(product) => setSelectedPreviewProduct(product)}
               />
             </SurfaceErrorBoundaryWithRouter>
           )}
@@ -245,6 +289,8 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
               order={order as OrderDetail}
               productPreviews={itemPreviews}
               onPersonalizationSubmitted={handlePersonalizationSubmitted}
+              selectedPreviewProduct={selectedPreviewProduct}
+              setSelectedPreviewProduct={setSelectedPreviewProduct}
             />
           </SurfaceErrorBoundaryWithRouter>
 

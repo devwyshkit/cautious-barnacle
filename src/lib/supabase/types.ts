@@ -11,5 +11,13 @@ export type ProductResult = Database['public']['Functions']['search_products_ato
 export type Product = Tables<'products'>;
 export type Vendor = Tables<'vendors'>;
 export type Category = Tables<'categories'>;
+export type Order = Tables<'orders'>;
+export type OrderProduct = Tables<'order_products'>;
+export type Address = Tables<'user_addresses'>;
+export type OrderDetails = View<'v_order_detail'>;
+export type OrderWithProducts = Order & {
+    order_products: OrderProduct[];
+    user_addresses: Address | null;
+};
 
 export type { Database };

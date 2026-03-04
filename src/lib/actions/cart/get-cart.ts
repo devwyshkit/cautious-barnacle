@@ -25,13 +25,15 @@ export const getCart = cache(async (userParam?: any): Promise<GetCartResult> => 
     try {
         const supabase = await createClient();
 
-        // 1. Resolve Auth
+        // 1. Resolve Auth (WYSHKIT 2026: Dual-Identity Fetch during transition)
         let user = userParam;
         if (!user) {
             const { data: { user: fetchedUser } } = await supabase.auth.getUser();
             user = fetchedUser;
         }
-        const guestSessionId = !user ? await getGuestSessionIdReadOnly() : null;
+
+        // We always fetch the guest session if it exists, as the merge might still be in progress
+        const guestSessionId = await getGuestSessionIdReadOnly();
 
         if (!user && !guestSessionId) {
             return {

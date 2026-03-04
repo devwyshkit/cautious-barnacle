@@ -166,6 +166,13 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_selected_addons: (validated.payload.selected_addons as any) || []
                     });
                     if (error) throw error;
+
+                    if (data && !(data as any).success) {
+                        // WYSHKIT 2026: Throw the RPC's internal error (e.g., VENDOR_MISMATCH) so the 
+                        // intent engine catches it and sends {success: false, error: ...} back to CartProvider
+                        throw new Error((data as any).error || 'Failed to add product');
+                    }
+
                     revalidatePath('/', 'layout');
                     return { success: true, data };
                 }

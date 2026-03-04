@@ -12,9 +12,14 @@ export function normalizePhone(phone: string): string {
   const digits = phone.replace(/\D/g, '');
 
   // CHECK FOR TEST NUMBERS (WYSHKIT 2026: Zero Friction for Devs)
-  // If the number is clearly a test number (starts with 123, 555, 000) or is exactly 10 digits (India local),
+  // If the number is clearly a test number (starts with 123, 555, 000, 762),
   // we pass it raw if it doesn't already have a plus, to avoid double-prefixing or prefixing test accounts.
-  if (digits.length === 10 && (digits.startsWith('123') || digits.startsWith('555') || digits.startsWith('000'))) {
+  if (digits.length === 10 && (
+    digits.startsWith('123') ||
+    digits.startsWith('555') ||
+    digits.startsWith('000') ||
+    digits.startsWith('762') // Specific test range for reported issues
+  )) {
     return digits; // Return raw 10 digits for local/test numbers
   }
 

@@ -6,6 +6,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
 import { MapPin, Check, Home, Briefcase, ChevronRight, Loader2, Plus, Clock } from "lucide-react";
 
+import { useUI } from "@/providers/UIProvider";
 import { setSelectedAddressAction } from "@/lib/actions/checkout/checkout";
 import type { Address } from "@/lib/types/address";
 
@@ -19,6 +20,7 @@ interface AddressSlotProps {
 export function AddressSlot({ initialAddresses = [], currentAddress, disabled, etaMinutes }: AddressSlotProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const { openOTPSheet, openProfileSheet } = useUI();
   const [isChanging, setIsChanging] = useState(false);
 
   const [state, selectAction, isPending] = useActionState(async (prevState: any, addressId: string | null) => {
@@ -78,9 +80,9 @@ export function AddressSlot({ initialAddresses = [], currentAddress, disabled, e
           <button
             onClick={() => {
               if (!user) {
-                router.push('/auth?returnUrl=/checkout');
+                openOTPSheet();
               } else {
-                router.push('/profile?tab=addresses&action=add&returnUrl=/checkout');
+                openProfileSheet('addresses');
               }
             }}
             disabled={disabled}

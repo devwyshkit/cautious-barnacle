@@ -12,6 +12,7 @@ import { LocationData } from '@/lib/actions/discovery/location';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { Masthead } from '@/components/customer/home/Masthead';
 import { useUI } from '@/providers/UIProvider';
+import { useSearchParams } from 'next/navigation';
 
 
 interface TopHeaderProps {
@@ -33,7 +34,7 @@ interface TopHeaderProps {
 export function TopHeader({ location, status, etaMinutes, locationName, hasMasthead: hasMastheadProp }: TopHeaderProps) {
   const router = useRouter();
   const { user, loading } = useAuth();
-  const { openLocationSheet } = useUI();
+  const { openLocationSheet, openProfileSheet, openSearchSheet, openOTPSheet } = useUI();
   const hasMasthead = hasMastheadProp ?? !!(status || etaMinutes || locationName);
 
   return (
@@ -71,7 +72,7 @@ export function TopHeader({ location, status, etaMinutes, locationName, hasMasth
             <button
               onClick={() => {
                 triggerHaptic(HapticPattern.ACTION);
-                router.push('/search');
+                openSearchSheet();
               }}
               className="w-full flex items-center gap-[var(--space-3)] h-11 px-[var(--space-4)] bg-[var(--surface-muted)] rounded-[var(--radius-md)] hover:bg-[var(--input)] transition-all group"
             >
@@ -85,7 +86,7 @@ export function TopHeader({ location, status, etaMinutes, locationName, hasMasth
             <Button
               onClick={() => {
                 triggerHaptic(HapticPattern.ACTION);
-                user ? router.push('/profile') : router.push('/auth');
+                user ? openProfileSheet() : openOTPSheet();
               }}
               className="h-10 px-[var(--space-4)] rounded-[var(--radius-md)] hover:bg-[var(--surface-muted)] gap-[var(--space-2)] font-bold text-sm text-[var(--text-primary)] active:scale-95 transition-all"
             >
@@ -132,19 +133,21 @@ export function TopHeader({ location, status, etaMinutes, locationName, hasMasth
                 <span className="text-[10px] font-bold text-[var(--text-tertiary)] truncate w-full tracking-tight">{location.address}</span>
               </div>
             </button>
-            <Link
-              href="/profile"
-              onClick={() => triggerHaptic(HapticPattern.ACTION)}
+            <button
+              onClick={() => {
+                triggerHaptic(HapticPattern.ACTION);
+                user ? openProfileSheet() : openOTPSheet();
+              }}
               className="size-9 rounded-full bg-[var(--surface-muted)] border border-[var(--border)] flex items-center justify-center shrink-0 active:scale-95 transition-transform"
             >
               <User className="size-4.5 text-[var(--text-secondary)]" />
-            </Link>
+            </button>
           </div>
 
           <button
             onClick={() => {
               triggerHaptic(HapticPattern.ACTION);
-              router.push('/search');
+              openSearchSheet();
             }}
             className="w-full flex items-center gap-[var(--space-3)] h-11 px-[var(--space-4)] bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius-md)] active:bg-[var(--input)] transition-all group"
           >

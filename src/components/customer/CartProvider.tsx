@@ -150,11 +150,17 @@ export function CartProvider({
                         }
                     });
 
-                    if (result && (result as any).data?.error === 'VENDOR_MISMATCH') {
+                    if (result && result.error === 'VENDOR_MISMATCH') {
                         triggerHaptic(HapticPattern.ERROR);
                         setPendingItem({ product_id, variant_id, personalization, selected_addons, quantity, optimistic_data });
                         setShowReplaceCartDialog(true);
                         resolve({ success: false, error: 'VENDOR_MISMATCH' });
+                        return;
+                    }
+
+                    if (result && (result.error === 'VARIANT_REQUIRED' || result.error === 'INVALID_VARIANT')) {
+                        triggerHaptic(HapticPattern.ERROR);
+                        resolve({ success: false, error: 'Please select a size or option before adding to cart.' });
                         return;
                     }
 

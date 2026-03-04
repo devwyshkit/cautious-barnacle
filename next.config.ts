@@ -52,7 +52,7 @@ const nextConfig: NextConfig = {
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' blob: data: https://*.supabase.co https://*.supabase.com https://*.razorpay.com https://lh3.googleusercontent.com",
               "frame-src https://*.razorpay.com",
-              "connect-src 'self' https://*.supabase.co https://*.supabase.com https://*.razorpay.com https://vitals.vercel-insights.com"
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.supabase.com https://*.razorpay.com https://vitals.vercel-insights.com"
             ].join('; ')
           },
           {

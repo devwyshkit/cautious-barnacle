@@ -1,12 +1,25 @@
 # WyshKit 2026
 
-> **"The Shadow of Swiggy. The Speed of Instamart. Zero Reinvention."**
+> **Inventory + 10-minute service. Delivered at Swiggy speed.**
 
-WyshKit turns local engraving and embroidery shops into on-demand personalisation nodes.  
-**Last-minute gifts, personalised, delivered in under 60 minutes.**
+WyshKit is the hyperlocal marketplace for products with optional personalisation. We turn local engraving and embroidery shops into on-demand personalisation nodes. **Last-minute gifts, personalised, delivered in under 60 minutes.**
 
-> [!IMPORTANT]
-> **Audit 2026 Phase 1 Complete**: All 4 critical flow blockages resolved (Auth E.164, Pricing NaN, Desktop Scroll, Personalization Select).
+---
+
+## The Mental Model
+
+```
+LAYER 1 — SWIGGY FOOD    Browse → Cart → Pay
+          (Deferred auth. Guest cart. One-page checkout. Auto-selected address.)
+
+LAYER 2 — INSTAMART      Physical product sheet with inventory reality
+          (Photo. Name. Vendor. Price. Variants. Add-ons. ETA. Stock.)
+
+LAYER 3 — FIVERR         Post-payment work loop
+          (Pay → Submit requirements → Receive preview → Approve/Revise → Production)
+```
+
+**Customisation** = selecting size/colour/material before payment. **Personalisation** = submitting engraving text or a logo after payment. Zero new patterns. Zero reinvention.
 
 ---
 
@@ -18,9 +31,6 @@ WyshKit turns local engraving and embroidery shops into on-demand personalisatio
 | 2 | **Time > Distance** | "Arriving by 5:15 PM." Never "2.4 km away." |
 | 3 | **Zero Shadow Math** | The database is the only computer. The frontend is a display. |
 
-> [!TIP]
-> **Nomenclature Protection**: WyshKit 2026 maintains zero tolerance for legacy terms like Partner / Item / Merchant via structural type enforcement and code audits.
-
 ---
 
 ## Tech Stack
@@ -31,6 +41,7 @@ WyshKit turns local engraving and embroidery shops into on-demand personalisatio
 | Backend / Auth | Supabase (PostgreSQL, RLS, SECURITY DEFINER RPCs) |
 | Payments | Razorpay (100% advance, idempotent, webhook-verified) |
 | Logistics | Shadowfax / Porter (3PL — zero fleet, zero CapEx) |
+| Location | Google Maps Platform (autocomplete, geocoding, live map) |
 | Vendor KYC | IDfy (OCR extraction-first — vendor verifies, never types) |
 | UI | shadcn/ui + Radix primitives + Tailwind CSS |
 | Validation | Zod (all mutations validated before any RPC) |
@@ -43,19 +54,24 @@ WyshKit turns local engraving and embroidery shops into on-demand personalisatio
 
 ```bash
 npm install
-cp .env.example .env        # Fill in Supabase + Razorpay keys (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)
+cp .env.example .env        # Fill in Supabase + Razorpay keys
 npm run dev
 ```
 
-> [!IMPORTANT]
-> **Slug-First Routing**: WyshKit 2026 enforces human-readable slugs for all vendor/product URLs. Using a UUID in a customer-facing URL is considered a P0 architectural bug.
-
 **Before every PR:**
 ```bash
-npm run lint                # High density code quality check
+npm run lint                # Code quality
 npm test                    # 80% coverage gate
 npm run build               # Production build validation
 ```
+
+**Hard rules:**
+- **Zero Shadow Math** — no hardcoded colours or magic numbers. Use CSS variables.
+- **Zero Reinvention** — check Supabase or shadcn/ui before adding dependencies.
+- **Mobile First** — all interfaces optimised for 44px tap targets.
+- **Nomenclature** — never use 'Partner', 'Item', or 'Merchant'. Use 'Vendor', 'Product', 'Customer'.
+- **Slug-First Routing** — using a UUID in a customer-facing URL is a P0 bug.
+- **Zero `console.log`** — structured logger only.
 
 ---
 
@@ -68,4 +84,4 @@ npm run build               # Production build validation
 | [KERNEL.md](./docs/KERNEL.md) | **Engineering** | The 7 Laws, hard engineering rules, Commerce Intent Engine, security, observability |
 | [DOCTRINE.md](./docs/DOCTRINE.md) | **Product + Strategy** | The WyshKit differentiation (The Preview Moat), 20+ behavioral science laws, messaging playbook, GTM |
 | [WORKFLOW.md](./docs/WORKFLOW.md) | **Product + Engineering** | Full user journey (Home → Checkout → Tracking → Delivery), notification architecture, SLA table, refund policy |
-| [OPERATIONS.md](./docs/OPERATIONS.md) | **Ops + BD** | Vendor onboarding funnel, KYC/KYB extraction-first, commission tiers, operator runbook (SLA breach, wallet, payment recovery) |
+| [OPERATIONS.md](./docs/OPERATIONS.md) | **Ops + BD** | Vendor onboarding funnel, KYC/KYB extraction-first, commission tiers, operator runbook |

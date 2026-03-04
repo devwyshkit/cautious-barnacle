@@ -14,7 +14,7 @@ export type Views<T extends keyof PublicSchema['Views']> = PublicSchema['Views']
 
 // WYSHKIT 2026: V_ORDER_DETAIL is the "God-Level" single-trip source.
 // We cast Json fields to their specific interfaces for UI safety.
-export interface OrderDetail extends Omit<Views<'v_order_detail'>, 'order_products' | 'previews' | 'timeline' | 'status'> {
+export interface OrderDetail extends Omit<Views<'v_order_detail'>, 'order_products' | 'previews' | 'timeline' | 'status' | 'change_request_count' | 'awb_number' | 'courier_vendor' | 'tracking_url' | 'max_change_requests' | 'personalization_status'> {
   order_products: OrderProductDetail[] | null;
   previews: PreviewSubmission[] | null;
   timeline: OrderStatusHistory[] | null;
@@ -98,4 +98,6 @@ export interface PreviewSubmission {
   vendor_notes?: string | null;
   submitted_at: string;
 }
-
+export interface OrderProductListItem extends Views<'v_order_tracking'> {
+  personalization_status?: string | null;
+}

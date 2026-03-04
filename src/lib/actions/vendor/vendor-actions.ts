@@ -347,25 +347,22 @@ export async function upload_preview(
 
     if (fetch_error || !order) throw new Error('Order not found');
 
-    // WYSHKIT 2026: Combined Update (Metadata-Driven)
-    // Update the specific order_product metadata with the preview URL
-    const { error: product_error } = await supabase
-      .from('order_products')
-      .update({
-        personalization_details: {
-          preview_url: preview_url,
-          vendor_notes: vendor_notes || null,
-          preview_ready: true,
-          preview_uploaded_at: new Date().toISOString()
-        } as any
-      })
-      .eq('id', order_product_id);
+    // WYSHKIT 2026: Atomic JSON Merge (Prevents replacing the customer's text/image data)
+    const { error: rpc_error } = await supabase.rpc('vendor_upload_preview', {
+      p_order_id: order_id,
+      p_order_product_id: order_product_id,
+      p_preview_data: {
+        preview_url: preview_url,
+        vendor_notes: vendor_notes || null,
+        preview_ready: true,
+        preview_uploaded_at: new Date().toISOString()
+      } as any
+    });
 
-    if (product_error) throw product_error;
+    if (rpc_error) throw rpc_error;
 
     // WYSHKIT 2026: DO NOT move to PACKED on preview upload.
     // The order stays IN_PRODUCTION until the customer approves.
-    // We update the local state for the vendor dashboard to reflect 'submitted'.
     revalidatePath(`/vendor/orders/${order_id}`);
     revalidateTag(`order-${order_id}`);
 

@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Logo } from '@/components/ui/Logo';
 
+import { useUI } from '@/providers/UIProvider';
+
 interface DesktopFooterProps {
     className?: string;
 }
@@ -15,6 +17,7 @@ interface DesktopFooterProps {
  * Zero Redundancy: Consolidates navigation, branding, and compliance.
  */
 export function DesktopFooter({ className }: DesktopFooterProps) {
+    const { openSearchSheet, openProfileSheet } = useUI();
     return (
         <footer className={cn("bg-[var(--surface)] border-t border-[var(--border)] py-[var(--space-16)] px-[var(--space-8)] hidden md:block", className)}>
             <div className="max-w-[1440px] mx-auto">
@@ -36,18 +39,38 @@ export function DesktopFooter({ className }: DesktopFooterProps) {
                         <h4 className="text-[10px] font-black tracking-widest text-[var(--text-tertiary)] uppercase">Discovery</h4>
                         <ul className="flex flex-col gap-[var(--space-2)]">
                             <li><Link href="/" className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors">Home</Link></li>
-                            <li><Link href="/search" className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors">Search</Link></li>
+                            <li>
+                                <button
+                                    onClick={() => openSearchSheet()}
+                                    className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors text-left"
+                                >
+                                    Search
+                                </button>
+                            </li>
                             <li><Link href="/orders" className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors">My Orders</Link></li>
+                            <li>
+                                <button
+                                    onClick={() => openProfileSheet()}
+                                    className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors text-left"
+                                >
+                                    My Profile
+                                </button>
+                            </li>
                         </ul>
                     </div>
 
-                    {/* Company Links */}
+                    {/* Company Links - WYSHKIT 2026: Consolidation */}
                     <div className="space-y-[var(--space-4)]">
-                        <h4 className="text-[10px] font-black tracking-widest text-[var(--text-tertiary)] uppercase">Company</h4>
+                        <h4 className="text-[10px] font-black tracking-widest text-[var(--text-tertiary)] uppercase">Support</h4>
                         <ul className="flex flex-col gap-[var(--space-2)]">
-                            <li><Link href="/about" className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors">About Us</Link></li>
-                            <li><Link href="/contact" className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors">Contact</Link></li>
-                            <li><Link href="/feedback" className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors">Feedback</Link></li>
+                            <li>
+                                <button
+                                    onClick={() => openProfileSheet()}
+                                    className="text-sm font-bold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors text-left"
+                                >
+                                    Help & Support
+                                </button>
+                            </li>
                         </ul>
                     </div>
 

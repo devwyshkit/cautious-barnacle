@@ -107,8 +107,15 @@ export async function updateSession(request: NextRequest): Promise<{
 
             const isCustomerProtected = ['/profile', '/orders'].some(p => pathname.startsWith(p));
             if (isCustomerProtected) {
-                const url = new URL('/auth', request.url)
-                url.searchParams.set('intent', 'signin')
+                const url = new URL('/', request.url)
+                if (pathname.startsWith('/profile')) {
+                    url.searchParams.set('profile', 'true')
+                    // Extract tab if present in query
+                    const tab = request.nextUrl.searchParams.get('tab')
+                    if (tab) url.searchParams.set('tab', tab)
+                } else {
+                    url.searchParams.set('auth', 'true')
+                }
                 url.searchParams.set('returnUrl', pathname)
                 return { supabaseResponse: createRedirectResponse(url.toString()), user: null, roles: ['customer'] }
             }
