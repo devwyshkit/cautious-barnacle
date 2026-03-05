@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { ShareButton } from '@/components/ui/ShareButton';
 import { formatPrepTime } from '@/lib/utils/sla';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
+import { AppHeading, AppText } from '@/components/ui/Typography';
 
 const FALLBACK_IMAGE = '/images/logo.png';
 
@@ -35,7 +36,7 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                     src={data.image_url || FALLBACK_IMAGE}
                     alt={data.name}
                     fill
-                    className="object-cover opacity-60 grayscale blur-sm"
+                    className="object-cover opacity-40"
                     priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-[var(--background)]/50 to-transparent" />
@@ -46,9 +47,9 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                         triggerHaptic(HapticPattern.ACTION);
                         router.back();
                     }}
-                    className="absolute top-[var(--space-4)] left-[var(--space-4)] z-20 size-8 rounded-full bg-[var(--surface)] flex items-center justify-center text-[var(--text-primary)] border border-[var(--border)] shadow-[var(--shadow-sm)] active:scale-95 transition-all"
+                    className="absolute top-[var(--space-4)] left-[var(--space-4)] z-20 size-11 rounded-full bg-[var(--surface)] flex items-center justify-center text-[var(--text-primary)] border border-[var(--border)] shadow-[var(--shadow-md)] active:scale-95 transition-all"
                 >
-                    <ArrowLeft className="size-4" />
+                    <ArrowLeft className="size-5" />
                 </button>
             </div>
 
@@ -66,12 +67,12 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                                 />
                             </div>
                             <div className="flex flex-col">
-                                <h1 className="text-xl md:text-2xl font-black text-[var(--text-primary)] tracking-tighter leading-none mb-[var(--space-1)]">
+                                <AppHeading level={1} className="text-xl md:text-2xl mb-[var(--space-1)]">
                                     {data.name}
-                                </h1>
-                                <div className="flex items-center gap-[var(--space-1-5)] text-[10px] font-black text-[var(--text-tertiary)] uppercase tracking-widest">
+                                </AppHeading>
+                                <div className="flex items-center gap-[var(--space-1-5)] text-[var(--text-tertiary)]">
                                     <MapPin className="size-2.5 text-[var(--primary)]" />
-                                    <span>{data.city || 'Local Store'}</span>
+                                    <AppText variant="caption" weight="medium">{data.city || 'Local Store'}</AppText>
                                 </div>
                             </div>
                         </div>
@@ -86,10 +87,10 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                         {data.rating && (
                             <div className="bg-[var(--foreground)] px-[var(--space-2-5)] py-[var(--space-1-5)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] flex flex-col items-center min-w-[44px]">
                                 <div className="flex items-center gap-[var(--space-0-5)]">
-                                    <span className="text-sm font-black text-[var(--text-inverse)] leading-none">{data.rating.toFixed(1)}</span>
+                                    <AppText weight="bold" className="text-sm text-[var(--text-inverse)] leading-none">{data.rating.toFixed(1)}</AppText>
                                     <Star className="size-2.5 fill-[var(--text-inverse)] text-[var(--text-inverse)]" />
                                 </div>
-                                <span className="text-[var(--text-tiny)] font-black text-[var(--text-inverse)]/60 uppercase tracking-tighter mt-[var(--space-0-5)] whitespace-nowrap">Rating</span>
+                                <AppText variant="metadata" className="text-[var(--text-inverse)]/70 mt-[var(--space-0-5)] whitespace-nowrap">Rating</AppText>
                             </div>
                         )}
                     </div>
@@ -98,7 +99,7 @@ export function StoreHeader({ data }: StoreHeaderProps) {
                 <div className="flex items-center gap-[var(--space-3)] mt-[var(--space-4)]">
                     <div className="flex items-center gap-[var(--space-1-5)] px-[var(--space-2-5)] py-[var(--space-1-5)] rounded-[var(--radius-md)] bg-[var(--well-success)] border border-[var(--success)]/10">
                         <Clock className="size-3 text-[var(--success)]" />
-                        <span className="text-[10px] font-black text-[var(--text-primary)] uppercase tracking-widest">{etaText}</span>
+                        <AppText variant="caption" weight="medium">{etaText}</AppText>
                     </div>
 
                 </div>

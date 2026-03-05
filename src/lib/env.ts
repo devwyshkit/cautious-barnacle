@@ -11,6 +11,14 @@ const REQUIRED_ENV_VARS = [
     'SUPABASE_SERVICE_ROLE_KEY',
     'RAZORPAY_KEY_ID',
     'RAZORPAY_KEY_SECRET',
+    'SHIPROCKET_EMAIL',
+    'SHIPROCKET_PASSWORD',
+    'REFRENS_URL_KEY',
+    'REFRENS_APP_ID',
+    'REFRENS_APP_SECRET',
+    'REFRENS_PRIVATE_KEY',
+    'IDFY_ACCOUNT_ID',
+    'IDFY_API_KEY',
 ] as const;
 
 export function validateEnv() {

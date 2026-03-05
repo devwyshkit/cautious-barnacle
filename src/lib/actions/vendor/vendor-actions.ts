@@ -11,7 +11,6 @@ import {
   OrderWithProducts,
   Tables
 } from '@/lib/supabase/types';
-import { ShadowfaxService } from '@/lib/services/shadowfax';
 import { ORDER_STATUS } from '@/lib/types/order-status';
 import { logger } from '@/lib/logging/logger';
 import { revalidatePath, revalidateTag } from 'next/cache';

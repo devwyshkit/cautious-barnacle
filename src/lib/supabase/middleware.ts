@@ -107,6 +107,17 @@ export async function updateSession(request: NextRequest): Promise<{
 
             const isCustomerProtected = ['/profile', '/orders'].some(p => pathname.startsWith(p));
             if (isCustomerProtected) {
+                // WYSHKIT 2026: Auth Resilience
+                // If we have an auth cookie, we assume the user is logged in but getUser() failed
+                // (e.g. due to ISP/timeout). We avoid redirecting and let the Page handle it.
+                const supabaseProjectRef = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').match(/https:\/\/([^.]+)\./)?.[1] || '';
+                const authCookieName = `sb-${supabaseProjectRef}-auth-token`;
+                const hasAuthCookie = request.cookies.has(authCookieName);
+
+                if (hasAuthCookie) {
+                    return { supabaseResponse, user: null, roles: ['customer'] }
+                }
+
                 const url = new URL('/', request.url)
                 if (pathname.startsWith('/profile')) {
                     url.searchParams.set('profile', 'true')

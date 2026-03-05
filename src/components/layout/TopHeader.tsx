@@ -114,7 +114,7 @@ export function TopHeader({ location, status, etaMinutes, locationName, hasMasth
         </div>
 
         {/* Mobile Header: High Density WYSHKIT 2026 Style */}
-        <div className="md:hidden flex flex-col gap-[var(--space-2)] px-[var(--space-4)] pt-[var(--space-3)] pb-[var(--space-2)] h-[var(--top-header-base-mobile)]">
+        <div className="md:hidden flex flex-col gap-[var(--space-1-5)] px-[var(--space-4)] pt-[var(--space-2)] pb-[var(--space-1-5)] h-[var(--top-header-base-mobile)]">
           <div className="flex items-center justify-between gap-[var(--space-4)]">
             <button
               id="location-trigger-mobile"
@@ -122,15 +122,18 @@ export function TopHeader({ location, status, etaMinutes, locationName, hasMasth
                 triggerHaptic(HapticPattern.ACTION);
                 openLocationSheet();
               }}
-              className="flex items-center gap-[var(--space-2)] group overflow-hidden"
+              className="flex items-center gap-[var(--space-1)] group overflow-hidden"
             >
-              <MapPin className="size-5 text-[var(--primary)] shrink-0" />
-              <div className="flex flex-col items-start min-w-0">
-                <div className="flex items-center gap-[var(--space-1)] w-full leading-none">
-                  <span className="text-sm font-bold text-[var(--text-primary)] truncate tracking-tight">{location.name}</span>
-                  <ChevronDown className="size-3.5 text-[var(--text-tertiary)] group-active:text-[var(--text-primary)] transition-colors" />
-                </div>
-                <span className="text-[10px] font-bold text-[var(--text-tertiary)] truncate w-full tracking-tight">{location.address}</span>
+              <span className="text-[var(--primary)] text-base shrink-0">📍</span>
+              <div className="flex items-center gap-[var(--space-1)]">
+                <span className="text-sm font-bold text-[var(--text-primary)] tracking-tight truncate max-w-[120px]">
+                  {location.name.split(',')[0]}
+                </span>
+                <span className="text-[var(--text-tertiary)] font-bold">·</span>
+                <span className="text-sm font-bold text-[var(--text-primary)] tracking-tight shrink-0">
+                  ~{etaMinutes || 45} min
+                </span>
+                <ChevronDown className="size-3.5 text-[var(--text-tertiary)] group-active:text-[var(--text-primary)] transition-colors ml-0.5" />
               </div>
             </button>
             <button
@@ -149,10 +152,10 @@ export function TopHeader({ location, status, etaMinutes, locationName, hasMasth
               triggerHaptic(HapticPattern.ACTION);
               openSearchSheet();
             }}
-            className="w-full flex items-center gap-[var(--space-3)] h-11 px-[var(--space-4)] bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius-md)] active:bg-[var(--input)] transition-all group"
+            className="w-full flex items-center gap-[var(--space-3)] h-9 px-[var(--space-4)] bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius-md)] active:bg-[var(--input)] transition-all group"
           >
-            <Search className="size-4 text-[var(--primary)]" />
-            <span className="text-sm font-bold text-[var(--text-tertiary)]">Search &quot;Best Birthday Cakes&quot;</span>
+            <Search className="size-3.5 text-[var(--primary)]" />
+            <span className="text-xs font-medium text-[var(--text-tertiary)]">Search for gifts, awards, custom products...</span>
           </button>
         </div>
 

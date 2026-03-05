@@ -24,10 +24,10 @@ export default async function OrdersPage() {
                 <div className="max-w-xl mx-auto px-4">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-2">
+                            <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-2">
                                 My Orders
                             </h1>
-                            <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mt-0.5 uppercase">
+                            <p className="text-xs font-medium text-[var(--text-tertiary)] tracking-tight mt-0.5">
                                 Track and manage your orders
                             </p>
                         </div>
@@ -55,15 +55,17 @@ async function AsyncOrderList({ userId }: { userId: string }) {
 
     if (!orders || (orders as any[]).length === 0) {
         return (
-            <div className="p-[var(--space-12)] text-center bg-[var(--surface)] rounded-[var(--radius-3xl)] border border-[var(--border)] shadow-[var(--shadow-sm)] animate-in fade-in slide-in-from-bottom-2">
-                <div className="size-16 rounded-full bg-[var(--surface-muted)] flex items-center justify-center mx-auto mb-4 border border-[var(--border)]">
+            <div className="p-12 text-center bg-[var(--surface)] rounded-[var(--radius-3xl)] border border-[var(--border)] shadow-[var(--shadow-sm)] animate-in fade-in slide-in-from-bottom-2">
+                <div className="size-16 rounded-full bg-[var(--surface-muted)] flex items-center justify-center mx-auto mb-6 border border-[var(--border)]">
                     <Package className="size-8 text-[var(--text-tertiary)]" />
                 </div>
-                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">No orders yet</h3>
-                <p className="text-xs font-medium text-[var(--text-tertiary)] mb-8 max-w-[200px] mx-auto">Start exploring the best premium stores in your city!</p>
+                <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2 tracking-tight">No orders yet</h3>
+                <p className="text-sm font-medium text-[var(--text-tertiary)] mb-10 max-w-[240px] mx-auto leading-relaxed">
+                    Discovery is just a tap away. Explore premium stores and gifts near you.
+                </p>
                 <Link href="/">
-                    <button className="bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-lg)] px-10 py-4 font-bold text-sm active:scale-95 transition-all shadow-lg shadow-[var(--shadow-sm)]">
-                        Browse Stores
+                    <button className="bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-xl)] px-12 py-4 font-bold text-sm active:scale-95 transition-all shadow-[var(--shadow-md)]">
+                        Find a store near you
                     </button>
                 </Link>
             </div>
@@ -75,7 +77,7 @@ async function AsyncOrderList({ userId }: { userId: string }) {
     return (
         <div className="space-y-4 animate-in fade-in duration-500">
             <div className="flex justify-end mb-2">
-                <span className="text-xs font-black text-[var(--text-tertiary)] tracking-widest uppercase bg-[var(--surface-muted)]/50 px-2 py-1 rounded">
+                <span className="text-xs font-medium text-[var(--text-tertiary)] bg-[var(--surface-muted)]/50 px-2.5 py-1 rounded-full border border-[var(--border)]">
                     {orderList.length} Total Orders
                 </span>
             </div>
@@ -88,7 +90,7 @@ function OrdersSkeleton() {
     return (
         <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-[var(--surface)] rounded-[var(--radius-3xl)] border border-[var(--border)] animate-pulse flex items-center px-[var(--space-6)] gap-[var(--space-4)]">
+                <div key={i} className="h-24 bg-[var(--surface)] rounded-[var(--radius-xl)] border border-[var(--border)] animate-pulse flex items-center px-[var(--space-6)] gap-[var(--space-4)]">
                     <div className="size-16 rounded-[var(--radius-lg)] bg-[var(--surface-muted)]" />
                     <div className="flex-1 space-y-2">
                         <div className="h-4 w-1/3 bg-[var(--surface-muted)] rounded" />

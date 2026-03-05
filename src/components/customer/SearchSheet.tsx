@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useTransition, useRef } from 'react';
-import { Search, X, Loader2, Search as SearchIcon } from 'lucide-react';
+import { X, Loader2, Search as SearchIcon } from 'lucide-react';
+import { AppText, AppHeading } from '@/components/ui/Typography';
 import { Input } from '@/components/ui/input';
 import { ResponsiveSurface } from '@/components/ui/ResponsiveSurface';
 import { useUI } from '@/providers/UIProvider';
@@ -97,8 +98,8 @@ export function SearchSheet() {
                             <div className="size-16 bg-[var(--surface)] rounded-full flex items-center justify-center mb-4 shadow-sm border border-[var(--border)]">
                                 <SearchIcon className="size-8 text-[var(--border)]" />
                             </div>
-                            <p className="text-sm font-bold text-[var(--text-primary)] tracking-tight">Search WyshKit</p>
-                            <p className="text-xs text-[var(--text-tertiary)] mt-1">Find bespoke products and top vendors</p>
+                            <AppText variant="label" weight="bold" color="primary">Search WyshKit</AppText>
+                            <AppText variant="caption" color="tertiary" className="mt-1">Find bespoke products and top vendors</AppText>
                         </div>
                     ) : isPending && !hasResults ? (
                         <div className="flex items-center justify-center py-20">
@@ -106,17 +107,17 @@ export function SearchSheet() {
                         </div>
                     ) : !hasResults ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in duration-700">
-                            <p className="text-sm font-bold text-[var(--text-primary)] tracking-tight">No matches found</p>
-                            <p className="text-xs text-[var(--text-tertiary)] mt-2 mx-auto max-w-[200px]">
+                            <AppText variant="label" weight="bold" color="primary">No matches found</AppText>
+                            <AppText variant="caption" color="tertiary" className="mt-2 mx-auto max-w-[200px]">
                                 Try searching for something else or browse categories on the home page.
-                            </p>
+                            </AppText>
                         </div>
                     ) : (
                         <div className={cn("p-4 space-y-8 transition-opacity duration-300", isPending ? "opacity-50" : "opacity-100")}>
                             {/* Vendor Section */}
                             {results.vendors.length > 0 && (
                                 <section className="space-y-4">
-                                    <h3 className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-[0.2em] px-1">Top Stores</h3>
+                                    <AppHeading level={3} color="tertiary" className="uppercase tracking-[0.2em] px-1">Top Stores</AppHeading>
                                     <div className="space-y-3">
                                         {results.vendors.map((vendor) => (
                                             <div key={vendor.id} onClick={closeSearchSheet}>
@@ -133,7 +134,7 @@ export function SearchSheet() {
                             {/* Product Section */}
                             {results.products.length > 0 && (
                                 <section className="space-y-4">
-                                    <h3 className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-[0.2em] px-1">Products</h3>
+                                    <AppHeading level={3} color="tertiary" className="uppercase tracking-[0.2em] px-1">Products</AppHeading>
                                     <div className="grid grid-cols-2 gap-x-3 gap-y-6">
                                         {results.products.map((product) => (
                                             <div key={product.id} onClick={closeSearchSheet}>

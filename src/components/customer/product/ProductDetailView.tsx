@@ -14,6 +14,7 @@ import { formatCurrency } from '@/lib/utils/pricing';
 const FALLBACK_IMAGE = '/images/logo.png';
 
 import { WyshkitProduct } from '@/lib/types/product';
+import { Badge } from '@/components/ui/ProductBadge';
 
 interface ProductDetailViewProps {
     product: WyshkitProduct;
@@ -58,12 +59,10 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
 
     const variantsArray = Array.isArray(product?.variants) ? product.variants : [];
     // WYSHKIT 2026: Strictly defined personalization as a post-payment service
-    const hasPersonalizationService = !!(product as any).has_personalization || (product as any).personalization_options?.length > 0;
-    const personalizationPrice = (product as any).personalization_fee || 0;
+    const hasPersonalizationService = !!product.has_personalization;
+    const personalizationPrice = product.personalization_fee || 0;
 
-    const selectedVariant = useMemo(() => {
-        return (variantsArray as any[]).find((v: any) => String(v.id) === selectedVariantId) || null;
-    }, [variantsArray, selectedVariantId]);
+    const selectedVariant = variantsArray.find((v: any) => String(v.id) === selectedVariantId) || null;
 
     const selectedAddons = useMemo(() => {
         // WYSHKIT 2026: Combined Add-ons (Limit 8 total)
@@ -84,7 +83,6 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
         return selectedVariant ? (Number(selectedVariant.price) || 0) : basePrice;
     }, [product.base_price, selectedVariant]);
 
-    const totalPrice = (unitPrice * quantity) + (isPersonalizationEnabled ? personalizationPrice : 0);
 
     const isEditMode = !!initialState?.cartProductId;
 
@@ -114,7 +112,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                     product_image: product.images?.[0] || FALLBACK_IMAGE,
                     unit_price: Number(unitPrice) || 0,
                     vendor_id: product.vendor_id!,
-                    vendor_name: (product as any).vendor_name || 'Store',
+                    vendor_name: product.vendor_name || 'Store',
                     update_product_id: initialState?.cartProductId
                 }
             );
@@ -156,8 +154,8 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                     </button>
                 </div>
 
-                {/* Image Section */}
-                <div className="relative bg-[var(--surface)] w-full aspect-[4/3] md:aspect-square">
+                {/* Image Section - Instamart Standard Aspect Ratio */}
+                <div className="relative bg-[var(--surface)] w-full aspect-square md:aspect-[4/3]">
                     <div
                         ref={imageContainerRef}
                         className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
@@ -218,9 +216,9 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         <div className="flex items-start justify-between gap-4">
                             <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                    <p className="text-sm font-semibold text-[var(--text-secondary)] tracking-tight">{(product as any).category_name || 'Product'}</p>
+                                    <p className="text-sm font-medium text-[var(--text-secondary)]">{product.category_name || 'Product'}</p>
                                     <div className="size-1 rounded-full bg-[var(--border)]" />
-                                    <p className="text-sm font-semibold text-[var(--text-secondary)] tracking-tight">{(product as any).vendor_name || product.vendors?.name || 'Store'}</p>
+                                    <p className="text-sm font-medium text-[var(--text-secondary)]">{product.vendor_name || product.vendors?.name || 'Store'}</p>
                                 </div>
                                 <h2 className="text-2xl font-bold text-[var(--text-primary)] leading-tight tracking-tight">
                                     {product.name}
@@ -238,31 +236,66 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                             </div>
                         </div>
 
+                        {/* Elite Signals (Urgency & Scarcity) */}
+                        {product.elite_signals && (
+                            <div className="flex flex-wrap gap-2">
+                                {product.elite_signals.urgency_signal && (
+                                    <Badge type="delivery" value={product.elite_signals.urgency_signal} className="animate-pulse" />
+                                )}
+                                {product.elite_signals.delivery_signal && (
+                                    <Badge type="fulfillment" value={product.elite_signals.delivery_signal} />
+                                )}
+                                {product.elite_signals.badges?.map((badge, idx) => (
+                                    <Badge
+                                        key={idx}
+                                        type={badge.variant === 'fast' ? 'delivery' : 'status'}
+                                        value={badge.text}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
                         <div className="flex flex-wrap items-center gap-2 pt-1">
-                            {/* @ts-ignore - Handle missing is_cold in strict types temporarily */}
-                            {product.is_cold && (
-                                <span className="inline-flex items-center gap-1 rounded-[var(--radius-xs)] bg-[var(--well-info)] px-1.5 py-0.5 text-xs font-bold text-[var(--well-info-text)] uppercase tracking-widest border border-[var(--well-info-text)]/20 backdrop-blur-sm shadow-[var(--shadow-sm)]">
-                                    <Snowflake className="size-2.5" />
+                            {/* Physical Transparency Chips - Law 7 Mandatory */}
+                            {product.dimensions && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--surface-muted)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)] border border-[var(--border)]">
+                                    {typeof product.dimensions === 'string' ? product.dimensions : 'Custom Size'}
                                 </span>
                             )}
-                            {product.preview_time_minutes && product.preview_time_minutes > 0 && (
-                                <div className="flex items-center gap-1.5 px-2 py-1 bg-[var(--text-primary)] text-[var(--background)] rounded-[var(--radius-md)] shadow-[var(--shadow-sm)]">
+                            {product.material && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--surface-muted)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)] border border-[var(--border)]">
+                                    {product.material}
+                                </span>
+                            )}
+                            {product.is_cold && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-[var(--well-info)] px-3 py-1 text-xs font-bold text-[var(--well-info-text)] border border-[var(--well-info-text)]/20">
+                                    <Snowflake className="size-2.5" />
+                                    <span>Chilled</span>
+                                </span>
+                            )}
+                            {product.preview_time_minutes !== undefined && product.preview_time_minutes !== null && product.preview_time_minutes > 0 && (
+                                <div className="flex items-center gap-1.5 px-3 py-1 bg-[var(--text-primary)] text-[var(--background)] rounded-full shadow-sm">
                                     <Sparkles className="size-3 text-[var(--warning)]" />
-                                    <span className="text-xs font-semibold tracking-tight">{product.preview_time_minutes} min preview</span>
+                                    <span className="text-xs font-semibold">{product.preview_time_minutes} min preview</span>
                                 </div>
                             )}
-                            <span className="text-xs font-semibold text-[var(--text-tertiary)] tracking-tight">Inc. {product.gst_percentage || 0}% GST</span>
+                            {product.production_time_minutes !== undefined && product.production_time_minutes !== null && product.production_time_minutes > 0 && (
+                                <div className="flex items-center gap-1.5 px-3 py-1 bg-[var(--surface-muted)] text-[var(--text-primary)] rounded-full border border-[var(--border)]">
+                                    <Clock className="size-3" />
+                                    <span className="text-xs font-semibold">Ready in {product.production_time_minutes}m</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Variants Selection (4x4 Standardized Grid) */}
+                    {/* Variants Selection - Swiggy Chip Strategy */}
                     {variantsArray.length > 0 && (
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Select Option</h3>
-                                <span className="text-xs font-semibold text-[var(--well-warning-text)] bg-[var(--well-warning)] px-2 py-0.5 rounded-[var(--radius-sm)] border border-[var(--well-warning-text)]/20 tracking-tight">Required</span>
+                                <h3 className="text-sm font-bold text-[var(--text-primary)]">Select Option</h3>
+                                <span className="text-xs font-medium text-[var(--warning)]">Required</span>
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="flex flex-wrap gap-2">
                                 {variantsArray.slice(0, 16).map((v: any) => {
                                     const isSelected = selectedVariantId === String(v.id);
                                     const isOutOfStock = typeof v.stock_quantity === 'number' && v.stock_quantity <= 0;
@@ -276,24 +309,21 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                                 triggerHaptic(HapticPattern.ACTION);
                                             }}
                                             className={cn(
-                                                "flex flex-col items-start p-3 rounded-[var(--radius-lg)] border text-left transition-all active:scale-[0.98]",
+                                                "px-4 py-2 rounded-full border text-xs font-medium transition-all active:scale-95",
                                                 isSelected
-                                                    ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-[var(--shadow-md)]"
+                                                    ? "bg-[var(--text-primary)] border-[var(--text-primary)] text-[var(--background)] shadow-sm"
                                                     : isOutOfStock
                                                         ? "bg-[var(--surface-muted)] border-[var(--border)] text-[var(--text-tertiary)] cursor-not-allowed"
-                                                        : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border)]"
+                                                        : "bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--text-secondary)]"
                                             )}
                                         >
-                                            <span className="text-xs font-semibold leading-tight mb-1">{v.name}</span>
-                                            <div className="flex items-center justify-between w-full">
-                                                <span className={cn(
-                                                    "text-xs font-bold tabular-nums",
-                                                    isSelected ? "text-[var(--text-inverse)]/80" : "text-[var(--text-tertiary)]"
-                                                )}>
-                                                    {formatCurrency(v.price || 0)}
-                                                </span>
-                                                {isOutOfStock && <span className="text-[10px] font-bold text-rose-500 uppercase tracking-tight">Sold Out</span>}
-                                            </div>
+                                            <span className="mr-2">{v.name}</span>
+                                            <span className={cn(
+                                                "font-bold tabular-nums",
+                                                isSelected ? "opacity-90" : "text-[var(--text-tertiary)]"
+                                            )}>
+                                                {formatCurrency(v.price || 0)}
+                                            </span>
                                         </button>
                                     );
                                 })}
@@ -306,7 +336,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">Add Personalisation</h3>
+                                    <h3 className="text-sm font-medium text-[var(--text-primary)] tracking-tight">Add Personalisation</h3>
                                     <Sparkles className="size-3.5 text-[var(--warning)]" />
                                 </div>
                                 <span className="text-xs font-bold text-[var(--primary)]">{formatCurrency(personalizationPrice)}</span>
@@ -335,7 +365,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                                         )}>
                                             {isPersonalizationEnabled && <Check className="size-3 text-[var(--text-primary)]" strokeWidth={4} />}
                                         </div>
-                                        <span className="text-sm font-semibold">Make it special</span>
+                                        <span className="text-sm font-medium">Make it special</span>
                                     </div>
                                     <p className={cn(
                                         "text-[10px] font-bold tracking-tight pl-8",
@@ -356,20 +386,20 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         <h3 className="text-sm font-semibold text-[var(--text-primary)] tracking-tight px-1">Specifications</h3>
                         <div className="grid grid-cols-1 gap-2 bg-[var(--surface-muted)]/50 rounded-[var(--radius-lg)] p-2 border border-[var(--border)]">
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)]/50">
-                                <span className="text-xs font-semibold text-[var(--text-secondary)] tracking-tight">Dimensions</span>
-                                <span className="text-xs font-semibold text-[var(--text-primary)]">
+                                <span className="text-xs font-medium text-[var(--text-secondary)] tracking-tight">Dimensions</span>
+                                <span className="text-xs font-medium text-[var(--text-primary)]">
                                     {product.dimensions ? (typeof product.dimensions === 'string' ? product.dimensions : JSON.stringify(product.dimensions).replace(/["{}]/g, '').replace(/:/g, ': ')) : '–'}
                                 </span>
                             </div>
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)]/50">
-                                <span className="text-xs font-semibold text-[var(--text-secondary)] tracking-tight">Weight</span>
-                                <span className="text-xs font-semibold text-[var(--text-primary)]">
+                                <span className="text-xs font-medium text-[var(--text-secondary)] tracking-tight">Weight</span>
+                                <span className="text-xs font-medium text-[var(--text-primary)]">
                                     {product.weight_kg ? `${product.weight_kg} kg` : '–'}
                                 </span>
                             </div>
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)]/50">
-                                <span className="text-xs font-semibold text-[var(--text-secondary)] tracking-tight">Material</span>
-                                <span className="text-xs font-semibold text-[var(--text-primary)]">{product.material || 'Premium Finish'}</span>
+                                <span className="text-xs font-medium text-[var(--text-secondary)] tracking-tight">Material</span>
+                                <span className="text-xs font-medium text-[var(--text-primary)]">{product.material || 'Premium Finish'}</span>
                             </div>
                             <div className="grid grid-cols-[1fr,2fr] gap-4 p-3 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)]/50">
                                 <span className="text-xs font-semibold text-[var(--text-secondary)] tracking-tight">HSN Code</span>
@@ -386,16 +416,18 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                         </div>
                     </section>
 
-                    {/* Support Section */}
+                    {/* Law of Physical Transparency - Return Window */}
                     <section className="flex items-center gap-3 pt-4">
                         <div className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-4 rounded-[var(--radius-lg)] border-2 font-semibold tracking-tight text-xs",
-                            product.return_eligible ? "bg-[var(--well-info)] border-[var(--well-info-text)]/10 text-[var(--well-info-text)]" : "bg-[var(--surface-muted)] border-[var(--border)] text-[var(--text-secondary)]"
+                            "flex-1 flex items-center justify-center gap-2 py-4 rounded-[var(--radius-lg)] border font-semibold text-xs transition-colors",
+                            (product.return_eligible || !isPersonalizationEnabled)
+                                ? "bg-[var(--well-info)] border-[var(--well-info-text)]/10 text-[var(--well-info-text)]"
+                                : "bg-[var(--well-neutral)] border-[var(--border)] text-[var(--text-secondary)]"
                         )}>
                             <Info className="size-4" />
-                            {product.return_eligible ? '7-Day Return' : 'Final Sale - No Returns'}
+                            {isPersonalizationEnabled ? "No returns after preview" : "24h return (damaged/wrong)"}
                         </div>
-                        <div className="flex-1 flex items-center justify-center gap-2 py-4 rounded-[var(--radius-lg)] border-2 bg-[var(--surface-muted)] border-[var(--border)] text-[var(--text-secondary)] font-semibold tracking-tight text-xs">
+                        <div className="flex-1 flex items-center justify-center gap-2 py-4 rounded-[var(--radius-lg)] border bg-[var(--well-neutral)] border-[var(--border)] text-[var(--text-secondary)] font-semibold text-xs">
                             <ShieldCheck className="size-4" />
                             Secure Order
                         </div>
@@ -416,8 +448,8 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                 </div>
             </div>
 
-            {/* Fixed Action Footer */}
-            <div className="bg-[var(--surface)] px-5 pt-5 pb-[max(var(--space-5),env(safe-area-inset-bottom,0px))] border-t border-[var(--surface-muted)] shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
+            {/* Fixed Action Footer: WYSHKIT 2026 High Commitment Surface */}
+            <div className="bg-[var(--surface)] px-5 pt-5 pb-[max(var(--space-5),env(safe-area-inset-bottom,0px))] border-t border-[var(--surface-muted)] shrink-0 shadow-[0_-10px_40px_rgba(0,0,0,0.04)] z-[var(--z-nav)]">
                 <div className="flex items-center gap-4">
                     {/* Quantity controls */}
                     <div className="flex items-center bg-[var(--surface-muted)] rounded-[var(--radius-lg)] p-1 shrink-0">
@@ -454,7 +486,7 @@ export function ProductDetailView({ product, onBack, vendorId, initialState }: P
                             <>
                                 <span>{isEditMode ? 'Update Product' : 'Add to Cart'}</span>
                                 <div className="h-4 w-px bg-[var(--surface)]/20" />
-                                <span>{formatCurrency(Number(totalPrice) || 0)}</span>
+                                <span>{formatCurrency(Number(unitPrice) || 0)}</span>
                             </>
                         )}
                     </button>

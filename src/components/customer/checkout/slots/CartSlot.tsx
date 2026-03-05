@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 interface CartSlotProps {
   initialHydratedProducts?: CartProduct[];
+  editable?: boolean;
 }
 
 /**
@@ -19,7 +20,7 @@ interface CartSlotProps {
  * - Data injected via props
  * - Mutations via Server Actions + router.refresh()
  */
-export function CartSlot({ initialHydratedProducts = [] }: CartSlotProps) {
+export function CartSlot({ initialHydratedProducts = [], editable = true }: CartSlotProps) {
   const router = useRouter();
   const { draftOrder, updateQuantity, removeFromDraftOrder } = useCart();
 
@@ -32,18 +33,19 @@ export function CartSlot({ initialHydratedProducts = [] }: CartSlotProps) {
     return initialHydratedProducts;
   }, [draftOrder.products, initialHydratedProducts]);
 
-  const handleUpdateQuantity = async (productId: string, variantId: string | null, quantity: number) => {
+  const handleUpdateQuantity = async (productId: string, variantId: string | null, quantity: number, personalization?: any, selected_addons?: any[]) => {
     try {
-      await updateQuantity(productId, variantId, quantity);
-      // No router.refresh needed because useCart is reactive
+      await updateQuantity(productId, variantId, quantity, personalization, selected_addons);
+      router.refresh(); // Refresh server-side checkout totals
     } catch (e) {
       toast.error("Failed to update quantity");
     }
   };
 
-  const handleRemoveItem = async (productId: string, variantId: string | null) => {
+  const handleRemoveItem = async (productId: string, variantId: string | null, personalization?: any, selected_addons?: any[]) => {
     try {
-      await removeFromDraftOrder(productId, variantId);
+      await removeFromDraftOrder(productId, variantId, personalization, selected_addons);
+      router.refresh(); // Refresh server-side checkout totals
     } catch (e) {
       toast.error("Failed to remove product");
     }
@@ -62,7 +64,7 @@ export function CartSlot({ initialHydratedProducts = [] }: CartSlotProps) {
       products={displayProducts}
       onUpdateQuantity={handleUpdateQuantity}
       onRemoveItem={handleRemoveItem}
-      editable={true}
+      editable={editable}
     />
   );
 }

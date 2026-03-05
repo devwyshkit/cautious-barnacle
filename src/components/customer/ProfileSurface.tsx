@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button';
+import { AppText, AppHeading } from '@/components/ui/Typography';
 import { OrderList } from '@/components/customer/orders/OrderList';
 import { useUI } from '@/providers/UIProvider';
 import { AddressManager } from './AddressManager';
@@ -60,10 +61,10 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-        <div className="size-16 bg-[var(--surface-muted)] rounded-full flex items-center justify-center mb-4">
-          <User className="size-8 text-[var(--text-tertiary)]" />
+        <div className="size-12 bg-[var(--surface-muted)] rounded-full flex items-center justify-center mb-4">
+          <User className="size-6 text-[var(--text-tertiary)]" />
         </div>
-        <h2 className="text-xl font-bold text-[var(--text-primary)]">Sign in to view profile</h2>
+        <AppHeading level={3}>Sign in to view profile</AppHeading>
         <Button onClick={() => openOTPSheet()} className="bg-[var(--primary)] text-[var(--primary-foreground)] rounded-[var(--radius-xl)] px-8 mt-6">
           Sign In
         </Button>
@@ -84,11 +85,11 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
       {/* Profile Header */}
       <div className="px-6 py-8 border-b border-[var(--surface-muted)]">
         <div className="flex items-center gap-4">
-          <div className="size-16 bg-[var(--text-primary)] rounded-full flex items-center justify-center text-[var(--primary-foreground)] text-xl font-bold">
+          <div className="size-12 bg-[var(--primary)] rounded-full flex items-center justify-center text-[var(--primary-foreground)] text-lg font-bold">
             {user.phone?.[0] || 'U'}
           </div>
           <div className="flex-1">
-            <h2 className="text-lg font-bold text-[var(--text-primary)]">+91 {user.phone}</h2>
+            <AppHeading level={3}>+91 {user.phone}</AppHeading>
             <button
               onClick={() => setActiveTab('settings')}
               className="text-xs font-semibold text-[var(--text-tertiary)] tracking-tight mt-1 hover:text-[var(--text-secondary)] transition-colors"
@@ -114,7 +115,7 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "flex-1 py-4 flex flex-col items-center gap-1.5 transition-all relative",
+                "flex-1 py-2.5 flex flex-col items-center gap-1 transition-all relative",
                 activeTab === tab.id ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
               )}
             >
@@ -168,17 +169,17 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
             )}
 
             <section>
-              <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-4">Quick Actions</h3>
+              <AppText variant="caption" weight="bold" color="tertiary" className="mb-3 uppercase tracking-wider">Quick Actions</AppText>
               <div className="grid grid-cols-3 gap-3">
-                <button onClick={() => setActiveTab('orders')} className="p-4 bg-[var(--surface)] rounded-[var(--radius-xl)] flex flex-col items-center gap-2 border border-[var(--border)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-muted)] transition-colors">
+                <button onClick={() => setActiveTab('orders')} className="p-3 bg-[var(--surface)] rounded-[var(--radius-xl)] flex flex-col items-center gap-2 border border-[var(--border)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-muted)] transition-colors">
                   <Package className="size-5 text-[var(--text-secondary)]" />
                   <span className="text-xs font-bold tracking-tight">Orders</span>
                 </button>
-                <button onClick={() => setActiveTab('orders')} className="p-4 bg-[var(--primary)] rounded-[var(--radius-xl)] flex flex-col items-center gap-2 border border-[var(--primary-hover)]/30 text-[var(--primary-foreground)] shadow-[var(--shadow-brand)] hover:opacity-90 transition-opacity">
+                <button onClick={() => setActiveTab('orders')} className="p-3 bg-[var(--primary)] rounded-[var(--radius-xl)] flex flex-col items-center gap-2 border border-[var(--primary-hover)]/30 text-[var(--primary-foreground)] shadow-[var(--shadow-brand)] hover:opacity-90 transition-opacity">
                   <Sparkles className="size-5 text-[var(--warning)]" />
-                  <span className="text-xs font-bold tracking-tight">Briefs</span>
+                  <span className="text-xs font-bold tracking-tight">Orders</span>
                 </button>
-                <button onClick={() => setActiveTab('addresses')} className="p-4 bg-[var(--surface)] rounded-[var(--radius-xl)] flex flex-col items-center gap-2 border border-[var(--border)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-muted)] transition-colors">
+                <button onClick={() => setActiveTab('addresses')} className="p-3 bg-[var(--surface)] rounded-[var(--radius-xl)] flex flex-col items-center gap-2 border border-[var(--border)] shadow-[var(--shadow-sm)] hover:bg-[var(--surface-muted)] transition-colors">
                   <MapPin className="size-5 text-[var(--text-secondary)]" />
                   <span className="text-xs font-bold tracking-tight">Address</span>
                 </button>
@@ -206,7 +207,11 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
         {activeTab === 'support' && (
           <div className="px-6 py-4 space-y-4">
             <button
-              onClick={() => { }}
+              onClick={() => {
+                if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP) {
+                  window.open(`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP}`, '_blank');
+                }
+              }}
               className="w-full flex items-center justify-between p-4 rounded-[var(--radius-xl)] bg-[var(--surface-muted)] border border-[var(--border)] hover:bg-[var(--surface)] transition-all group"
             >
               <div className="flex items-center gap-4">
@@ -219,10 +224,14 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
                 </div>
               </div>
               <ChevronRight className="size-4 text-[var(--text-tertiary)] group-hover:translate-x-1 transition-transform" />
-            </button>
+            </button >
 
             <button
-              onClick={() => { }}
+              onClick={() => {
+                if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_SUPPORT_PHONE) {
+                  window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`;
+                }
+              }}
               className="w-full flex items-center justify-between p-4 rounded-[var(--radius-xl)] bg-[var(--surface-muted)] border border-[var(--border)] hover:bg-[var(--surface)] transition-all group"
             >
               <div className="flex items-center gap-4">
@@ -256,18 +265,20 @@ export function ProfileSurface({ initialAddresses = [] }: ProfileSurfaceProps = 
                 </button>
               </div>
             </div>
-          </div>
+          </div >
         )}
 
-        {activeTab === 'settings' && (
-          <div className="p-6">
-            <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-4">Settings</h3>
-            <div className="p-4 bg-[var(--surface-muted)] rounded-[var(--radius-xl)] border border-[var(--border)] text-[var(--text-tertiary)] font-bold text-xs tabular-nums">
-              +91 {user.phone}
+        {
+          activeTab === 'settings' && (
+            <div className="p-6">
+              <h3 className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight mb-4">Settings</h3>
+              <div className="p-4 bg-[var(--surface-muted)] rounded-[var(--radius-xl)] border border-[var(--border)] text-[var(--text-tertiary)] font-bold text-xs tabular-nums">
+                +91 {user.phone}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )
+        }
+      </div >
     </div >
   );
 }

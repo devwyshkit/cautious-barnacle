@@ -6,7 +6,6 @@ import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import {
   Clock,
   CheckCircle2,
-  Package,
   ChevronDown,
   ChevronUp,
   AlertCircle,
@@ -17,12 +16,10 @@ import {
   ShoppingBag,
   Info,
   Sparkles,
-  FileText,
   RefreshCw,
   X,
   Phone,
-  ArrowLeft,
-  Home
+  ArrowLeft
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import Image from 'next/image';
@@ -36,6 +33,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { SurfaceErrorBoundaryWithRouter } from '@/components/error/SurfaceErrorBoundary';
 import { hasProductPersonalization } from '@/lib/utils/personalization';
 import dynamic from 'next/dynamic';
+import { OrderTrackerSkeleton } from './OrderTrackerSkeleton';
 
 const PersonalizationForm = dynamic(() => import('./PersonalizationForm').then(mod => mod.PersonalizationForm), {
   loading: () => <div className="h-48 w-full bg-[var(--surface-muted)]/50 rounded-[var(--radius-md)] animate-pulse" />
@@ -50,7 +48,14 @@ const OrderTimeline = dynamic(() => import('./tracking/OrderTimeline').then(mod 
 const DeliveryInfo = dynamic(() => import('./tracking/DeliveryInfo').then(mod => mod.DeliveryInfo));
 const OrderProductsList = dynamic(() => import('./tracking/OrderProductsList').then(mod => mod.OrderProductsList));
 const BillSummary = dynamic(() => import('./tracking/BillSummary').then(mod => mod.BillSummary));
-const CreativeBrief = dynamic(() => import('./tracking/CreativeBrief').then(mod => mod.CreativeBrief));
+const PersonalizationStatus = dynamic(() => import('./tracking/PersonalizationStatus').then(mod => mod.PersonalizationStatus));
+const TrackingMap = dynamic(() => import('./tracking/TrackingMap').then(mod => mod.TrackingMap), {
+  loading: () => <div className="h-[200px] w-full bg-[var(--surface-muted)]/50 rounded-[var(--radius-xl)] animate-pulse" />
+});
+
+const PreviewApproval = dynamic(() => import('./PreviewApproval').then(mod => mod.PreviewApproval), {
+  loading: () => <div className="h-96 w-full bg-[var(--surface-muted)]/50 rounded-[var(--radius-md)] animate-pulse" />
+});
 
 interface OrderTrackerProps {
   orderId: string;
@@ -77,8 +82,8 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   const personalizedProductsPending = useMemo(() => {
     return (orderProducts || []).filter((product) => {
       if (!product.is_personalized) return false;
-      const s = (product.status || 'pending').toLowerCase();
-      const blocked = ['submitted', 'details_received', 'preview_ready', 'approved', 'in_production', 'packed', 'shipped', 'delivered', 'cancelled'];
+      const s = (product.status || 'PENDING_PERSONALIZATION').toUpperCase();
+      const blocked = ['SUBMITTED', 'DETAILS_RECEIVED', 'MOCKUP_READY', 'MOCKUP_APPROVED', 'IN_PRODUCTION', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
       return !blocked.includes(s) && !product.personalization_details;
     });
   }, [orderProducts]);
@@ -98,8 +103,10 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
     }
   }, [showSuccess]);
 
+  // WYSHKIT 2026: Intrusive toasts removed. Connection status is now a subtle inline pill in StatusCard.
+
   const handlePersonalizationSubmitted = () => {
-    toast.success("Details shared with vendor!");
+    toast.success("Details sent ✓ Preview in ~2 hours.");
     setIsPersonalizationSubmittedOptimistic(true);
     setProactivePersonalizationOpen(false);
     // WYSHKIT 2026: Force a local refetch if channel is slow
@@ -135,28 +142,8 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
 
   if (!order) {
     return (
-      <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker" showHomeButton>
-        <div className="mx-auto bg-[var(--surface-muted)]/50 pb-safe transition-all duration-500 overflow-y-auto scrollbar-hide max-w-md min-h-[100dvh]">
-          <div className="flex flex-col gap-6 p-4">
-            {showPersonalizationParam ? (
-              <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-[var(--surface)] rounded-[var(--radius-md)] p-1 border border-[var(--border)] glass-morphism shadow-sm shadow-[var(--shadow-sm)]/50 overflow-hidden relative">
-                <div className="flex flex-col gap-6 p-4">
-                  <div className="space-y-6 animate-pulse">
-                    <div className="h-10 w-24 bg-[var(--surface-muted)]/50 rounded-full" />
-                    <div className="h-32 w-full bg-[var(--surface)]/30 rounded-[var(--radius-md)] border border-[var(--border)]" />
-                    <div className="h-48 w-full bg-[var(--surface)]/50 rounded-[var(--radius-md)] border border-[var(--border)]" />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6 animate-in fade-in duration-500">
-                <div className="h-[180px] w-full bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] animate-pulse" />
-                <div className="h-[120px] w-full bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] animate-pulse" />
-                <div className="h-[300px] w-full bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] animate-pulse" />
-              </div>
-            )}
-          </div>
-        </div>
+      <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker">
+        <OrderTrackerSkeleton />
       </SurfaceErrorBoundaryWithRouter>
     );
   }
@@ -165,32 +152,9 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
   const showPersonalizationForm = !isPersonalizationSubmittedOptimistic && proactivePersonalizationOpen && personalizedProductsPending.length > 0;
 
   return (
-    <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker" showHomeButton>
-      <div className="mx-auto bg-[var(--surface-muted)]/50 pb-safe transition-all duration-500 overflow-y-auto scrollbar-hide overscroll-contain max-w-md min-h-[100dvh]">
-        {/* WYSHKIT 2026: Sticky Nav Header */}
-        <div className="sticky top-0 z-[var(--z-nav)] bg-[var(--surface)]/80 backdrop-blur-md border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
-          <button
-            onClick={() => router.push('/')}
-            className="flex items-center gap-2 text-sm font-bold text-[var(--text-primary)] active:scale-95 transition-all hover:text-[var(--primary)]"
-          >
-            <ArrowLeft className="size-5" />
-            <Home className="size-4" />
-          </button>
-          <div className="flex flex-col items-center">
-            <span className="text-xs font-bold tracking-tight text-[var(--text-secondary)]">
-              {order?.order_number ? order.order_number : 'Order Tracking'}
-            </span>
-          </div>
-          <div className="w-12" />{/* Spacer for centering */}
-        </div>
-
-        {!isConnected && (
-          <div className="glass-morphism bg-[var(--primary)] text-[var(--text-inverse)] text-xs font-bold tracking-tight py-3 px-4 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-300 z-[var(--z-nav)] sticky top-0">
-            <RefreshCw className="size-3 animate-spin" />
-            Reconnecting to order pulse...
-          </div>
-        )}
-        <div className="flex flex-col gap-4 p-4 pb-20">
+    <SurfaceErrorBoundaryWithRouter surfaceName="Order Tracker">
+      <div className="mx-auto bg-[var(--surface-muted)]/30 pb-safe transition-all duration-500 max-w-4xl">
+        <div className="flex flex-col gap-4 p-4 pb-20 md:p-8 md:gap-6">
           <SurfaceErrorBoundaryWithRouter surfaceName="Success & Auth Overlay">
             {(showSuccess || showPersonalizationForm) && (
               <div className="animate-in slide-in-from-bottom-6 duration-700 ease-out bg-[var(--surface)] rounded-[var(--radius-md)] p-1 border border-[var(--border)] shadow-sm shadow-[var(--shadow-sm)]/50 overflow-hidden relative">
@@ -215,20 +179,6 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                   </div>
                 )}
 
-                {!showSuccess && showPersonalizationForm && (
-                  <div className="flex items-center justify-between p-6 pb-2">
-                    <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-[var(--radius-md)] bg-[var(--text-primary)] flex items-center justify-center shadow-lg shadow-[var(--text-primary)]/10">
-                        <Sparkles className="size-5 text-[var(--warning)]" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold tracking-tight text-[var(--text-primary)]">Add personalisation details</h3>
-                        <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">We need a few details to personalise your product</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 {(showPersonalizationForm || (showPersonalizationParam && !order)) && (
                   <div className="p-4 pt-2">
                     <PersonalizationForm
@@ -244,36 +194,78 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
             )}
           </SurfaceErrorBoundaryWithRouter>
 
-          <SurfaceErrorBoundaryWithRouter surfaceName="Order Status">
-            <StatusCard order={order as OrderDetail} orderProducts={orderProducts} />
+          <SurfaceErrorBoundaryWithRouter surfaceName="Order Physical Hero">
+            {/* WYSHKIT 2026: The Physical Hero Pattern (Map-First) */}
+            {order.status !== ORDER_STATUS.DELIVERED && order.status !== ORDER_STATUS.CANCELLED && (
+              <div className="animate-in fade-in zoom-in-95 duration-700">
+                <TrackingMap order={order as OrderDetail} className="h-[280px] md:h-[320px] shadow-lg shadow-[var(--shadow-sm)]/10" />
+              </div>
+            )}
           </SurfaceErrorBoundaryWithRouter>
 
-          {/* WYSHKIT 2026: Non-personalized order — simple progress card */}
-          {!order.has_personalization && !showPersonalizationForm && (
-            <SurfaceErrorBoundaryWithRouter surfaceName="Standard Progress">
-              <section className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] p-5 flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center border border-[var(--border)]">
-                    <Package className="size-5 text-[var(--text-tertiary)]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-[var(--text-primary)] tracking-tight">No personalisation required</p>
-                    <p className="text-xs font-bold text-[var(--text-tertiary)] mt-0.5">Your order is being prepared as-is</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-2.5 bg-[var(--surface-muted)] rounded-[var(--radius-md)] border border-[var(--border)]">
-                  <CheckCircle2 className="size-4 text-[var(--success)] shrink-0" />
-                  <p className="text-xs font-bold text-[var(--text-secondary)] tracking-tight">
-                    Nothing to submit — vendor is handling production directly
-                  </p>
-                </div>
-              </section>
-            </SurfaceErrorBoundaryWithRouter>
-          )}
+          <SurfaceErrorBoundaryWithRouter surfaceName="Order Status">
+            <StatusCard order={order as OrderDetail} orderProducts={orderProducts} isConnected={isConnected} className="-mt-12 md:-mt-16 z-10 mx-2 md:mx-4" />
+          </SurfaceErrorBoundaryWithRouter>
+
+          {/* WYSHKIT 2026: Inline Preview Thread (P1) */}
+          {(() => {
+            const productsWithPreviews = orderProducts.filter(p => p.status === 'preview_ready');
+            if (productsWithPreviews.length === 0) return null;
+
+            return (
+              <div className="flex flex-col gap-6 animate-in slide-in-from-bottom-4 duration-500">
+                {productsWithPreviews.map(product => (
+                  <SurfaceErrorBoundaryWithRouter key={product.id} surfaceName={`Preview Approval: ${product.id}`}>
+                    <div className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] overflow-hidden shadow-sm">
+                      <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--surface-muted)]/30 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="size-4 text-[var(--primary)]" />
+                          <span className="text-xs font-bold text-[var(--text-primary)] tracking-tight">Design Preview: {product.product_name}</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-[var(--success)] bg-[var(--well-success)] px-2 py-0.5 rounded-full uppercase tracking-widest">Action Needed</span>
+                      </div>
+                      <PreviewApproval
+                        preview={itemPreviews[product.id]}
+                        orderProduct={product}
+                        onApprove={async () => {
+                          const { approve_preview } = await import('@/lib/actions/commerce/orders');
+                          const result = await approve_preview(itemPreviews[product.id].id, order.id!);
+                          if (result.success) {
+                            toast.success('Product approved! Production has started.');
+                            triggerHaptic(HapticPattern.SUCCESS);
+                          } else {
+                            toast.error(result.error ?? 'Failed to approve');
+                            triggerHaptic(HapticPattern.ERROR);
+                          }
+                          return result;
+                        }}
+                        onRequestChange={async (feedback: string) => {
+                          const { request_change } = await import('@/lib/actions/commerce/orders');
+                          const result = await request_change(itemPreviews[product.id].id, order.id!, feedback);
+                          if (result.success) {
+                            toast.success('Feedback sent. Vendor will upload a new preview.');
+                            triggerHaptic(HapticPattern.SUCCESS);
+                          } else {
+                            toast.error(result.error ?? 'Failed to send feedback');
+                            triggerHaptic(HapticPattern.ERROR);
+                          }
+                          return result;
+                        }}
+                        isApproving={false} // Managed internally by PreviewApproval state or by parent refetch
+                        maxChanges={(order as unknown as OrderDetail).max_change_requests ?? 2}
+                        changeCount={(order as unknown as OrderDetail).change_request_count ?? 0}
+                      />
+                    </div>
+                  </SurfaceErrorBoundaryWithRouter>
+                ))}
+              </div>
+            );
+          })()}
+
 
           {!showPersonalizationForm && (
-            <SurfaceErrorBoundaryWithRouter surfaceName="Creative Brief">
-              <CreativeBrief
+            <SurfaceErrorBoundaryWithRouter surfaceName="Personalization Status">
+              <PersonalizationStatus
                 order={order as OrderDetail}
                 previews={previews}
                 timeline={events}
@@ -336,7 +328,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                     triggerHaptic(HapticPattern.ACTION);
                     window.open(`https://wa.me/${process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP}`, '_blank');
                   }}
-                  className="flex-1 h-14 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text-secondary)] active:scale-95 transition-all hover:bg-[var(--surface-muted)]"
+                  className="flex-1 h-10 rounded-[var(--radius-xl)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text-secondary)] active:scale-95 transition-all hover:bg-[var(--surface-muted)]"
                 >
                   <MessageSquare className="size-4" />
                   Chat
@@ -348,7 +340,7 @@ export function OrderTracker({ orderId }: OrderTrackerProps) {
                     triggerHaptic(HapticPattern.ACTION);
                     window.location.href = `tel:${process.env.NEXT_PUBLIC_SUPPORT_PHONE}`;
                   }}
-                  className="flex-1 h-14 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text-secondary)] active:scale-95 transition-all hover:bg-[var(--surface-muted)]"
+                  className="flex-1 h-10 rounded-[var(--radius-xl)] bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center gap-2 text-xs font-bold text-[var(--text-secondary)] active:scale-95 transition-all hover:bg-[var(--surface-muted)]"
                 >
                   <Phone className="size-4" />
                   Call

@@ -59,7 +59,7 @@ export async function getZeroTripUser(): Promise<User | null> {
   const injectedUserId = headerList.get('x-wyshkit-user-id');
   const injectedUserEmail = headerList.get('x-wyshkit-user-email');
 
-  if (!injectedUserId) return null;
+  if (!injectedUserId || injectedUserId === 'PENDING') return null;
 
   return {
     id: injectedUserId,

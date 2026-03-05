@@ -4,6 +4,8 @@ import { getServerLocation } from "@/lib/actions/discovery/location";
 import { HomeSkeleton } from "@/components/customer/home/HomeSkeleton";
 import { ReorderRail } from "@/components/customer/home/ReorderRail";
 import { ActiveOrdersBanner } from '@/components/customer/home/ActiveOrdersBanner';
+import { WalletHook } from '@/components/customer/home/WalletHook';
+import { getWalletInfo } from '@/lib/actions/user/wallet';
 import { cn } from "@/lib/utils";
 
 
@@ -11,6 +13,7 @@ import { CircleRail } from "@/components/ui/blocks/discovery/CircleRail";
 import { CardRail } from "@/components/ui/blocks/discovery/CardRail";
 import { Grid } from "@/components/ui/blocks/discovery/Grid";
 import { BannerBento } from "@/components/ui/blocks/discovery/BannerBento";
+import { HomeSection } from "@/components/customer/home/HomeSection";
 
 import { getZeroTripUser } from '@/lib/auth/server';
 import { cookies, headers } from 'next/headers';
@@ -42,6 +45,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       effectiveUserId
     );
 
+    // WYSHKIT 2026: "The Hook" (Wallet Balance)
+    const { data: walletInfo } = await getWalletInfo();
+    const balance = walletInfo?.balance ?? 0;
+
     const discovery = globalInit.home;
     const error = (globalInit as any).error;
     const displayLocationName = location.name || 'Your Area';
@@ -51,14 +58,19 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <main className="pb-24">
           <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
 
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-5 md:gap-10">
             {/* Categories - WYSHKIT 2026: High Density Discovery (Hick's Law) */}
             <section className="relative px-4 md:px-8 z-10">
               <CircleRail data={discovery.categories} context={{ selected_category: category }} />
             </section>
 
             {(!category || category.toLowerCase() === 'recommended' || category.toLowerCase() === 'all') && (
-              <div className="px-4 md:px-8 space-y-8">
+              <div className="flex flex-col gap-5 md:gap-10 px-4 md:px-8">
+                {/* WYSHKIT 2026: "The Hook" (Zeigarnik Effect) */}
+                {balance > 0 && (
+                  <WalletHook balance={balance} />
+                )}
+
                 {/* WYSHKIT 2026: Zeigarnik Banner (High Priority) */}
                 {discovery.activeOrders?.length > 0 && (
                   <ActiveOrdersBanner orders={discovery.activeOrders} />
@@ -73,7 +85,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
                 {/* WYSHKIT 2026: Reorder Rail (Low Priority / Discovery) */}
                 {discovery.recentOrders?.length > 0 && (
-                  <ReorderRail initialOrders={discovery.recentOrders} />
+                  <HomeSection title="Quick Reorder" subtitle="From your recent favorites">
+                    <ReorderRail initialOrders={discovery.recentOrders} />
+                  </HomeSection>
                 )}
               </div>
             )}
@@ -101,25 +115,27 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </div>
             )}
 
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-5 md:gap-10">
               {/* Trending Products */}
               {discovery.trendingProducts?.length > 0 && (
-                <section className="relative px-4 md:px-8 z-10">
-                  <div className="flex flex-col gap-4">
-                    <h2 className="text-xl font-black text-[var(--text-primary)] tracking-tighter">Trending Around You</h2>
-                    <CardRail data={discovery.trendingProducts} />
-                  </div>
-                </section>
+                <HomeSection
+                  title="Trending Around You"
+                  subtitle="Popular picks this week"
+                  className="px-4 md:px-8"
+                >
+                  <CardRail data={discovery.trendingProducts} />
+                </HomeSection>
               )}
 
               {/* Featured Stores */}
               {discovery.featuredVendors?.length > 0 ? (
-                <section className="relative px-4 md:px-8 z-10">
-                  <div className="flex flex-col gap-4">
-                    <h2 className="text-xl font-black text-[var(--text-primary)] tracking-tighter">Top Stores Near You</h2>
-                    <Grid data={discovery.featuredVendors} />
-                  </div>
-                </section>
+                <HomeSection
+                  title="Top Stores Near You"
+                  subtitle="Fast delivery from local favorites"
+                  className="px-4 md:px-8"
+                >
+                  <Grid data={discovery.featuredVendors} />
+                </HomeSection>
               ) : !error && (
                 <section className="relative px-[var(--space-4)] md:px-[var(--space-8)] py-[var(--space-20)] text-center border-2 border-dashed border-[var(--border)] rounded-[var(--radius-3xl)] mx-[var(--space-4)] z-10">
                   <div className="max-w-xs mx-auto flex flex-col gap-2">

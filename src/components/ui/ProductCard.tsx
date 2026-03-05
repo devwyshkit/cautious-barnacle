@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import { AddToCartButton } from '@/components/customer/AddToCartButton';
 import { useUI } from '@/providers/UIProvider';
 import type { WyshkitProduct } from '@/lib/types/product';
+import { logger } from '@/lib/logging/logger';
 
 interface ProductCardProps {
     data: WyshkitProduct;
@@ -27,7 +28,7 @@ export function ProductCard({ data, className, variant = 'portrait' }: ProductCa
     const isUuid = (str?: string) => str && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
     if (isUuid(vendorIdentifier) || isUuid(productSlug)) {
-        console.error(`[WYSHKIT 2026 P0] Slug-First Violation: Detected UUID in URL construction.`, {
+        logger.error(`[WYSHKIT 2026 P0] Slug-First Violation: Detected UUID in URL construction.`, undefined, {
             vendor: vendorIdentifier,
             product: productSlug
         });
@@ -46,8 +47,8 @@ export function ProductCard({ data, className, variant = 'portrait' }: ProductCa
 
     return (
         <Card className={cn(
-            "overflow-hidden border border-[var(--border)] shadow-[var(--shadow-sm)] group transition-all duration-500 active:scale-[0.98] relative rounded-[var(--radius-xl)] bg-[var(--surface)] hover:shadow-[var(--shadow-md)] hover:border-[var(--primary-ring)]",
-            isRow ? "flex flex-row gap-[var(--space-4)] p-[var(--space-2)]" : "flex flex-col gap-[var(--space-2)]",
+            "overflow-hidden border border-[var(--border)] shadow-[var(--shadow-xs)] group transition-all duration-500 active:scale-[0.98] relative rounded-[var(--radius-xl)] bg-[var(--surface)] hover:border-[var(--primary-ring)]/40",
+            isRow ? "flex flex-row gap-3 p-1.5" : "flex flex-col gap-1.5",
             className
         )}>
             {/* Background Action for Product Sheet */}
@@ -58,13 +59,13 @@ export function ProductCard({ data, className, variant = 'portrait' }: ProductCa
             />
             <div className={cn(
                 "relative overflow-hidden bg-[var(--surface-muted)] z-10 pointer-events-none",
-                isPortrait ? "aspect-square w-full rounded-t-[calc(var(--radius-xl)-1px)]" : "aspect-square w-24 shrink-0 rounded-[var(--radius-lg)]"
+                isPortrait ? "aspect-square w-full rounded-t-[calc(var(--radius-xl)-2px)]" : "aspect-square w-20 shrink-0 rounded-[var(--radius-lg)]"
             )}>
                 {(() => {
                     const productImage = data.image_url ?? data.images?.[0];
                     if (!productImage) return (
                         <div className="flex items-center justify-center h-full bg-[var(--surface-muted)]">
-                            <span className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-widest">Wysh</span>
+                            <span className="text-[10px] font-bold text-[var(--text-tertiary)] tracking-tight">WyshKit</span>
                         </div>
                     );
                     return (
@@ -78,21 +79,21 @@ export function ProductCard({ data, className, variant = 'portrait' }: ProductCa
                     );
                 })()}
                 {etaMins && (
-                    <div className="absolute bottom-[var(--space-2)] left-[var(--space-2)] px-[var(--space-1-5)] py-[var(--space-0-5)] bg-[var(--surface)]/90 backdrop-blur-md rounded-[var(--radius-sm)] shadow-[var(--shadow-sm)] flex items-center gap-[var(--space-1)] pointer-events-none">
-                        <Clock className="size-2.5 text-[var(--text-primary)]" />
-                        <span className="text-[10px] font-black text-[var(--text-primary)] tracking-tighter uppercase leading-none">
+                    <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 bg-[var(--surface)]/90 backdrop-blur-md rounded-[var(--radius-sm)] shadow-[var(--shadow-xs)] flex items-center gap-1 pointer-events-none">
+                        <Clock className="size-2 text-[var(--text-primary)]" />
+                        <span className="text-[9px] font-bold text-[var(--text-primary)] tracking-tight">
                             {formatPrepTime(etaMins)}
                         </span>
                     </div>
                 )}
             </div>
 
-            <div className={cn("flex flex-col z-10 pointer-events-none", isRow ? "flex-1 justify-center" : "")}>
-                <h3 className="text-xs font-bold text-[var(--text-primary)] truncate tracking-tight group-hover:text-[var(--primary)] transition-colors">
+            <div className={cn("flex flex-col z-10 pointer-events-none px-2.5 pb-2.5", isRow ? "flex-1 justify-center pr-1.5" : "")}>
+                <h3 className="text-[13px] font-bold text-[var(--text-primary)] truncate tracking-tight group-hover:text-[var(--primary)] transition-colors leading-tight">
                     {data.name}
                 </h3>
-                <div className="flex items-center justify-between mt-[var(--space-1)] z-20 relative pointer-events-auto">
-                    <span className="text-xs font-bold text-[var(--text-primary)] tabular-nums">{formatCurrency(data.base_price)}</span>
+                <div className="flex items-center justify-between mt-1 z-20 relative pointer-events-auto">
+                    <span className="text-xs font-black text-[var(--text-primary)] tabular-nums">{formatCurrency(data.base_price)}</span>
                     <AddToCartButton
                         product_id={data.id}
                         product_name={data.name}
@@ -102,7 +103,7 @@ export function ProductCard({ data, className, variant = 'portrait' }: ProductCa
                         vendor_id={data.vendor_id}
                         vendor_name={data.vendor_name || 'Store'}
                         vendor_slug={data.vendor_slug}
-                        className="h-7 w-16 text-xs font-bold tracking-widest uppercase"
+                        className="h-7 min-w-[30px] px-2"
                         has_personalization={!!(data.personalization_options as any[] | null)?.length}
                     />
                 </div>

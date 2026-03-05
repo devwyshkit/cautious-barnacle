@@ -14,7 +14,7 @@ export function ProductSheet() {
             onOpenChange={(open) => !open && closeProductSheet()}
             title={activeProduct?.name || "Product Details"}
             description={activeProduct?.vendor_name || "Store Details"}
-            className="md:max-w-xl h-[92vh] md:h-[85vh] p-0"
+            className="md:max-w-xl h-[100dvh] md:h-[85vh] p-0"
         >
             {activeProduct ? (
                 <ProductDetailView

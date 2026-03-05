@@ -46,6 +46,9 @@ export function useOrderRealtime({
   const [error, setError] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
 
+  const [isChannelConnected, setIsChannelConnected] = useState(false);
+  const { isConnected: isGlobalConnected } = useRealtime();
+
   // WYSHKIT 2026: Track previous isConnected to only re-fetch on RECONNECT, not on initial mount.
   const prevConnectedRef = useRef<boolean | null>(null);
   const isFetchingRef = useRef(false);
@@ -116,11 +119,11 @@ export function useOrderRealtime({
 
   // WYSHKIT 2026: Re-fetch ONLY on reconnection (transition from false → true).
   useEffect(() => {
-    if (prevConnectedRef.current === false && isConnected === true) {
+    if (prevConnectedRef.current === false && isChannelConnected === true) {
       fetchOrderData();
     }
-    prevConnectedRef.current = isConnected;
-  }, [isConnected, fetchOrderData]);
+    prevConnectedRef.current = isChannelConnected;
+  }, [isChannelConnected, fetchOrderData]);
 
   // Realtime subscriptions — dedicated channel per order
   useEffect(() => {
@@ -183,9 +186,13 @@ export function useOrderRealtime({
 
 
     orderChannel.subscribe((status, err) => {
-      if (status === 'CHANNEL_ERROR') {
+      if (status === 'SUBSCRIBED') {
+        setIsChannelConnected(true);
+      } else if (status === 'CHANNEL_ERROR') {
+        setIsChannelConnected(false);
         console.error(`[WYSHKIT 2026 Realtime] Channel error for order ${orderId}:`, err);
       } else if (status === 'CLOSED') {
+        setIsChannelConnected(false);
         console.warn(`[WYSHKIT 2026 Realtime] Channel closed for order ${orderId}`);
       }
     });
@@ -194,6 +201,20 @@ export function useOrderRealtime({
       supabase.removeChannel(orderChannel);
     };
   }, [orderId, fetchOrderData, onStatusChange, onTimelineEvent, onPreviewUploaded]);
+
+  // WYSHKIT 2026: Polling Fallback Logic (P0)
+  // Initiates 30s polling if WebSocket connection is lost.
+  useEffect(() => {
+    if (isChannelConnected) return;
+
+    const pollInterval = setInterval(() => {
+      if (!isFetchingRef.current) {
+        fetchOrderData();
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [isChannelConnected, fetchOrderData]);
 
   // Derived getters for UI convenience with strict typing
   const timelineEvents = (order?.timeline as unknown as TimelineEvent[]) || [];
@@ -205,7 +226,7 @@ export function useOrderRealtime({
     timelineEvents,
     previews,
     orderProducts,
-    isConnected,
+    isConnected: isChannelConnected || isGlobalConnected,
     error,
     isPolling,
     refetch: fetchOrderData,

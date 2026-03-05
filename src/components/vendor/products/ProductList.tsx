@@ -62,13 +62,13 @@ export function ProductList({
           <div
             key={product.id}
             className={cn(
-              "bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] p-3 transition-all",
+              "bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-md)] p-2.5 transition-all",
               !product.is_active && "opacity-60"
             )}
           >
-            <div className="flex gap-3">
+            <div className="flex gap-2.5">
               <div
-                className="relative size-16 rounded-[var(--radius-sm)] overflow-hidden bg-[var(--surface-muted)] shrink-0 cursor-pointer"
+                className="relative size-12 rounded-[var(--radius-sm)] overflow-hidden bg-[var(--surface-muted)] shrink-0 cursor-pointer border border-[var(--border)]/50"
                 onClick={() => onEdit?.(product)}
               >
                 {product.images?.[0] ? (
@@ -80,7 +80,7 @@ export function ProductList({
                   />
                 ) : (
                   <div className="size-full flex items-center justify-center">
-                    <Package className="size-6 text-[var(--text-tertiary)]" />
+                    <Package className="size-5 text-[var(--text-tertiary)]" />
                   </div>
                 )}
               </div>
@@ -91,26 +91,25 @@ export function ProductList({
                     className="min-w-0 cursor-pointer flex-1"
                     onClick={() => onEdit?.(product)}
                   >
-                    <h3 className="text-sm font-medium text-[var(--text-primary)] truncate">
+                    <h3 className="text-[13px] font-bold text-[var(--text-primary)] truncate leading-tight">
                       {product.name}
                     </h3>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="text-xs text-[var(--text-secondary)]">{product.category || 'Uncategorized'}</span>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <span className="text-[10px] text-[var(--text-tertiary)] font-semibold uppercase tracking-tight">{product.category || 'Item'}</span>
                       {product.variants_count && product.variants_count > 0 && (
                         <>
-                          <span className="text-[var(--text-tertiary)]">·</span>
-                          <span className="text-xs text-[var(--text-secondary)] flex items-center gap-0.5">
-                            <Layers className="size-3" />
+                          <span className="text-[var(--text-tertiary)] opacity-30">·</span>
+                          <span className="text-[10px] text-[var(--text-secondary)] flex items-center gap-0.5 font-medium">
                             {product.variants_count} variants
                           </span>
                         </>
                       )}
                       {product.has_personalization && (
                         <>
-                          <span className="text-[var(--text-tertiary)]">·</span>
-                          <span className="text-xs text-[var(--warning)] flex items-center gap-0.5">
-                            <Sparkles className="size-3 text-[var(--star-rating)]" />
-                            Personalizable
+                          <span className="text-[var(--text-tertiary)] opacity-30">·</span>
+                          <span className="text-[10px] text-[var(--warning)] flex items-center gap-0.5 font-bold">
+                            <Sparkles className="size-2.5" />
+                            Custom
                           </span>
                         </>
                       )}

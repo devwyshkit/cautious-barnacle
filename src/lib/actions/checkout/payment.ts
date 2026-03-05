@@ -49,6 +49,8 @@ export async function create_payment_order(
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
+        logger.info('create_payment_order: starting', { userId: user?.id, productsCount: payload.draft_products?.length, addressId: payload.address_id });
+
         if (!user) return { error: 'Unauthorized', status: 401 };
         if (!payload.draft_products || payload.draft_products.length === 0) return { error: 'No products in cart', status: 400 };
         if (!payload.address_id || payload.address_id === 'guest_location') return { error: 'Please select a valid delivery address.', status: 400 };
@@ -80,6 +82,7 @@ export async function create_payment_order(
         );
 
         const pricing = pricingData;
+        logger.info('create_payment_order: pricing result', { pricing, pricingErrorMsg });
 
         if (pricingErrorMsg || !pricing) {
             return { error: pricingErrorMsg || 'Pricing verification failed', status: 400 };
@@ -113,6 +116,8 @@ export async function create_payment_order(
             return { error: 'Failed to prepare order session', status: 500 };
         }
 
+        logger.info('create_payment_order: session updated');
+
         const { data: session } = await supabase.from('checkout_sessions').select('id').eq('user_id', user.id).single();
         const sessionId = session?.id || user.id;
 
@@ -129,7 +134,25 @@ export async function create_payment_order(
             await supabase.from('checkout_sessions').update({ snapshot_products: snapshotProducts as any }).eq('id', session.id);
         }
 
-        // 5. RAZORPAY ORDER
+        // 5. PRE-PAYMENT HARDENING (WYSHKIT 2026)
+        // Verify stock availability one last time before opening the gateway
+        const { verifyStockAvailability } = await import('@/lib/actions/commerce/inventory');
+        const stockCheck = await verifyStockAvailability(
+            payload.draft_products.map(p => ({
+                product_id: p.product_id,
+                variant_id: p.variant_id,
+                quantity: p.quantity
+            }))
+        );
+
+        if (!stockCheck.success) {
+            return {
+                error: `INSUFFICIENT_STOCK: ${stockCheck.outOfStockProduct || 'One or more items'}`,
+                status: 400
+            };
+        }
+
+        // 6. RAZORPAY ORDER
         const receipt = `order_${Date.now()}`;
         const order = await create_razorpay_order(
             server_amount,
@@ -140,6 +163,8 @@ export async function create_payment_order(
                 sessionId: sessionId,
             }
         );
+
+        logger.info('create_payment_order: razorpay order created', { razorpayOrderId: order.id });
 
         // 6. [PURGED] STOCK RESERVATION (Moving to Absolute Atomicity in DB)
 

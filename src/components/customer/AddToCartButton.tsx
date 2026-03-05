@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useCart } from '@/components/customer/CartProvider';
 import { Button } from '@/components/ui/button';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
+import { logger } from '@/lib/logging/logger';
 
 interface AddToCartButtonProps {
     product_id: string;
@@ -66,7 +67,7 @@ export function AddToCartButton({
             // WYSHKIT 2026: Law 11 P0 Hardening
             // Intercepted routes REQUIRE exact slug matching. UUID fallbacks will break interception.
             if (!vSlug || !pSlug) {
-                console.error(`[WYSHKIT 2026 P0] Slug-First Violation: Missing slugs for intercepted navigation. Interception will fail.`, {
+                logger.error(`[WYSHKIT 2026 P0] Slug-First Violation: Missing slugs for intercepted navigation. Interception will fail.`, undefined, {
                     vendor: vSlug,
                     product: pSlug,
                     product_id
@@ -121,7 +122,7 @@ export function AddToCartButton({
             onClick={handleAction}
             disabled={localPending || isPending}
             className={cn(
-                "h-8 px-3 rounded-[var(--radius-md)] transition-all z-10 font-bold text-xs tracking-tight min-w-[70px]",
+                "h-8 px-3 rounded-[var(--radius-md)] transition-all z-10 font-bold text-xs min-w-[60px]",
                 justAdded
                     ? "bg-[var(--success)] text-[var(--background)] hover:bg-[var(--success)]/90 border-none shadow-[var(--shadow-sm)]"
                     : showCustomize
@@ -136,17 +137,17 @@ export function AddToCartButton({
             ) : justAdded ? (
                 <div className="flex items-center gap-1">
                     <Check className="size-3 stroke-[3]" />
-                    <span className="uppercase">Added</span>
+                    <span>Added</span>
                 </div>
             ) : showCustomize ? (
                 <div className="flex items-center gap-1">
                     <Sparkles className="size-3" />
-                    <span className="uppercase">Select</span>
+                    <span>Options</span>
                 </div>
             ) : (
-                <div className="flex items-center gap-1 text-[var(--text-primary)]">
-                    <Plus className="size-3 stroke-[3]" />
-                    <span className="uppercase">Add</span>
+                <div className="flex items-center gap-1.5 text-[var(--text-primary)]">
+                    <Plus className="size-3.5 stroke-[3]" />
+                    <span>Add</span>
                 </div>
             )}
         </Button>

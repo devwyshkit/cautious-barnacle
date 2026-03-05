@@ -21,10 +21,13 @@ interface ActiveOrdersBannerProps {
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
     'PENDING': { label: 'Awaiting Confirmation', color: 'text-[var(--well-warning-text)] bg-[var(--well-warning)]', icon: Timer },
+    'PENDING_PERSONALIZATION': { label: 'Details needed', color: 'text-[var(--well-destructive-text)] bg-[var(--well-destructive)] animate-pulse', icon: Timer },
     'CONFIRMED': { label: 'Order Confirmed', color: 'text-[var(--well-info-text)] bg-[var(--well-info)]', icon: Package },
     'IN_PRODUCTION': { label: 'Being Prepared', color: 'text-[var(--well-warning-text)] bg-[var(--well-warning)]', icon: Package },
     'PACKED': { label: 'Ready for Pickup', color: 'text-[var(--well-success-text)] bg-[var(--well-success)]', icon: Package },
+    'RIDER_ASSIGNED': { label: 'Rider Assigned', color: 'text-[var(--well-info-text)] bg-[var(--well-info)]', icon: Navigation },
     'OUT_FOR_DELIVERY': { label: 'On the Way', color: 'text-[var(--well-info-text)] bg-[var(--well-info)]', icon: Navigation },
+    'DELIVERED': { label: 'Delivered', color: 'text-[var(--well-success-text)] bg-[var(--well-success)]', icon: Package },
 };
 
 /**
@@ -47,32 +50,32 @@ export function ActiveOrdersBanner({ orders }: ActiveOrdersBannerProps) {
         <div className="mx-4 md:mx-8 animate-in fade-in slide-in-from-top-4 duration-700">
             <button
                 onClick={() => router.push(`/orders/${order.id}`)}
-                className="w-full bg-[var(--foreground)] rounded-full p-1 shadow-lg shadow-[var(--shadow-sm)] group relative overflow-hidden active:scale-[0.98] transition-all border border-white/5"
+                className="w-full bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-xl)] p-3 shadow-[var(--shadow-xs)] group relative overflow-hidden active:scale-[0.98] transition-all"
             >
-                <div className="flex items-center gap-3 pl-1.5 pr-4 py-1.5">
-                    <div className={cn("size-9 rounded-full flex items-center justify-center shrink-0 shadow-inner", statusInfo.color)}>
-                        <StatusIcon className="size-4.5" />
+                <div className="flex items-center gap-2.5">
+                    <div className={cn("size-8 rounded-full flex items-center justify-center shrink-0 border border-[var(--border)]/40", statusInfo.color)}>
+                        <StatusIcon className="size-4" />
                     </div>
 
                     <div className="flex-1 text-left min-w-0">
                         <div className="flex items-center gap-1.5">
-                            <span className="text-[9px] font-black text-[var(--text-inverse)]/40 uppercase tracking-widest whitespace-nowrap">#{order.order_number}</span>
+                            <span className="text-[10px] font-bold text-[var(--text-tertiary)] uppercase tracking-tight whitespace-nowrap">#{order.order_number}</span>
                             <div className="h-1 w-1 rounded-full bg-[var(--success)] animate-pulse" />
                         </div>
-                        <h3 className="text-sm font-black text-[var(--text-inverse)] tracking-tight truncate leading-none mt-0.5">
+                        <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-tight truncate leading-none mt-1">
                             {displayLabel}
                         </h3>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-[10px] font-black text-[var(--text-inverse)] uppercase tracking-wider bg-white/10 px-2 py-1 rounded-full">Track</span>
-                        <ChevronRight className="size-4 text-[var(--text-inverse)]/60" />
+                    <div className="flex items-center gap-1 shrink-0 text-[var(--primary)] text-[10px] font-bold uppercase tracking-tight">
+                        Track Now
+                        <ChevronRight className="size-3 stroke-[3] transition-transform group-hover:translate-x-0.5" />
                     </div>
                 </div>
 
                 {/* Progress Bar (Integrated) */}
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5 w-full overflow-hidden">
-                    <div className="h-full bg-[var(--primary)] w-1/2 animate-progress-glow" />
+                <div className="mt-3 h-1 bg-[var(--surface-muted)] w-full rounded-full overflow-hidden">
+                    <div className="h-full bg-[var(--primary)] w-1/2 animate-progress-glow rounded-full" />
                 </div>
             </button>
 

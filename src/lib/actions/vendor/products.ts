@@ -29,6 +29,8 @@ export type ProductInput = {
     gst_percentage?: number;
     personalization_options?: any;
     product_addons?: any;
+    stock_status?: string;
+    available_for_order?: boolean;
 };
 
 export type VariantInput = {
@@ -89,6 +91,8 @@ export async function createProduct(vendorId: string, input: ProductInput) {
                 hsn_code: input.hsn_code || '9983',
                 gst_percentage: input.gst_percentage || 5.00,
                 personalization_options: input.personalization_options || [],
+                stock_status: input.stock_status || 'IN_STOCK',
+                available_for_order: input.available_for_order ?? true,
             } as any)
             .select('id')
             .single();

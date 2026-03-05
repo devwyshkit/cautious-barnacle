@@ -332,6 +332,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                       )}
                       {data.image_url && (
                         <div className="relative aspect-square w-24 rounded-[var(--radius-md)] overflow-hidden border border-[var(--well-warning-border)] group shadow-[var(--shadow-sm)]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={data.image_url} alt="Customer upload" className="size-full object-cover" />
                           <div className="absolute inset-0 bg-[var(--foreground)]/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-2 transition-opacity">
                             <a

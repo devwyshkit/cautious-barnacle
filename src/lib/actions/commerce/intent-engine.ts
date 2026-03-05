@@ -21,7 +21,9 @@ const AddToCartSchema = z.object({
 const UpdateCartSchema = z.object({
     product_id: z.string().uuid(),
     quantity: z.number().int().nonnegative(),
-    variant_id: z.string().uuid().optional(),
+    variant_id: z.string().uuid().optional().nullable(),
+    personalization: z.record(z.string(), z.any()).optional().nullable(),
+    selected_addons: z.array(z.any()).optional().nullable(),
 });
 
 const ApplyCouponSchema = z.object({
@@ -184,7 +186,9 @@ export async function executeCommerceIntent(intentAction: CommerceIntent) {
                         p_mode: 'SET',
                         p_user_id: user?.id ?? undefined,
                         p_session_id: sessionId ?? undefined,
-                        p_variant_id: validated.payload.variant_id ?? undefined
+                        p_variant_id: validated.payload.variant_id ?? undefined,
+                        p_personalization: (validated.payload.personalization as any) || { enabled: false },
+                        p_selected_addons: (validated.payload.selected_addons as any) || []
                     });
                     if (error) throw error;
                     if (data && !(data as any).success) {

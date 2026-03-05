@@ -47,7 +47,17 @@ export function DeliveryInfo({ order }: DeliveryInfoProps) {
                         <p className="text-xs font-bold text-[var(--text-secondary)] tracking-tight mb-1.5 leading-none">Delivery Address</p>
                         <p className="text-sm font-semibold text-[var(--text-primary)] leading-snug">
                             {typeof order.delivery_address === 'object'
-                                ? `${(order.delivery_address as Record<string, any>).name || ''} • ${(order.delivery_address as Record<string, any>).address_line1 || (order.delivery_address as Record<string, any>).line1 || ''}`
+                                ? (() => {
+                                    const addr = order.delivery_address as Record<string, any>;
+                                    const parts = [
+                                        addr.name,
+                                        addr.address_line1 || addr.line1,
+                                        addr.address_line2 || addr.line2,
+                                        addr.city,
+                                        addr.pincode
+                                    ].filter(Boolean);
+                                    return parts.join(' • ');
+                                })()
                                 : 'Address on file'}
                         </p>
                         {(order.gstin) && (

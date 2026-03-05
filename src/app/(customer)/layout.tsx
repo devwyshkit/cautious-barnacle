@@ -1,6 +1,5 @@
 import { Suspense } from "react";
-import { FloatingCartBar } from "@/components/customer/FloatingCartBar";
-import { OrderTrackingBar } from "@/components/customer/OrderTrackingBar";
+import { FloatingStack } from "@/components/customer/FloatingStack";
 import { CartProvider } from "@/components/customer/CartProvider";
 import { CartErrorBoundary } from "@/components/error/CartErrorBoundary";
 import { getCart } from "@/lib/actions/cart/get-cart";
@@ -33,14 +32,12 @@ export const dynamic = 'force-dynamic';
 
 export default function CustomerLayout({
   children,
-  modal,
 }: {
   children: React.ReactNode;
-  modal: React.ReactNode;
 }) {
   return (
     <Suspense fallback={<LayoutSkeleton />}>
-      <AsyncLayoutContent modal={modal}>
+      <AsyncLayoutContent>
         {children}
       </AsyncLayoutContent>
     </Suspense>
@@ -54,10 +51,8 @@ export default function CustomerLayout({
  */
 async function AsyncLayoutContent({
   children,
-  modal,
 }: {
   children: React.ReactNode;
-  modal: React.ReactNode;
 }) {
   let cartResult: { cart?: DraftTransaction, cartSessionId?: string, guestSessionId?: string | null } = {
     cart: EMPTY_CART,
@@ -155,12 +150,10 @@ async function AsyncLayoutContent({
         }}
       >
         {children}
-        {modal}
       </NavShell>
       <CartErrorBoundary>
-        <FloatingCartBar key={cartResult.cartSessionId} />
+        <FloatingStack activeOrders={activeOrders} key={cartResult.cartSessionId} />
       </CartErrorBoundary>
-      <OrderTrackingBar initialOrders={activeOrders} />
 
       {/* Global Intent-Based Sheets (The 7 Sheets Mandate) */}
       <CartDrawer />

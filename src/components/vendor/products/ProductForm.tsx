@@ -115,6 +115,8 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
     dimensions: typeof product?.dimensions === 'object' && product?.dimensions !== null ? (product.dimensions as any) : { length: 0, width: 0, height: 0 },
     hsn_code: product?.hsn_code || '',
     gst_percentage: product?.gst_percentage ? Number(product.gst_percentage) : 18.00,
+    stock_status: product?.stock_status || 'IN_STOCK',
+    available_for_order: product?.available_for_order ?? true,
   });
 
   const [variants, setVariants] = useState<Variant[]>(
@@ -493,6 +495,21 @@ export function ProductForm({ vendorId, product, open, onOpenChange, onSuccess }
               <Switch
                 checked={formData.is_active}
                 onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+              />
+            </div>
+
+            <div className="flex items-center justify-between py-2 border-t border-[var(--surface-muted)]">
+              <div>
+                <p className="text-sm font-medium text-[var(--text-primary)]">In Stock</p>
+                <p className="text-xs text-[var(--text-secondary)]">Available for orders</p>
+              </div>
+              <Switch
+                checked={formData.stock_status !== 'OUT_OF_STOCK'}
+                onCheckedChange={(checked) => setFormData({
+                  ...formData,
+                  stock_status: checked ? 'IN_STOCK' : 'OUT_OF_STOCK',
+                  available_for_order: checked
+                })}
               />
             </div>
           </div>

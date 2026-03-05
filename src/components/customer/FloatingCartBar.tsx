@@ -2,7 +2,6 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { ShoppingBag, ChevronRight, Sparkles } from 'lucide-react';
-import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/components/customer/CartProvider';
 import { useAuth } from '@/providers/AuthProvider';
@@ -10,12 +9,13 @@ import { cn } from '@/lib/utils';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { hasAnyPersonalization } from '@/lib/utils/personalization';
 import { formatCurrency } from '@/lib/utils/pricing';
+import { AppText } from '@/components/ui/Typography';
 
 /**
- * WYSHKIT 2026: FloatingCartBar - Token Aligned
- * REFRESHED: Switched from Swiggy Emerald to WyshKit Red.
+ * WYSHKIT 2026: FloatingCartBar - Spatial Pill Pattern
+ * Ultra-compact, thumb-friendly, high-density pill. Zero width bloat.
  */
-export function FloatingCartBar() {
+export function FloatingCartBar({ isStacked = false }: { isStacked?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
   const { draftOrder, loading: cartLoading } = useCart();
@@ -25,7 +25,6 @@ export function FloatingCartBar() {
   const hasProducts = displayCart && displayCart.product_count > 0;
 
   // WYSHKIT 2026: UI Isolation Pattern
-  // Hide on transactional pages where primary action is already on-page.
   const isTransactionalPage = [
     '/checkout',
     '/auth',
@@ -52,14 +51,12 @@ export function FloatingCartBar() {
   useEffect(() => {
     setVisualCount(productCount);
     if (productCount > prevCount.current) {
-      // Item was added — pulse the bar
       setShouldPulse(true);
       triggerHaptic(HapticPattern.ACTION);
       const timer = setTimeout(() => setShouldPulse(false), 300);
       prevCount.current = productCount;
       return () => clearTimeout(timer);
     }
-    // Always sync ref so remove+re-add works correctly
     prevCount.current = productCount;
   }, [productCount]);
 
@@ -69,9 +66,11 @@ export function FloatingCartBar() {
       aria-label="Floating cart summary"
       data-testid="floating-cart-bar"
       className={cn(
-        "fixed z-[var(--z-overlay)] transition-all duration-300 ease-out",
-        "left-[var(--space-4)] right-[var(--space-4)] bottom-[var(--floating-cart-bottom)] pb-safe",
-        "md:left-auto md:w-[420px] md:right-[var(--space-8)] md:bottom-[var(--space-8)] md:pb-0",
+        !isStacked && [
+          "fixed z-[var(--z-floating)]",
+          "left-0 right-0 mx-auto w-max bottom-[var(--floating-cart-bottom)]"
+        ],
+        "transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
         isVisible ? "translate-y-0 opacity-100" : "translate-y-32 opacity-0 pointer-events-none"
       )}
     >
@@ -80,53 +79,42 @@ export function FloatingCartBar() {
         type="button"
         aria-label={`View cart: ${visualCount} items, ${formatCurrency(displayTotal)}`}
         className={cn(
-          "w-full bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] backdrop-blur-3xl rounded-[var(--radius-2xl)] shadow-[var(--shadow-xl)] border border-[var(--primary-hover)]/20 overflow-hidden",
+          "bg-gradient-to-r from-[var(--primary)] to-[var(--primary-hover)] backdrop-blur-3xl rounded-full shadow-[var(--shadow-xl)] border border-white/10 overflow-hidden",
           "transition-all duration-300 cursor-pointer active:scale-[0.98] text-left",
-          shouldPulse && "scale-[1.02] brightness-110",
+          shouldPulse && "scale-[1.05] brightness-110",
           isLoading && "opacity-70 pointer-events-none"
         )}
       >
-        <div className="flex items-center justify-between px-[var(--space-5)] py-[var(--space-3-5)] min-h-[64px]">
-          <div className="flex items-center gap-[var(--space-4)]">
-            <div className="relative">
-              <div className="size-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
-                <ShoppingBag className="size-5 text-white" />
-              </div>
-              <div className="absolute -top-1 -right-1 size-5 rounded-full bg-white flex items-center justify-center shadow-[var(--shadow-sm)] border-2 border-[var(--primary)]">
-                <span className="text-[10px] font-black text-[var(--primary)] tabular-nums">{visualCount}</span>
-              </div>
-            </div>
+        <div className="flex items-center px-2 py-0.5 h-[34px] gap-2.5"> {/* Super tight height */}
 
-            <div className="flex flex-col">
-              <span className="text-sm font-black text-white tracking-tight leading-none">
-                {visualCount} {visualCount === 1 ? 'Product' : 'Products'}
-              </span>
-              <div className="flex items-center gap-[var(--space-2)] mt-1">
-                <span className="text-[11px] font-bold text-white/70 truncate max-w-[140px] uppercase tracking-widest">
-                  {displayCart?.products?.[0]?.vendor_name || 'Local Store'}
-                </span>
-                {hasPersonalization && (
-                  <div className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-white/20 border border-white/10">
-                    <Sparkles className="size-2 text-white" />
-                    <span className="text-[9px] font-black text-white tracking-tighter leading-none uppercase">Personalized</span>
-                  </div>
-                )}
-              </div>
+          {/* Badge Icon - Refined circle */}
+          <div className="relative flex items-center justify-center size-7 bg-white/15 rounded-full shrink-0">
+            <ShoppingBag className="size-3.5 text-white" />
+            <div className="absolute -top-0.5 -right-0.5 min-w-[12px] h-[12px] px-1 rounded-full bg-white flex items-center justify-center shadow-xs">
+              <span className="text-[7.5px] font-black text-[var(--primary)] tabular-nums leading-none">{visualCount}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-[var(--space-4)]">
-            <div className="flex flex-col items-end">
-              <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest leading-none">To Pay</span>
-              <span className="text-base font-black text-white tabular-nums mt-0.5">
-                {formatCurrency(displayTotal)}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-white px-4 py-2 rounded-full text-[var(--primary)] font-black text-[11px] uppercase tracking-widest shadow-sm hover:bg-white/90 transition-colors">
-              Checkout
-              <ChevronRight className="size-3.5 stroke-[4]" />
-            </div>
+          {/* Pricing & Metadata - High Density */}
+          <div className="flex flex-col justify-center gap-0 pr-1">
+            <AppText variant="body-sm" weight="bold" className="text-white leading-none">
+              {formatCurrency(displayTotal)}
+            </AppText>
+            {hasPersonalization ? (
+              <div className="flex items-center gap-0.5 mt-[1px]">
+                <Sparkles className="size-2 text-[var(--warning)]" />
+                <span className="text-[8px] font-black text-white/70 uppercase tracking-widest">Custom</span>
+              </div>
+            ) : (
+              <span className="text-[8px] font-black text-white/50 uppercase tracking-widest mt-[1px]">View Bag</span>
+            )}
           </div>
+
+          {/* Unified Arrow */}
+          <div className="flex items-center justify-center size-5 bg-white/10 rounded-full text-white shrink-0">
+            <ChevronRight className="size-3 stroke-[3]" />
+          </div>
+
         </div>
       </button>
     </div>

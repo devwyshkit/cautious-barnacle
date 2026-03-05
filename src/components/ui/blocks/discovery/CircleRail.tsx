@@ -7,6 +7,7 @@ import { LayoutGrid } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { cn } from '@/lib/utils';
+import { AppText } from '@/components/ui/Typography';
 
 interface CircleRailProps {
     data: any[];
@@ -56,7 +57,7 @@ function CircleRailContent({ data, context }: CircleRailProps) {
                     >
                         <div className="flex flex-col items-center gap-[var(--space-1-5)] shrink-0 group active:scale-95 transition-all duration-300">
                             <div className={cn(
-                                "size-14 md:size-16 rounded-full overflow-hidden relative transition-all duration-500 border-2",
+                                "size-12 md:size-16 rounded-full overflow-hidden relative transition-all duration-500 border-2",
                                 isSelected
                                     ? "border-[var(--text-primary)] bg-[var(--surface)]"
                                     : "border-transparent bg-[var(--surface-muted)]"
@@ -70,7 +71,7 @@ function CircleRailContent({ data, context }: CircleRailProps) {
                                             "object-cover transition-all duration-700 ease-in-out group-hover:scale-110",
                                             isSelected ? "scale-90" : "scale-100"
                                         )}
-                                        sizes="(max-width: 768px) 56px, 64px"
+                                        sizes="(max-width: 768px) 48px, 64px"
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center h-full">
@@ -78,16 +79,15 @@ function CircleRailContent({ data, context }: CircleRailProps) {
                                     </div>
                                 )}
                             </div>
-                            <span className={cn(
-                                "text-[var(--text-tiny)] font-bold tracking-tight text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
-                                isSelected ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]"
-                            )}>
-                                {product.name === 'ALL' ? (
-                                    <span className="text-xs font-bold tracking-widest text-[var(--primary)]">All</span>
-                                ) : (
-                                    product.name
+                            <AppText
+                                variant="label"
+                                className={cn(
+                                    "text-[var(--font-size-tiny)] font-bold text-center leading-tight max-w-[64px] md:max-w-[80px] line-clamp-1 transition-colors",
+                                    isSelected ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]"
                                 )}
-                            </span>
+                            >
+                                {product.name === 'ALL' ? 'All' : product.name}
+                            </AppText>
                         </div>
                     </Link>
                 );

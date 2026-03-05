@@ -69,7 +69,7 @@ export function ActionSlider({
         }
     }, [isSuccess]);
 
-    const handleConfirm = async () => {
+    const handleConfirm = useCallback(async () => {
         if (disabled || isLoading || isSuccess) return;
 
         setInternalLoading(true);
@@ -89,7 +89,7 @@ export function ActionSlider({
         } finally {
             setInternalLoading(false);
         }
-    };
+    }, [disabled, isLoading, isSuccess, onConfirm, maxDrag]);
 
     const handlePointerDown = useCallback((e: React.PointerEvent) => {
         if (disabled || isLoading || isSuccess) return;

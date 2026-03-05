@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import ErrorReporter from "@/components/ErrorReporter";
@@ -7,9 +7,9 @@ import { Providers } from "@/components/Providers";
 import { validateEnv, checkRecommendedEnv } from "@/lib/env";
 import { cn } from "@/lib/utils";
 
-const inter = Inter({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-outfit",
 });
 
 validateEnv();
@@ -62,7 +62,7 @@ export default function RootLayout({
 }>) {
   try {
     return (
-      <html lang="en" style={{ colorScheme: 'light' }} className={cn("min-h-screen w-full selection:bg-[var(--primary-muted)] selection:text-[var(--primary)]", inter.variable)} suppressHydrationWarning>
+      <html lang="en" style={{ colorScheme: 'light' }} className={cn("min-h-screen w-full selection:bg-[var(--primary-muted)] selection:text-[var(--primary)]", outfit.variable)} suppressHydrationWarning>
         <body className="font-sans antialiased min-h-[100dvh] w-full bg-[var(--background)]">
           <ErrorReporter />
           <Providers>

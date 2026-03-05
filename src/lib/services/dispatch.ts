@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logging/logger';
-import { ShadowfaxService } from '@/lib/services/shadowfax';
+import { ShiprocketService } from '@/lib/services/shiprocket';
 import { createAdminClient } from '@/lib/supabase/server';
 
 interface DispatchOrderPayload {
@@ -9,7 +9,7 @@ interface DispatchOrderPayload {
 /**
  * WYSHKIT 2026: Standardized Dispatch Orchestrator
  * Rules:
- * 1. Try Shadowfax API (3 attempts, 30s apart).
+ * 1. Try Shiprocket API (Standard Provider).
  * 2. If all attempts fail, Fallback to Manual Delivery.
  */
 export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ success: boolean; error?: string }> => {
@@ -40,50 +40,45 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
         const vendor = (order as any).vendor as Record<string, any>;
         const order_products = (order as any).order_products as any[] || [];
 
-
         let total_weight = 0;
-        let missing_weight_count = 0;
+        let total_value = 0;
 
         order_products.forEach((product: any) => {
-            if (!product.weight_kg) {
-                missing_weight_count++;
-            }
             total_weight += (Number(product.weight_kg) || 0.1) * (product.quantity || 1);
+            total_value += (Number(product.unit_price) || 0) * (product.quantity || 1);
         });
 
-        if (missing_weight_count > 0) {
-            logger.warn(`DispatchService: ${missing_weight_count} products missing weight_kg for order ${order.order_number}. Using default 0.1kg per product.`);
-        }
-
-        const shadowfax_payload = {
-            order_id: order.id,
-            customer: {
-                name: address?.name || 'Customer',
-                phone: address?.phone || '',
-                address: `${address?.address_line1 || ''}`.trim(),
-                city: address?.city || '',
-                pincode: address?.pincode || '',
-            },
-            pickup: {
-                name: vendor?.business_name || vendor?.name || 'Vendor',
-                phone: String(vendor?.whatsapp_number || ''),
-                address: `${vendor?.address || ''}`.trim(),
-                city: vendor?.city || '',
-                pincode: vendor?.pincode || '',
-            },
-            order_details: {
-                total_weight_kg: total_weight > 0 ? total_weight : 0.5,
-            }
+        const shiprocket_payload = {
+            order_id: order.order_number || order.id,
+            order_date: new Date().toISOString().split('T')[0],
+            pickup_location: vendor?.business_name || 'Primary',
+            billing_customer_name: address?.name?.split(' ')[0] || 'Customer',
+            billing_last_name: address?.name?.split(' ').slice(1).join(' ') || '',
+            billing_address: address?.address_line1 || '',
+            billing_city: address?.city || '',
+            billing_pincode: address?.pincode || '',
+            billing_state: address?.state || '',
+            billing_country: 'India',
+            billing_email: address?.email || 'customer@wyshkit.com',
+            billing_phone: address?.phone || '',
+            shipping_is_billing: true,
+            order_items: order_products.map((p: any) => ({
+                name: p.product_name || 'Product',
+                sku: p.product_id || 'SKU',
+                units: p.quantity || 1,
+                selling_price: p.unit_price || 0
+            })),
+            payment_method: 'Prepaid' as const,
+            sub_total: total_value,
+            length: 10,
+            width: 10,
+            height: 10,
+            weight: total_weight > 0 ? total_weight : 0.5
         };
 
-        // 3. Persist Intent (WYSHKIT 2026: Absolute Persistence)
-        // Table 'dispatch_attempts' purged in favor of direct order status metadata in WYSHKIT 2026 lean model.
-        // We bypass the outbox for now and go direct to provider.
-        const attempt = { id: payload.order_id };
-
         // 4. Perform First Attempt
-        logger.info(`[Dispatch] Initial attempt for order ${order.order_number}`);
-        const dispatch_result = await ShadowfaxService.createOrder(shadowfax_payload);
+        logger.info(`[Dispatch] Initial attempt for order ${order.order_number} via Shiprocket`);
+        const dispatch_result = await ShiprocketService.createOrder(shiprocket_payload);
 
         // 5. Update Intent Status
         if (dispatch_result.success) {
@@ -92,20 +87,18 @@ export const dispatch_order = async (payload: DispatchOrderPayload): Promise<{ s
                 p_order_id: payload.order_id,
                 p_target_status: 'RIDER_ASSIGNED',
                 p_metadata: {
-                    awb_number: dispatch_result.awbNumber,
-                    courier_vendor: 'Shadowfax',
-                    tracking_url: dispatch_result.trackingUrl,
+                    awb_number: (dispatch_result as any).awb_code,
+                    courier_vendor: 'Shiprocket',
+                    shipment_id: (dispatch_result as any).shipment_id,
                     dispatched_at: new Date().toISOString()
                 } as any
             });
 
             return { success: true };
         } else {
-            const error_msg = dispatch_result.error || 'Shadowfax API Error';
+            const error_msg = dispatch_result.error || 'Shiprocket API Error';
             logger.error(`[Dispatch] Initial attempt failed for ${order.id}: ${error_msg}`);
-
-            logger.warn(`[Dispatch] Initial attempt failed for ${order.id}. Intent preserved for retry worker.`);
-            return { success: true, error: `Initial dispatch failed but persistent intent created: ${error_msg}` };
+            return { success: false, error: `Initial dispatch failed: ${error_msg}` };
         }
 
     } catch (error) {

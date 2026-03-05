@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { ORDER_STATUS, getStatusConfig, isFinalStatus, canCancelOrder } from '@/lib/types/order-status';
+import {
+    ORDER_STATUS,
+    getStatusConfig,
+    isFinalStatus,
+    canCancelOrder,
+    getOrderStatusDisplay,
+    getOrderStatusColor
+} from '@/lib/types/order-status';
 
 // WYSHKIT 2026: Order Lifecycle State Machine Tests
 // Ensures deterministic state transitions and prevents invalid order terminal states.
@@ -26,5 +33,25 @@ describe('Order Lifecycle State Machine', () => {
 
         const deliveredConfig = getStatusConfig({ status: ORDER_STATUS.DELIVERED, has_personalization: false });
         expect(deliveredConfig.subLabel).toBe('delivered');
+
+        // Design Input Needed: requires PLACED/CONFIRMED status AND needsInput (has_personalization && !metadata.personalization.input_received)
+        const pendingPersonalizationConfig = getStatusConfig({
+            status: ORDER_STATUS.PLACED,
+            has_personalization: true,
+            metadata: { personalization: { input_received: false } }
+        });
+        expect(pendingPersonalizationConfig.label).toBe('Design Input Needed');
+
+        const packedConfig = getStatusConfig({ status: ORDER_STATUS.PACKED, has_personalization: false });
+        expect(packedConfig.subLabel).toBe('quality check & packed');
+    });
+
+    it('should map PENDING_PERSONALIZATION to a user-friendly label', () => {
+        expect(getOrderStatusDisplay('PENDING_PERSONALIZATION')).toBe('Awaiting your details');
+    });
+
+    it('should use success colors for PACKED status', () => {
+        const color = getOrderStatusColor(ORDER_STATUS.PACKED);
+        expect(color).toContain('well-success');
     });
 });

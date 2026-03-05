@@ -40,8 +40,8 @@ interface CartContextType {
         quantity?: number,
         optimistic_data?: any
     ) => Promise<CartActionResult>;
-    removeFromDraftOrder: (productId: string, variantId?: string | null) => Promise<void>;
-    updateQuantity: (productId: string, variantId: string | null, quantity: number) => Promise<void>;
+    removeFromDraftOrder: (productId: string, variantId?: string | null, personalization?: SelectedPersonalization, selected_addons?: SelectedAddon[]) => Promise<void>;
+    updateQuantity: (productId: string, variantId: string | null, quantity: number, personalization?: SelectedPersonalization, selected_addons?: SelectedAddon[]) => Promise<void>;
     clearDraftOrder: () => Promise<void>;
 }
 
@@ -94,6 +94,22 @@ export function CartProvider({
                 case 'add':
                     // WYSHKIT 2026: Pure metadata addition. NO pricing arithmetic.
                     // The server revalidation will flow back the authoritative totals.
+                    const existingIndex = state.products.findIndex((p: CartProduct) =>
+                        p.product_id === update.payload.product_id &&
+                        (p.variant_id ?? null) === (update.payload.variant_id ?? null) &&
+                        JSON.stringify(p.personalization || { enabled: false }) === JSON.stringify(update.payload.personalization || { enabled: false }) &&
+                        JSON.stringify(p.selected_addons || []) === JSON.stringify(update.payload.selected_addons || [])
+                    );
+
+                    if (existingIndex > -1) {
+                        const newProducts = [...state.products];
+                        newProducts[existingIndex] = {
+                            ...newProducts[existingIndex],
+                            quantity: newProducts[existingIndex].quantity + (update.payload.quantity || 1)
+                        };
+                        return { ...state, products: newProducts };
+                    }
+
                     return {
                         ...state,
                         products: [...state.products, {
@@ -135,7 +151,14 @@ export function CartProvider({
                 // Optimistic UI update
                 setOptimisticCart({
                     type: 'add',
-                    payload: { product_id, variant_id: variant_id, ...optimistic_data }
+                    payload: {
+                        product_id,
+                        variant_id: variant_id,
+                        quantity,
+                        personalization,
+                        selected_addons,
+                        ...optimistic_data
+                    }
                 });
 
                 try {
@@ -177,10 +200,14 @@ export function CartProvider({
         });
     }, [startTransition, setOptimisticCart]);
 
-    const removeFromDraftOrder = useCallback(async (productId: string, variantId?: string | null) => {
+    const removeFromDraftOrder = useCallback(async (productId: string, variantId?: string | null, personalization?: SelectedPersonalization, selected_addons?: SelectedAddon[]) => {
         const normalizedVariantId = variantId ?? null;
         const cartItem = optimisticCart.products.find(
-            (i: CartProduct) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
+            (i: CartProduct) =>
+                i.product_id === productId &&
+                (i.variant_id ?? null) === normalizedVariantId &&
+                JSON.stringify(i.personalization || { enabled: false }) === JSON.stringify(personalization || { enabled: false }) &&
+                JSON.stringify(i.selected_addons || []) === JSON.stringify(selected_addons || [])
         );
         if (!cartItem) return;
 
@@ -192,7 +219,9 @@ export function CartProvider({
                     payload: {
                         product_id: cartItem.product_id,
                         variant_id: (cartItem.variant_id ?? undefined) as string | undefined,
-                        quantity: 0
+                        quantity: 0,
+                        personalization,
+                        selected_addons
                     }
                 });
             } catch (err) {
@@ -201,10 +230,14 @@ export function CartProvider({
         });
     }, [optimisticCart.products, startTransition, setOptimisticCart]);
 
-    const updateQuantity = useCallback(async (productId: string, variantId: string | null, quantity: number) => {
+    const updateQuantity = useCallback(async (productId: string, variantId: string | null, quantity: number, personalization?: SelectedPersonalization, selected_addons?: SelectedAddon[]) => {
         const normalizedVariantId = variantId ?? null;
         const cartItem = optimisticCart.products.find(
-            (i: CartProduct) => i.product_id === productId && (i.variant_id ?? null) === normalizedVariantId
+            (i: CartProduct) =>
+                i.product_id === productId &&
+                (i.variant_id ?? null) === normalizedVariantId &&
+                JSON.stringify(i.personalization || { enabled: false }) === JSON.stringify(personalization || { enabled: false }) &&
+                JSON.stringify(i.selected_addons || []) === JSON.stringify(selected_addons || [])
         );
         if (!cartItem) return;
 
@@ -216,7 +249,9 @@ export function CartProvider({
                     payload: {
                         product_id: cartItem.product_id,
                         variant_id: (cartItem.variant_id ?? undefined) as string | undefined,
-                        quantity: quantity
+                        quantity: quantity,
+                        personalization,
+                        selected_addons
                     }
                 });
             } catch (err) {

@@ -152,7 +152,7 @@ export function usePaymentFlow({
                     prefill: {
                         name: authUser?.user_metadata?.full_name, phone: authUser?.phone
                     },
-                    theme: { color: '#D91B24' },
+                    theme: { color: '#D91B24' }, // Razorpay SDK requires a hex string, not a CSS variable
                     modal: {
                         ondismiss: () => {
                             setIsProcessing(false);

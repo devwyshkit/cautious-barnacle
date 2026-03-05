@@ -53,12 +53,16 @@ export interface WyshkitProduct extends Omit<Tables<'products'>, 'variants' | 'p
   } | null;
   product_variants?: Array<Tables<'product_variants'> & { price: number | null; stock_quantity: number | null }>;
 
-  // Aliases & Missing Fields (Shadow State Resolution)
+  // Joins & ALiases
   variants?: Array<Tables<'product_variants'> & { price: number | null; stock_quantity: number | null }>;
-  personalization_options: any;
+  personalization_options: any; // Override Json with any for easier traversal in UI
+  has_personalization: boolean | null;
   video_url: string | null;
   preview_time_minutes: number | null;
   return_eligible?: boolean;
+
+  // Physical Metadata (Law 7) - Extended from base
+  is_cold?: boolean;
 
   elite_signals?: ValidatedWyshkitProduct['elite_signals'];
 }

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 :root {
@@ -44,38 +44,70 @@
   --text-tertiary: #A1A1AA;
   --text-inverse: #FFFFFF;
 
-  /* Performance Typography - Swiggy 2026 High Density */
-  --text-tiny: 11px;
-  --text-xxs: 12px;
+  /* Performance Typography - Swiggy 2026 High Density (Mobile-First) */
+  --font-size-label: 9px;
+  /* Status pills, extra tight metadata */
+  --font-size-tiny: 8px;
+  /* Micro metadata */
+  --font-size-caption: 10px;
+  /* Timestamps, secondary metadata */
+  --font-size-body-xs: 11px;
+  /* Tertiary labels */
+  --font-size-body-sm: 13px;
+  /* Primary body text */
+  --font-size-body-md: 15px;
+  /* Section subheaders, card titles */
+  --font-size-heading-sm: 16px;
+  /* Section headings */
+  --font-size-heading-md: 18px;
+  /* Small layout headings */
+  --font-size-heading-lg: 20px;
+  /* Page headers (h1) */
 
-  /* WYSHKIT 2026 Radius Scale - Elite Standard */
+  /* SWIGGY 2026: FONT WEIGHT CONTRACT
+     ============================================================
+     font-medium: Default body text, metadata, captions
+     font-semibold: Interactive labels, active states, subheaders
+     font-bold: Primary headers (H2, H3), Price, Primary CTAs
+     font-black: Restricted to H1 Page titles ONLY (Law of Focus)
+     ============================================================
+  */
+
+  /* Surface Width Tokens - Swiggy 2026 Focused Architecture */
+  --surface-width-focused: 448px;
+  /* max-w-md */
+  --surface-width-browse: 1440px;
+  --surface-width-checkout: 896px;
+  /* max-w-4xl */
+
+  /* WYSHKIT 2026 Radius Scale - Elite Standard (Tightened for Density) */
   --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
-  --radius-3xl: 32px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 28px;
   --radius: 12px;
 
-  /* Spacing Scale - Swiggy 2026 */
+  /* Spacing Scale - Swiggy 2026 (Tightened for Mobile Density) */
   --space-0-5: 2px;
-  --space-1: 4px;
-  --space-1-5: 6px;
-  --space-2: 8px;
-  --space-2-5: 10px;
-  --space-3: 12px;
-  --space-3-5: 14px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-14: 56px;
-  --space-16: 64px;
-  --space-20: 80px;
-  --space-24: 96px;
+  --space-1: 3px;
+  --space-1-5: 5px;
+  --space-2: 6px;
+  --space-2-5: 8px;
+  --space-3: 10px;
+  --space-3-5: 12px;
+  --space-4: 14px;
+  --space-5: 16px;
+  --space-6: 20px;
+  --space-8: 24px;
+  --space-10: 32px;
+  --space-12: 40px;
+  --space-14: 48px;
+  --space-16: 56px;
+  --space-20: 72px;
+  --space-24: 88px;
 
   /* Swiggy 2026 Elite Elevation */
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -96,15 +128,33 @@
   --star-rating: #f59e0b;
 
   /* Layout Tokens */
-  --top-header-base-mobile: 104px;
-  --top-masthead-height: 44px;
-  --top-header-height-mobile-with-masthead: 148px;
+  --top-header-base-mobile: 88px;
+  --top-masthead-height: 32px;
+  --top-header-height-mobile-with-masthead: calc(var(--top-header-base-mobile) + var(--top-masthead-height));
   --top-header-height-mobile: var(--top-header-base-mobile);
   /* Default fallback */
   --top-header-height: 64px;
-  --bottom-nav-height: 64px;
-  /* Increased for better thumb ergonomics */
-  --floating-cart-bottom: calc(var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom, 0px));
+  --bottom-nav-height: 52px;
+  /* Optimized for reachability and content density */
+
+  /* SWIGGY 2026: FLOATING STACK COORDINATES
+     ============================================================
+     The "Single Stack" logic ensures tracking and cart bars
+     never overlap and maintain a unified design voice.
+     Stacked from bottom: 
+     1. Safe Area / Bottom Nav
+     2. Cart Bar (if visible)
+     3. Tracking Bar (if visible, offset by Cart Bar)
+     ============================================================
+  */
+  --floating-gap: var(--space-1);
+  --floating-bottom-safe: calc(var(--bottom-nav-height) + var(--space-2) + env(safe-area-inset-bottom, 0px));
+  --floating-cart-height: 34px;
+
+  --floating-cart-bottom: var(--floating-bottom-safe);
+  --floating-tracking-bottom-base: var(--floating-bottom-safe);
+  --floating-tracking-bottom-with-cart: calc(var(--floating-cart-bottom) + var(--floating-cart-height) + var(--floating-gap));
+
 
   /* Swiggy 2026 Z-Index Architecture */
   --z-base: 0;
@@ -169,10 +219,12 @@ h6 {
 
 p {
   color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 body {
   /* WYSHKIT 2026: Mobile-First Scroll Policy - Standardize for performance */
+  overscroll-behavior-y: none;
 }
 
 @layer utilities {
@@ -183,5 +235,15 @@ body {
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.5s infinite;
   }
 }

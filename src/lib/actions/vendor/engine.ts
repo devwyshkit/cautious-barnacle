@@ -92,8 +92,11 @@ export async function executeVendorIntent(intent: VendorIntent) {
                 if (validated.action === 'TOGGLE_STATUS') {
                     await supabase.from('products').update({ is_active: validated.metadata.isActive }).eq('id', validated.id);
                 } else if (validated.action === 'TOGGLE_STOCK') {
-                    // products table doesn't have stock_status, we use is_active or update variants
-                    await supabase.from('products').update({ is_active: validated.metadata.stockStatus === 'IN_STOCK' }).eq('id', validated.id);
+                    const isAvailable = validated.metadata.stockStatus === 'IN_STOCK';
+                    await supabase.from('products').update({
+                        stock_status: validated.metadata.stockStatus,
+                        available_for_order: isAvailable
+                    }).eq('id', validated.id);
                 } else if (validated.action === 'UPDATE_STOCK') {
                     const { variant_id, quantity } = validated.metadata;
                     await supabase.from('product_variants').update({ stock_quantity: quantity }).eq('id', variant_id).eq('product_id', validated.id);

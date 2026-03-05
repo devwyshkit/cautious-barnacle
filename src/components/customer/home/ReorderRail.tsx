@@ -133,20 +133,8 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
   if (!user || recentOrders.length === 0) return null;
 
   return (
-    <section>
-      <div className="flex items-center justify-between mb-4 px-1">
-        <div className="flex items-center gap-2">
-          <div className="size-8 rounded-[var(--radius-sm)] bg-[var(--well-success)] flex items-center justify-center">
-            <RotateCcw className="size-4 text-[var(--well-success-text)]" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-[var(--text-primary)] tracking-tight">Reorder</h2>
-            <p className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">From your recent picks</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2">
+    <>
+      <div className="flex gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 pb-1">
         {recentOrders.map((order, index) => {
           const firstProduct = order.products?.[0];
           const productCount = order.products?.length || 0;
@@ -160,83 +148,75 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
               onClick={() => initiateReorder(order)}
               disabled={isPending || isReordering || !isOrderAvailable}
               className={cn(
-                "shrink-0 w-[260px] bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden shadow-sm",
-                "hover:border-[var(--border)] transition-all duration-300",
+                "shrink-0 w-[170px] bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-xl)]",
+                "transition-all duration-300 text-left p-2.5 overflow-hidden",
                 "active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed",
                 !isOrderAvailable && "grayscale",
                 "group animate-in fade-in slide-in-from-bottom-2",
                 `[animation-delay:${index * 0.1}s]`
               )}
             >
-              <div className="flex items-stretch h-28">
-                <div className="relative w-28 bg-[var(--surface-muted)] shrink-0">
-                  {firstProduct?.image_url ? (
-                    <Image
-                      src={firstProduct.image_url}
-                      alt={firstProduct.product_name || 'Order product'}
-                      fill
-                      className="object-cover"
-                      sizes="110px"
-                    />
-                  ) : (
-                    <div className="size-full flex items-center justify-center">
-                      <RotateCcw className="size-6 text-[var(--text-tertiary)]" />
-                    </div>
-                  )}
-                  {hasPersonalization && (
-                    <div className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded-[var(--radius-xs)] bg-[var(--warning)] shadow-lg shadow-[var(--warning)]/20">
-                      <Sparkles className="size-3 text-[var(--text-inverse)] fill-[var(--text-inverse)]" />
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex-1 p-3 flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-tertiary)] mb-1 uppercase tracking-wider">
-                    <Clock className="size-3" />
-                    <span>{formatDate(order.created_at)}</span>
-                    <span>•</span>
-                    <span className="truncate">{order.vendor_name}</span>
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-start gap-2.5">
+                  <div className="relative size-10 rounded-[var(--radius-md)] bg-[var(--surface-muted)] shrink-0 overflow-hidden border border-[var(--border)]/50">
+                    {firstProduct?.image_url ? (
+                      <Image
+                        src={firstProduct.image_url}
+                        alt={firstProduct.product_name || 'Order product'}
+                        fill
+                        className="object-cover"
+                        sizes="40px"
+                      />
+                    ) : (
+                      <div className="size-full flex items-center justify-center">
+                        <RotateCcw className="size-4 text-[var(--text-tertiary)]" />
+                      </div>
+                    )}
+                    {hasPersonalization && (
+                      <div className="absolute -top-0.5 -right-0.5 size-2.5 bg-[var(--warning)] rounded-full ring-2 ring-[var(--surface)] shadow-sm flex items-center justify-center">
+                        <Sparkles className="size-1.5 text-[var(--text-inverse)]" />
+                      </div>
+                    )}
                   </div>
 
-                  <p className="text-sm font-bold text-[var(--text-primary)] truncate leading-tight">
-                    {firstProduct?.product_name || 'Order'}
-                  </p>
-                  {productCount > 1 && (
-                    <p className="text-xs font-bold text-[var(--text-secondary)] uppercase mt-0.5">
-                      +{productCount - 1} other product{productCount > 2 ? 's' : ''}
-                    </p>
-                  )}
-
-                  <div className="flex items-center justify-between mt-auto">
-                    <span className="text-sm font-bold text-[var(--text-primary)] tabular-nums">
-                      {formatCurrency(order.total)}
-                    </span>
-
-                    <div className={cn(
-                      "flex items-center gap-1 px-3 py-1.5 rounded-[var(--radius-md)] text-xs font-bold uppercase tracking-tight transition-all",
-                      isReordering
-                        ? "bg-[var(--well-success)] text-[var(--well-success-text)]"
-                        : !isOrderAvailable
-                          ? "bg-[var(--well-destructive)] text-[var(--well-destructive-text)]"
-                          : "bg-[var(--surface-muted)] text-[var(--text-primary)] group-hover:bg-[var(--foreground)] group-hover:text-[var(--text-inverse)]"
-                    )}>
-                      {isReordering ? (
-                        <>
-                          <Check className="size-3" />
-                          <span>Adding</span>
-                        </>
-                      ) : !isOrderAvailable ? (
-                        <>
-                          <AlertCircle className="size-3" />
-                          <span>OOS</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Reorder</span>
-                          <ChevronRight className="size-3" />
-                        </>
-                      )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1 text-[8px] font-black text-[var(--text-tertiary)] uppercase tracking-wider">
+                      <span>{formatDate(order.created_at)}</span>
                     </div>
+
+                    <p className="text-[11px] font-bold text-[var(--text-primary)] truncate block leading-tight mt-0.5 group-hover:text-[var(--primary)] transition-colors">
+                      {order.vendor_name || 'Store'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-[10px] font-semibold text-[var(--text-secondary)] truncate leading-tight opacity-90">
+                    {firstProduct?.product_name || 'Order Details'}
+                    {productCount > 1 && ` +${productCount - 1}`}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]/30">
+                  <span className="text-[10px] font-black text-[var(--text-primary)] tabular-nums tracking-tighter">
+                    {formatCurrency(order.total)}
+                  </span>
+
+                  <div className={cn(
+                    "flex items-center justify-center size-7 rounded-full transition-all",
+                    isReordering
+                      ? "bg-[var(--well-success)] text-[var(--success)]"
+                      : !isOrderAvailable
+                        ? "bg-[var(--well-destructive)] text-[var(--destructive)]"
+                        : "bg-[var(--primary)] text-white shadow-brand active:scale-95"
+                  )}>
+                    {isReordering ? (
+                      <Check className="size-3.5 stroke-[3] animate-in zoom-in" />
+                    ) : !isOrderAvailable ? (
+                      <AlertCircle className="size-3.5 stroke-[3]" />
+                    ) : (
+                      <RotateCcw className="size-3.5 stroke-[3]" />
+                    )}
                   </div>
                 </div>
               </div>
@@ -284,6 +264,6 @@ export function ReorderRail({ initialOrders }: ReorderWidgetProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </section>
+    </>
   );
 }

@@ -23,7 +23,7 @@ export function CardRail({ data }: CardRailProps) {
                     {data.map((product, index) => {
                         const isProduct = product.type === 'product' || !!product.vendor_id;
                         return (
-                            <CarouselItem key={product.id} className="pl-4 basis-[200px] sm:basis-[240px]">
+                            <CarouselItem key={product.id} className="pl-4 basis-[156px] sm:basis-[240px]">
                                 {isProduct ? (
                                     <ProductCard
                                         data={product}

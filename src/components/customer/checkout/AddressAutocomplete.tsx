@@ -57,7 +57,9 @@ export function AddressAutocomplete({
   const hasApiKey = !!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   useEffect(() => {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
+      process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ||
+      process.env.GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
       setReady(true);
       return;

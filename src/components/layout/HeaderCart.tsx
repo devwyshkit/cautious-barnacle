@@ -10,7 +10,11 @@ import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 import { formatCurrency } from '@/lib/utils/pricing';
 import { Button } from '@/components/ui/button';
 
-export function HeaderCart() {
+interface HeaderCartProps {
+    className?: string;
+}
+
+export function HeaderCart({ className }: HeaderCartProps) {
     const router = useRouter();
     const pathname = usePathname();
     const { draftOrder, loading } = useCart();
@@ -53,7 +57,7 @@ export function HeaderCart() {
     if (!hasProducts || isCheckoutOpen) return null;
 
     return (
-        <div>
+        <div className={className}>
             <Button
                 variant="ghost"
                 onClick={handleCheckout}

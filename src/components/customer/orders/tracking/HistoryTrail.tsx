@@ -24,7 +24,7 @@ interface HistoryTrailProps {
 /**
  * WYSHKIT 2026: The "Creative Journey" History Trail
  * Visualizes the 3-layer trust engine:
- * 1. What You Sent (Brief)
+ * 1. Your Request (Personalization)
  * 2. What Vendor Sent (Preview)
  * 3. What Changed (Revisions)
  */
@@ -49,13 +49,13 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                 {/* Vertical Line */}
                 <div className="absolute left-[11px] top-2 bottom-2 w-px bg-[var(--surface-muted)]" />
 
-                {/* Layer 1: The Briefing */}
+                {/* Layer 1: Your Request */}
                 {personalizedProducts.map(product => (
                     <div key={product.id} className="relative">
                         <div className="absolute -left-[20px] top-1 size-2.5 rounded-full bg-[var(--text-primary)] ring-4 ring-[var(--surface)] shadow-sm" />
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                                <h4 className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">Layer 1: The Briefing</h4>
+                                <h4 className="text-xs font-bold text-[var(--text-primary)] tracking-tight leading-none">Layer 1: Your Request</h4>
                                 <span className="text-[var(--text-xxs)] font-bold text-[var(--text-tertiary)] tabular-nums">
                                     {product.details_submitted_at ? format(new Date(product.details_submitted_at), 'h:mm a') : 'Pending'}
                                 </span>
@@ -70,7 +70,7 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
                                 )}
                                 {product.personalization_details?.image_url && (
                                     <div className="aspect-video rounded-[var(--radius-lg)] overflow-hidden border border-[var(--border)]">
-                                        <img src={product.personalization_details.image_url} alt="Brief Reference" className="size-full object-cover" />
+                                        <img src={product.personalization_details.image_url} alt="Design Reference" className="size-full object-cover" />
                                     </div>
                                 )}
                             </div>

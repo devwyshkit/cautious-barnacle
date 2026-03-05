@@ -3,12 +3,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { OrderProductListItem } from "@/lib/types/order";
-import { OrderStatus } from "@/lib/types/order-status";
 import { OrderCard } from "./OrderCard";
-import { Loader2, PackageOpen } from "lucide-react";
+import { AppText } from "@/components/ui/Typography";
+import { PackageOpen } from "lucide-react";
+import { OrderCardSkeleton } from "@/components/ui/skeleton-layouts";
 import { PullToRefresh } from "@/components/layout/PullToRefresh";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useRouter } from "next/navigation";
+import { isToday, isYesterday, parseISO, startOfDay, subDays } from "date-fns";
 
 interface OrderListProps {
   initialOrders?: OrderProductListItem[];
@@ -59,8 +61,10 @@ export function OrderList({ initialOrders }: OrderListProps) {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Loader2 className="size-8 animate-spin text-[var(--border)]" />
+      <div className="space-y-4 px-4 py-6">
+        {[...Array(3)].map((_, i) => (
+          <OrderCardSkeleton key={i} />
+        ))}
       </div>
     );
   }
@@ -74,20 +78,64 @@ export function OrderList({ initialOrders }: OrderListProps) {
           actionLabel="Browse products"
           onAction={() => router.push("/")}
         >
-          <div className="size-16 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center mb-4">
-            <PackageOpen className="size-8 text-[var(--text-tertiary)]" />
+          <div className="size-12 rounded-[var(--radius-md)] bg-[var(--surface-muted)] flex items-center justify-center mb-4">
+            <PackageOpen className="size-6 text-[var(--text-tertiary)]" />
           </div>
         </EmptyState>
       </div>
     );
   }
 
+  const groupOrders = (orders: OrderProductListItem[]) => {
+    const groups: Record<string, OrderProductListItem[]> = {
+      "Active Orders": [],
+      "Today": [],
+      "Yesterday": [],
+      "Earlier": []
+    };
+
+    orders.forEach(order => {
+      const status = order.status ?? 'UNKNOWN';
+      const isActive = ['PLACED', 'CONFIRMED', 'IN_PRODUCTION', 'PACKED', 'OUT_FOR_DELIVERY'].includes(status);
+
+      if (isActive) {
+        groups["Active Orders"].push(order);
+        return;
+      }
+
+      const date = parseISO(order.created_at || new Date().toISOString());
+      if (isToday(date)) groups["Today"].push(order);
+      else if (isYesterday(date)) groups["Yesterday"].push(order);
+      else groups["Earlier"].push(order);
+    });
+
+    return groups;
+  };
+
+  const groupedOrders = groupOrders(orders);
+
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="space-y-4 pb-10">
-        {orders.map((order) => (
-          <OrderCard key={order.id} order={order} />
-        ))}
+      <div className="space-y-5 pb-10">
+        {Object.entries(groupedOrders).map(([title, items]) => {
+          if (items.length === 0) return null;
+          return (
+            <div key={title} className="space-y-2">
+              <AppText variant="caption" weight="bold" color="tertiary" className="px-1 tracking-wider uppercase">
+                {title}
+              </AppText>
+              <div className="space-y-3">
+                {items.map((order) => (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    variant={title === "Earlier" ? "compact" : "default"}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </PullToRefresh>
   );

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ShieldCheck, MapPin, CreditCard, FileText, Sparkles } from 'lucide-react';
+import { AppText } from '@/components/ui/Typography';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -20,6 +21,7 @@ import { GstinSection } from './GstinSection';
 import { EstimateButton } from './EstimateButton';
 import { SlideToPay } from './SlideToPay';
 import { formatCurrency } from '@/lib/utils/pricing';
+import { CartSlot } from './slots/CartSlot';
 
 interface CheckoutClientProps {
     initialData: CheckoutData;
@@ -56,203 +58,140 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
     const payTotal = checkoutData.pricing?.total ?? 0;
 
     return (
-        <div className="max-w-lg mx-auto min-h-[100dvh] flex flex-col">
-            {/* Simple back header — not sticky, no clutter */}
-            <header className="flex items-center gap-3 px-4 pt-5 pb-3">
-                <button
-                    onClick={() => router.back()}
-                    className="size-9 rounded-full bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shadow-sm active:scale-95 transition-all"
-                    aria-label="Go back"
-                >
-                    <ArrowLeft className="size-4 text-[var(--text-secondary)]" />
-                </button>
-                <h1 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">Checkout</h1>
-            </header>
-
-            <div className="flex-1 overflow-y-auto px-4 pb-32 space-y-3">
-
-                {/* ITEMS SECTION - Anchoring Commitment */}
-                <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
-                    <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
-                        <ShieldCheck className="size-3.5 text-[var(--primary)]" />
-                        <span className="text-xs font-bold text-[var(--text-secondary)] tracking-widest uppercase">Your Order</span>
-                    </div>
-                    <div className="px-4 py-3 space-y-3">
-                        {checkoutData.products.map(product => (
-                            <div key={product.id} className="flex items-center gap-3">
-                                <div className="relative size-12 rounded-[var(--radius-md)] bg-[var(--surface-muted)] overflow-hidden shrink-0">
-                                    <Image
-                                        src={product.product_image || '/images/logo.png'}
-                                        alt={product.product_name}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center justify-between gap-2">
-                                        <p className="text-sm font-bold text-[var(--text-primary)] truncate">{product.product_name}</p>
-                                        <button
-                                            onClick={() => {
-                                                triggerHaptic(HapticPattern.ACTION);
-                                                openProductSheet(product.product_id);
-                                            }}
-                                            className="text-xs font-bold text-[var(--primary)] uppercase tracking-tight px-2 py-1 bg-[var(--well-destructive)] rounded-[var(--radius-md)] hover:opacity-80 transition-colors"
-                                        >
-                                            Edit
-                                        </button>
-                                    </div>
-                                    <div className="flex items-center gap-1.5 mt-0.5">
-                                        <span className="text-xs text-[var(--text-secondary)]">Qty {product.quantity}</span>
-                                        {product.is_personalized && (
-                                            <span className="flex items-center gap-0.5 text-xs font-bold text-[var(--warning)] bg-[var(--well-warning)] border border-[var(--warning)]/20 px-1.5 py-0.5 rounded-full">
-                                                <Sparkles className="size-2" /> Personalized
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <span className="text-sm font-bold text-[var(--text-primary)]">{formatCurrency(product.line_total)}</span>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* DELIVERY SECTION */}
-                <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
-                    <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
-                        <MapPin className="size-3.5 text-[var(--primary)]" />
-                        <span className="text-xs font-bold text-[var(--text-secondary)] tracking-widest uppercase">Delivery</span>
-                    </div>
-                    <div className="px-4 py-3">
-                        <AddressSlot
-                            initialAddresses={checkoutData.addresses}
-                            currentAddress={checkoutData.addresses?.find(a => a.id === checkoutData.selected_address_id)}
-                            disabled={paymentFlow.isProcessing}
-                            etaMinutes={checkoutData.eta_minutes}
-                        />
-                        <div className="mt-3">
-                            <label className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-widest">
-                                Instructions <span className="font-semibold normal-case text-[var(--text-tertiary)]">(optional)</span>
-                            </label>
-
-                            {/* WYSHKIT 2026: Anticipatory Presets (Zero Shadow UX) */}
-                            <div className="flex flex-wrap gap-2 mt-2 mb-3">
-                                {[
-                                    { id: 'silence', label: '🤫 Silence Mode', hint: 'Dont ring bell' },
-                                    { id: 'gate', label: '🚧 Gate Drop', hint: 'Leave at gate' },
-                                    { id: 'careful', label: '💎 Fragile', hint: 'Handle with care' }
-                                ].map(preset => (
-                                    <button
-                                        key={preset.id}
-                                        type="button"
-                                        onClick={() => {
-                                            triggerHaptic(HapticPattern.ACTION);
-                                            const current = addressCtx?.deliveryInstructions ?? '';
-                                            if (current.includes(preset.hint)) return;
-                                            addressCtx?.setDeliveryInstructions(current ? `${current}, ${preset.hint}` : preset.hint);
-                                        }}
-                                        className="text-xs font-bold px-3 py-1.5 rounded-full bg-[var(--surface-muted)] border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors active:scale-95"
-                                    >
-                                        {preset.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <textarea
-                                value={addressCtx?.deliveryInstructions ?? ''}
-                                onChange={(e) => addressCtx?.setDeliveryInstructions(e.target.value)}
-                                disabled={paymentFlow.isProcessing}
-                                placeholder="e.g. Ring bell, leave at gate..."
-                                className="w-full h-16 px-4 py-3 rounded-[var(--radius-xl)] bg-[var(--surface-muted)] border border-[var(--border)] text-sm font-medium focus:bg-[var(--surface)] focus:border-[var(--primary)] transition-all resize-none outline-none disabled:opacity-50"
+        <div className="max-w-4xl mx-auto min-h-[100dvh] flex flex-col lg:flex-row lg:gap-10 lg:items-start lg:px-6">
+            {/* Main Content Area (Left Column on Desktop) */}
+            <div className="flex-1 w-full lg:max-w-2xl">
+                <div className="flex-1 px-4 space-y-4 lg:px-0 pb-32 lg:pb-24 mt-6">
+                    {/* ITEMS SECTION - Anchoring Commitment */}
+                    <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
+                        <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
+                            <ShieldCheck className="size-3.5 text-[var(--primary)]" />
+                            <AppText variant="caption" weight="bold" color="secondary">Your Order</AppText>
+                        </div>
+                        <div className="px-4 py-4">
+                            <CartSlot
+                                initialHydratedProducts={checkoutData.products}
+                                editable={!paymentFlow.isProcessing}
                             />
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                {/* COUPON SECTION - Progressive Disclosure */}
+                    {/* DELIVERY SECTION */}
+                    <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
+                        <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
+                            <MapPin className="size-3.5 text-[var(--primary)]" />
+                            <AppText variant="caption" weight="bold" color="secondary">Delivery Details</AppText>
+                        </div>
+                        <div className="px-4 py-4">
+                            <AddressSlot
+                                initialAddresses={checkoutData.addresses}
+                                currentAddress={checkoutData.addresses?.find(a => a.id === checkoutData.selected_address_id)}
+                                disabled={paymentFlow.isProcessing}
+                                etaMinutes={checkoutData.eta_minutes}
+                            />
+                            <div className="mt-5">
+                                <AppText variant="caption" weight="medium" color="tertiary" className="mb-2 block">
+                                    Delivery Instructions <span className="opacity-60">(optional)</span>
+                                </AppText>
+
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {[
+                                        { id: 'silence', label: '🤫 Silence Mode', hint: 'Dont ring bell' },
+                                        { id: 'gate', label: '🚧 Gate Drop', hint: 'Leave at gate' },
+                                        { id: 'careful', label: '💎 Fragile', hint: 'Handle with care' }
+                                    ].map(preset => (
+                                        <button
+                                            key={preset.id}
+                                            type="button"
+                                            onClick={() => {
+                                                triggerHaptic(HapticPattern.ACTION);
+                                                const current = addressCtx?.deliveryInstructions ?? '';
+                                                if (current.includes(preset.hint)) return;
+                                                addressCtx?.setDeliveryInstructions(current ? `${current}, ${preset.hint}` : preset.hint);
+                                            }}
+                                            className="text-xs font-bold px-3 py-1.5 rounded-full bg-[var(--surface-muted)] border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--surface)] transition-all active:scale-95"
+                                        >
+                                            {preset.label}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <textarea
+                                    value={addressCtx?.deliveryInstructions ?? ''}
+                                    onChange={(e) => addressCtx?.setDeliveryInstructions(e.target.value)}
+                                    disabled={paymentFlow.isProcessing}
+                                    placeholder="e.g. Ring bell, leave at gate..."
+                                    className="w-full h-16 px-4 py-3 rounded-[var(--radius-xl)] bg-[var(--surface-muted)] border border-[var(--border)] text-sm font-medium focus:bg-[var(--surface)] focus:border-[var(--primary)] transition-all resize-none outline-none disabled:opacity-50"
+                                />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* COUPON SECTION - Mobile Only Disclosure (will be duplicated for desktop column if needed, or kept here) */}
+                    <div className="lg:hidden">
+                        <CouponSlot
+                            initialCoupon={checkoutData.applied_coupon}
+                            disabled={paymentFlow.isProcessing}
+                        />
+                    </div>
+
+                    {/* Mobile-only Bill Summary (shown before payment bar) */}
+                    <div className="lg:hidden space-y-4">
+                        <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
+                            <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
+                                <FileText className="size-3.5 text-[var(--primary)]" />
+                                <AppText variant="caption" weight="bold" color="secondary">Bill Summary</AppText>
+                            </div>
+                            <BillBreakdown pricing={checkoutData.pricing} />
+                        </section>
+
+                        <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
+                            <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
+                                <CreditCard className="size-3.5 text-[var(--primary)]" />
+                                <AppText variant="caption" weight="bold" color="secondary">Payment Details</AppText>
+                            </div>
+                            <div className="px-4 py-4 space-y-4">
+                                <WalletSlot
+                                    walletInfo={checkoutData.wallet_info}
+                                    useWalletBalance={checkoutData.use_wallet}
+                                    pricing={checkoutData.pricing}
+                                    disabled={paymentFlow.isProcessing}
+                                />
+                                <GstinSection
+                                    initialGstin={checkoutData.gstin || ''}
+                                    disabled={paymentFlow.isProcessing}
+                                />
+                            </div>
+                        </section>
+                    </div>
+
+                    <p className="text-[10px] text-[var(--text-tertiary)] text-center px-4 leading-relaxed lg:text-left lg:px-0">
+                        100% advance payment. Personalized products cannot be returned once production starts.
+                    </p>
+                </div>
+            </div>
+
+            {/* Right Column (Desktop Only) */}
+            <aside className="hidden lg:flex flex-col w-[380px] pt-24 sticky top-0 gap-4">
                 <CouponSlot
                     initialCoupon={checkoutData.applied_coupon}
                     disabled={paymentFlow.isProcessing}
                 />
 
-                {/* BILL SECTION */}
                 <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
                         <FileText className="size-3.5 text-[var(--primary)]" />
-                        <span className="text-xs font-bold text-[var(--text-secondary)] tracking-widest uppercase">Bill</span>
+                        <AppText variant="caption" weight="bold" color="secondary">Bill Summary</AppText>
                     </div>
-
-                    {/* Pricing Breakdown */}
-                    {checkoutData.pricing && (
-                        <div className="px-4 py-3 space-y-2">
-                            <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
-                                <span>Products</span>
-                                <span>{formatCurrency(checkoutData.pricing.subtotal)}</span>
-                            </div>
-                            {checkoutData.pricing.personalization_charges > 0 && (
-                                <div className="flex flex-col gap-0.5">
-                                    <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
-                                        <span>Personalization Service</span>
-                                        <span>{formatCurrency(checkoutData.pricing.personalization_charges)}</span>
-                                    </div>
-                                    <span className="text-[10px] font-bold text-[var(--success)]">Details to be provided after payment</span>
-                                </div>
-                            )}
-                            {checkoutData.pricing.addons_price > 0 && (
-                                <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
-                                    <span>Add-ons</span>
-                                    <span>{formatCurrency(checkoutData.pricing.addons_price)}</span>
-                                </div>
-                            )}
-                            {checkoutData.pricing.delivery_fee > 0 && (
-                                <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
-                                    <span>Delivery</span>
-                                    <span>{formatCurrency(checkoutData.pricing.delivery_fee)}</span>
-                                </div>
-                            )}
-                            {checkoutData.pricing.platform_fee > 0 && (
-                                <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
-                                    <span>Platform fee</span>
-                                    <span>{formatCurrency(checkoutData.pricing.platform_fee)}</span>
-                                </div>
-                            )}
-                            {checkoutData.pricing.gst > 0 && (
-                                <div className="flex justify-between text-xs font-bold text-[var(--text-secondary)]">
-                                    <span>GST</span>
-                                    <span>{formatCurrency(checkoutData.pricing.gst)}</span>
-                                </div>
-                            )}
-                            {checkoutData.pricing.discount > 0 && (
-                                <div className="flex justify-between text-xs font-bold text-[var(--success)]">
-                                    <span>Discount</span>
-                                    <span>- {formatCurrency(checkoutData.pricing.discount)}</span>
-                                </div>
-                            )}
-                            {checkoutData.pricing.wallet_discount > 0 && (
-                                <div className="flex justify-between text-xs font-bold text-[var(--success)]">
-                                    <span>Wallet</span>
-                                    <span>- {formatCurrency(checkoutData.pricing.wallet_discount)}</span>
-                                </div>
-                            )}
-                            <div className="flex justify-between items-center pt-2 border-t border-[var(--border)]">
-                                <span className="text-sm font-bold text-[var(--text-primary)]">To pay</span>
-                                <span className="text-base font-bold text-[var(--text-primary)]">{formatCurrency(checkoutData.pricing.total)}</span>
-                            </div>
-                            {checkoutData.pricing.wyshkit_money_earned > 0 && (
-                                <p className="text-xs font-bold text-[var(--success)] text-right">
-                                    🎁 Earn {formatCurrency(checkoutData.pricing.wyshkit_money_earned)} WyshKit Money after delivery
-                                </p>
-                            )}
-                        </div>
-                    )}
+                    <BillBreakdown pricing={checkoutData.pricing} />
                 </section>
 
-                {/* PAYMENT SECTION */}
                 <section className="bg-[var(--surface)] rounded-[var(--radius-2xl)] border border-[var(--border)] overflow-hidden shadow-[var(--shadow-sm)]">
                     <div className="flex items-center gap-2 px-4 pt-4 pb-2 border-b border-[var(--surface-muted)]">
                         <CreditCard className="size-3.5 text-[var(--primary)]" />
-                        <span className="text-xs font-bold text-[var(--text-secondary)] tracking-widest">Payment</span>
+                        <AppText variant="caption" weight="bold" color="secondary">Payment</AppText>
                     </div>
-                    <div className="px-4 py-3 space-y-4">
+                    <div className="px-4 py-4 space-y-4">
                         <WalletSlot
                             walletInfo={checkoutData.wallet_info}
                             useWalletBalance={checkoutData.use_wallet}
@@ -266,18 +205,28 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                     </div>
                 </section>
 
-                {/* Disclaimer */}
-                <p className="text-xs text-[var(--text-tertiary)] text-center px-4 leading-relaxed">
-                    100% advance payment. Personalized products cannot be returned once production starts.
-                </p>
-            </div>
+                {/* Desktop Payment Button */}
+                <div className="mt-2">
+                    <SlideToPay
+                        onPay={() => {
+                            if (!authUser) {
+                                triggerHaptic(HapticPattern.WARNING);
+                                openOTPSheet();
+                                return;
+                            }
+                            paymentFlow.handlePayment();
+                        }}
+                        amount={payTotal}
+                        isProcessing={paymentFlow.isProcessing}
+                    />
+                </div>
+            </aside>
 
-            {/* Fixed Slide to Pay — healthy friction */}
-            <div className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto px-4 pb-safe bg-[var(--surface)]/90 backdrop-blur-xl border-t border-[var(--border)] pt-3 pb-5">
+            {/* Fixed Slide to Pay — Mobile Only */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 max-w-lg mx-auto px-4 pb-safe bg-[var(--surface)]/90 backdrop-blur-xl border-t border-[var(--border)] pt-3 pb-5 z-20">
                 <SlideToPay
                     onPay={() => {
                         if (!authUser) {
-                            // WYSHKIT 2026: Delayed Logic - Only force login on payment intent
                             triggerHaptic(HapticPattern.WARNING);
                             openOTPSheet();
                             return;
@@ -287,6 +236,43 @@ function CheckoutClientInner({ initialData }: CheckoutClientProps) {
                     amount={payTotal}
                     isProcessing={paymentFlow.isProcessing}
                 />
+            </div>
+        </div>
+    );
+}
+
+function BillBreakdown({ pricing }: { pricing: any }) {
+    if (!pricing) return null;
+    return (
+        <div className="px-4 py-4 space-y-3">
+            <div className="flex justify-between text-xs font-medium text-[var(--text-secondary)]">
+                <span>Items Subtotal</span>
+                <span className="tabular-nums">{formatCurrency(pricing.subtotal)}</span>
+            </div>
+            {pricing.personalization_charges > 0 && (
+                <div className="flex flex-col gap-1">
+                    <div className="flex justify-between text-xs font-medium text-[var(--text-secondary)]">
+                        <span>Personalization</span>
+                        <span className="tabular-nums">{formatCurrency(pricing.personalization_charges)}</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-[var(--success)] uppercase tracking-wider">Details post-payment</span>
+                </div>
+            )}
+            {pricing.delivery_fee > 0 && (
+                <div className="flex justify-between text-xs font-medium text-[var(--text-secondary)]">
+                    <span>Delivery Fee</span>
+                    <span className="tabular-nums">{formatCurrency(pricing.delivery_fee)}</span>
+                </div>
+            )}
+            {pricing.discount > 0 && (
+                <div className="flex justify-between text-xs font-bold text-[var(--success)]">
+                    <span>Discount</span>
+                    <span className="tabular-nums">- {formatCurrency(pricing.discount)}</span>
+                </div>
+            )}
+            <div className="flex justify-between items-center pt-3 border-t border-[var(--border)]">
+                <AppText variant="label" weight="bold" color="primary">Total to Pay</AppText>
+                <AppText variant="body" weight="bold" color="primary" className="tabular-nums">{formatCurrency(pricing.total)}</AppText>
             </div>
         </div>
     );

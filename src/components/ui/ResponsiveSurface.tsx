@@ -99,7 +99,7 @@ export function ResponsiveSurface({
 
                 {(!lean && (title || description)) && (
                     <DrawerHeader className="text-left shrink-0 pb-[var(--space-4)] pt-[var(--space-4)] border-b border-[var(--border)] bg-[var(--surface)] rounded-t-[var(--radius-3xl)]">
-                        {title && <DrawerTitle className="text-xl font-black tracking-tight text-[var(--text-primary)]">{title}</DrawerTitle>}
+                        {title && <DrawerTitle className="text-xl font-bold tracking-tight text-[var(--text-primary)]">{title}</DrawerTitle>}
                         {description && <DrawerDescription className="text-xs font-medium text-[var(--text-secondary)]">{description}</DrawerDescription>}
                     </DrawerHeader>
                 )}

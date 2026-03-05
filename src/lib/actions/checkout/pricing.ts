@@ -29,7 +29,7 @@ export async function calculateOrderTotalRPC(
   try {
     const supabase = await createClient();
 
-    const { data, error } = await (supabase.rpc as any)('calculate_order_total', {
+    const params = {
       p_items: cartProducts.map(product => ({
         product_id: product.product_id,
         quantity: product.quantity,
@@ -38,14 +38,18 @@ export async function calculateOrderTotalRPC(
         has_personalization: product.has_personalization ?? false,
         selected_addons: product.selected_addons ?? []
       })) as unknown as Json,
-      p_user_id: userId || null,
-      p_session_id: null,
-      p_address_id: addressId || null,
-      p_coupon_code: couponCode || null,
+      p_user_id: userId || undefined,
+      p_session_id: undefined,
+      p_address_id: addressId || undefined,
+      p_coupon_code: couponCode || undefined,
       p_use_wallet: useWallet,
-      p_delivery_fee_override: deliveryFeeOverride ?? null,
-      p_distance_km: null
-    });
+      p_delivery_fee_override: deliveryFeeOverride ?? undefined,
+      p_distance_km: undefined
+    };
+
+    logger.info('Calling calculate_order_total RPC with params:', params);
+
+    const { data, error } = await supabase.rpc('calculate_order_total', params);
 
     if (error) {
       logger.error('Postgres RPC error in calculateOrderTotalRPC', error);

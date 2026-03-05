@@ -15,8 +15,8 @@ const FALLBACK_IMAGE = '/images/logo.png';
 
 interface DraftSummaryBlockProps {
   products: CartProduct[];
-  onUpdateQuantity?: (productId: string, variantId: string | null, quantity: number) => void;
-  onRemoveItem?: (productId: string, variantId: string | null) => void;
+  onUpdateQuantity?: (productId: string, variantId: string | null, quantity: number, personalization?: any, selected_addons?: any[]) => void;
+  onRemoveItem?: (productId: string, variantId: string | null, personalization?: any, selected_addons?: any[]) => void;
   editable?: boolean;
 }
 
@@ -27,13 +27,13 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
   const router = useRouter();
   if (products.length === 0) return null;
 
-  const handleQuantityChange = (productId: string, variantId: string | null, currentQty: number, delta: number) => {
+  const handleQuantityChange = (product: CartProduct, delta: number) => {
     triggerHaptic(HapticPattern.ACTION);
-    const newQty = Math.max(0, currentQty + delta);
+    const newQty = Math.max(0, product.quantity + delta);
     if (newQty === 0) {
-      onRemoveItem?.(productId, variantId);
+      onRemoveItem?.(product.product_id, product.variant_id ?? null, product.personalization, product.selected_addons);
     } else {
-      onUpdateQuantity?.(productId, variantId, newQty);
+      onUpdateQuantity?.(product.product_id, product.variant_id ?? null, newQty, product.personalization, product.selected_addons);
     }
   };
 
@@ -83,7 +83,7 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
                   {editable && onUpdateQuantity && onRemoveItem ? (
                     <div className="flex items-center gap-0.5">
                       <button
-                        onClick={() => handleQuantityChange(product.product_id || '', product.variant_id ?? null, product.quantity, -1)}
+                        onClick={() => handleQuantityChange(product, -1)}
                         className={cn(
                           "size-6 flex items-center justify-center rounded-[var(--radius-md)] transition-colors",
                           product.quantity === 1
@@ -97,7 +97,7 @@ export function DraftSummaryBlock({ products, onUpdateQuantity, onRemoveItem, ed
                         {product.quantity}
                       </span>
                       <button
-                        onClick={() => handleQuantityChange(product.product_id || '', product.variant_id ?? null, product.quantity, 1)}
+                        onClick={() => handleQuantityChange(product, 1)}
                         className="size-6 flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:bg-[var(--border)] transition-colors"
                       >
                         <Plus className="size-3" />

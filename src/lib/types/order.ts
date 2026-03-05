@@ -27,6 +27,12 @@ export interface OrderDetail extends Omit<Views<'v_order_detail'>, 'order_produc
   tracking_url?: string | null;
   max_change_requests?: number | null;
   change_request_count?: number | null;
+
+  // WYSHKIT 2026: Live Pulse Coordinates
+  vendor_lat?: number | null;
+  vendor_lng?: number | null;
+  rider_lat?: number | null;
+  rider_lng?: number | null;
 }
 
 export interface OrderProductSummary extends Omit<Views<'v_order_tracking'>, 'personalization_status' | 'first_product_name' | 'vendor_name'> {
@@ -88,6 +94,7 @@ export interface OrderProductDetail {
   personalization_details?: any;
   product_image_url?: string | null;
   final_approved_mockup_url?: string | null;
+  selected_variant_options?: any;
 }
 
 export interface PreviewSubmission {

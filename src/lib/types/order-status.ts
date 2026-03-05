@@ -127,6 +127,7 @@ const STATUS_DISPLAY: Record<string, string> = {
   DELIVERED: 'Delivered',
   CANCELLED: 'Cancelled',
   REFUNDED: 'Refunded',
+  PENDING_PERSONALIZATION: 'Awaiting your details',
 };
 
 // Color classes for statuses - Wyshkit 2026 Design Language
@@ -134,7 +135,7 @@ const STATUS_COLORS: Record<string, string> = {
   PLACED: 'bg-[var(--well-destructive)] text-[var(--primary)] border-[var(--destructive)]/20',
   CONFIRMED: 'bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20',
   IN_PRODUCTION: 'bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20',
-  PACKED: 'bg-[var(--well-destructive)] text-[var(--destructive)] border-[var(--destructive)]/20',
+  PACKED: 'bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20',
   RIDER_ASSIGNED: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
   ARRIVED_PICKUP: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
   OUT_FOR_DELIVERY: 'bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20',
@@ -143,6 +144,7 @@ const STATUS_COLORS: Record<string, string> = {
   CANCELLED: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
   REFUNDED: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] border-[var(--border)]',
   // Personalization Statuses (v_order_tracking maps these)
+  PENDING_PERSONALIZATION: 'bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20',
   pending: 'bg-[var(--well-warning)] text-[var(--warning)] border-[var(--warning)]/20',
   preview_ready: 'bg-[var(--well-success)] text-[var(--success)] border-[var(--success)]/20',
   change_requested: 'bg-[var(--well-destructive)] text-[var(--destructive)] border-[var(--destructive)]/20',

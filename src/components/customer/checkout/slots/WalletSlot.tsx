@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, startTransition } from 'react';
 import { Wallet, Loader2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
@@ -70,7 +70,7 @@ export function WalletSlot({ walletInfo, useWalletBalance, pricing, disabled }: 
                     ) : (
                         <Switch
                             checked={useWalletBalance}
-                            onCheckedChange={() => toggleAction()}
+                            onCheckedChange={() => startTransition(() => toggleAction())}
                             disabled={isPending || disabled}
                             className={cn(
                                 "data-[state=checked]:bg-[var(--success)]",

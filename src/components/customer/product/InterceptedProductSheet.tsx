@@ -6,6 +6,7 @@ import { ProductDetailView } from '@/components/customer/product/ProductDetailVi
 import { z } from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { WyshkitProduct } from '@/lib/types/product';
+import { logger } from "@/lib/logging/logger";
 
 const checkoutStateSchema = z.object({
     edit: z.string().optional(),
@@ -34,11 +35,18 @@ export function InterceptedProductSheet({ product, onCloseOverride }: Intercepte
         const returnUrl = searchParams.get('returnUrl');
         // WYSHKIT 2026: Explicit slug-first navigation
         const vendorSlug = product.vendor_slug || searchParams.get('vendor_slug');
-        if (!vendorSlug) {
-            console.warn(`[WYSHKIT 2026] Missing vendor_slug for product ${product.id}. Law 11 Violation.`);
+        if (!vendorSlug && !returnUrl && !onCloseOverride) {
+            logger.warn(`[WYSHKIT 2026] Missing vendor_slug for product ${product.id}. Law 11 Violation.`, {
+                productId: product.id
+            });
         }
-        const vendorPath = vendorSlug ? `/vendor/${vendorSlug}` : '/';
-        const targetPath = returnUrl || onCloseOverride || vendorPath;
+
+        // Target resolution logic:
+        // 1. Explicit returnUrl (e.g. from search page)
+        // 2. Explicit onCloseOverride (e.g. from intercepted route)
+        // 3. Fallback to constructed vendor path
+        // 4. Ultimate fallback to shop home
+        const targetPath = returnUrl || onCloseOverride || (vendorSlug ? `/vendor/${vendorSlug}` : '/');
 
         router.push(targetPath);
     }, [product.id, product.vendor_slug, onCloseOverride, router, searchParams]);

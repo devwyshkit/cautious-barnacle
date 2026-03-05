@@ -40,8 +40,17 @@ export const getGlobalInitSurface = cache(async function getGlobalInitSurface(
         let resolvedUserId: string | undefined = (userId === 'RESOLVE' || !userId) ? undefined : userId;
 
         if (userId === 'RESOLVE') {
-            const { data: { user } } = await supabase.auth.getUser();
-            resolvedUserId = user?.id ?? undefined;
+            try {
+                // Soft resolve with timeout to prevent hung renders
+                const { data: { user } } = await Promise.race([
+                    supabase.auth.getUser(),
+                    new Promise<any>((_, reject) => setTimeout(() => reject(new Error('AUTH_TIMEOUT')), 2000))
+                ]);
+                resolvedUserId = user?.id ?? undefined;
+            } catch (err) {
+                logger.warn('One-Trip: Auth resolution failed/timed out, proceeding as guest', { authError: err });
+                resolvedUserId = undefined;
+            }
         }
 
         // We call the multi-surface RPC with a strict timeout to prevent 26s hung states

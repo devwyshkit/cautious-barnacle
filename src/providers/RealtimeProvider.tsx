@@ -31,11 +31,13 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (authLoading || !user) {
-            if (channel) {
-                supabase.removeChannel(channel);
-                setChannel(null);
-                setIsConnected(false);
-            }
+            setChannel((prev) => {
+                if (prev) {
+                    supabase.removeChannel(prev);
+                }
+                return null;
+            });
+            setIsConnected(false);
             return;
         }
 

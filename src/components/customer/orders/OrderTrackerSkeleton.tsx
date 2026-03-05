@@ -4,7 +4,7 @@ import React from 'react';
 
 export function OrderTrackerSkeleton() {
     return (
-        <div className="max-w-2xl mx-auto px-4 pt-6 pb-24 space-y-6 animate-in fade-in duration-500">
+        <div className="max-w-md mx-auto px-4 pt-6 pb-24 space-y-6 animate-in fade-in duration-500">
             {/* Status Card Skeleton */}
             <div className="bg-[var(--surface)] rounded-[var(--radius-xl)] border border-[var(--border)] p-6 space-y-4">
                 <div className="flex justify-between items-start">

@@ -53,7 +53,7 @@ export function PersonalizationForm({
 
     // Load draft details on mount
     useEffect(() => {
-        const saved = localStorage.getItem(`wyshkit_draft_${orderId}`);
+        const saved = sessionStorage.getItem(`wyshkit_draft_${orderId}`);
         if (saved) {
             try {
                 setFormData(JSON.parse(saved));
@@ -92,7 +92,7 @@ export function PersonalizationForm({
     // Save draft details on change
     useEffect(() => {
         if (Object.keys(formData).length > 0) {
-            localStorage.setItem(`wyshkit_draft_${orderId}`, JSON.stringify(formData));
+            sessionStorage.setItem(`wyshkit_draft_${orderId}`, JSON.stringify(formData));
         }
     }, [formData, orderId]);
 
@@ -187,7 +187,7 @@ export function PersonalizationForm({
 
             const result = await submit_order_personalization(orderId, personalizationData);
             if (result.success) {
-                localStorage.removeItem(`wyshkit_draft_${orderId}`);
+                toast.success("Details sent ✓ Preview in ~2 hours.");
                 onSubmitted();
             } else {
                 toast.error(result.error || "Submission failed");
@@ -213,7 +213,14 @@ export function PersonalizationForm({
                 {personalizedProducts.map((product, idx) => {
                     const legacyConfig = product.personalization_config || (product.personalization as any) || {};
                     const addons = (product.selected_addons || []).filter(a => a.requires_preview);
-                    const config: PersonalizationConfig = addons.length > 0 ? {
+
+                    // WYSHKIT 2026: Combined Schema resolution
+                    // If schema exists (P1 Schema Unification), it takes precedence in PersonalizationField.
+                    // Otherwise, we derive a legacy config.
+                    const config: PersonalizationConfig = product.personalization_schema ? {
+                        allow_text: true, // Internal flag for field safety
+                        text_required: true
+                    } : (addons.length > 0 ? {
                         text_required: true,
                         allow_text: true,
                         allow_image: true,
@@ -224,7 +231,7 @@ export function PersonalizationForm({
                         allow_text: legacyConfig.allow_text ?? true,
                         text_label: legacyConfig.text_label ?? legacyConfig.prompt ?? 'details',
                         text_required: legacyConfig.text_required ?? true
-                    };
+                    });
 
                     return (
                         <PersonalizationField
@@ -253,7 +260,7 @@ export function PersonalizationForm({
 
                     <ActionSlider
                         onConfirm={handleSubmit}
-                        label="Slide to Share Brief"
+                        label="Slide to Add Details"
                         successLabel="Shared"
                         isLoading={isSubmitting}
                         variant="amber"

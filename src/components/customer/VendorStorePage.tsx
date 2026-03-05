@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { AppText, AppHeading } from '@/components/ui/Typography';
 import { MappedVendor } from '@/lib/types/vendor';
 import { useRouter } from 'next/navigation';
 import { useCartValidation } from '@/hooks/useCartValidation';
@@ -43,7 +44,7 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
         <div className="px-[var(--space-4)] py-[var(--space-3)] bg-[var(--well-warning)] border-b border-[var(--warning)]/10 flex items-center justify-between gap-[var(--space-3)] sticky top-0 z-[var(--z-nav)]">
           <div className="flex items-center gap-[var(--space-2)]">
             <AlertCircle className="size-3.5 text-[var(--warning)]" />
-            <p className="text-xs font-bold text-[var(--text-primary)] tracking-widest">Active cart at another vendor</p>
+            <p className="text-xs font-bold text-[var(--text-primary)]">Active cart at another vendor</p>
           </div>
           <Button
             variant="outline"
@@ -52,7 +53,7 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
               triggerHaptic(HapticPattern.ACTION);
               router.push('/checkout');
             }}
-            className="h-7 px-[var(--space-3)] text-xs font-bold tracking-widest border-[var(--warning)]/20 bg-[var(--surface)] text-[var(--warning)]"
+            className="h-7 px-[var(--space-3)] text-xs font-bold border-[var(--warning)]/20 bg-[var(--surface)] text-[var(--warning)]"
           >
             View cart
           </Button>
@@ -60,7 +61,7 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
       )}
 
       {/* CORE STORE UI - ZERO SDUI LEAKS */}
-      <div className="flex flex-col gap-[var(--space-6)]">
+      <div className="flex flex-col gap-4">
         <StoreHeader data={{
           id: initialData.id,
           name: initialData.name,
@@ -71,16 +72,16 @@ export function VendorStorePage({ vendorId, initialData, products, productsGroup
           prep_mins: initialData.prep_mins ?? undefined
         }} />
 
-        <section className="px-[var(--space-4)] md:px-[var(--space-8)] max-w-[1440px] mx-auto w-full">
+        <section className="sticky top-[var(--top-header-height)] z-[var(--z-nav)] bg-[var(--surface)] px-[var(--space-4)] md:px-[var(--space-8)] py-[var(--space-4)] border-b border-[var(--border)] max-w-[1440px] mx-auto w-full">
           <CircleRail data={categories} context={{ vendor_id: vendorId }} />
         </section>
 
         <div className="flex flex-col gap-[var(--space-10)] px-[var(--space-4)] md:px-[var(--space-8)] max-w-[1440px] mx-auto w-full pb-[var(--space-12)]">
           {Object.entries(productsGroupedByCategory).map(([category, categoryProducts]) => (
-            <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="flex flex-col gap-[var(--space-4)]">
+            <section key={category} id={category.toLowerCase().replace(/\s+/g, '-')} className="flex flex-col gap-[var(--space-4)] scroll-mt-32">
               <div className="flex items-center gap-[var(--space-3)]">
-                <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tighter capitalize">{category}</h2>
-                <span className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-widest bg-[var(--surface-muted)] px-[var(--space-2)] py-[var(--space-0-5)] rounded-full border border-[var(--border)]">
+                <AppHeading level={3} className="capitalize">{category}</AppHeading>
+                <span className="text-[10px] font-medium text-[var(--text-tertiary)] tracking-tight bg-[var(--surface-muted)] px-[var(--space-2-5)] py-0.5 rounded-full border border-[var(--border)]">
                   {categoryProducts.length} {categoryProducts.length === 1 ? 'Product' : 'Products'}
                 </span>
               </div>

@@ -32,7 +32,7 @@ export function PersonalizationHeader({ orderId, designDeadline }: Personalizati
             </div>
 
             <p className="text-sm font-medium text-[var(--text-tertiary)] leading-relaxed max-w-[280px] mb-6 relative z-10">
-                Your payment is confirmed. To start the bespoke crafting process, please share your vision below.
+                Your payment is confirmed. To start the bespoke crafting process, please share your preferences below.
             </p>
 
             {designDeadline && (

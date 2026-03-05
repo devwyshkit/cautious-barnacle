@@ -35,7 +35,7 @@ export function SubmittedPersonalization({ details, itemName, isOptimisticSubmit
                     </div>
                     <div>
                         <p className="text-xs font-bold text-[var(--text-tertiary)] tracking-tight">
-                            {isOptimisticSubmitted && !hasContent ? 'Brief Processing...' : 'Submitted Personalisation'}
+                            {isOptimisticSubmitted && !hasContent ? 'Design Processing...' : 'Personalization Request'}
                         </p>
                         <p className="text-xs font-bold text-[var(--text-primary)] truncate max-w-[150px]">
                             {itemName || (isOptimisticSubmitted ? 'Sharing Vision...' : 'View your details')}

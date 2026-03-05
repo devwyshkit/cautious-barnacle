@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Search, Package } from 'lucide-react';
 import { ProductList } from './ProductList';
@@ -40,6 +40,11 @@ export function ProductListClient({ initialProducts, vendorId }: ProductListClie
   const [editingProduct, setEditingProduct] = useState<ProductWithDetails | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
+  // WYSHKIT 2026: Reactive State Sync
+  useEffect(() => {
+    setProducts(initialProducts as ProductWithDetails[]);
+  }, [initialProducts]);
+
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(search.toLowerCase()) ||
     (product as any).category?.toLowerCase().includes(search.toLowerCase())
@@ -71,7 +76,11 @@ export function ProductListClient({ initialProducts, vendorId }: ProductListClie
     });
     if (result.success) {
       setProducts(prev => prev.map(product =>
-        product.id === productId ? { ...product, is_active: stockStatus === 'IN_STOCK' } : product
+        product.id === productId ? {
+          ...product,
+          stock_status: stockStatus,
+          available_for_order: stockStatus === 'IN_STOCK'
+        } : product
       ));
       toast.success('Stock status updated');
     } else {
