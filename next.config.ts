@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['razorpay'],
   experimental: {
     serverActions: {
       allowedOrigins: ["localhost:3000", "wyshkit.com", "*.wyshkit.com", "wyshkit-salt-bae.vercel.app"],
