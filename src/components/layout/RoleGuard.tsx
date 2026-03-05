@@ -20,51 +20,37 @@ export function RoleGuard({
   fallbackPath = '/'
 }: RoleGuardProps) {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, permissions, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
+    if (authLoading) return;
 
-    async function checkRole() {
-      if (authLoading) return;
-
-      if (!user) {
-        if (mounted) setLoading(false);
-        return;
-      }
-
-      try {
-        const permissions = await resolveUserPermissionsClient(user.id);
-
-        if (mounted) {
-          // Wyshkit 2026: Admins can access everything (Vendor/Admin dashboards)
-          // We check the specific permission flags
-          const isAuthorized =
-            (allowedRoles.includes('admin') && permissions.isAdmin) ||
-            (allowedRoles.includes('vendor') && (permissions.isVendor || permissions.isAdmin)) ||
-            (allowedRoles.includes('customer') && permissions.isCustomer);
-
-          if (isAuthorized) {
-            setAuthorized(true);
-          } else {
-            router.push(fallbackPath);
-          }
-        }
-      } catch (error) {
-        logger.error('Error checking role in RoleGuard', error, { allowedRoles, fallbackPath });
-        if (mounted) router.push(fallbackPath);
-      } finally {
-        if (mounted) setLoading(false);
-      }
+    if (!user) {
+      setLoading(false);
+      return;
     }
 
-    checkRole();
-    return () => {
-      mounted = false;
-    };
-  }, [user, authLoading, allowedRoles, fallbackPath, router]);
+    // WYSHKIT 2026: Use permissions from AuthProvider to avoid redundant DB rounds
+    if (!permissions) {
+      // If user exists but permissions aren't loaded yet, stay in loading state
+      setLoading(true);
+      return;
+    }
+
+    const isAuthorized =
+      (allowedRoles.includes('admin') && permissions.isAdmin) ||
+      (allowedRoles.includes('vendor') && (permissions.isVendor || permissions.isAdmin)) ||
+      (allowedRoles.includes('customer') && permissions.isCustomer);
+
+    if (isAuthorized) {
+      setAuthorized(true);
+    } else {
+      router.push(fallbackPath);
+    }
+    setLoading(false);
+  }, [user, permissions, authLoading, allowedRoles, fallbackPath, router]);
 
 
   if (authLoading || loading) {

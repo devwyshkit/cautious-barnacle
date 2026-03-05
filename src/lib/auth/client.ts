@@ -1,16 +1,11 @@
-import { createBrowserClient } from '@supabase/ssr';
-import { type UserRole, type UserPermissions, resolveUserPermissions } from './core';
-
-
+import { createClient } from '@/lib/supabase/client';
+import { type UserPermissions, resolveUserPermissions } from './core';
 
 /**
- * Client-side helper: Resolves permissions using the browser-side Supabase client
+ * Client-side helper: Resolves permissions using the singleton browser-side Supabase client
+ * WYSHKIT 2026: Always use singleton to avoid redundant Auth verify calls.
  */
 export async function resolveUserPermissionsClient(userId: string): Promise<UserPermissions> {
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
+  const supabase = createClient();
   return resolveUserPermissions(supabase, userId);
 }

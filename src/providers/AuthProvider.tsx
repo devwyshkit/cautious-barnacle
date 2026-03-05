@@ -83,7 +83,7 @@ export function AuthProvider({
             }
 
             setUser(fetchedUser);
-            updatePermissions(fetchedUser.id);
+            await updatePermissions(fetchedUser.id);
             setLoading(false);
         } catch (err) {
             logger.error('Auth Init Error:', err as Error);
