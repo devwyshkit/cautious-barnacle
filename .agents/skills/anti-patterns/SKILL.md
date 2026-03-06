@@ -23,7 +23,9 @@ description: Forbidden patterns and anti-patterns that must never appear in Wysh
 | Pre-payment text input for personalisation | Commitment Before Creativity | Toggle only. Details post-payment. |
 | Auto-retry on payment failure | User must decide | Show retry options |
 | `Partner`, `Item`, `Merchant` | Nomenclature violation | `Vendor`, `Product`, `Customer` |
-| `Design Hub`, `Creative Brief` | Deprecated terminology | `Preview Thread`, Requirements Form |
+| `Design Hub`, `Creative Brief`, `builder`, `Canva` | Design-tool drift | `Preview Thread`, `Identity Layer`, `Personalisation Preview` |
+| Gifting-first framing | Identity drift (v2026 core) | Framing as "Product Marketplace" |
+| `showCustomize`, `giftText`, `designDeadline` | Nomenclature drift | `showPersonalise`, `personalText`, `personalizationDeadline` |
 | Subscription tiers for customers | YAGNI + forced continuity | Zero subscriptions |
 
 ## Forbidden UX Patterns

@@ -46,8 +46,8 @@ export type VariantInput = {
 const CATEGORY_TAX_MAP: Record<string, { hsn: string; gst: number }> = {
     'flowers': { hsn: '0603', gst: 5.00 },
     'cakes': { hsn: '1905', gst: 5.00 },
-    'gifts': { hsn: '9983', gst: 5.00 },
-    'personalized-gifts': { hsn: '9983', gst: 12.00 },
+    'personalised-products': { hsn: '9983', gst: 12.00 },
+    'luxury-products': { hsn: '9941', gst: 18.00 },
     'luxury': { hsn: '9983', gst: 18.00 },
 };
 

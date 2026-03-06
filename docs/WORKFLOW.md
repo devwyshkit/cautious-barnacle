@@ -6,7 +6,7 @@
 
 ## The Mental Model
 
-WyshKit is three proven models stitched together. Zero new patterns invented.
+WyshKit is three proven models stitched together. Zero new patterns invented. Note: While gifting is a high-volume category, these workflows apply to *any* product that supports identity-layer personalization.
 
 ```
 LAYER 1 — SWIGGY FOOD    Browse → Cart → Pay
@@ -47,7 +47,18 @@ This distinction determines the entire product architecture.
 | Toggling "Add personalisation +₹X" | **Personalisation add-on** | Before payment | Product Sheet |
 | Submitting text/image/name | **Personalisation details** | After payment | `/orders/[id]` Section B |
 | Seeing the digital render | **Personalisation preview** | After payment | `/orders/[id]` Section C |
-| Approving the render | **Personalisation approval** | After payment | `/orders/[id]` Section C |
+| **Approving the render** | **Personalisation approval** | After payment | `/orders/[id]` Section C |
+
+---
+
+## The Personalization Model (The Apple Way)
+
+WyshKit does NOT do customization. We do **Personalization**.
+
+- **❌ NOT CANVA**: We are not a builder tool. We don't ask users to "design" layouts.
+- **✅ ENGRAVING MODEL**: We follow the Apple AirPods model. The product exists; we add an "Identity Layer" (Text/Image) on top of it.
+
+This distinction is critical for SLA discipline. Designing takes hours; Personalizing takes 10 minutes.
 
 ---
 

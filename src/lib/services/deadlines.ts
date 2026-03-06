@@ -3,12 +3,12 @@ import { logger } from '@/lib/logging/logger';
 import { ORDER_STATUS } from '@/lib/types/order-status';
 
 /**
- * ENFORCE DESIGN DEADLINES (Wyshkit 2026)
+ * ENFORCE PERSONALIZATION DEADLINES (Wyshkit 2026)
  * Scans for:
  * 1. Confirmed orders where customer hasn't shared details for 24h (Cancel/Partial Refund)
  * 2. Preview Ready orders where customer hasn't actioned for 24h (Auto-Approve)
  */
-export async function enforce_design_deadlines() {
+export async function enforce_personalization_deadlines() {
     // WYSHKIT 2026: Design deadlines are now managed by a separate worker 
     // that monitors metadata fields. Placeholder for future expansion.
     return { count: 0 };

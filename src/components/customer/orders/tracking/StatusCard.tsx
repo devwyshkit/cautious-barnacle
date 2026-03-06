@@ -58,7 +58,7 @@ export function StatusCard({ order, orderProducts, isConnected = true, className
         try {
             await navigator.share({
                 title: `Track my Wyshkit Order #${order.order_number}`,
-                text: `Check out the live progress of my gift!`,
+                text: `Check out the live progress of my order!`,
                 url: window.location.href,
             });
             triggerHaptic(HapticPattern.SUCCESS);
@@ -90,13 +90,13 @@ export function StatusCard({ order, orderProducts, isConnected = true, className
     function getNextStep(status: string, hasPersonalization: boolean = false) {
         switch (status) {
             case ORDER_STATUS.PLACED:
-                return hasPersonalization ? 'Waiting for your design details' : 'Waiting for vendor to accept';
+                return hasPersonalization ? 'Waiting for your personalisation details' : 'Waiting for vendor to accept';
             case ORDER_STATUS.CONFIRMED:
                 return hasPersonalization ? 'Add preferences to start crafting' : 'Vendor is securing your products';
-            case ORDER_STATUS.IN_PRODUCTION: return 'Your gift is being masterfully prepared';
+            case ORDER_STATUS.IN_PRODUCTION: return 'Your order is being masterfully crafted';
             case ORDER_STATUS.PACKED: return 'Waiting for delivery executive';
             case ORDER_STATUS.OUT_FOR_DELIVERY: return 'Delivery agent is navigating to your address';
-            case ORDER_STATUS.DELIVERED: return 'Gift successfully delivered';
+            case ORDER_STATUS.DELIVERED: return 'Order delivered successfully';
             default: return 'Processing your order';
         }
     }

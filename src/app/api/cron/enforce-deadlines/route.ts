@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { enforce_acceptance_deadlines, enforce_design_deadlines } from '@/lib/services/deadlines';
+import { enforce_acceptance_deadlines, enforce_personalization_deadlines } from '@/lib/services/deadlines';
 import { logger } from '@/lib/logging/logger';
 
 /**
@@ -15,15 +15,15 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const [acceptance, design] = await Promise.all([
+        const [acceptance, personalization] = await Promise.all([
             enforce_acceptance_deadlines(),
-            enforce_design_deadlines()
+            enforce_personalization_deadlines()
         ]);
 
         return NextResponse.json({
             success: true,
             processedAcceptance: acceptance.count,
-            processedPersonalisation: design.count,
+            processedPersonalisation: personalization.count,
             timestamp: new Date().toISOString()
         });
 

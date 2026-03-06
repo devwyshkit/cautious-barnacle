@@ -1,6 +1,10 @@
 # WyshKit 2026: OPERATIONS — The Supply Chain
 
-> *"Every paying customer starts with a vendor who was onboarded well. Every breach recovered is a customer kept."*
+> **"Extraction-First KYC. SLA Discipline. Zero Manual SQL."**
+
+## ❌ WHAT WE'RE **NOT**
+- **NOT** a gifting marketplace (gifting is just ONE category)
+- **NOT** quick commerce (we don't own inventory)
 
 ---
 
@@ -32,9 +36,10 @@ The 3-second qualify:
 
 **Phase 1 target types (Bengaluru)**:
 - Trophy & awards shops (laser engraving)
-- Print studios (mugs, phone cases, custom merchandise)
+- Print studios (mugs, phone cases, identity-layer merchandise)
 - Custom embroidery shops (t-shirts, tote bags)
 - Leather personalisation shops (wallets, belts)
+- Specialty workshops (3D printed keepsakes, engraved wood)
 
 ---
 
@@ -194,15 +199,14 @@ Stored in `platform_settings` table. **Never hardcoded.**
 | 2 — Trusted | None | Priority ranking | 12% |
 | 3 — Elite | "Elite Vendor" badge | Top feed position | 10% |
 
----
-
 ### Vendor Pitch Script (BD)
 
-> *"You already have the machine. You already know how to do the engraving.*
-> *The problem is: no one can find you online.*
-> *WyshKit puts you in front of customers who are already looking — and they pay 100% upfront before you touch anything.*
-> *No ghost orders. No WhatsApp chasing. Just paid orders, rider picks up, you keep 85–90%.*
-> *First 10 orders: zero commission. On us."*
+> *"You already have the machine. You already know how to do the engraving.
+> The problem is: no one can find you online.
+> WyshKit puts you in front of local customers who are already looking for products like yours — and they pay 100% upfront before you touch anything.
+> We follow the **Apple Personalisation Model**: the product exists, you just add the identity (name, logo, memory). No long design hours. Just 10 minutes of production.
+> Just like Swiggy brings food orders, we bring product orders to your workshop. We handle the delivery; you just provide the product and personalisation.
+> First 10 orders: zero commission. On us."*
 
 ---
 

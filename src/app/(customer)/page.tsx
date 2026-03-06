@@ -56,7 +56,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     return (
       <div className="animate-in font-sans selection:bg-[#D91B24]/10 bg-[var(--background)]">
         <main className="pb-24">
-          <h1 className="sr-only">Wyshkit Salt Bae - Premium Gifting and Stores</h1>
+          <h1 className="sr-only">WyshKit — Hyperlocal Products with Optional Personalisation, Delivered Fast</h1>
 
           <div className="flex flex-col gap-5 md:gap-10">
             {/* Categories - WYSHKIT 2026: High Density Discovery (Hick's Law) */}

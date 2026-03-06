@@ -183,7 +183,7 @@ export function AppBar({
                                 className="w-full flex items-center gap-[var(--space-3)] h-11 px-[var(--space-4)] bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius-md)] active:bg-[var(--input)] transition-all group"
                             >
                                 <Search className="size-4 text-[var(--primary)]" />
-                                <span className="text-sm font-medium text-[var(--text-tertiary)]">Search for gifts, awards, custom products...</span>
+                                <span className="text-sm font-medium text-[var(--text-tertiary)]">Search products, trophies, keepsakes...</span>
                             </button>
                         </div>
                     </>

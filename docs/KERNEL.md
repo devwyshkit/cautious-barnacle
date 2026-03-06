@@ -1,6 +1,11 @@
 # WyshKit 2026: KERNEL — The Engineering Law
 
-> *The database is the only computer. The frontend is a high-fidelity display. Everything else is noise.*
+> **"Inventory + 10-minute service. Delivered at Swiggy speed."**
+
+## ❌ WHAT WE'RE **NOT**
+- **NOT** a gifting marketplace (gifting is just ONE category)
+- **NOT** quick commerce (we don't own inventory/dark stores)
+- **NOT** customization platform (it's **personalization**)
 
 ---
 
@@ -50,7 +55,7 @@
 
 ## Commerce Intent Engine
 
-> **Target architecture.** Currently RPCs are called directly from server actions. This is the convergence pattern.
+> **Target architecture (Convergence Pattern).** Currently RPCs are called directly from server actions; the Intent Engine wrapper is the target architecture for v2. Every commerce intent (PLACE_ORDER, CANCEL_ORDER, MERGE_CART) is mapped to a strictly typed intent object.
 
 Every user mutation flows through one validated entry point:
 
@@ -142,6 +147,8 @@ The database is the Single Source of Truth. Never hand-roll types.
 | Variant | **Variant** | SKU (as config ID) |
 | Customisation | **Customisation** | — |
 | Personalisation | **Personalisation** | Design, Custom |
+| **_Forbidden Var_** | **showPersonalize** | `showCustomize` (Nomenclature drift) |
+| **_Forbidden Var_** | **personalText** | `giftText` (Identity drift) |
 | Order Line | **Order Product** | Order Item, Line Item |
 | Rider | **Delivery Executive** | Delivery Partner, Driver |
 | Order ref | **`#WK-YYYYMMDD-XXXX`** | `#WSH-` or any other prefix |

@@ -32,7 +32,7 @@ interface PersonalizationFormProps {
     products: OrderProduct[];
     onSubmitted: () => void;
     onSkip?: () => void;
-    designDeadline?: string | null;
+    personalizationDeadline?: string | null;
     isAutoOpenedForSuccess?: boolean;
 }
 
@@ -41,7 +41,7 @@ export function PersonalizationForm({
     products,
     onSubmitted,
     onSkip,
-    designDeadline,
+    personalizationDeadline,
     isAutoOpenedForSuccess
 }: PersonalizationFormProps) {
     const [formData, setFormData] = useState<Record<string, { text?: string; image_url?: string }>>({});
@@ -147,7 +147,7 @@ export function PersonalizationForm({
                 delete next[productId];
                 return next;
             }), 1000);
-            toast.success("Image added to design");
+            toast.success("Image added to personalisation");
         } catch (error) {
             logger.error('Image upload error', error as Error);
             toast.error('Failed to upload image');
@@ -207,7 +207,7 @@ export function PersonalizationForm({
 
     return (
         <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-            {isAutoOpenedForSuccess && <PersonalizationHeader orderId={orderId} designDeadline={designDeadline} />}
+            {isAutoOpenedForSuccess && <PersonalizationHeader orderId={orderId} personalizationDeadline={personalizationDeadline} />}
 
             <div className="space-y-6">
                 {personalizedProducts.map((product, idx) => {

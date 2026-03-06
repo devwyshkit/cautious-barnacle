@@ -61,7 +61,7 @@ async function AsyncOrderList({ userId }: { userId: string }) {
                 </div>
                 <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2 tracking-tight">No orders yet</h3>
                 <p className="text-sm font-medium text-[var(--text-tertiary)] mb-10 max-w-[240px] mx-auto leading-relaxed">
-                    Discovery is just a tap away. Explore premium stores and gifts near you.
+                    Discovery is just a tap away. Explore premium local stores near you.
                 </p>
                 <Link href="/">
                     <button className="bg-[var(--text-primary)] text-[var(--text-inverse)] rounded-[var(--radius-xl)] px-12 py-4 font-bold text-sm active:scale-95 transition-all shadow-[var(--shadow-md)]">

@@ -189,7 +189,7 @@ export function FeedbackStep({ orderId, products, onComplete }: FeedbackStepProp
                             <div className="bg-[var(--surface-muted)] rounded-[var(--radius-lg)] p-4 border border-[var(--border)] flex items-center gap-4">
                                 <div className="size-20 rounded-[var(--radius-md)] bg-[var(--border)] overflow-hidden relative group shrink-0">
                                     {product.mockup_url ? (
-                                        <img src={product.mockup_url} alt="Design" className="size-full object-cover" />
+                                        <img src={product.mockup_url} alt="Product Preview" className="size-full object-cover" />
                                     ) : (
                                         <div className="size-full flex items-center justify-center"><ImageIcon className="size-6 text-[var(--text-tertiary)]" /></div>
                                     )}

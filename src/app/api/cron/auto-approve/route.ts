@@ -21,8 +21,8 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-        const { enforce_design_deadlines } = await import('@/lib/services/deadlines');
-        const { count } = await enforce_design_deadlines();
+        const { enforce_personalization_deadlines } = await import('@/lib/services/deadlines');
+        const { count } = await enforce_personalization_deadlines();
 
         return NextResponse.json({
             success: true,

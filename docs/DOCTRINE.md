@@ -4,6 +4,21 @@
 
 ---
 
+## ❌ WHAT WE'RE **NOT**
+- **NOT** a gifting marketplace (gifting is just ONE category)
+- **NOT** quick commerce (we don't own inventory/dark stores)
+- **NOT** customization platform (it's **personalization**)
+- **NOT** a custom design tool (no Canva bullshit)
+
+## ✅ WHAT WE **ARE**
+**"Swiggy for Products with Optional Personalization"**
+
+Just like:
+- Swiggy Food = Hyperlocal restaurant marketplace where restaurants provide food, Swiggy provides delivery
+- **WyshKit = Hyperlocal product marketplace where vendors provide products (with optional personalization), WyshKit provides delivery**
+
+---
+
 ## The Differentiation Problem (Research-Backed)
 
 WyshKit is built on the **Swiggy 2026 substrate**: hyperlocal logistics, SLA discipline, neighbourhood density. But we are not a commodity delivery app.
@@ -22,14 +37,23 @@ WyshKit is built on the **Swiggy 2026 substrate**: hyperlocal logistics, SLA dis
 
 ---
 
-## The Cleartax Insight: Inventory + Service
+## The Apple Example: Personalization vs. Customization (CRITICAL)
+
+The WyshKit mental model follows the **Apple Pattern**: **Inventory + 10-minute Identity Layer.**
+
+- **Customization** = Changing the product itself (Making iPhone in pink, custom chip, different specs). **WyshKit does NOT do this.**
+- **Personalization** = Adding identity to an existing product (Engraving "Rahul" on existing Space Grey AirPods). **THIS is what we do.**
+
+We are the Apple Engraving Service, scaled to every local vendor. We Source → Identify → Deliver.
+
+## The Cleartax Insight: Trust → Personalisation
 
 The WyshKit mental model was born from 5 years of corporate gifting data. The industry error is treating personalized products as "custom manufacturing" (slow, expensive, centralized).
 
-The **WyshKit Reality** is the Apple Pattern: **Inventory + 10-minute Services.** 
-- We hold/source the item (AirPods pattern).
-- We apply a high-speed service (Laser engraving pattern).
-- We deliver at hyperlocal speed (Swiggy pattern).
+The **WyshKit Reality** is the convergent pattern:
+- **Inventory** is sourced locally (Swiggy pattern).
+- **Service** is applied via neighbourhood workshop nodes (Fiverr pattern).
+- **Trust** is established via the digital preview (Identity pattern).
 
 ---
 
@@ -198,7 +222,7 @@ If everything is highlighted, nothing is highlighted. One primary CTA per screen
 
 | Use | Never Use |
 |---|---|
-| "personalised", "preview" | "customised", "mockup", "Design Hub" |
+| "personalised", "personalisation", "preview" | "customised", "mockup", "Design Hub", "builder" |
 | "by 5:15 PM", "~40 min" | "2.4 km away", "distance" |
 | "local vendor" | "platform", "marketplace", "e-commerce" |
 
@@ -217,7 +241,12 @@ If everything is highlighted, nothing is highlighted. One primary CTA per screen
 
 **Target zones**: Koramangala, Indiranagar, HSR Layout, Jayanagar, Whitefield.
 
-**Target moments**: Last-minute birthdays, forgotten anniversaries, festivals (Diwali, Valentine's, Mother's Day). Corporate gifting is Phase 2.
+**Target moments**: 
+- **Personal**: Last-minute birthdays, forgotten anniversaries, festivals (Diwali, Valentine's, Mother's Day).
+- **Professional**: Corporate awards, employee kits, speaker mementos, branded event merchandise.
+- **Identity**: Personal keepsakes, nameplates, heritage items, sports trophies.
+
+Corporate gifting is a major vertical, but not the identity. WyshKit is the utility for *any* product that needs to be personal, fast.
 
 **Customer acquisition**: Instagram/Meta hyperlocal ads to 25–40yo professionals in these pin codes. Zero generic ads. Every creative shows a real vendor, real product, real ETA.
 

@@ -17,9 +17,9 @@ checkRecommendedEnv();
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  title: "WyshKit | Premium Hyperlocal Personalization",
-  description: "Last-minute personalised gifts, delivered in under 60 minutes by your local vendor.",
-  keywords: ["hyperlocal", "personalization", "delivery", "local vendors", "wyshkit", "personalised gifts", "gift delivery"],
+  title: "WyshKit | Hyperlocal Products & Personalisation",
+  description: "Hyperlocal products with optional personalisation, delivered by local vendors in under 60 minutes.",
+  keywords: ["hyperlocal", "personalization", "delivery", "local vendors", "wyshkit", "personalised products", "local vendor delivery", "hyperlocal products"],
   authors: [{ name: "Wyshkit" }],
   icons: {
     icon: '/favicon.ico',
@@ -36,13 +36,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Wyshkit",
-    title: "WyshKit | Personalised Gifts Delivered in 60 Minutes",
-    description: "See a preview before we make it. Personalised gifts from local vendors, delivered fast.",
+    title: "WyshKit | Local Products. Optional Personalisation. Fast Delivery.",
+    description: "Get local products with optional personalisation. See a preview before it's crafted. Fast delivery.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "WyshKit | Personalised Gifts Delivered in 60 Minutes",
-    description: "See a preview before we make it. Personalised gifts from local vendors, delivered fast.",
+    title: "WyshKit | Local Products. Optional Personalisation. Fast Delivery.",
+    description: "Get local products with optional personalisation. See a preview before it's crafted. Fast delivery.",
   },
 };
 

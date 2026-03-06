@@ -22,7 +22,7 @@ import { PreviewUploader } from '../personalization/PreviewUploader';
 import { triggerHaptic, HapticPattern } from '@/lib/utils/haptic';
 
 const ACCEPT_SLA_MINUTES = 5;
-const DESIGN_DEADLINE_HOURS = 24;
+const PERSONALIZATION_DEADLINE_HOURS = 24;
 
 interface OrderCardProps {
   order: VendorOrder;
@@ -88,7 +88,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
   const [selectedOrderProductId, setSelectedOrderProductId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
-  const [designDeadlineLeft, setDesignDeadlineLeft] = useState<number | null>(null);
+  const [personalizationDeadlineLeft, setPersonalizationDeadlineLeft] = useState<number | null>(null);
 
   const isNewOrder = order.status === ORDER_STATUS.PLACED;
   const isAwaitingDetails = order.has_personalization &&
@@ -136,15 +136,15 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
     const calculateDeadline = () => {
       // WYSHKIT 2026: Design deadline is 24h from creation
       const orderTime = new Date(order.created_at!);
-      const deadline = new Date(orderTime.getTime() + DESIGN_DEADLINE_HOURS * 60 * 60 * 1000);
+      const deadline = new Date(orderTime.getTime() + PERSONALIZATION_DEADLINE_HOURS * 60 * 60 * 1000);
       const secondsLeft = differenceInSeconds(deadline, new Date());
       return Math.max(0, secondsLeft);
     };
 
-    setDesignDeadlineLeft(calculateDeadline());
+    setPersonalizationDeadlineLeft(calculateDeadline());
 
     const timer = setInterval(() => {
-      setDesignDeadlineLeft(calculateDeadline());
+      setPersonalizationDeadlineLeft(calculateDeadline());
     }, 60000);
 
     return () => clearInterval(timer);
@@ -164,7 +164,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
   };
 
   const isUrgent = timeLeft !== null && timeLeft <= 60;
-  const isDeadlineUrgent = designDeadlineLeft !== null && designDeadlineLeft <= 3600;
+  const isDeadlineUrgent = personalizationDeadlineLeft !== null && personalizationDeadlineLeft <= 3600;
 
   const handleReject = () => {
     if (rejectReason) {
@@ -240,7 +240,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                         {formatTimeLeft(timeLeft)}
                       </Badge>
                     )}
-                    {isAwaitingDetails && designDeadlineLeft !== null && (
+                    {isAwaitingDetails && personalizationDeadlineLeft !== null && (
                       <Badge
                         variant="outline"
                         className={cn(
@@ -251,7 +251,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                         )}
                       >
                         <AlertTriangle className="size-3 mr-1" />
-                        Customer: {formatHoursLeft(designDeadlineLeft)}
+                        Customer: {formatHoursLeft(personalizationDeadlineLeft)}
                       </Badge>
                     )}
                   </div>
@@ -318,7 +318,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
           {/* WYSHKIT 2026: Personalization Details Section (Canonical Product-Level) */}
           {order.order_products?.some((i: any) => i.personalization_entry || i.personalization_details) && (
             <div className="mx-4 mb-4 p-4 rounded-[var(--radius-lg)] bg-[var(--well-warning)] border border-[var(--well-warning-border)] space-y-3">
-              <p className="text-xs font-black text-[var(--well-warning-text)] tracking-tight uppercase">Customer Design Details</p>
+              <p className="text-xs font-black text-[var(--well-warning-text)] tracking-tight uppercase">Customer Personalization Details</p>
               <div className="space-y-4">
                 {order.order_products.filter((i: any) => i.is_personalized).map((product: any, idx: number) => {
                   const data = (product.personalization_entry || product.personalization_details || {}) as any;
@@ -432,7 +432,7 @@ export function OrderCard({ order, onAccept, onReject, onStatusUpdate, isUpdatin
                 Waiting for Customer Details...
               </Button>
               <p className="text-xs text-center text-[var(--well-warning-text)]/70 mt-2 font-medium">
-                Customer has 24 hours to submit design details.
+                Customer has 24 hours to submit personalisation details.
               </p>
             </div>
           )}

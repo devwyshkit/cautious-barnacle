@@ -1,12 +1,22 @@
-# WyshKit 2026
-
-> **Inventory + 10-minute service. Delivered at Swiggy speed.**
-
-WyshKit is the hyperlocal marketplace for products with optional personalisation. We turn local engraving and embroidery shops into on-demand personalisation nodes. **Last-minute gifts, personalised, delivered in under 60 minutes.**
+# WyshKit — The Hyperlocal Product Engine
+> **"Hyperlocal Products. Optional Personalisation. Fast Delivery."**
 
 ---
 
-## The Mental Model
+### ❌ WHAT WE'RE **NOT**
+- **NOT** a gifting marketplace (gifting is just ONE category)
+- **NOT** quick commerce (we don't own inventory/dark stores)
+- **NOT** customization platform (it's **personalization**)
+- **NOT** a custom design tool (no Canva-style builders)
+
+### ✅ WHAT WE **ARE**
+**Hyperlocal product marketplace where vendors provide products (with optional personalisation), and WyshKit provides delivery.**
+
+---
+
+WyshKit is a mobile-first commerce platform designed for 2026. Just as Swiggy Food connects you to restaurant kitchens, WyshKit connects you to local vendor workshops — from engravers and embroiderers to print studios and award makers.
+
+**The Mental Model:**
 
 ```
 LAYER 1 — SWIGGY FOOD    Browse → Cart → Pay

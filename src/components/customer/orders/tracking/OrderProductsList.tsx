@@ -128,7 +128,7 @@ export function OrderProductsList({ order, productPreviews, onPersonalizationSub
                                                             <div className="flex items-start gap-3">
                                                                 <Sparkles className="size-4 text-[var(--warning)] shrink-0" />
                                                                 <p className="text-xs font-bold text-[var(--text-secondary)]">
-                                                                    Add preferences to help the vendor craft your gift.
+                                                                    Add personalisation details to get started.
                                                                 </p>
                                                             </div>
                                                             <button

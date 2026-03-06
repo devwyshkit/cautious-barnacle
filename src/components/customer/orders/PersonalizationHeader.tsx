@@ -6,10 +6,10 @@ import { HyperlocalTimer } from '@/components/ui/HyperlocalTimer';
 
 interface PersonalizationHeaderProps {
     orderId: string;
-    designDeadline?: string | null;
+    personalizationDeadline?: string | null;
 }
 
-export function PersonalizationHeader({ orderId, designDeadline }: PersonalizationHeaderProps) {
+export function PersonalizationHeader({ orderId, personalizationDeadline }: PersonalizationHeaderProps) {
     return (
         <div className="bg-[var(--foreground)] rounded-[var(--radius-md)] p-7 text-[var(--text-inverse)] shadow-sm shadow-[var(--text-primary)]/20 border border-[var(--text-inverse)]/10 mb-8 relative overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
@@ -35,7 +35,7 @@ export function PersonalizationHeader({ orderId, designDeadline }: Personalizati
                 Your payment is confirmed. To start the bespoke crafting process, please share your preferences below.
             </p>
 
-            {designDeadline && (
+            {personalizationDeadline && (
                 <div className="bg-[var(--surface-muted)]/20 border border-[var(--border)] rounded-[var(--radius-md)] p-5 flex items-center justify-between relative z-10 backdrop-blur-sm">
                     <div className="flex items-center gap-3">
                         <div className="size-9 rounded-full bg-rose-500/10 flex items-center justify-center border border-rose-500/20">
@@ -44,7 +44,7 @@ export function PersonalizationHeader({ orderId, designDeadline }: Personalizati
                         <div>
                             <p className="text-xs font-bold tracking-tight text-[var(--text-inverse)]/40 mb-0.5">Approval SLA Baseline</p>
                             <HyperlocalTimer
-                                deadline={designDeadline}
+                                deadline={personalizationDeadline}
                                 variant="minimal"
                                 className="text-sm font-bold text-rose-500 p-0 shadow-none bg-transparent"
                             />

@@ -23,7 +23,7 @@ interface PersonalizationStatusProps {
 }
 
 /**
- * WYSHKIT 2026: Design Command Center (REFINED)
+ * WYSHKIT 2026: Personalisation Command Center (REFINED)
  * 
  * WYSHKIT 2026 Pattern: Absolute Transparency & Zero Friction
  * - Move "Skip" logic to the main dashboard for minimal clicks.
@@ -51,7 +51,7 @@ export function PersonalizationStatus({ order, previews, timeline, onOpenPersona
 
     return (
         <section className="flex flex-col gap-8 animate-in fade-in duration-700">
-            {/* Design Previews Milestone (High Impact) */}
+            {/* Personalisation Previews Milestone (High Impact) */}
             <div className="space-y-4">
                 {previews.length > 0 ? (
                     <div className="space-y-3">

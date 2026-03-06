@@ -113,7 +113,7 @@ export function AddToCartButton({
         }
     }, [justAdded]);
 
-    const showCustomize = has_personalization && !justAdded;
+    const showPersonalize = has_personalization && !justAdded;
 
     return (
         <Button
@@ -125,7 +125,7 @@ export function AddToCartButton({
                 "h-8 px-3 rounded-[var(--radius-md)] transition-all z-10 font-bold text-xs min-w-[60px]",
                 justAdded
                     ? "bg-[var(--success)] text-[var(--background)] hover:bg-[var(--success)]/90 border-none shadow-[var(--shadow-sm)]"
-                    : showCustomize
+                    : showPersonalize
                         ? "bg-[var(--foreground)] text-[var(--background)] hover:bg-[var(--foreground)]/90 border-none"
                         : "bg-[var(--surface)] text-[var(--text-primary)] hover:bg-[var(--surface-muted)] shadow-[var(--shadow-sm)] border border-[var(--border)]",
                 "active:scale-95",
@@ -139,7 +139,7 @@ export function AddToCartButton({
                     <Check className="size-3 stroke-[3]" />
                     <span>Added</span>
                 </div>
-            ) : showCustomize ? (
+            ) : showPersonalize ? (
                 <div className="flex items-center gap-1">
                     <Sparkles className="size-3" />
                     <span>Options</span>

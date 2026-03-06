@@ -22,7 +22,7 @@ interface HistoryTrailProps {
 }
 
 /**
- * WYSHKIT 2026: The "Creative Journey" History Trail
+ * WYSHKIT 2026: The "Personalization Journey" History Trail
  * Visualizes the 3-layer trust engine:
  * 1. Your Request (Personalization)
  * 2. What Vendor Sent (Preview)
@@ -33,8 +33,8 @@ export function HistoryTrail({ orderProducts, previews, timeline }: HistoryTrail
 
     if (personalizedProducts.length === 0) return null;
 
-    // Filter timeline for relevant creative events
-    const creativeEvents = timeline.filter(e =>
+    // Filter timeline for relevant personalisation events
+    const personalisationEvents = timeline.filter(e =>
         ['DETAILS_RECEIVED', 'PREVIEW_READY', 'CHANGE_REQUESTED', 'APPROVED', 'IN_PRODUCTION'].includes(e.type)
     );
 
