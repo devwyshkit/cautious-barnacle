@@ -4,7 +4,7 @@
 
 ## ❌ WHAT WE'RE **NOT**
 - **NOT** a gifting marketplace (gifting is just ONE category)
-- **NOT** quick commerce (we don't own inventory)
+- **NOT** quick commerce in the Blinkit/Zepto sense — we own zero inventory, zero dark stores. Vendors own the stock. WyshKit delivers.
 
 ---
 
@@ -25,21 +25,29 @@ LEAD → QUALIFIED → ONBOARDED → LIVE
 
 ---
 
-### Stage 1: Qualifying a Vendor
+### Stage 1: Qualifying a Vendor (2026)
 
-The 3-second qualify:
-1. Do they have the machine (engraver, embroidery, etc.)?
-2. Can they produce in ≤60 minutes post-approval?
-3. Are they within the current serviceable zone?
+WyshKit supply acquisition follows two high-standard tracks:
 
-**If any = No → Don't onboard.** One slow vendor destroys the SLA promise for the whole neighbourhood.
+**Track A: The Artisan Node (High Uniqueness)**
+- Trophy shops, print studios, independent specialty shops.
+- Value Prop: "We bring Swiggy speed to your professional craft."
 
-**Phase 1 target types (Bengaluru)**:
-- Trophy & awards shops (laser engraving)
-- Print studios (mugs, phone cases, identity-layer merchandise)
-- Custom embroidery shops (t-shirts, tote bags)
-- Leather personalisation shops (wallets, belts)
-- Specialty workshops (3D printed keepsakes, engraved wood)
+**Track B: The Brand Fulfillment Node (High Scale)**
+- Apple Premium Resellers, boAt zones, Decathlon outlets.
+- Value Prop: "**Store-as-Dark-Store**. We turn your neighborhood retail footprint into the fastest delivery node for your 2026 customers."
+
+> **The vendor qualifier is identical for both tracks**: Physical stock that can be dispatched today + within serviceable zone. Personalisation capability is a bonus, not the entry bar.
+
+**Phase 1 target types (Bengaluru) — both tracks:**
+- Trophy & awards shops (laser engraving, always have stock) → Track A
+- Print studios (mugs, phone cases, merchandise with stock) → Track A
+- Embroidery shops (t-shirts, tote bags — stock + personalisation) → Track A
+- Leather goods shops (wallets, belts — stock + personalisation) → Track A
+- Specialty gift/lifestyle shops (stock-first, personalisation optional) → Track A
+- Apple Premium Resellers (AirPods, accessories + engraving) → Track B
+- boAt / Noise / Samsung experience stores (audio, accessories + etching) → Track B
+- Decathlon / Chroma / Nykaa outlets with local in-store stock → Track B
 
 ---
 
@@ -162,9 +170,9 @@ Maximum 3 fields per product. These fields are collected **POST-PAYMENT** on `/o
 **Steps**:
 1. Ops places test order using a **test customer account** (internal credit or bypass flag — never a real customer account)
 2. Vendor receives notification → accepts
-3. **Post-payment requirements**: Ops lands on tracking page and submits dummy personalisation details
-4. Vendor uploads a preview within their stated SLA
-5. Ops approves preview via "Slide to Approve"
+3. **Post-payment requirements** *(personalisation vendors only)*: Ops lands on tracking page and submits dummy personalisation details. For non-personalisation vendors, Section B and C do not appear — skip to step 4 directly.
+4. *(Personalisation vendors only)* Vendor uploads a preview within their stated SLA
+5. *(Personalisation vendors only)* Ops approves preview via "Slide to Approve"
 6. Vendor marks order `PACKED`
 7. Internal rider (or ops) picks up → marks `DELIVERED`
 
@@ -199,14 +207,13 @@ Stored in `platform_settings` table. **Never hardcoded.**
 | 2 — Trusted | None | Priority ranking | 12% |
 | 3 — Elite | "Elite Vendor" badge | Top feed position | 10% |
 
-### Vendor Pitch Script (BD)
+### Vendor Pitch Script (BD 2026)
 
-> *"You already have the machine. You already know how to do the engraving.
-> The problem is: no one can find you online.
-> WyshKit puts you in front of local customers who are already looking for products like yours — and they pay 100% upfront before you touch anything.
-> We follow the **Apple Personalisation Model**: the product exists, you just add the identity (name, logo, memory). No long design hours. Just 10 minutes of production.
-> Just like Swiggy brings food orders, we bring product orders to your workshop. We handle the delivery; you just provide the product and personalisation.
-> First 10 orders: zero commission. On us."*
+**To Artisan Shop Owners:**
+> *"You have the inventory. You have the machines. But you're invisible. Swiggy Food did for restaurants what WyshKit does for products. We put you on the neighborhood's home screen. We handle the WareIQ logistics. You just pick, pack, and (optionally) personalise. 10 minutes of work = a high-margin order."*
+
+**To Brand Managers (Apple/boAt/Decathlon):**
+> *"Your stores are no longer just showrooms; they are your most valuable **hyperlocal fulfillment nodes**. WyshKit provides the 10-minute discovery layer. We connect your in-store inventory to neighborhood demand with 40-minute delivery. Your team fulfill the order; our WareIQ riders deliver. Zero CAC. 100% stock rotation."*
 
 ---
 

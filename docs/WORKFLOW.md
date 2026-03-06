@@ -10,16 +10,16 @@ WyshKit is three proven models stitched together. Zero new patterns invented. No
 
 ```
 LAYER 1 — SWIGGY FOOD    Browse → Cart → Pay
-          (Deferred auth. Guest cart. One-page checkout. Saved address pre-selected.)
+          (Implicit persistent auth. Guest cart. 1-Page checkout. Address Gravity.)
 
 LAYER 2 — INSTAMART      Physical product sheet with inventory reality
-          (Photo. Name. Vendor. Price. Variants. Add-ons. ETA. Stock. That's it.)
+          (Plain path is default. Photo. Price. Stock. ETA. Add to Cart.)
 
-LAYER 3 — FIVERR         Post-payment work loop
-          (Pay → Submit requirements → Receive preview → Approve/Revise → Production)
+LAYER 3 — FIVERR         Post-payment work loop (Personalised only)
+          (Pay → Requirements → Preview → Approve/Revise → Ready)
 ```
 
-**The WyshKit insight** (from 5 years of founder experience): Personalised physical products are not custom manufacturing. They are inventory + a 10-minute service. Apple does this with AirPods engraving. Nike does $1B/year from it. WyshKit applies Uber Eats speed to this model.
+**The 2026 Shift**: WyshKit is not just for artisans. It is the hyperlocal node for **organised retail** (Apple, boAt, Decathlon). Every vendor outlet is a Dark Store.
 
 ---
 
@@ -51,25 +51,39 @@ This distinction determines the entire product architecture.
 
 ---
 
-## The Personalization Model (The Apple Way)
+## The Personalization Model (The Apple Way — OPTIONAL)
 
-WyshKit does NOT do customization. We do **Personalization**.
+WyshKit does NOT do customization. We offer **optional Personalization** where vendors support it.
 
 - **❌ NOT CANVA**: We are not a builder tool. We don't ask users to "design" layouts.
-- **✅ ENGRAVING MODEL**: We follow the Apple AirPods model. The product exists; we add an "Identity Layer" (Text/Image) on top of it.
+- **✅ ENGRAVING MODEL**: We follow the Apple AirPods model. The product exists; personalisation adds an "Identity Layer" (Text/Image) on top of it — if and only if the vendor has that capability.
+- **✅ PRODUCT-FIRST**: A product that requires no personalisation is a completely valid WyshKit product. A crystal trophy sold as-is, delivered in 40 minutes — that is the core promise.
 
-This distinction is critical for SLA discipline. Designing takes hours; Personalizing takes 10 minutes.
+This distinction is critical for SLA discipline. Designing takes hours; Personalizing takes 10 minutes. Selling stock takes 0 minutes of production.
 
 ---
 
-## The Four Beliefs (Non-Negotiable)
+## The Five Beliefs (Non-Negotiable)
 
-> These are the **product beliefs** (the WHY). For the **implementation rules** (the HOW), see [DOCTRINE.md → 7 Product Laws](./DOCTRINE.md).
+1. **One Vendor, One Cart** — A cart is a point-to-point contract. Mixing vendors is a logistics P0 failure.
+2. **Address Gravity** — Serviceability is checked at the first interaction. Destination is pre-selected.
+3. **Commitment Before Creativity** — Pay first, personalise after. Eliminate pre-payment anxiety/effort.
+4. **Preview > Production** — *(Personalised only)* The render is the legal contract.
+5. **Turbo Checkout** — Consistent 1-Tap patterns for recurring users.
 
-1. **Commitment Before Creativity** — Pay first, personalise after. Always.
-2. **Time > Distance** — "Arriving by 5:15 PM." Never "2.4 km away."
-3. **Preview > Production** — A digital preview (not a product photo) is approved before anything is made. This is the moat.
-4. **Anticipatory UX** — Eliminate typing wherever possible. Pre-fill and pre-select based on available data (address, past orders, location).
+## The One-Vendor Friction (Policy)
+
+WyshKit enforces a **Single Vendor Order** policy. 
+
+### Why?
+1. **Logistics SLA**: Mixed carts require two pickups, doubling travel time and rider cost. 
+2. **Personalisation Surface**: Each vendor has unique requirements. A single order tracking page cannot handle two parallel Work-to-Order loops without becoming "Canva-bullshit" noisy.
+
+### Conflict Management: The "Replace Cart" Sheet
+When a user adds an item from **Vendor B** while their cart has items from **Vendor A**:
+- **Trigger**: `ADD_TO_CART` intent returns `VENDOR_MISMATCH`.
+- **UX**: Show a bottom sheet: *"Replace cart with items from [Vendor B]? Your current selection from [Vendor A] will be cleared."*
+- **Action**: User confirms → `MERGE_GUEST_CART_ATOMIC(replace=true)` → Cart updates.
 
 ---
 
@@ -109,6 +123,17 @@ SuccessOverlay · PersonalisationForm · PreviewThread · OrderProductsList · D
 
 ---
 
+## Forbidden Patterns (Anti-Audit 2026)
+
+WyshKit strictly prohibits these legacy "Dark Patterns":
+
+1. **Basket Sneaking**: Never add items (even free ones) to the cart without an explicit user tap. No "Sample included" auto-adds.
+2. **Confirm Shaming**: Never use guilt-tripping copy for opt-outs. Buttons must be neutral: `Skip` or `Not Now`, never *"No, I like paying full price"*.
+3. **Noisy Hubris**: No floating marketing stickers, intrusive "Sale" banners, or persistent "Rate us" prompts on the core browse surface.
+4. **Interface Interference**: No pre-selecting "Personalisation +₹X" by default. The user must opt-in to the identity layer.
+
+---
+
 ## Auth Gate Table
 
 | Surface | Auth Required | Behaviour |
@@ -129,18 +154,18 @@ SuccessOverlay · PersonalisationForm · PreviewThread · OrderProductsList · D
 
 ### Step 1 — HOME FEED `/`
 
-**Location Resolution — 3 Tiers, automatic:**
-1. **Tier 1**: IP geolocation → feed shows immediately with skeleton
-2. **Tier 2**: Browser GPS (prompted with context, not cold)
-3. **Tier 3**: Manual entry via LocationSheet
+**Location Resolution — Address Gravity:**
+1. **Tier 1**: IP + History → App "knows" you. Feed shows immediately.
+2. **Tier 2**: Browser GPS → Refine to neighbourhood accuracy.
+3. **Tier 3 (Correction only)**: Manual entry via LocationSheet. Use ONLY if Tier 1/2 fails or user is ordering for another location.
 
 Address bar (persistent top): `📍 Koramangala · ~45 min ▾`
 
 **Feed Layout:**
 - `[Active order widget]` ← if order exists, above everything else (Zeigarnik — no exceptions)
 - `[Banner Bento]` — promos
-- `[Category Rail]` — max 8 icons, single row, horizontal scroll
-- `[Vendor-Grouped Product Grid]`
+- **Category Rail** — Bento-style compartmentalisation. Max 8 icons, single row, horizontal scroll.
+- **Vendor-Grouped Product Grid** — High-density, multi-column bento blocks.
   - Each card: photo · name · `~40 min` chip · price · `[+]` button
   - `"Promoted"` badge if promoted (always visible, never hidden)
 - `[Wallet Balance]` — for logged-in users, above Banner Bento: "₹48 WyshKit Money — use today." Hidden wallet = broken Hook.
@@ -154,7 +179,7 @@ Address bar (persistent top): `📍 Koramangala · ~45 min ▾`
 
 ### Step 2 — THE INSTAMART-STANDARD PRODUCT SHEET
 
-ProductSheet = everything needed for a confident purchase decision. Nothing else.
+ProductSheet = everything needed for a confident purchase decision. Nothing else. Follows the **Spatial Module** pattern (floating overlay).
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -370,7 +395,7 @@ Single page. Everything inline. No modals. No extra navigation.
 - Current status + icon + colour + order ref `#WK-YYYYMMDD-XXXX`
 - ETA: "Arriving by 5:15 PM" (once rider assigned)
 
-**Section B — PERSONALISATION REQUIREMENTS** (personalised products only)
+**Section B — PERSONALISATION REQUIREMENTS** *(personalised products only — this section does not appear for non-personalised orders)*
 - Auto-opens if `?success=true` and order contains personalised products.
 - Fields driven by vendor's `personalization_schema` config (max 3 fields).
 - Inline validation. Character counter. Clear copy.
@@ -527,87 +552,39 @@ Rate: Configured in `platform_settings` (never hardcoded). Current: 2%, min ₹1
 
 ## Notification Architecture
 
-### The Hierarchy (Least to Most Interruptive)
-
-```
-In-App Banner      (contextual, high relevance, non-interruptive)
-      ↓
-Push Notification  (interrupts; use sparingly)
-      ↓
-WhatsApp           (high open %; reserve for critical + compliance-safe)
-      ↓
-SMS                (fallback only — cost + regulatory overhead)
-      ↓
-Email              (invoices and legal documents only)
-```
-
 **Rule**: One event = one channel. Stacking channels on the same event is spam.
+**DND window**: No promotional push between 10 PM–8 AM. Enforced in notification scheduler.
+**Deep links**: Every push must deep-link to a specific surface. Ghost pushes (no deep link) are forbidden.
 
 ### Urgency Tiers
 
-| Tier | Description | Channel | Delay |
-|---|---|---|---|
-| **P0 — Critical** | Order cancellation, refund, payment failed | Push + WhatsApp | Immediate |
-| **P1 — Transactional** | Order placed, preview ready, rider assigned, delivered | Push | Immediate |
-| **P2 — Operational** | SLA reminder (T-30min), vendor accepted | Push | <2 min |
-| **P3 — Deferred** | Rating prompt, cashback credited, wallet expiry | In-App Banner | 30 min post-trigger |
-| **P4 — Marketing** | Festival campaigns, re-engagement | Push (batched) | Operator-scheduled |
+| Tier | Description | Channel |
+|---|---|---|
+| **P0 — Critical** | Order cancellation, refund, payment failed | Push + WhatsApp (immediate) |
+| **P1 — Transactional** | Order placed, preview ready, rider assigned, delivered | Push (immediate) |
+| **P2 — Operational** | SLA reminder, vendor accepted | Push (<2 min) |
+| **P3 — Deferred** | Rating prompt, cashback credited | In-App Banner (30 min post-trigger) |
+| **P4 — Marketing** | Festival campaigns, re-engagement | Push batched, operator-scheduled |
 
-### Customer Trigger Matrix
+### Key Customer Triggers
 
-| Trigger | Tier | Channel | Copy |
-|---|---|---|---|
-| Order placed | P1 | Push | "Order #WK-XXXX placed! Your vendor will confirm shortly." |
-| Vendor confirms | P1 | Push | "[Vendor] accepted your order." |
-| Preview ready | P1 | Push | "Your preview is ready! Approve or request a change." |
-| Rider assigned | P1 | Push | "[Name] is picking up. Arriving by [time]." |
-| Delivered | P0 | Push | "Delivered! ₹X WyshKit Money added." |
-| SLA breach | P0 | Push + WhatsApp | "Vendor is running late. Wait or cancel for full refund." |
-| Cancelled + refund | P0 | Push + WhatsApp | "Order cancelled. ₹X refunded." |
-| Rating prompt | P3 | In-App | 30 mins after delivered or next app open. Never both. |
+| Trigger | Tier | Copy |
+|---|---|---|
+| Order placed | P1 | "Order #WK-XXXX placed!" |
+| Preview ready | P1 | "Your preview is ready! Approve or request a change." |
+| Rider assigned | P1 | "[Name] is picking up. Arriving by [time]." |
+| Delivered | P0 | "Delivered! ₹X WyshKit Money added." |
+| SLA breach | P0 | "Vendor is running late. Wait or cancel for full refund." |
+| Cancelled + refund | P0 | "Order cancelled. ₹X refunded." |
 
-### Vendor Trigger Matrix
+### Key Vendor Triggers
 
-| Trigger | Tier | Channel | Copy |
-|---|---|---|---|
-| New order | P0 | Push + WhatsApp | "New order! #WK-XXXX — [Product]. Accept now." |
-| Details submitted | P1 | Push | "[Customer] submitted details. Upload preview." |
-| Revision requested | P1 | Push | "[Customer] requested a change. Check the feedback." |
-| Preview approved | P1 | Push | "Preview approved! Start production now." |
-| SLA warning (T-30min) | P2 | Push | "Reminder: preview due in 30 mins for #WK-XXXX." |
-| SLA breach | P0 | Push + WhatsApp | "URGENT: Preview overdue. Customer notified." |
-| Payout processed | P3 | In-App | "₹X payout processed for [date range]." |
+| Trigger | Tier | Copy |
+|---|---|---|
+| New order | P0 | "New order! #WK-XXXX — [Product]. Accept now." |
+| Details submitted | P1 | "[Customer] submitted details. Upload preview." |
+| Preview approved | P1 | "Preview approved! Start production now." |
+| SLA warning | P2 | "Reminder: preview due in 30 mins." |
+| SLA breach | P0 | "URGENT: Preview overdue. Customer notified." |
 
-### What We Never Do
-
-- ❌ Promotional push between 10 PM–8 AM (DND window)
-- ❌ More than 2 pushes for the same order within 60 minutes
-- ❌ Push notification without a deep link (ghost pushes destroy trust)
-- ❌ WhatsApp without an unsubscribe path (TRAI compliance)
-- ❌ Rating prompt before delivery is logged in DB
-- ❌ "You have a new notification" — always be specific
-
-### Deep Link Standard
-
-| Notification | Deep Link |
-|---|---|
-| Order push | `/orders/[id]` |
-| Preview push | `/orders/[id]#preview` |
-| Payout push | `/vendor/earnings` |
-
-No push ever links to the home feed.
-
-### Data Model
-
-```sql
-notifications {
-  user_id:       UUID,        -- Recipient (Customer or Vendor)
-  type:          TEXT,        -- 'PREVIEW_READY', 'ORDER_PLACED', etc.
-  metadata:      JSONB,       -- {order_id, product_id, vendor_name, etc.}
-  image_url:     TEXT,        -- Optional thumbnail
-  is_persistent: BOOLEAN,     -- Stays in bell icon history?
-  priority:      INTEGER,     -- UI sorting
-  read_at:       TIMESTAMPTZ, -- Not NULL if clicked
-  expires_at:    TIMESTAMPTZ  -- Auto-cleanup
-}
-```
+> Full trigger matrix, WhatsApp compliance rules, and notification DB schema live in the implementation spec.

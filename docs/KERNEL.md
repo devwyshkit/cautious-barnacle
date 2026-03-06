@@ -1,23 +1,24 @@
 # WyshKit 2026: KERNEL — The Engineering Law
 
-> **"Inventory + 10-minute service. Delivered at Swiggy speed."**
+> **"The database is the only computer. The frontend is a display."**
 
 ## ❌ WHAT WE'RE **NOT**
 - **NOT** a gifting marketplace (gifting is just ONE category)
-- **NOT** quick commerce (we don't own inventory/dark stores)
-- **NOT** customization platform (it's **personalization**)
+- **NOT** quick commerce in the Blinkit/Zepto sense — we own zero inventory, zero dark stores
+- **NOT** a customization platform (it's **personalisation**)
 
 ---
 
 ## The 7 Laws of 2026
 
-1. **Zero Shadow Math** — All commerce arithmetic (GST, platform fees, delivery, coupons, wallet) is the exclusive domain of the Postgres kernel. Frontend math is prohibited. *Total price on "Add to Cart" must be indicative or server-fetched.*
+1. **Zero Shadow Math** — All commerce arithmetic (GST, platform fees, delivery, coupons, wallet) is the exclusive domain of the Postgres kernel. Frontend math is forbidden.
 2. **Atomic Intent** — Every user decision maps to exactly one RPC round-trip. No chaining. No "Shadow Sessions."
-3. **Perpetual State Purity** — The UI is a stateless projection of the database. The first render is always the Authored Source.
-4. **No Surface Nesting** — Sheets never open inside sheets. Cart sheet closes before checkout loads. Borders and headers form one continuous surface.
-5. **Healthy Friction** — `Slide to Pay` validates intent. Friction is a bug only when it blocks a decision; it is a feature when it confirms one.
-6. **Visual Gravity** — Surfaces containing money (Wallets, Bill) always carry higher visual elevation (shadows, borders) than static surfaces.
-7. **Haptic Resonance** — Every transactional intent (Confirm, Toggle, Slide) must echo in the hand. No vibration = no transaction.
+3. **The Preview Moat** — *(Personalised only)* Pay first. Preview after. The digital render is the legal contract.
+4. **DLS-Atoms-Only** — Ad-hoc CSS and raw Tailwind are forbidden. If a design needs it, the DLS is missing a component. Add it there, not here.
+5. **Zero-Ask Address Gravity** — The backend resolves serviceability nodes. The frontend only confirms.
+6. **Density Guard** — No UI component may exceed the standard 44px vertical node limit without metadata justification. Above-the-fold efficiency is a P0 requirement.
+7. **Healthy Friction** — `Slide to Pay` validates intent. Friction is a bug only when it blocks a decision; it is a feature when it confirms one.
+8. **Haptic Resonance** — Every transactional intent (Confirm, Toggle, Slide) must echo in the hand. No vibration = no transaction.
 
 ---
 
@@ -45,6 +46,7 @@
     - `vendor.avg_prep_time_mins` is seeded during the onboarding dummy order, then updated via running average after 10 real orders.
     - Product Card: "~40 min" | Checkout: "Arriving in ~45 mins" | Tracking: "Arriving by 5:15 PM"
     - Never show km. Ever.
+    - **3PL**: WareIQ handles last-mile dispatch. ETA formula is vendor-prep-dominant; rider pickup is treated as a constant once WareIQ confirms assignment.
 7. **Slug-First Architecture** — All customer-facing URLs must use human-readable slugs (`/vendor/bakery-name/product/chocolate-cake`) instead of standard IDs/UUIDs for SEO and trust. *Passing a UUID to a slug-based route results in a 400 architecture guard.*
     - **HARDENING 2026**: Fallback to UUID in customer-facing links is a P0 failure. Always fetch `vendor_slug` and `product_slug` (aliased as `slug`) in the One-Trip context. 
     - **POLYMORPHIC RESOLUTION**: RPCs like `get_product_surface_v1` and `get_vendor_surface` MUST support dual resolution (ID or Slug) via regex-based input detection to prevent routing failures during the 2026 transition. 
@@ -145,8 +147,8 @@ The database is the Single Source of Truth. Never hand-roll types.
 | Vendor | **Vendor** | Partner, Merchant, Seller |
 | Product | **Product** | Item, SKU, Good |
 | Variant | **Variant** | SKU (as config ID) |
-| Customisation | **Customisation** | — |
-| Personalisation | **Personalisation** | Design, Custom |
+| Customisation | **Customisation** | Custom, Configure |
+| Personalisation | **Personalisation** | Design, Custom, Gift Text |
 | **_Forbidden Var_** | **showPersonalize** | `showCustomize` (Nomenclature drift) |
 | **_Forbidden Var_** | **personalText** | `giftText` (Identity drift) |
 | Order Line | **Order Product** | Order Item, Line Item |
@@ -155,9 +157,18 @@ The database is the Single Source of Truth. Never hand-roll types.
 
 **Customisation** = selecting vendor-defined options (size, colour, material) before payment. **Personalisation** = submitting unique inputs (text, image, name) after payment. These are NOT interchangeable.
 
-**Automated guard [Phase 2]**: `npm run lint:nomenclature` will fail CI if any forbidden term is detected in `src/`.
+**Personalisation is OPTIONAL.** Not all products are personalised. Not all vendors offer personalisation. A vendor must hold sellable inventory to qualify; personalisation capability is a bonus.
+
+**The Canonical Vendor Definition (Zero Drift):**
+```
+❌ Engraver with no stock, custom-order-only = NOT a WyshKit vendor
+✅ Trophy shop with stock + optional engraving = WyshKit vendor
+✅ Gift shop with stock, no personalisation = WyshKit vendor
+```
 
 ---
+
+## Security
 
 ## Security
 

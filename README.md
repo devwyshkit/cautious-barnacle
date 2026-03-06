@@ -5,41 +5,52 @@
 
 ### ❌ WHAT WE'RE **NOT**
 - **NOT** a gifting marketplace (gifting is just ONE category)
-- **NOT** quick commerce (we don't own inventory/dark stores)
-- **NOT** customization platform (it's **personalization**)
+- **NOT** a customization platform (it's **personalisation**)
 - **NOT** a custom design tool (no Canva-style builders)
+- **NOT** quick commerce in the Blinkit/Zepto sense — we own **zero inventory, zero dark stores**. Vendors own the stock. WyshKit delivers.
 
 ### ✅ WHAT WE **ARE**
-**Hyperlocal product marketplace where vendors provide products (with optional personalisation), and WyshKit provides delivery.**
+**"The Hyperlocal Product OS for 2026"**
+
+WyshKit rides the **"Store-as-Dark-Store"** wave. We don't build warehouses; we turn every local brand outlet (Apple, boAt, Decathlon) and premium artisan shop into a high-speed fulfillment node.
+
+#### THE WHY (The VC Narrative)
+In 2026, the $10B+ non-food hyperlocal market is converging. Branded retail (Apple Premium Resellers, Samsung Experience Zones, boAt) already has the inventory and 10-minute personalisation capacity; Quick Commerce has the last-mile rails. WyshKit is the **Intelligence + Identity Layer** that bridges them. We provide the high-trust interface for both stock-standard products and uniquely personalised ones.
+
+#### THE ZERO-FRICTION BETS
+1. **One Vendor, One Cart** — We follow the Swiggy Food principle. Mixing Apple AirPods with a local trophy is a logistics anti-pattern. One Order = One Vendor = One High-Speed Delivery.
+2. **Address Gravity** — The app "knows" where you are. We pre-select the destination. We don't ask.
+3. **Turbo Checkout** — 1-Tap prediction + Address Gravity = <10s checkout.
+4. **The Preview Moat** — *(Personalised orders only)* Pay first. Preview after. The digital render is the legal contract between customer intent and vendor capability.
 
 ---
 
-WyshKit is a mobile-first commerce platform designed for 2026. Just as Swiggy Food connects you to restaurant kitchens, WyshKit connects you to local vendor workshops — from engravers and embroiderers to print studios and award makers.
-
-**The Mental Model:**
+## The Mental Model
 
 ```
 LAYER 1 — SWIGGY FOOD    Browse → Cart → Pay
-          (Deferred auth. Guest cart. One-page checkout. Auto-selected address.)
+          (Implicit persistent auth. Guest cart. One-page checkout. Address Gravity.)
 
-LAYER 2 — INSTAMART      Physical product sheet with inventory reality
-          (Photo. Name. Vendor. Price. Variants. Add-ons. ETA. Stock.)
+LAYER 2 — INSTAMART      Physical product with inventory reality
+          (Photo. Name. Vendor. Price. Variants. ETA. Stock. That's it.)
+          Example A: Order AirPods from an Apple Premium Reseller. Delivered in 40 mins. No personalisation.
+          Example B: Order a trophy + engraving from Trophy Palace. Layer 3 activates.
 
-LAYER 3 — FIVERR         Post-payment work loop
-          (Pay → Submit requirements → Receive preview → Approve/Revise → Production)
+LAYER 3 — FIVERR         Post-payment work loop (personalised orders only)
+          (Pay → Submit requirements → Receive preview → Approve → Production)
 ```
 
-**Customisation** = selecting size/colour/material before payment. **Personalisation** = submitting engraving text or a logo after payment. Zero new patterns. Zero reinvention.
+**Customisation** = selecting size/colour/material before payment. **Personalisation** = submitting engraving text or a logo after payment. Layer 3 only activates when the customer toggles personalisation. Zero new patterns. Zero reinvention.
 
 ---
 
-## The 3 Laws
+## The 3 Bets
 
-| # | Law | Meaning |
+| # | Bet | Why |
 |---|---|---|
-| 1 | **Commitment Before Creativity** | Pay first, personalise after. Zero ghost orders. |
-| 2 | **Time > Distance** | "Arriving by 5:15 PM." Never "2.4 km away." |
-| 3 | **Zero Shadow Math** | The database is the only computer. The frontend is a display. |
+| 1 | **Commitment Before Creativity** | Pay first, personalise after. Zero ghost orders. Vendor never touches a product that isn't sold. |
+| 2 | **Time > Distance** | "Arriving by 5:15 PM." Never "2.4 km away." Users plan around time, not geography. |
+| 3 | **Preview > Production** | *(personalised orders only)* A customer who approves a digital mockup cannot return the product. Return rate → ~0. |
 
 ---
 
@@ -50,7 +61,7 @@ LAYER 3 — FIVERR         Post-payment work loop
 | Framework | Next.js 15 (App Router, Server Components, Streaming) |
 | Backend / Auth | Supabase (PostgreSQL, RLS, SECURITY DEFINER RPCs) |
 | Payments | Razorpay (100% advance, idempotent, webhook-verified) |
-| Logistics | Shadowfax / Porter (3PL — zero fleet, zero CapEx) |
+| Logistics | WareIQ (3PL — zero fleet, zero CapEx) |
 | Location | Google Maps Platform (autocomplete, geocoding, live map) |
 | Vendor KYC | IDfy (OCR extraction-first — vendor verifies, never types) |
 | UI | shadcn/ui + Radix primitives + Tailwind CSS |
@@ -76,7 +87,7 @@ npm run build               # Production build validation
 ```
 
 **Hard rules:**
-- **Zero Shadow Math** — no hardcoded colours or magic numbers. Use CSS variables.
+- **Zero Shadow Math** — all commerce arithmetic lives in Postgres. Frontend is a display.
 - **Zero Reinvention** — check Supabase or shadcn/ui before adding dependencies.
 - **Mobile First** — all interfaces optimised for 44px tap targets.
 - **Nomenclature** — never use 'Partner', 'Item', or 'Merchant'. Use 'Vendor', 'Product', 'Customer'.
@@ -92,6 +103,6 @@ npm run build               # Production build validation
 | Doc | For | What It Answers |
 |---|---|---|
 | [KERNEL.md](./docs/KERNEL.md) | **Engineering** | The 7 Laws, hard engineering rules, Commerce Intent Engine, security, observability |
-| [DOCTRINE.md](./docs/DOCTRINE.md) | **Product + Strategy** | The WyshKit differentiation (The Preview Moat), 20+ behavioral science laws, messaging playbook, GTM |
-| [WORKFLOW.md](./docs/WORKFLOW.md) | **Product + Engineering** | Full user journey (Home → Checkout → Tracking → Delivery), notification architecture, SLA table, refund policy |
+| [DOCTRINE.md](./docs/DOCTRINE.md) | **Product + Strategy** | Differentiation, the Preview Moat, product laws, messaging playbook, GTM |
+| [WORKFLOW.md](./docs/WORKFLOW.md) | **Product + Engineering** | Full user journey (Home → Checkout → Tracking → Delivery), SLA table, refund policy |
 | [OPERATIONS.md](./docs/OPERATIONS.md) | **Ops + BD** | Vendor onboarding funnel, KYC/KYB extraction-first, commission tiers, operator runbook |

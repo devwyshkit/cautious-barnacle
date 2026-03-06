@@ -1,14 +1,14 @@
 # WyshKit 2026: DOCTRINE — The Strategy
 
-> *"We are what Swiggy would be if they delivered trust instead of biryani."*
+> *"Inventory + 10-minute service. Delivered at Swiggy speed."*
 
 ---
 
 ## ❌ WHAT WE'RE **NOT**
 - **NOT** a gifting marketplace (gifting is just ONE category)
-- **NOT** quick commerce (we don't own inventory/dark stores)
-- **NOT** customization platform (it's **personalization**)
-- **NOT** a custom design tool (no Canva bullshit)
+- **NOT** a customization platform (it's **personalisation**)
+- **NOT** a custom design tool (no Canva-style builders)
+- **NOT** quick commerce in the Blinkit/Zepto sense — we own **zero inventory, zero dark stores**. Vendors own the stock. WyshKit delivers.
 
 ## ✅ WHAT WE **ARE**
 **"Swiggy for Products with Optional Personalization"**
@@ -23,51 +23,88 @@ Just like:
 
 WyshKit is built on the **Swiggy 2026 substrate**: hyperlocal logistics, SLA discipline, neighbourhood density. But we are not a commodity delivery app.
 
-**The WyshKit Delta: Trust → Personalisation.**
+| Feature | Traditional E-com | Quick Commerce (Instamart/Blinkit) | WyshKit |
+|---|---|---|---|
+| **Inventory** | Central Warehouse | Dark Stores (Owned/Managed) | **Local Brand Stores / Artisan Nodes** |
+| **Logistics** | 2-Day Courier | 10-Min Fleet | **Local 3PL (WareIQ)** |
+| **Selection** | Global SKU | Local Convenience SKU | **Local Inventory + Identity Layer** |
+| **Logic** | Multi-Vendor Cart | Multi-Warehouse Cart | **One Vendor, One Cart (Point-to-Point)** |
+| **Persona** | Bulk Gifting | Urgent Grocery | **Identity & Spontaneous High-Value** |
+| **Trust mechanism** | Ratings, ETA | Standard SLA; + Preview Workflow for personalised orders |
+| **Return risk** | Low (edible/consumable) | Low for plain products; high for personalised (engraved = unsellable without preview) |
+| **Solution** | Standard delivery SLA | Standard SLA for all; **Preview Workflow** for personalised products |
 
-| | Swiggy / Blinkit | WyshKit |
-|---|---|---|
-| **Core delivery** | Food / Goods | Personalised goods |
-| **Trust mechanism** | Ratings, ETA | The Preview (digital mockup before production) |
-| **Return risk** | Low (edible/consumable) | High without preview (engraved = unsellable) |
-| **Disappointment Tax** | Low | Very high (wrong name engraved = destroyed product) |
-| **Solution** | Standard delivery SLA | **Preview Workflow** — customer approves before production |
+> **On quick commerce**: WyshKit is NOT quick commerce in the ownership model (zero dark stores, zero inventory). However, like Instamart routing from a Decathlon outlet instead of a dark store, WyshKit IS in the same delivery speed category by using vendor stores as local fulfillment nodes. The difference: we are the marketplace, not the warehouse.
 
 **The Preview Moat**: Once a customer sees their name engraved on a digital mockup and taps "Slide to Approve," the product is theirs. Return rate → ~0. Premium pricing justified.
 
 ---
 
-## The Apple Example: Personalization vs. Customization (CRITICAL)
+### The Foundational Insight (2026)
+WyshKit sits at the intersection of **Retail Inventory** and **Rider Networks**.
 
-The WyshKit mental model follows the **Apple Pattern**: **Inventory + 10-minute Identity Layer.**
+In 2026, brands like Apple, boAt, and Decathlon are turning their experience stores into Dark Stores to compete with 10-minute delivery apps. WyshKit is the **Marketplace Layer** for this shift. We provide the "Identity Layer" (Personalisation) on top of existing local stock.
 
-- **Customization** = Changing the product itself (Making iPhone in pink, custom chip, different specs). **WyshKit does NOT do this.**
-- **Personalization** = Adding identity to an existing product (Engraving "Rahul" on existing Space Grey AirPods). **THIS is what we do.**
+**The Arbitrage**:
+1.  **Inventory**: Already exists in the store (Apple Resellers, Trophy shops).
+2.  **Logistics**: Already exists in the neighborhood (WareIQ).
+3.  **WyshKit**: The interface that makes it reachable with a "Preview Moat".
 
-We are the Apple Engraving Service, scaled to every local vendor. We Source → Identify → Deliver.
+### Personalization vs. Customization (The Apple Pattern)
+The WyshKit mental model follows the **Apple Pattern**: **Inventory + Optional Identity Layer.**
 
-## The Cleartax Insight: Trust → Personalisation
+- **Customization** = Changing the product itself (Making iPhone in pink, custom chip). **WyshKit does NOT do this.**
+- **Personalization** = Adding identity to an existing product (Engraving "Rahul" on Space Grey AirPods). **THIS is what we optionally offer.**
 
-The WyshKit mental model was born from 5 years of corporate gifting data. The industry error is treating personalized products as "custom manufacturing" (slow, expensive, centralized).
+Apple sells AirPods to everyone. Only some buyers add engraving. **An Apple Premium Reseller in Koramangala is a valid WyshKit vendor** — they hold AirPods stock, can engrave in ~10 minutes, and are within delivery range. WyshKit provides the demand, the order management, and the delivery. The APR provides the product and the service.
 
-The **WyshKit Reality** is the convergent pattern:
-- **Inventory** is sourced locally (Swiggy pattern).
-- **Service** is applied via neighbourhood workshop nodes (Fiverr pattern).
-- **Trust** is established via the digital preview (Identity pattern).
+This is not a small-artisan-only model. It is any vendor — artisan or brand — with:
+1. **Physical stock** they can dispatch today
+2. A **location** within the serviceable zone
+3. **Optional** personalisation capability
+
+**The WyshKit Vendor Spectrum:**
+```
+ARTISAN END                                          BRAND END
+✔ Local trophy shop + engraver                       ✔ Apple Premium Reseller (AirPods + engraving)
+✔ Print studio with mugs/cases in stock              ✔ boAt experience zone (headphones + laser etching)
+✔ Leather goods shop with stock                      ✔ Decathlon outlet (sports gear, in-store stock)
+✔ Specialty gift shop (stock-first, no personalisation) ✔ Samsung brand store (phones + accessories)
+❌ Engraver with zero stock → NOT a vendor            ❌ Online-only brand with no local stock → NOT a vendor
+```
+
+Personalisation is the **moat**, not the **minimum**. A vendor without stock is a freelancer. A vendor with local stock is a WyshKit node — whether they are a one-machine artisan or a brand experience store.
+
+## The Supply-Side Convergence
+The last-mile gap in India is not creativity — it's **discoverability and delivery**. There are Apple Resellers, boAt zones, and professional engravers within 3km of virtually every urban resident. WyshKit connects them to the Swiggy rails.
+
+**The 2026 market convergence WyshKit is riding:**
+- **Store-as-Dark-Store**: Brands are expanding experience-store footprints in Tier 1 India, creating dense local inventory nodes.
+- **Personalisation at Scale**: Personalisation is now a brand-level feature (Apple, boAt, Nike).
+- **WareIQ Logistics**: Neighbourhood-level 3PL is viable in 2026 without fleet ownership.
 
 ---
 
-## The 7 Product Laws of Swiggy 2026
+## The 4 Laws of WyshKit Product
 
-> These are the **implementation rules** (the HOW). For the **product beliefs** (the WHY), see [WORKFLOW.md → The Four Beliefs](./WORKFLOW.md).
+> These are the **implementation rules** (the HOW). For the **product beliefs** (the WHY), see [PHILOSOPHY.md](./PHILOSOPHY.md).
 
-1. **Commitment Before Creativity** — Pay first, personalise after. Eliminate the "Creative Tax" pre-payment.
-2. **Law of the One-Page Checkout** — Address, Bill, Coupon, GST, and Payment on ONE scroll. No drawers. No intermediate screens. 
-3. **Law of Address Gravity** — Pre-select the destination. State "Delivering to [X]", don't ask "Where?".
-4. **Law of Late-Bind Auth** — Guests are kings. Login is the final gate at checkout entry (OTPSheet over `/checkout`). Browse and cart are fully anonymous.
-5. **Instamart Cataloging** — Selection via Chips/Toggles only. **Zero pre-payment typing.**
-6. **One-Trip Promise** — Every data point needed for checkout (Pricing, ETA, Addresses) must load in ONE RPC.
-7. **Law of Physical Transparency** — Dimensions, Weight, Material, and Return Window are mandatory chips on the product sheet.
+1.  **One Vendor, One Cart (The Swiggy Food Corollary)**
+    - You cannot mix products from different vendors in one order.
+    - Why? Hyperlocal logistics is a point-to-point race. Stopping at two shops doubles ETA and rider friction.
+    - Order 1: AirPods (Apple Store). Order 2: Trophy (Local Engraver). Parallel tracks.
+
+2.  **Address Gravity (Zero-Ask UX)**
+    - The app pre-resolves destination based on GPS/History.
+    - Checkout starts with a serviceability check, not an address form.
+
+3.  **Commitment Before Creativity (Pay First)**
+    - Personalisation is a post-payment work loop.
+    - We capture intent with money, then solve the "Identity Layer".
+
+4.  **Preview > Production (The Legal Anchor)**
+    - *(Personalised orders only)* A vendor cannot move an order to `PRODUCTION` until the customer explicitly approves the `PREVIEW`.
+    - This digitizes trust. The render is the contract.
 
 ---
 
@@ -95,7 +132,7 @@ More Demand
           → More Demand (Repeat)
 ```
 
-**WyshKit lever**: Cashback sits at the bottom as the "Investment" in the Hook Model. It accelerates the repeat cycle without discounting the product.
+**WyshKit lever**: Loyalty sits at the bottom as the "Investment" in the Hook Model. We reward **frequency over volume**, building habit without the "Dark Pattern" of deep discounting.
 
 ---
 
@@ -110,47 +147,27 @@ Every product decision must pass the 4W test. If one W is missing, the feature i
 
 ---
 
-## Behavioral Science Laws (Implementation-Backed)
+## Product Design Laws (Implementation-Backed)
+
+> For full visual and interaction patterns (Spatial UI, Bento, Haptics), see [DESIGN.md](./DESIGN.md).
+
+1. **High-Density, Low-Noise**: Maximize information per millimeter. If a user has to scroll to see the "Primary Action", the layout has failed.
+2. **Spatial Modularization**: UI elements are floating "modules" with weight. They are not flat page sections.
+3. **Skeleton Precision**: Skeletons must match the exact layout of the arriving JSON. Zero layout shift.
+4. **Haptic Confirmation**: Every transactional intent must echo in the user's hand. No haptics = no trust.
 
 ### Hick's Law — Every Extra Choice is a Conversion Tax
-- Max 4 variant groups, max 4 options per group (matches WORKFLOW + OPERATIONS).
-- Max 8 categories in CIRCLE_RAIL.
+- Max 4 variant groups, max 4 options per group.
+- Max 8 categories in feed rail.
 - Single payment method: Razorpay. No COD. Ever.
-- Personalisation selection: Single toggle on Product Sheet.
-- Personalisation requirements: ≤3 fields per product (**Post-Payment ONLY**).
+- Personalisation: single toggle on Product Sheet. Zero pre-payment typing.
+- Personalisation requirements form: ≤3 fields per product, post-payment only.
 
-### Miller's Law — 7±2 Cognitive Slots
-Never show more than 7 primary items in a single view. All secondary options collapse via Progressive Disclosure.
-
-### Fitts' Law — Tap Targets
-All interactive elements: minimum **44×44px** tap target. Primary actions (Add to Cart, Slide to Pay) are large, high-contrast, thumb-reachable.
-
-### Nir Eyal's Hook Model — The Cashback Flywheel
-```
-TRIGGER   → "Anniversary tomorrow" push / Instagram ad
-ACTION    → Open app → browse → add to cart (3 taps)
-REWARD    → Preview mockup (variable, emotionally resonant)
-            + Cashback credit (variable %, feels like a bonus)
-INVEST    → Saved address + review left + wallet balance
-    ↓
-INTERNAL TRIGGER → Next occasion → user remembers WyshKit without a prompt
-```
-- Surface wallet balance on home: "₹48 WyshKit Money — use today."
-- Hidden wallet = broken Hook.
-
-### Peak-End Rule (Kahneman) — Memory, Not Average
-Users remember the peak moment and the final moment. Not the average.
-
-| Moment | What it must feel like |
-|---|---|
-| **Peak** (Preview Approval) | Full-bleed preview, haptic on slide, instant animation. Not a plain button. |
-| **End** (Delivery + Cashback) | Brief confetti (≤2s), large cashback credit display, wallet balance update. Not a plain toast. |
-
-### Zeigarnik Effect — Open Loops Pull Users Back
-A user with an active order MUST see their order status widget at the top of the home feed, above the Banner Bento. It creates psychological open loops. Never de-prioritise it.
+### Fitts' Law — Tap Target Mandate
+All interactive elements: minimum **44×44px** tap target. Primary actions (Add to Cart, Slide to Pay) are full-width, high-contrast, thumb-reachable.
 
 ### Doherty Threshold — 400ms Budget
-Every user action must produce visual feedback within 400ms. Below this, users enter flow.
+Every user action must produce visual feedback within 400ms.
 
 | Action | Target | How |
 |---|---|---|
@@ -159,81 +176,79 @@ Every user action must produce visual feedback within 400ms. Below this, users e
 | Search | <300ms | Debounced `search_products_atomic` RPC + skeleton. |
 | Page nav | <400ms | Next.js prefetch + RSC streaming. No blank screens. |
 
-### Jakob's Law — Borrow, Never Invent Gestures
-| Pattern | Source | WyshKit Implementation |
-|---|---|---|
-| Bottom sheet product detail | Swiggy / Zomato | Sheet slides up from bottom, swipe-down to dismiss |
-| Slide-to-pay | Swiggy / Uber | Horizontal slider with haptic on release |
-| Float cart button | Swiggy / Blinkit | Bottom-right FAB with item count badge |
-| Pull-to-refresh | iOS / Android | All feed pages: `router.refresh()` |
-| Order tracking timeline | Swiggy / Amazon | Vertical stepper: completed / active / pending |
-
-### Tesler's Law — Complexity Belongs in the Kernel
-| Complexity | Who Bears It |
-|---|---|
-| GST (5/12/18/28% per HSN) | `calculate_order_total` RPC. User sees: "GST: ₹XX." |
-| Delivery fee (distance, vendor, min order) | Postgres. User sees: "Delivery: ₹30" or "FREE." |
-| Commission tiers | `platform_settings` table. Vendor sees "Commission: 12%." |
-| Coupon validation (min order, expiry, usage limit) | Atomic RPC. User taps "Apply" → sees green or red. |
-
-### Customisation vs. Personalisation
-
-> Full definition in [WORKFLOW.md](./WORKFLOW.md). Summary below.
-
-| Term | Meaning | When | Where |
-|---|---|---|---|
-| **Customisation** | Selecting pre-defined options (Size/Color) | Before payment | Product Sheet |
-| **Personalisation Add-on** | Toggling the "Add Engraving" service | Before payment | Product Sheet |
-| **Personalisation Details** | Submitting text/image/name | After payment | Order Tracking |
-| **Personalisation Preview** | Seeing the digital render | After payment | Order Tracking |
-| **Personalisation Approval** | Tapping "Slide to Approve" | After payment | Order Tracking |
-
-### Von Restorff Effect — The Isolation Rule
-If everything is highlighted, nothing is highlighted. One primary CTA per screen. One primary colour per screen. Everything else is muted.
-
-### Weber's Law — Price Perception
-₹30 delivery on a ₹200 order = painful (15%). Same ₹30 on ₹2000 = invisible (1.5%).
-- Subsidize delivery on low-AOV orders.
-- Minimum cashback floor: ₹10. Below that, round up. The variable reward must feel meaningful.
+### The Hook Model — Cashback as Repeat Engine
+```
+TRIGGER   → "Your award is ready for collection" / urgent product need
+ACTION    → Open app → browse → add to cart (3 taps)
+REWARD    → Delivered product + optional preview approval (emotionally resonant)
+            + Cashback credit (variable %, feels like a bonus)
+INVEST    → Saved address + review left + wallet balance
+    ↓
+INTERNAL TRIGGER → Next need → user opens WyshKit first
+```
+- Surface wallet balance on home: "₹48 WyshKit Money — use today."
+- Hidden wallet = broken Hook.
 
 ### Anti-Dark-Pattern Doctrine (Absolute)
 | Dark Pattern | WyshKit Position |
 |---|---|
-| Confirmshaming | **Forbidden**. Decline CTAs say "No thanks." Never guilt-laden copy or tiny "I don't need this" text. |
-| Hidden fees | **Forbidden**. Delivery fee visible on the product card chip. No surprises at payment. |
-| Cancellation | 100% fee after order placement for personalised items. Must be clearly stated at pay-slide. |
-| Return Window | 24 hours for damaged/incorrect physical items. Visible on product sheet. |
-| Mandatory Sign-up | **Forbidden**. Late-bind auth only. Let them see the bill before asking for ID. |
-| Urgency theatre | "Only 3 left!" requires `stock_quantity <= 3 AND stock_quantity IS NOT NULL`. Never fabricated. Technical enforcement: query must verify real stock before rendering any scarcity indicator. |
+| Confirmshaming | **Forbidden**. Decline CTAs say "No thanks." |
+| Hidden fees | **Forbidden**. Delivery fee visible on product card. No surprises at payment. |
+| Cancellation | 100% fee after placement for personalised items. Stated clearly at pay-slide. |
+| Return Window | 24 hours for damaged/incorrect physical items. On product sheet. |
+| Mandatory Sign-up | **Forbidden**. Late-bind auth only. |
+| Urgency theatre | "Only 3 left!" requires `stock_quantity <= 3 AND NOT NULL`. Never fabricated. |
 | Forced continuity | No subscription tiers for customers. Zero. |
-| Disguised ads | Promoted vendors carry a visible "Promoted" badge. Always. |
+| Disguised ads | Promoted vendors carry visible "Promoted" badge. Always. |
 | Pre-checked opt-ins | All checkboxes unchecked by default. Always. |
-| `window.confirm()` | **Forbidden**. All destructive confirmations use inline styled double-confirm. Never native browser dialogs. |
+| `window.confirm()` | **Forbidden**. Inline styled double-confirm only. |
 | Promotional push 10PM–8AM | **Forbidden**. DND window enforced in notification scheduler. |
+
+### Customisation vs. Personalisation
+
+| Term | Meaning | When | Where |
+|---|---|---|---|
+| **Customisation** | Selecting pre-defined options (Size/Color) | Before payment | Product Sheet |
+| **Personalisation Add-on** | Toggling the service (e.g. "Add engraving +₹X") | Before payment | Product Sheet |
+| **Personalisation Details** | Submitting text/image/name | After payment | Order Tracking |
+| **Personalisation Preview** | Seeing the digital render | After payment | Order Tracking |
+| **Personalisation Approval** | Tapping "Slide to Approve" | After payment | Order Tracking |
 
 ---
 
 ## Messaging Playbook
 
-### To Customers: Emotional → Transactional → Rational
-- *"Forgot a birthday? Personalised gift before the party starts."*
+### To Customers: Practical → Personal → Fast
+
+> **Rule**: Lead with the product or the moment, not the word "gift". Not every WyshKit order is a gift. A trophy, a nameplate, a corporate award, a personalised notebook — these are products with identity. Lead with that.
+
+| Occasion | Copy |
+|---|---|
+| Last-minute occasion | *"Your product, personalised, before [time]."* |
+| Corporate | *"50 branded awards. Delivered to your office by 6 PM."* |
+| Personal keepsake | *"Your name. Their memory. 40 minutes."* |
+| Generic | *"Local products. Optional personalisation. Delivered fast."* |
+
 - *"See a preview before we make it. Don't like it — instant refund."*
-- *"Last-minute. Lifetime memory."*
+- *"Arriving by 5:15 PM. Not '2.4 km away.'"*
 
 | Use | Never Use |
 |---|---|
-| "personalised", "personalisation", "preview" | "customised", "mockup", "Design Hub", "builder" |
+| "personalised", "personalisation", "preview", "product" | "gift", "customised", "mockup", "Design Hub", "builder" |
 | "by 5:15 PM", "~40 min" | "2.4 km away", "distance" |
-| "local vendor" | "platform", "marketplace", "e-commerce" |
+| "local vendor", "local shop" | "platform", "marketplace", "e-commerce" |
+
+> **Why not "gift"?** Because gifting is ONE use case. A customer ordering a crystal award for their office wall is not "gifting". A customer ordering a leather nameplate is not "gifting". Framing everything as gifting is an identity error that narrows the addressable market.
 
 ### To Vendors: Clear ROI, Zero Jargon
 - *"Every order you receive is already paid. 100%. No ghost orders."*
-- *"We bring the customer. You do the 5-minute engraving. Rider picks up. You get paid."*
+- *"We bring the customer. You provide the product — and if you offer personalisation, you do the 5-minute work. Rider picks up. You get paid."*
 - *"Once the customer approves your preview, the sale is final. No returns."*
+- *"You already have the stock. You already have the skill. WyshKit just brings the order."*
 
 | Use | Never Use |
 |---|---|
-| "orders", "your shop", "earnings" | "vendor panel", "dashboard", "merchant" |
+| "orders", "your shop", "earnings", "your products" | "vendor panel", "dashboard", "merchant", "gifting" |
 
 ---
 
@@ -241,18 +256,28 @@ If everything is highlighted, nothing is highlighted. One primary CTA per screen
 
 **Target zones**: Koramangala, Indiranagar, HSR Layout, Jayanagar, Whitefield.
 
-**Target moments**: 
-- **Personal**: Last-minute birthdays, forgotten anniversaries, festivals (Diwali, Valentine's, Mother's Day).
-- **Professional**: Corporate awards, employee kits, speaker mementos, branded event merchandise.
-- **Identity**: Personal keepsakes, nameplates, heritage items, sports trophies.
+**Target use cases (in order of strategic priority)**:
+- **Identity**: Nameplates, trophies, personal keepsakes, heritage items, sports awards — products where the owner's name is the value.
+- **Corporate**: Employee recognition kits, speaker mementos, branded event merchandise, office awards — B2B repeat orders with high AOV.
+- **Occasions**: Last-minute products for birthdays, festivals, and personal milestones — high-urgency, high-conviction buyers.
 
-Corporate gifting is a major vertical, but not the identity. WyshKit is the utility for *any* product that needs to be personal, fast.
+Corporate orders are a major vertical, but not the identity. WyshKit is the utility for *any* product that benefits from being local, fast, and optionally personal.
 
 **Customer acquisition**: Instagram/Meta hyperlocal ads to 25–40yo professionals in these pin codes. Zero generic ads. Every creative shows a real vendor, real product, real ETA.
 
-**Vendor acquisition**: Direct BD to trophy shops, print studios, engraving shops. Pitch: *"You have the machine. We have the customers."* Zero commission on first 10 orders.
+**Vendor acquisition — two BD tracks:**
 
-**Market position**: *"We are what Swiggy would be if they delivered personalised gifts instead of biryani."*
+**Track A — Artisan & Local Shop BD** (immediate pipeline):
+Direct BD to trophy shops, print studios, embroidery workshops, leather goods shops, specialty gift stores.
+Pitch: *"You have the stock. You have the skill. We have the customers. First 10 orders: zero commission."*
+
+**Track B — Brand Partnership BD** (parallel, higher AOV):
+Partner with Apple Premium Resellers, boAt experience zones, organised retail outlets (Decathlon, Nykaa, Chroma) that hold local stock.
+Pitch: *"Your store becomes a 40-minute delivery node. We bring the orders. Your staff handles fulfillment. We handle the last mile."*
+
+> **Vendor Qualifier (both tracks)**: Physical stock that can be dispatched today + within serviceable zone. Personalisation is optional. An online-only brand with no local stock does not qualify.
+
+**Market position**: *"We are what Swiggy would be if they delivered local products — with optional personalisation — instead of biryani."*
 
 ---
 
