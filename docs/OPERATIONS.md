@@ -37,7 +37,7 @@ WyshKit supply acquisition follows two high-standard tracks:
 - Apple Premium Resellers, boAt zones, Decathlon outlets.
 - Value Prop: "**Store-as-Dark-Store**. We turn your neighborhood retail footprint into the fastest delivery node for your 2026 customers."
 
-> **The vendor qualifier is identical for both tracks**: Physical stock that can be dispatched today + within serviceable zone. Personalisation capability is a bonus, not the entry bar.
+> **The vendor qualifier is identical for both tracks**: Physical stock that can be dispatched today + within serviceable zone. Personalisation capability is a bonus, not the entry bar. We ride the **"Inventory + 10-minute Service"** law — treating personalisation as a quick value-add, not a manufacturing bottleneck.
 
 **Phase 1 target types (Bengaluru) — both tracks:**
 - Trophy & awards shops (laser engraving, always have stock) → Track A

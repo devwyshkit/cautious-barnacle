@@ -1,24 +1,33 @@
-# WyshKit — The Hyperlocal Product Engine
-> **"Hyperlocal Products. Optional Personalisation. Fast Delivery."**
+# WyshKit — The Hyperlocal Product OS 2026
+> **"Inventory + 10-Minute Personalisation. Swiggy Food for Physical Products."**
 
 ---
 
+### 🎙 THE ORIGIN (Founder's Mandate)
+In 2019, Prateek (Founder) left Cleartax without a backup to solve a fundamental friction in commerce. After moving thousands of corporate orders (starting with Google) and 5 years in the trenches, he discovered a **mental model error** that defines the $100B industry:
+
+The industry treats personalized products as **custom manufacturing** — slow, centralized, and expensive. 
+**Reality?** Personalization is just **Inventory + 10-minute services**. 
+
+Think Apple doing laser engraving on AirPods they already have in stock. That insight is WyshKit.
+
+### 🚀 MARKET VALIDATION
+- **Performance**: Launched Month 1 (Zero Marketing) -> **$2,000 USD GMV**.
+- **The Nike Benchmark**: Nike makes **$1 Billion+ yearly** from personalization alone (*Nike By You*). 
+- **The Shift**: By 2026, 60% of urban purchases will shift to <30-minute delivery. WyshKit is the only platform built for this convergence.
+
 ### ❌ WHAT WE'RE **NOT**
-- **NOT** a gifting marketplace (gifting is just ONE category)
-- **NOT** a customization platform (it's **personalisation**)
-- **NOT** a custom design tool (no Canva-style builders)
-- **NOT** quick commerce in the Blinkit/Zepto sense — we own **zero inventory, zero dark stores**. Vendors own the stock. WyshKit delivers.
+- **NOT** a gifting company (Gifting is just ONE category).
+- **NOT** a customization platform (it's **personalisation** — identity added post-payment).
+- **NOT** quick commerce (we own **zero inventory/dark stores**). Vendors own stock; WyshKit provides the OS.
 
 ### ✅ WHAT WE **ARE**
-**"The Hyperlocal Product OS for 2026"**
+**"Swiggy for Products with Optional Personalisation"**
 
-WyshKit rides the **"Store-as-Dark-Store"** wave. We don't build warehouses; we turn every local brand outlet (Apple, boAt, Decathlon) and premium artisan shop into a high-speed fulfillment node.
-
-#### THE WHY (The VC Narrative)
-In 2026, the $10B+ non-food hyperlocal market is converging. Branded retail (Apple Premium Resellers, Samsung Experience Zones, boAt) already has the inventory and 10-minute personalisation capacity; Quick Commerce has the last-mile rails. WyshKit is the **Intelligence + Identity Layer** that bridges them. We provide the high-trust interface for both stock-standard products and uniquely personalised ones.
+We are a pure **B2C Marketplace** with 2026-standard business utilities (GSTIN, Estimate Downloads) baked into the core. We turn every local brand outlet (Apple, boAt, Decathlon) into a high-speed fulfillment node.
 
 #### THE ZERO-FRICTION BETS
-1. **One Vendor, One Cart** — We follow the Swiggy Food principle. Mixing Apple AirPods with a local trophy is a logistics anti-pattern. One Order = One Vendor = One High-Speed Delivery.
+1. **One Vendor, One Cart** — Following the Swiggy Food principle. Mixing Apple AirPods with a local trophy is a logistics anti-pattern. One Order = One Vendor = One High-Speed Delivery.
 2. **Address Gravity** — The app "knows" where you are. We pre-select the destination. We don't ask.
 3. **Turbo Checkout** — 1-Tap prediction + Address Gravity = <10s checkout.
 4. **The Preview Moat** — *(Personalised orders only)* Pay first. Preview after. The digital render is the legal contract between customer intent and vendor capability.

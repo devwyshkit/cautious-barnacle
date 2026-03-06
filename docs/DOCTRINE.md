@@ -17,6 +17,8 @@ Just like:
 - Swiggy Food = Hyperlocal restaurant marketplace where restaurants provide food, Swiggy provides delivery
 - **WyshKit = Hyperlocal product marketplace where vendors provide products (with optional personalization), WyshKit provides delivery**
 
+WyshKit solves the **mental model error** of treating personalisation as manufacturing. We treat it as a **10-minute service on existing inventory.**
+
 ---
 
 ## The Differentiation Problem (Research-Backed)
@@ -29,10 +31,8 @@ WyshKit is built on the **Swiggy 2026 substrate**: hyperlocal logistics, SLA dis
 | **Logistics** | 2-Day Courier | 10-Min Fleet | **Local 3PL (WareIQ)** |
 | **Selection** | Global SKU | Local Convenience SKU | **Local Inventory + Identity Layer** |
 | **Logic** | Multi-Vendor Cart | Multi-Warehouse Cart | **One Vendor, One Cart (Point-to-Point)** |
-| **Persona** | Bulk Gifting | Urgent Grocery | **Identity & Spontaneous High-Value** |
-| **Trust mechanism** | Ratings, ETA | Standard SLA; + Preview Workflow for personalised orders |
-| **Return risk** | Low (edible/consumable) | Low for plain products; high for personalised (engraved = unsellable without preview) |
-| **Solution** | Standard delivery SLA | Standard SLA for all; **Preview Workflow** for personalised products |
+| **Persona** | Bulk Gifting / Bulk Buy | Urgent Grocery | **B2C Identity & Spontaneous High-Value** |
+| **Validation** | Legacy Reviews | High-Velocity Groceries | **Nike ($1B/yr) & WyshKit ($2k Month 1)** |
 
 > **On quick commerce**: WyshKit is NOT quick commerce in the ownership model (zero dark stores, zero inventory). However, like Instamart routing from a Decathlon outlet instead of a dark store, WyshKit IS in the same delivery speed category by using vendor stores as local fulfillment nodes. The difference: we are the marketplace, not the warehouse.
 
@@ -43,7 +43,9 @@ WyshKit is built on the **Swiggy 2026 substrate**: hyperlocal logistics, SLA dis
 ### The Foundational Insight (2026)
 WyshKit sits at the intersection of **Retail Inventory** and **Rider Networks**.
 
-In 2026, brands like Apple, boAt, and Decathlon are turning their experience stores into Dark Stores to compete with 10-minute delivery apps. WyshKit is the **Marketplace Layer** for this shift. We provide the "Identity Layer" (Personalisation) on top of existing local stock.
+**Market Reality Check**: 
+- **Nike** generates **$1 Billion+ annually** from *Nike By You* personalization. 
+- **WyshKit** (Month 1, Zero Marketing) generated **$2,000 USD GMV** purely via organic necessity.
 
 **The Arbitrage**:
 1.  **Inventory**: Already exists in the store (Apple Resellers, Trophy shops).

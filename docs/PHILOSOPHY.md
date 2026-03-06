@@ -3,7 +3,11 @@
 > "Build for the neighborhood of 2026. Zero reinvention. Zero overengineering. Maximum trust."
 
 ## The North Star
-WyshKit is the **Hyperlocal Product OS**. We do not own inventory; we own the **Intelligence + Identity Layer** that maps local supply to immediate demand. We are the "Swiggy Food for Products."
+WyshKit is the **Hyperlocal Product OS**. We solve the $100B commerce error that treats personalized products as custom manufacturing. 
+
+**Personalisation is just Inventory + 10-minute services.** 
+
+We do not own inventory; we own the **Intelligence + Identity Layer** that maps local supply to immediate demand. We are the "Swiggy Food for Products."
 
 ---
 
@@ -34,7 +38,8 @@ We follow the Swiggy Food substrate, not the Amazon/Grocery substrate.
 ## 3. The Identity Layer (Optionality)
 Personalization is our market differentiator, but **Inventory is the prerequisite.**
 
-- **The Rule**: Not every product is personalized. Not every user wants to personalize.
+- **The Rule**: Our core is 100% B2C. Gifting is just a category. 
+- **Strategic Utility**: Every transaction supports "Business-Friendly B2C" features like GSTIN and Estimate downloads as standard 2026 utilities.
 - **The Flow**: 
     1. **Layer 1**: Plain product delivery (Swiggy Food speed).
     2. **Layer 2**: Optional personalization work loop (Fiverr trust layer).

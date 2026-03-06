@@ -336,7 +336,8 @@ No guilt. No confirmshaming. Two clear options. Swipe down = "Keep Trophy Palace
 │  → Tap to apply. Text field for manual entry as         │
 │    secondary fallback only. Recognition over Recall.    │
 │  [Use ₹48 WyshKit Money]  toggle ← only if balance > 0 │
-│  [Business purchase? Add GSTIN  ▾]  ← collapsed        │
+│  [Business purchase? Add GSTIN  ▾]  ← expands to input │
+│  [📄 Download Estimate] ← Standard business utility      │
 ├─────────────────────────────────────────────────────────┤
 │  (sticky footer)                                       │
 │  Mobile:   [────── Slide to Pay · ₹1,514 ──────]       │
@@ -458,7 +459,9 @@ Each product with its own independent status badge:
 - Haptic + brief confetti (≤2s — auto-stops, never loops)
 - Status: "Delivered at 5:48 PM ✓"
 - Wallet credit: "💰 ₹30 WyshKit Money added to your wallet"
-- Invoice PDF downloadable: `[📄 Download Invoice]`
+- Invoice PDF & Business Utils:
+    - `[📄 Download Tax Invoice]` (includes personal/business GST)
+    - `[📋 Download Delivery Note]`
 - Rating prompt deferred (see Section H rules above)
 
 What does NOT happen: ❌ No separate "Thank you" page. ❌ No redirect to home. ❌ No push to rate immediately.
